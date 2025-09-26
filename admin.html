@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fa" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Panel</title>
+
+  <!-- IRANSans -->
+  <link href="https://cdn.fontcdn.ir/Font/Persian/IRANSans/IRANSans.css" rel="stylesheet" type="text/css" />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <!-- icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <!-- styles -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="admin-body">
+
+<header class="admin-header">
+  <h1>Admin Panel</h1>
+  <div class="admin-actions">
+    <a href="index.html" class="back-link"><i class="bi bi-arrow-left-circle"></i></a>
+    <button id="logoutBtn" class="logout-btn" type="button"><img src="images/icons8-logout-64.png" style="width: 20px;">log out</button>
+  </div>
+</header>
+
+<main>
+  
+  <section id="adminProfile" class="admin-section">
+    
+    
+    
+    <section class="send_post admin-section-item-1 admin-section-item">
+      <h2>Post Management</h2>
+
+    <!-- add / edit movie form -->
+    <form id="addMovieForm" class="admin-form" enctype="multipart/form-data">
+      <input id="title" type="text" placeholder="Title" />
+      <input id="coverFile" type="file" accept="image/*" />
+      <input id="link" type="text" placeholder="File Link" />
+      <textarea id="synopsis" placeholder="Synopsis"></textarea>
+      <input id="director" type="text" placeholder="Director" />
+      <input id="product" type="text" placeholder="Product" />
+      <input id="stars" type="text" placeholder="Stars" />
+      <input id="imdb" type="text" placeholder="IMDB" />
+      <input id="release_info" type="text" placeholder="Release Info" />
+      <input id="genre" type="text" placeholder="Genre (space-separated)" />
+      <button type="submit" class="admin-submit">Submit and Send<i class="bi bi-cloud-upload"></i></button>
+    </form>
+    </section>
+    
+    
+    
+    <section class="admin_messages admin-section-item-2 admin-section-item">
+      <!-- admin messages section -->
+      <h2>Admin Messages</h2>
+      <form id="addMessageForm" class="admin-form">
+        <textarea id="messageText" placeholder="Write a message..."></textarea>
+        <button type="submit" class="admin-submit">Submit message <i class="bi bi-chat-dots"></i></button>
+      </form>
+      <div id="messageList" class="message-list" aria-live="polite"></div>
+    </section>
+
+
+    <section id="unapproved-comments-section" class="admin-section-item-3 admin-section-item">
+      <h2>Unpublished Comments</h2>
+      <div id="unapprovedComments"></div>
+    </section>
+
+
+    <section id="social-links-section" class="admin-section-item-4 admin-section-item">
+        <h2>Links in sidemenu</h2>
+        <form id="addSocialForm" class="admin-form">
+           <input id="socialTitle" type="text" placeholder="Title" required />
+           <input id="socialIcon" type="file" accept="image/*" />
+           <input id="socialUrl" type="text" placeholder="Link" required />
+           <button type="submit" class="admin-submit">Add link</button>
+        </form>
+        <div id="socialList" class="message-list"></div>
+    </section>
+    
+    <section class="released_movies admin-section-item-5 admin-section-item">
+       <!-- admin search (after messages, before movie list) -->
+      <div class="admin-search-wrapper">
+        <h2>Search in released movies</h2>
+        <input id="adminSearch" class="admin-search-input" type="text" placeholder="Search movies..." />
+      </div>
+      <div>
+        <h2>Released Movies</h2>
+        <!-- movie list -->
+        <div id="movieList" class="movie-list"></div>
+        <div id="admin-pagination" class="pagination-container"></div>
+      </div>
+    </section>
+    
+  </section>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
