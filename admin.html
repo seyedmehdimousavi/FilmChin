@@ -38,18 +38,38 @@
 
     <!-- add / edit movie form -->
     <form id="addMovieForm" class="admin-form" enctype="multipart/form-data">
-      <input id="title" type="text" placeholder="Title" />
-      <input id="coverFile" type="file" accept="image/*" />
-      <input id="link" type="text" placeholder="File Link" />
-      <textarea id="synopsis" placeholder="Synopsis"></textarea>
-      <input id="director" type="text" placeholder="Director" />
-      <input id="product" type="text" placeholder="Product" />
-      <input id="stars" type="text" placeholder="Stars" />
-      <input id="imdb" type="text" placeholder="IMDB" />
-      <input id="release_info" type="text" placeholder="Release Info" />
-      <input id="genre" type="text" placeholder="Genre (space-separated)" />
-      <button type="submit" class="admin-submit">Submit and Send<i class="bi bi-cloud-upload"></i></button>
-    </form>
+  <!-- فرم اصلی فیلم تکی -->
+  <input id="title" type="text" placeholder="Title" />
+  <input id="coverFile" type="file" accept="image/*" />
+  <input id="link" type="text" placeholder="File Link" />
+  <textarea id="synopsis" placeholder="Synopsis"></textarea>
+  <input id="director" type="text" placeholder="Director" />
+  <input id="product" type="text" placeholder="Product" />
+  <input id="stars" type="text" placeholder="Stars" />
+  <input id="imdb" type="text" placeholder="IMDB" />
+  <input id="release_info" type="text" placeholder="Release Info" />
+  <input id="genre" type="text" placeholder="Genre (space-separated)" />
+<input type="hidden" id="mode" name="mode" value="single">
+  <!-- دکمه‌های Collection / Serial -->
+  <div id="bundle-toggle" class="admin-form">
+    <button type="button" id="btn-collection" class="admin-submit">Collection</button>
+    <button type="button" id="btn-serial" class="admin-submit">Serial</button>
+  </div>
+
+  <!-- کانتینر فرم‌های پویا -->
+  <div id="bundle-forms"></div>
+
+  <!-- دکمه‌های افزودن/حذف -->
+  <div id="bundle-actions" class="admin-form" hidden>
+    <button type="button" id="btn-add-item" class="admin-submit"></button>
+    <button type="button" id="btn-remove-last" class="admin-submit danger"></button>
+  </div>
+
+  <!-- دکمه ارسال -->
+  <button type="submit" class="admin-submit">
+    Submit and Send <i class="bi bi-cloud-upload"></i>
+  </button>
+</form>
     </section>
     
     
