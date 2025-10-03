@@ -1416,7 +1416,7 @@ Backdrop-filter: blur(var(--blur));
 
 .movie-type-tabs button {
   flex: 0 0 auto;         /* جلوگیری از کشیده شدن */
-  background: #f9f9f9;
+  background-color: var(--promo-accent-color);
   border: 1px solid #ddd;
   border-radius: 20px;
   padding: 6px 14px;
@@ -1430,14 +1430,7 @@ Backdrop-filter: blur(var(--blur));
   transition: all 0.2s ease;
 }
 
-.movie-type-tabs button .count {
-  background: #10b981;
-  color: #fff;
-  border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 12px;
-  font-weight: bold;
-}
+
 .movie-type-tabs button .count {
   display: inline-flex;
   align-items: center;
@@ -1445,8 +1438,8 @@ Backdrop-filter: blur(var(--blur));
   min-width: 22px;   /* حداقل عرض */
   height: 22px;      /* ارتفاع ثابت */
   padding: 0 6px;    /* کمی فاصله برای اعداد دو یا سه رقمی */
-  border-radius: 999px; /* همیشه گرد/کپسولی */
-  background: #10b981;
+  border-radius: 50%;
+  background-color: var(--primary-bg);
   color: #fff;
   font-size: 12px;
   font-weight: bold;
@@ -1454,14 +1447,14 @@ Backdrop-filter: blur(var(--blur));
   box-sizing: border-box;
 }
 .movie-type-tabs button.active {
-  background: #10b981;
+  background-color: var(--primary-bg);
   color: #fff;
-  border-color: #10b981;
+  border-color: var(--promo-accent-color);
 }
 
 .movie-type-tabs button.active .count {
   background: #fff;
-  color: #10b981;
+  color: var(--primary-bg);
 }
 /* کارت‌ها */
 .reveal {
