@@ -1519,14 +1519,17 @@ Backdrop-filter: blur(var(--blur));
   background-color: var(--promo-accent-color);
   
 }
-
+.tab-genres-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .tab-genres-list {
   display: flex;
   flex-wrap: nowrap;
   padding: 4px 0;
   margin: 0 20px;
 }
-.tab-genres-list::-webkit-scrollbar {
+.tab-genres-list:-webkit-scrollbar {
   display: none; /* Chrome, Safari */
 }
 /* مخفی کردن اسکرول‌بار در کروم/سافاری */
