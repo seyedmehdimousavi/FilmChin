@@ -13,6 +13,7 @@ let messages = [];
 let editingMovie = null;
 const PAGE_SIZE = 10;
 let currentPage = 1;
+let episodesByMovie = new Map(); // movie_id → [episodes]
 
 // -------------------- Utilities --------------------
 function escapeHtml(str) {
@@ -40,6 +41,95 @@ function timeAgo(iso) {
   return `${Math.floor(diff / 86400)}d`;
 }
 
+// -------------------- Upload Toast + Progress --------------------
+function showUploadToast(message) {
+  const container = document.getElementById("toast-container");
+  container.innerHTML = "";
+
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerHTML = `
+    <div class="message">${message}</div>
+    <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+  `;
+  container.appendChild(toast);
+}
+
+function updateUploadProgress(percent) {
+  const fill = document.querySelector(".progress-fill");
+  if (fill) fill.style.width = percent + "%";
+}
+
+function clearUploadToast() {
+  const container = document.getElementById("toast-container");
+  container.innerHTML = "";
+}
+
+// -------------------- Whole-post progress controller --------------------
+let __postProgress = {
+  totalParts: 0,
+  completedParts: 0
+};
+
+function startPostProgress(totalParts, message = "در حال پردازش...") {
+  __postProgress = { totalParts, completedParts: 0 };
+  showUploadToast(message);
+  updateUploadProgress(0);
+}
+
+function updatePartProgress(percentWithinPart) {
+  const { totalParts, completedParts } = __postProgress;
+  const partWeight = totalParts > 0 ? 100 / totalParts : 100;
+  const overall = Math.min(
+    100,
+    completedParts * partWeight + (percentWithinPart / 100) * partWeight
+  );
+  updateUploadProgress(Math.round(overall));
+}
+
+function completePart() {
+  __postProgress.completedParts += 1;
+  updatePartProgress(100);
+}
+
+function finishPostProgress(success = true) {
+  updateUploadProgress(100);
+  showUploadToast(success ? "انجام شد ✅" : "خطا در پردازش ❌");
+  setTimeout(clearUploadToast, success ? 1800 : 3200);
+}
+
+// -------------------- Upload file with real progress via XHR --------------------
+function uploadWithProgress(file, path) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `${SUPABASE_URL}/storage/v1/object/covers/${path}`);
+
+    xhr.setRequestHeader("apikey", SUPABASE_KEY);
+    xhr.setRequestHeader("Authorization", `Bearer ${SUPABASE_KEY}`);
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        updatePartProgress(percent);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve({ ok: true });
+      } else {
+        reject(new Error(`Upload failed (${xhr.status})`));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error("Network error"));
+
+    const formData = new FormData();
+    formData.append("file", file);
+    xhr.send(formData);
+  });
+}
+ 
 // -------------------- Toast --------------------
 function showToast(message) {
   try {
@@ -288,7 +378,7 @@ function attachCommentsHandlers(card, movieId) {
   sendBtn?.addEventListener('click', async () => {
     let name = (nameInput?.value || 'Guest').trim() || 'Guest';
     const text = (textInput?.value || '').trim();
-    if (name.length > 15) { showToast('Your name must not exceed 15 characters'); return; }
+    if (name.length > 16) { showToast('Your name must not exceed 15 characters'); return; }
     if (!text) { showToast('Please type a comment'); return; }
     sendBtn.disabled = true;
     const originalText = sendBtn.textContent;
@@ -461,6 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .order('created_at', { ascending: false });
       if (error) { console.error('fetch movies error', error); movies = []; }
       else { movies = data || []; }
+      await fetchEpisodes();
       currentPage = 1;
       await renderPagedMovies(); // note: await for inner supabase calls in bundles
       buildGenreGrid();
@@ -479,6 +570,32 @@ document.addEventListener('DOMContentLoaded', () => {
       if (document.getElementById('messageList')) renderAdminMessages();
     } catch (err) { console.error(err); messages = []; }
   }
+async function fetchEpisodes() {
+  try {
+    const { data, error } = await supabase
+      .from('movie_items')
+      .select('*')
+      .order('movie_id', { ascending: true })
+      .order('order_index', { ascending: true });
+
+    if (error) {
+      console.error('fetch episodes error', error);
+      episodesByMovie.clear();
+      return;
+    }
+
+    // ساخت کش: movie_id → episodes[]
+    episodesByMovie.clear();
+    (data || []).forEach(ep => {
+      const list = episodesByMovie.get(ep.movie_id) || [];
+      list.push(ep);
+      episodesByMovie.set(ep.movie_id, list);
+    });
+  } catch (err) {
+    console.error('fetchEpisodes catch', err);
+    episodesByMovie.clear();
+  }
+}
 
   // Messages UI
   function renderMessages() {
@@ -576,7 +693,24 @@ document.addEventListener('DOMContentLoaded', () => {
       renderPagedMovies();
     });
   }
+  
+const searchCloseBtn = document.getElementById('searchCloseBtn');
 
+if (searchInput && profileBtn && searchCloseBtn) {
+  const toggleSearchDecor = () => {
+    const hasText = searchInput.value.trim() !== '';
+    profileBtn.style.display = hasText ? 'none' : 'flex';
+    searchCloseBtn.style.display = hasText ? 'flex' : 'none';
+  };
+
+  toggleSearchDecor();
+  searchInput.addEventListener('input', toggleSearchDecor);
+
+  searchCloseBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+}
 
 
 // --------------------
@@ -608,42 +742,175 @@ function filterByType(type) {
 // وصل کردن کلیک روی تب‌ها
 document.querySelectorAll(".movie-type-tabs button").forEach(btn => {
   btn.addEventListener("click", () => {
+    // دکمه فعال
     document.querySelectorAll(".movie-type-tabs button").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
+
+    // ریست کردن سرچ
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    // ریست کردن ژانر انتخاب‌شده (زیر تب‌ها)
+    currentTabGenre = null; // متغیر سراسری ژانر
+    const genreChips = document.querySelectorAll('.tab-genres-list .genre-chip.active');
+    genreChips.forEach(chip => chip.classList.remove('active'));
+
+    // اعمال فیلتر نوع
     filterByType(btn.dataset.type);
   });
 });
+// -------------------- تشخیص جهت اسکرول --------------------
+let lastScrollY = window.scrollY;
+let scrollDirection = 'down';
 
+window.addEventListener('scroll', () => {
+  scrollDirection = window.scrollY > lastScrollY ? 'down' : 'up';
+  lastScrollY = window.scrollY;
+});
 
- // -------------------- تعریف Observer کارت‌ها --------------------
-const cardObserver = new IntersectionObserver(entries => {
+function handleAnimIntersection(entries) {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
-      entry.target.classList.add('active');
-      cardObserver.unobserve(entry.target);
+      if (scrollDirection === 'down') {
+        entry.target.classList.add('active-down');
+        entry.target.classList.remove('active-up');
+      } else {
+        entry.target.classList.add('active-up');
+        entry.target.classList.remove('active-down');
+      }
+    } else {
+      entry.target.classList.remove('active-down', 'active-up');
     }
   });
-}, { threshold: 0.1 });
+}
 
-// -------------------- تعریف Observer کوت‌ها --------------------
-const quoteObserver = new IntersectionObserver(entries => {
+const animObserver = new IntersectionObserver(handleAnimIntersection, { threshold: 0.1 });
+function handleCardIntersection(entries) {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
-      entry.target.classList.add('active');
-      quoteObserver.unobserve(entry.target);
+      // وقتی کارت وارد صفحه شد
+      if (scrollDirection === 'down') {
+        entry.target.classList.add('active-down');
+        entry.target.classList.remove('active-up');
+      } else {
+        entry.target.classList.add('active-up');
+        entry.target.classList.remove('active-down');
+      }
+    } else {
+      // وقتی کارت از صفحه خارج شد
+      entry.target.classList.remove('active-down', 'active-up');
     }
   });
-}, { threshold: 0.1 });
+}
 
+const cardObserver = new IntersectionObserver(handleCardIntersection, {
+  threshold: 0.1
+});
 // -------------------- Render movies (paged) --------------------
+// متغیر سراسری برای ژانر انتخاب‌شده
+let currentTabGenre = null;
+
+function buildTabGenres(filteredMovies = null) {
+  const container = document.querySelector('.tab-genres-list');
+  if (!container) return;
+
+  let baseMovies;
+
+  // اگر سرچ فعال بود → از filteredMovies استفاده کن
+  if (searchInput && searchInput.value.trim() !== '' && Array.isArray(filteredMovies)) {
+    baseMovies = filteredMovies;
+  } else {
+    // در غیر این صورت → از کل movies بر اساس تب فعال
+    baseMovies = movies;
+    if (currentTypeFilter === "collection") {
+      baseMovies = movies.filter(m => (m.type || "").toLowerCase() === "collection");
+    } else if (currentTypeFilter === "series") {
+      baseMovies = movies.filter(m => (m.type || "").toLowerCase() === "serial");
+    } else if (currentTypeFilter === "single") {
+      baseMovies = movies.filter(m => (m.type || "").toLowerCase() === "single");
+    }
+  }
+
+  // شمارش ژانرها
+  const genreCounts = {};
+  baseMovies.forEach(m => {
+    if (m.genre) {
+      m.genre.split(' ').forEach(g => {
+        const genre = g.trim();
+        if (genre !== '') {
+          genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+        }
+      });
+    }
+  });
+
+  // ساخت ژانرها
+  container.innerHTML = '';
+  Object.keys(genreCounts)
+    .sort((a, b) => genreCounts[b] - genreCounts[a])
+    .forEach(g => {
+      const chip = document.createElement('div');
+      chip.className = 'genre-chip';
+      chip.textContent = g;
+
+      if (currentTabGenre === g) {
+        chip.classList.add('active');
+      }
+
+      const countSpan = document.createElement('span');
+      countSpan.className = 'count';
+      countSpan.textContent = genreCounts[g];
+      chip.appendChild(countSpan);
+
+      chip.onclick = () => {
+        if (currentTabGenre === g) {
+          chip.classList.remove('active');
+          currentTabGenre = null;
+        } else {
+          container.querySelectorAll('.genre-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          currentTabGenre = g;
+        }
+        currentPage = 1;
+        renderPagedMovies();
+      };
+
+      container.appendChild(chip);
+    });
+}
+
+const episodeMatches = new Map(); // movie_id → index اپیزود
 async function renderPagedMovies(skipScroll) {
   if (!moviesGrid || !movieCount) return;
   const q = (searchInput?.value || '').toLowerCase();
 
-  let filtered = movies.filter(m =>
-    Object.values(m).some(val => typeof val === 'string' && val.toLowerCase().includes(q))
-  );
+  // هر بار سرچ جدید انجام میشه، مقادیر قبلی پاک بشن
+  episodeMatches.clear();
 
+  // 1. فیلتر سرچ
+  let filtered = movies.filter(m => {
+    const movieMatch = Object.values(m).some(val => typeof val === 'string' && val.toLowerCase().includes(q));
+
+    let episodeMatch = false;
+    if (!movieMatch && (m.type === 'collection' || m.type === 'serial')) {
+      const eps = episodesByMovie.get(m.id) || [];
+      for (let idx = 0; idx < eps.length; idx++) {
+        const ep = eps[idx];
+        if (Object.values(ep).some(val => typeof val === 'string' && val.toLowerCase().includes(q))) {
+          episodeMatches.set(m.id, idx + 1);
+          episodeMatch = true;
+          break;
+        }
+      }
+    } else if (movieMatch) {
+      episodeMatches.delete(m.id);
+    }
+
+    return movieMatch || episodeMatch;
+  });
+
+  // 2. فیلتر نوع
   if (currentTypeFilter !== "all") {
     filtered = filtered.filter(m => {
       const t = (m.type || "").toLowerCase();
@@ -651,6 +918,13 @@ async function renderPagedMovies(skipScroll) {
         return t === "serial";
       }
       return t === currentTypeFilter;
+    });
+  }
+
+  // 3. فیلتر ژانر
+  if (currentTabGenre) {
+    filtered = filtered.filter(m => {
+      return (m.genre || '').split(' ').includes(currentTabGenre);
     });
   }
 
@@ -663,7 +937,7 @@ async function renderPagedMovies(skipScroll) {
   const pageItems = filtered.slice(start, start + PAGE_SIZE);
 
   moviesGrid.innerHTML = '';
-  movieCount.innerText = `🎞️ Number of movies: ${filtered.length}`;
+  movieCount.innerText = `Number of movies: ${filtered.length}`;
 
   for (const m of pageItems) {
     const cover = escapeHtml(m.cover || 'https://via.placeholder.com/300x200?text=No+Image');
@@ -674,94 +948,110 @@ async function renderPagedMovies(skipScroll) {
     const stars = escapeHtml(m.stars || '-');
     const imdb = escapeHtml(m.imdb || '-');
     const release_info = escapeHtml(m.release_info || '-');
-
     const genreLinks = (m.genre || '')
       .split(' ')
       .filter(g => g.trim())
-      .map(g => `<a href="#" onclick="(function(){ const searchEl=document.getElementById('search'); searchEl.value='${escapeHtml(g)}'; searchEl.dispatchEvent(new Event('input')); })();">${escapeHtml(g)}</a>`)
+      .map(g => {
+        if (g.startsWith('#')) {
+          const clean = escapeHtml(g);
+          return `<span class="genre-chip-mini anim-vertical" onclick="(function(){ const searchEl=document.getElementById('search'); searchEl.value='${clean}'; searchEl.dispatchEvent(new Event('input')); })();">${clean}</span>`;
+        } else {
+          return `<a href="#" onclick="(function(){ const searchEl=document.getElementById('search'); searchEl.value='${escapeHtml(g)}'; searchEl.dispatchEvent(new Event('input')); })();">${escapeHtml(g)}</a>`;
+        }
+      })
       .join(' ');
 
     const card = document.createElement('div');
-    card.classList.add('movie-card', 'reveal');
+    card.classList.add('movie-card' , 'reveal'); // کارت کلّی انیمیشن عمودی
     card.dataset.movieId = m.id;
 
+    const badgeHtml = m.type && m.type !== 'single'
+      ? `<span class="collection-badge ${m.type === 'collection' ? 'badge-collection' : 'badge-serial'}">
+           ${m.type === 'collection' ? 'Collection' : 'Series'}
+           <span class="badge-count anim-left-right">0</span>
+         </span>`
+      : '';
+
     card.innerHTML = `
-      <div class="cover-container">
-        <div class="cover-blur" style="background-image: url('${cover}');"></div>
-        <img class="cover-image" src="${cover}" alt="${title}">
-      </div>
+  <div class="cover-container anim-vertical">
+    <div class="cover-blur anim-vertical" style="background-image: url('${cover}');"></div>
+    <img class="cover-image anim-vertical" src="${cover}" alt="${title}">
+  </div>
 
-      <div class="movie-info">
-        <div class="movie-title">
-          <span class="movie-name">${title}</span>
-          ${m.type && m.type !== 'single'
-            ? `<span class="collection-badge ${m.type === 'collection' ? 'badge-collection' : 'badge-serial'}">
-                 ${m.type === 'collection' ? 'کالکشن' : 'سریال'}
-               </span>`
-            : ''}
-        </div>
+  <div class="movie-info anim-vertical">
+    <div class="movie-title anim-left-right">
+      <span class="movie-name anim-horizontal">${title}</span>
+      ${badgeHtml}
+    </div>
 
-        <span class="field-label"><img src="images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
-        <div class="field-quote synopsis-quote">
-          <div class="quote-text">${synopsis}</div>
-          <button class="quote-toggle-btn">More</button>
-        </div>
+    <span class="field-label anim-vertical"><img src="images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
+    <div class="field-quote anim-left-right synopsis-quote">
+      <div class="quote-text anim-horizontal">${synopsis}</div>
+      <button class="quote-toggle-btn">More</button>
+    </div>
 
-        <span class="field-label"><img src="images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span>
-        <div class="field-quote">${director}</div>
+    <span class="field-label anim-vertical"><img src="images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span>
+    <div class="field-quote anim-left-right">${director}</div>
 
-        <span class="field-label"><img src="images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
-        <div class="field-quote">
-          ${product !== '-' ? `<a href="#" onclick="(function(){ const searchEl=document.getElementById('search'); searchEl.value='${product}'; searchEl.dispatchEvent(new Event('input')); })();">${product}</a>` : '-'}
-        </div>
+    <span class="field-label anim-vertical"><img src="images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
+    <div class="field-quote anim-left-right">${product}</div>
 
-        <span class="field-label"><img src="images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
-        <div class="field-quote">${stars}</div>
+    <span class="field-label anim-vertical"><img src="images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
+    <div class="field-quote anim-left-right">${stars}</div>
 
-        <span class="field-label"><img src="images/icons8-imdb-48.png" style="width:20px;height:20px;"> IMDB:</span>
-        <div class="field-quote">${imdb}</div>
+    <span class="field-label anim-vertical">
+      <img src="images/icons8-imdb-48.png" class="imdb-bell" style="width:20px;height:20px;">
+      IMDB:
+    </span>
+    <div class="field-quote anim-left-right">
+      <span class="chip imdb-chip anim-horizontal">${imdb}</span>
+    </div>
 
-        <span class="field-label"><img src="images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span>
-        <div class="field-quote">${release_info}</div>
+    <span class="field-label anim-vertical"><img src="images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span>
+    <div class="field-quote anim-left-right">${release_info}</div>
 
-        <span class="field-label"><img src="images/icons8-comedy-96.png" style="width:20px;height:20px;"> Genre:</span>
-        <div class="field-quote">${genreLinks || '-'}</div>
+    <span class="field-label anim-vertical"><img src="images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span>
+    <div class="field-quote anim-horizontal">${genreLinks || '-'}</div>
 
-        <div class="episodes-container" data-movie-id="${m.id}">
-          <div class="episodes-list"></div>
-        </div>
+    <div class="episodes-container anim-vertical" data-movie-id="${m.id}">
+      <div class="episodes-list anim-left-right"></div>
+    </div>
 
-        <button class="go-btn" data-link="${escapeHtml(m.link || '#')}">Go to file</button>
+    <button class="go-btn anim-vertical" data-link="${escapeHtml(m.link || '#')}">Go to file</button>
 
-        <div class="comment-summary">
-          <div class="avatars"></div>
-          <div class="comments-count">0 comments</div>
-          <button class="enter-comments"><img src="images/icons8-comment.apng" style="width:22px;height:22px;"></button>
-        </div>
+    <div class="comment-summary anim-horizontal">
+      <div class="avatars anim-vertical"></div>
+      <div class="comments-count">0 comments</div>
+      <button class="enter-comments"><img src="images/icons8-comment.apng" style="width:22px;height:22px;"></button>
+    </div>
 
-        <div class="comments-panel" aria-hidden="true">
-          <div class="comments-panel-inner">
-            <div class="comments-panel-header"><div class="comments-title">Comments</div></div>
-            <div class="comments-list"></div>
-            <div class="comment-input-row">
-              <div class="name-comments-close">
-                <input class="comment-name" placeholder="Your name" maxlength="60" />
-                <button class="comments-close">&times;</button>
-              </div>
-              <textarea class="comment-text" placeholder="Write a comment..." rows="2"></textarea>
-              <button class="comment-send">Send</button>
-            </div>
+    <div class="comments-panel" aria-hidden="true">
+      <div class="comments-panel-inner">
+        <div class="comments-panel-header"><div class="comments-title">Comments</div></div>
+        <div class="comments-list"></div>
+        <div class="comment-input-row">
+          <div class="name-comments-close">
+            <input class="comment-name" placeholder="Your name" maxlength="60" />
+            <button class="comments-close">&times;</button>
           </div>
+          <textarea class="comment-text" placeholder="Write a comment..." rows="2"></textarea>
+          <button class="comment-send">Send</button>
         </div>
       </div>
-    `;
+    </div>
+  </div>
+`;
 
     moviesGrid.appendChild(card);
+// 👇 کارت رو به آبزرور معرفی کن
+cardObserver.observe(card);
+   // معرفی همه المنت‌هایی که کلاس‌های انیمیشن دارن
+card.querySelectorAll(
+  '.anim-horizontal, .anim-vertical, .anim-left-right'
+).forEach(el => {
+  animObserver.observe(el);
+});
 
-    cardObserver.observe(card);
-    card.querySelectorAll('.field-quote').forEach(q => {
-      quoteObserver.observe(q);
-    });
 
     const goBtn = card.querySelector('.go-btn');
     goBtn?.addEventListener('click', () => {
@@ -771,6 +1061,7 @@ async function renderPagedMovies(skipScroll) {
 
     attachCommentsHandlers(card, m.id);
 
+    // 👇 منطق اپیزودها مثل قبل
     if (m.type === 'collection' || m.type === 'serial') {
       (async () => {
         const { data: eps, error: epsErr } = await supabase
@@ -802,48 +1093,140 @@ async function renderPagedMovies(skipScroll) {
         ];
 
         const listEl = card.querySelector('.episodes-list');
-        listEl.innerHTML = allEpisodes.map((ep, idx) => `
-          <div class="episode-card ${idx === 0 ? 'active' : ''}" data-link="${ep.link}">
-            <img src="${escapeHtml(ep.cover || 'https://via.placeholder.com/120x80?text=No+Cover')}" 
-                 alt="${escapeHtml(ep.title)}" class="episode-cover">
-            <div class="episode-title">${escapeHtml(ep.title)}</div>
-          </div>
-        `).join('');
 
-        goBtn.dataset.link = allEpisodes[0].link;
+        // اگر اپیزود match شده بود، همون index فعال میشه
+        const activeIndex = episodeMatches.get(m.id) ?? 0;
 
+        listEl.innerHTML = allEpisodes.map((ep, idx) => {
+          const titleText = escapeHtml(ep.title || '');
+          const scrollable = titleText.length > 16 ? 'scrollable' : '';
+          return `
+            <div class="episode-card ${idx === activeIndex ? 'active' : ''}" data-link="${ep.link}">
+              <img src="${escapeHtml(ep.cover || 'https://via.placeholder.com/120x80?text=No+Cover')}" 
+                   alt="${titleText}" class="episode-cover ">
+              <div class="episode-title ${scrollable}"><span>${titleText}</span></div>
+            </div>
+          `;
+        }).join('');
+
+        // لینک Go روی اپیزود فعال ست میشه
+        goBtn.dataset.link = allEpisodes[activeIndex].link;
+
+        // آپدیت IMDb chip برای اپیزود فعال
+        const imdbChip = card.querySelector('.imdb-chip');
+        if (imdbChip) imdbChip.textContent = allEpisodes[activeIndex].imdb || m.imdb;
+
+        // 🔹 آپدیت badge-count با تعداد اپیزودها + متن
+        const badgeCount = card.querySelector('.collection-badge .badge-count');
+        if (badgeCount) {
+          const totalEpisodes = ((eps || []).length) + 1; // شامل پست اصلی
+          badgeCount.textContent = totalEpisodes + (totalEpisodes > 1 ? " episodes" : " episode");
+        }
+
+        // اگر اپیزود match شده بود
+        if (activeIndex > 0) {
+          const ep = allEpisodes[activeIndex];
+
+          if (m.type === 'collection') {
+            // تغییر همه مشخصات
+            const nameEl = card.querySelector('.movie-name');
+            if (nameEl) nameEl.textContent = ep.title || m.title;
+            const coverImg = card.querySelector('.cover-image');
+            if (coverImg) coverImg.src = ep.cover || m.cover;
+            const coverBlur = card.querySelector('.cover-blur');
+            if (coverBlur) coverBlur.style.backgroundImage = `url('${ep.cover || m.cover}')`;
+            card.querySelector('.quote-text').textContent = ep.synopsis || m.synopsis;
+            card.querySelectorAll('.field-quote')[1].textContent = ep.director || m.director;
+            card.querySelectorAll('.field-quote')[2].textContent = ep.product || m.product;
+            card.querySelectorAll('.field-quote')[3].textContent = ep.stars || m.stars;
+            if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
+            card.querySelectorAll('.field-quote')[5].textContent = ep.release_info || m.release_info;
+            card.querySelectorAll('.field-quote')[6].textContent = ep.genre || '';
+          }
+
+          if (m.type === 'serial') {
+            // فقط تغییر title + cover + blur + link
+            const nameEl = card.querySelector('.movie-name');
+            if (nameEl) nameEl.textContent = ep.title || m.title;
+            const coverImg = card.querySelector('.cover-image');
+            if (coverImg) coverImg.src = ep.cover || m.cover;
+            const coverBlur = card.querySelector('.cover-blur');
+            if (coverBlur) coverBlur.style.backgroundImage = `url('${ep.cover || m.cover}')`;
+            goBtn.dataset.link = ep.link;
+          }
+        }
+
+        // 👇 اسکرول خودکار فقط اگر سرچ باعث match شده باشه
+        setTimeout(() => {
+          const activeEpEl = listEl.querySelector('.episode-card.active');
+          if (activeEpEl && allEpisodes.length > 3 && episodeMatches.has(m.id)) {
+            const prevScrollY = window.scrollY;
+            activeEpEl.scrollIntoView({
+              behavior: 'smooth',
+              inline: 'end',
+              block: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollTo({ top: prevScrollY });
+            }, 0);
+          }
+        }, 100);
+
+        // هندل کلیک روی اپیزودها
         listEl.querySelectorAll('.episode-card').forEach((cardEl, idx) => {
           cardEl.addEventListener('click', () => {
             listEl.querySelectorAll('.episode-card').forEach(c => c.classList.remove('active'));
             cardEl.classList.add('active');
 
+            const ep = allEpisodes[idx];
+
+            if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
+
             if (m.type === 'serial') {
-              goBtn.dataset.link = cardEl.dataset.link;
-            } else if (m.type === 'collection') {
-              const ep = allEpisodes[idx];
               const nameEl = card.querySelector('.movie-name');
-              if (nameEl) nameEl.textContent = ep.title || title;
+              if (nameEl) nameEl.textContent = ep.title || m.title;
               const coverImg = card.querySelector('.cover-image');
-              if (coverImg) coverImg.src = ep.cover || cover;
+              if (coverImg) coverImg.src = ep.cover || m.cover;
               const coverBlur = card.querySelector('.cover-blur');
-              if (coverBlur) coverBlur.style.backgroundImage = `url('${ep.cover || cover}')`;
-              card.querySelector('.quote-text').textContent = ep.synopsis || synopsis;
-              card.querySelectorAll('.field-quote')[1].textContent = ep.director || director;
-              card.querySelectorAll('.field-quote')[2].textContent = ep.product || product;
-              card.querySelectorAll('.field-quote')[3].textContent = ep.stars || stars;
-              card.querySelectorAll('.field-quote')[4].textContent = ep.imdb || imdb;
-              card.querySelectorAll('.field-quote')[5].textContent = ep.release_info || release_info;
-              card.querySelectorAll('.field-quote')[6].textContent = ep.genre || genreLinks;
+              if (coverBlur) coverBlur.style.backgroundImage = `url('${ep.cover || m.cover}')`;
               goBtn.dataset.link = ep.link;
+            } else if (m.type === 'collection') {
+              const nameEl = card.querySelector('.movie-name');
+              if (nameEl) nameEl.textContent = ep.title || m.title;
+              const coverImg = card.querySelector('.cover-image');
+              if (coverImg) coverImg.src = ep.cover || m.cover;
+              const coverBlur = card.querySelector('.cover-blur');
+              if (coverBlur) coverBlur.style.backgroundImage = `url('${ep.cover || m.cover}')`;
+              card.querySelector('.quote-text').textContent = ep.synopsis || m.synopsis;
+              card.querySelectorAll('.field-quote')[1].textContent = ep.director || m.director;
+              card.querySelectorAll('.field-quote')[2].textContent = ep.product || m.product;
+              card.querySelectorAll('.field-quote')[3].textContent = ep.stars || m.stars;
+              if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
+              card.querySelectorAll('.field-quote')[5].textContent = ep.release_info || m.release_info;
+              card.querySelectorAll('.field-quote')[6].textContent = ep.genre || '';
+              goBtn.dataset.link = ep.link;
+            }
+
+            if (allEpisodes.length > 3) {
+              const prevScrollY = window.scrollY;
+              cardEl.scrollIntoView({
+                behavior: 'smooth',
+                inline: 'end',
+                block: 'nearest'
+              });
+              setTimeout(() => {
+                window.scrollTo({ top: prevScrollY });
+              }, 0);
             }
           });
         });
 
+        // اگر badge نبود، با شمارش اضافه شود
         const titleEl = card.querySelector('.movie-title');
-        if (titleEl && !titleEl.querySelector('.collection-badge')) {
+        if (titleEl && !titleEl.querySelector('.collection-badge') && (m.type && m.type !== 'single')) {
           const badge = document.createElement('span');
-          badge.className = 'collection-badge';
-          badge.textContent = m.type === 'collection' ? 'کالکشن' : 'سریال';
+          badge.className = `collection-badge ${m.type === 'collection' ? 'badge-collection' : 'badge-serial'}`;
+          badge.innerHTML = `${m.type === 'collection' ? 'Collection' : 'Series'} <span class="badge-count">${(eps || []).length + 1} episodes</span>`;
           titleEl.appendChild(badge);
         }
       })();
@@ -898,15 +1281,15 @@ async function renderPagedMovies(skipScroll) {
     }
   });
 
-  // -------------------- صفحه‌بندی --------------------
+  // -------------------- صفحه‌بندی و ژانر --------------------
   renderPagination(filtered.length);
+  buildTabGenres(filtered);
 
   // -------------------- اسکرول به بالا --------------------
   if (!skipScroll) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
-
   // -------------------- Admin guard --------------------
   async function enforceAdminGuard() {
     try {
@@ -969,7 +1352,7 @@ function renderAdminMovieList(list = []) {
             <span class="movie-name">${escapeHtml(m.title || '')}</span>
             ${m.type && m.type !== 'single' 
               ? `<span class="badge-type ${m.type === 'collection' ? 'badge-collection' : 'badge-serial'}">
-                   ${m.type === 'collection' ? 'کالکشن' : 'سریال'}
+                   ${m.type === 'collection' ? 'Collection' : 'Series'}
                  </span>` 
               : ''}
           </div>
@@ -1343,35 +1726,6 @@ function renderEpisodeForms(eps = []) {
   loadAdminMovies();
 
 // -------------------- Admin: add/edit movie --------------------
-
-// ساخت فرم bundle برای collection یا serial
-function createBundleForm(type, data = {}) {
-  if (type === 'collection') {
-    return `
-      <div class="bundle-form">
-        <input placeholder="Title" value="${data.title || ''}">
-        <input placeholder="File Link" value="${data.link || ''}">
-        <textarea placeholder="Synopsis">${data.synopsis || ''}</textarea>
-        <input placeholder="Director" value="${data.director || ''}">
-        <input placeholder="Product" value="${data.product || ''}">
-        <input placeholder="Stars" value="${data.stars || ''}">
-        <input placeholder="IMDB" value="${data.imdb || ''}">
-        <input placeholder="Release Info" value="${data.release_info || ''}">
-        <input placeholder="Genre (space-separated)" value="${data.genre || ''}">
-      </div>
-    `;
-  }
-  if (type === 'serial') {
-    return `
-      <div class="bundle-form">
-        <input placeholder="Title" value="${data.title || ''}">
-        <input placeholder="Link" value="${data.link || ''}">
-      </div>
-    `;
-  }
-  return '';
-}
-
 if (addMovieForm && movieList) {
   enforceAdminGuard().then(ok => { if (!ok) return; });
 
@@ -1404,26 +1758,6 @@ if (addMovieForm && movieList) {
       const coverFile = coverInput?.files?.[0];
       let coverUrl = '';
 
-      if (coverFile) {
-        try {
-          const filename = `public/${Date.now()}_${coverFile.name}`;
-          const { data: upData, error: upErr } = await supabase
-            .storage.from('covers')
-            .upload(filename, coverFile, { upsert: true });
-          if (upErr) {
-            console.error('main cover upload error', upErr);
-            showToast('Upload cover failed');
-            return;
-          }
-          const { data: publicUrl } = supabase.storage.from('covers').getPublicUrl(upData.path);
-          coverUrl = publicUrl.publicUrl;
-        } catch (err) {
-          console.error('main cover upload exception', err);
-          showToast('Upload cover failed');
-          return;
-        }
-      }
-
       const isEditing = Boolean(editingMovie && editingMovie.id);
 
       // --------- helpers for bundle forms ---------
@@ -1432,103 +1766,134 @@ if (addMovieForm && movieList) {
       const hasBundleForms = bundleChildren.length > 0;
 
       const buildItemsFromForms = (movieId, type) => {
-  const out = [];
-  bundleChildren.forEach((formEl, idx) => {
-    const titleVal = formEl.querySelector('input[placeholder="Title"]')?.value?.trim() || '';
-    const linkValCollection = formEl.querySelector('input[placeholder="File Link"]')?.value?.trim() || '';
-    const linkValSerial = formEl.querySelector('input[placeholder="Link"]')?.value?.trim() || '';
-    const linkVal = (type === 'collection') ? linkValCollection : linkValSerial;
-    if (!titleVal && !linkVal) return;
+        const out = [];
+        bundleChildren.forEach((formEl, idx) => {
+          const titleVal = formEl.querySelector('input[placeholder="Title"]')?.value?.trim() || '';
+          const linkValCollection = formEl.querySelector('input[placeholder="File Link"]')?.value?.trim() || '';
+          const linkValSerial = formEl.querySelector('input[placeholder="Link"]')?.value?.trim() || '';
+          const linkVal = (type === 'collection') ? linkValCollection : linkValSerial;
+          if (!titleVal && !linkVal) return;
 
-    // مدیریت کاور
-    let coverVal = '';
-    const fileInput = formEl.querySelector('input[type="file"]');
-    if (fileInput && fileInput.files && fileInput.files.length > 0) {
-      // کاربر کاور جدید انتخاب کرده
-      coverVal = URL.createObjectURL(fileInput.files[0]); 
-    } else if (formEl.dataset.existingCover) {
-      // اگه کاور جدید انتخاب نشده → همون قبلی بمونه
-      coverVal = formEl.dataset.existingCover;
-    }
+          // کاور آیتم: یا فایل جدید یا کاور قبلی ذخیره‌شده
+          let coverVal = '';
+          const fileInput = formEl.querySelector('input[type="file"]');
+          if (fileInput && fileInput.files && fileInput.files.length > 0) {
+            coverVal = URL.createObjectURL(fileInput.files[0]); // موقت
+          } else if (formEl.dataset.existingCover) {
+            coverVal = formEl.dataset.existingCover;
+          }
 
-    if (type === 'collection') {
-      out.push({
-        movie_id: movieId,
-        title: titleVal,
-        cover: coverVal,
-        link: linkValCollection,
-        synopsis: formEl.querySelector('textarea')?.value?.trim() || '',
-        director: formEl.querySelector('input[placeholder="Director"]')?.value?.trim() || '',
-        product: formEl.querySelector('input[placeholder="Product"]')?.value?.trim() || '',
-        stars: formEl.querySelector('input[placeholder="Stars"]')?.value?.trim() || '',
-        imdb: formEl.querySelector('input[placeholder="IMDB"]')?.value?.trim() || '',
-        release_info: formEl.querySelector('input[placeholder="Release Info"]')?.value?.trim() || '',
-        genre: formEl.querySelector('input[placeholder="Genre (space-separated)"]')?.value?.trim() || '',
-        order_index: idx
-      });
-    } else {
-      out.push({
-        movie_id: movieId,
-        title: titleVal,
-        cover: coverVal,
-        link: linkValSerial,
-        order_index: idx
-      });
-    }
-  });
-  return out;
-};
+          if (type === 'collection') {
+            out.push({
+              movie_id: movieId,
+              title: titleVal,
+              cover: coverVal,
+              link: linkValCollection,
+              synopsis: formEl.querySelector('textarea')?.value?.trim() || '',
+              director: formEl.querySelector('input[placeholder="Director"]')?.value?.trim() || '',
+              product: formEl.querySelector('input[placeholder="Product"]')?.value?.trim() || '',
+              stars: formEl.querySelector('input[placeholder="Stars"]')?.value?.trim() || '',
+              imdb: formEl.querySelector('input[placeholder="IMDB"]')?.value?.trim() || '',
+              release_info: formEl.querySelector('input[placeholder="Release Info"]')?.value?.trim() || '',
+              genre: formEl.querySelector('input[placeholder="Genre (space-separated)"]')?.value?.trim() || '',
+              order_index: idx
+            });
+          } else {
+            out.push({
+              movie_id: movieId,
+              title: titleVal,
+              cover: coverVal,
+              link: linkValSerial,
+              order_index: idx
+            });
+          }
+        });
+        return out;
+      };
 
+      // --------- شمارش کل بخش‌ها برای Progress کلی پست ---------
+      const uploadParts =
+        (coverFile ? 1 : 0) +
+        bundleChildren.reduce((acc, formEl) => {
+          const f = formEl.querySelector('input[type="file"]');
+          return acc + (f && f.files && f.files.length > 0 ? 1 : 0);
+        }, 0);
+
+      let dbParts = 1;
+      if (isEditing) {
+        dbParts = 2;
+      } else if (!isEditing && selectedType !== 'single' && hasBundleForms) {
+        dbParts = 3;
+      }
+
+      const totalParts = uploadParts + dbParts;
+      startPostProgress(totalParts, "در حال آپلود و ثبت پست...");
+
+      // --------- آپلود کاور اصلی با Progress واقعی ---------
+      if (coverFile) {
+        try {
+          const filename = `public/${Date.now()}_${coverFile.name}`;
+          await uploadWithProgress(coverFile, filename);
+          const { data: publicUrl } = supabase.storage.from('covers').getPublicUrl(filename);
+          coverUrl = publicUrl.publicUrl;
+          completePart();
+        } catch (err) {
+          console.error('main cover upload error', err);
+          finishPostProgress(false);
+          showToast('Upload cover failed');
+          return;
+        }
+      }
+
+      // --------- آپلود کاور آیتم‌ها با Progress واقعی ---------
       const uploadItemCoversInPlace = async (items) => {
-  for (let i = 0; i < bundleChildren.length; i++) {
-    const formEl = bundleChildren[i];
-    const fileInput = formEl.querySelector('input[type="file"]');
-    const file = fileInput?.files?.[0];
+        for (let i = 0; i < bundleChildren.length; i++) {
+          const formEl = bundleChildren[i];
+          const fileInput = formEl.querySelector('input[type="file"]');
+          const file = fileInput?.files?.[0];
 
-    if (file) {
-      // آپلود کاور جدید
-      const filename = `public/items/${Date.now()}_${i}_${file.name}`;
-      const { data: upData, error: upErr } = await supabase
-        .storage.from('covers')
-        .upload(filename, file, { upsert: true });
-      if (!upErr) {
-        const { data: publicUrl } = supabase.storage.from('covers').getPublicUrl(upData.path);
-        if (items[i]) items[i].cover = publicUrl.publicUrl;
-      }
-    } else {
-      // اگر کاور جدید انتخاب نشده → قبلی رو نگه دار
-      const existing = formEl.dataset.existingCover;
-      if (existing && items[i]) {
-        items[i].cover = existing;
-      }
-    }
-  }
-};
-
+          if (file) {
+            try {
+              const filename = `public/items/${Date.now()}_${i}_${file.name}`;
+              await uploadWithProgress(file, filename);
+              const { data: publicUrl } = supabase.storage.from('covers').getPublicUrl(filename);
+              if (items[i]) items[i].cover = publicUrl.publicUrl;
+              completePart();
+            } catch (err) {
+              console.error('item cover upload error', err);
+              finishPostProgress(false);
+              showToast('Error uploading an item cover');
+              return false;
+            }
+          } else {
+            const existing = formEl.dataset.existingCover;
+            if (existing && items[i]) {
+              items[i].cover = existing;
+            }
+          }
+        }
+        return true;
+      };
       // ==================== EDIT ====================
       if (isEditing) {
         const movieId = editingMovie.id;
 
-        // تعیین نوع مورد نظر
         let intendedType = selectedType;
 
-        // ساخت آیتم‌ها
         let items = [];
         if (intendedType !== 'single') {
           items = buildItemsFromForms(movieId, intendedType);
-          await uploadItemCoversInPlace(items);
+          const okUpload = await uploadItemCoversInPlace(items);
+          if (!okUpload) return;
 
-          // جایگزینی کامل آیتم‌ها
           await supabase.from('movie_items').delete().eq('movie_id', movieId);
           if (items.length > 0) {
             await supabase.from('movie_items').insert(items);
           }
         } else {
-          // اگر تک‌فیلم باشه، همه آیتم‌ها پاک میشن
           await supabase.from('movie_items').delete().eq('movie_id', movieId);
         }
 
-        // تعیین نوع نهایی (طبق منطق تو)
         let finalType = 'single';
         if (intendedType === 'collection' && items.length >= 0) {
           finalType = 'collection';
@@ -1536,7 +1901,6 @@ if (addMovieForm && movieList) {
           finalType = 'serial';
         }
 
-        // آپدیت دیتای اصلی
         const updateData = {
           title,
           link,
@@ -1552,12 +1916,16 @@ if (addMovieForm && movieList) {
         if (coverUrl) updateData.cover = coverUrl;
 
         const { error: updErr } = await supabase.from('movies').update(updateData).eq('id', movieId);
+        completePart(); // بخش دیتابیس
+
         if (updErr) {
           console.error('update movie error', updErr);
+          finishPostProgress(false);
           showToast('Update movie failed');
           return;
         }
 
+        finishPostProgress(true);
         showToast('Movie updated');
         editingMovie = null;
         addMovieForm.reset();
@@ -1568,6 +1936,7 @@ if (addMovieForm && movieList) {
 
       // ==================== ADD ====================
       if (!coverUrl) {
+        finishPostProgress(false);
         showToast('Please select cover');
         return;
       }
@@ -1587,9 +1956,11 @@ if (addMovieForm && movieList) {
         .insert([newMovie])
         .select()
         .single();
+      completePart(); // درج فیلم
 
       if (addErr || !inserted) {
         console.error('movie insert err', addErr);
+        finishPostProgress(false);
         showToast('Add movie failed');
         return;
       }
@@ -1599,17 +1970,21 @@ if (addMovieForm && movieList) {
         items = buildItemsFromForms(inserted.id, provisionalType);
 
         if (provisionalType === 'collection' && items.length < 1) {
+          finishPostProgress(false);
           showToast('Collection requires at least 1 item');
           await supabase.from('movies').delete().eq('id', inserted.id);
           return;
         }
 
-        await uploadItemCoversInPlace(items);
+        const okUpload = await uploadItemCoversInPlace(items);
+        if (!okUpload) return;
 
         if (items.length > 0) {
           const { error: itemsError } = await supabase.from('movie_items').insert(items);
+          completePart(); // درج آیتم‌ها
           if (itemsError) {
             console.error('movie_items insert err', itemsError);
+            finishPostProgress(false);
             showToast('Add items failed');
             await supabase.from('movies').delete().eq('id', inserted.id);
             return;
@@ -1625,7 +2000,9 @@ if (addMovieForm && movieList) {
       }
 
       await supabase.from('movies').update({ type: finalType }).eq('id', inserted.id);
+      completePart(); // آپدیت نوع نهایی
 
+      finishPostProgress(true);
       showToast('Movie added');
       addMovieForm.reset();
       if (typeof window.resetMode === 'function') window.resetMode();
@@ -1850,6 +2227,115 @@ if (addMovieForm && movieList) {
       if (formsWrap.children.length === 0) resetMode();
     });
   }
+
+const adminSearchInput = document.getElementById('adminSearch');
+
+if (adminSearchInput) {
+  adminSearchInput.addEventListener('input', async () => {
+    const q = adminSearchInput.value.trim().toLowerCase();
+
+    if (!q) {
+      // اگه سرچ خالی بود، لیست کامل رو بیار
+      loadAdminMovies(1);
+      return;
+    }
+
+    // سرچ در دیتابیس
+    const { data, error } = await supabase
+      .from('movies')
+      .select('*')
+      .or(`title.ilike.%${q}%,director.ilike.%${q}%,genre.ilike.%${q}%`)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Admin search error:', error);
+      return;
+    }
+
+    renderAdminMovieList(data);
+    // صفحه‌بندی رو خالی کن چون سرچ معمولاً همه نتایج رو نشون میده
+    const adminPagination = document.getElementById('admin-pagination');
+    if (adminPagination) adminPagination.innerHTML = '';
+  });
+}
+
+// -------------show upload toast
+function showUploadToast(message) {
+  const container = document.getElementById("toast-container");
+  container.innerHTML = ""; // فقط یکی نشون بده
+
+  const toast = document.createElement("div");
+  toast.className = "toast";
+
+  const msg = document.createElement("div");
+  msg.className = "message";
+  msg.textContent = message;
+
+  const progressBar = document.createElement("div");
+  progressBar.className = "progress-bar";
+
+  const progressFill = document.createElement("div");
+  progressFill.className = "progress-fill";
+
+  progressBar.appendChild(progressFill);
+  toast.appendChild(msg);
+  toast.appendChild(progressBar);
+  container.appendChild(toast);
+
+  // ذخیره وضعیت در localStorage
+  localStorage.setItem("uploadToast", JSON.stringify({ message, progress: 0 }));
+}
+
+function updateUploadProgress(percent) {
+  const fill = document.querySelector(".progress-fill");
+  if (fill) {
+    fill.style.width = percent + "%";
+  }
+
+  // ذخیره درصد در localStorage
+  const saved = localStorage.getItem("uploadToast");
+  if (saved) {
+    const data = JSON.parse(saved);
+    data.progress = percent;
+    localStorage.setItem("uploadToast", JSON.stringify(data));
+  }
+}
+
+function clearUploadToast() {
+  const container = document.getElementById("toast-container");
+  container.innerHTML = "";
+  localStorage.removeItem("uploadToast");
+}
+
+// وقتی صفحه لود شد، وضعیت رو از localStorage بخون
+document.addEventListener("DOMContentLoaded", () => {
+  const saved = localStorage.getItem("uploadToast");
+  if (saved) {
+    const { message, progress } = JSON.parse(saved);
+    showUploadToast(message);
+    updateUploadProgress(progress);
+  }
+});
+
+// هر 10 دقیقه یکبار یک درخواست ساده به سوپابیس
+setInterval(async () => {
+  try {
+    const { data, error } = await supabase
+      .from('movie_items')
+      .select('id')
+      .limit(1);
+
+    if (error) {
+      console.error('Keep-alive error:', error.message);
+    } else {
+      console.log('Keep-alive ping OK');
+    }
+  } catch (err) {
+    console.error('Keep-alive failed:', err);
+  }
+}, 10 * 60 * 1000); // هر 10 دقیقه
+
+
 
   // -------------------- Initial load --------------------
   fetchMovies();
