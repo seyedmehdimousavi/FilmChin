@@ -20,13 +20,13 @@
 }
 @font-face {
   font-family: 'IRANSans';
-  src: url('/fonts/IRANSansWeb(FaNum)_Light.woff') format('woff');
+  src: url('IRANSansWeb(FaNum)_Light.woff') format('woff');
   unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF; /* محدوده‌ی یونیکد فارسی/عربی */
 }
 /* فونت انگلیسی */
 @font-face {
   font-family:'ProductSans';
-  src: url('/fonts/Product Sans Regular.ttf') format('opentype');
+  src: url('Product Sans Regular.ttf') format('opentype');
   unicode-range: U+0020-007F; /* محدوده‌ی یونیکد لاتین پایه (انگلیسی) */
 }
 *{
