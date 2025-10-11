@@ -27,7 +27,12 @@
 @font-face {
   font-family:'ProductSans';
   src: url('Product Sans Regular.ttf') format('opentype');
-  unicode-range: U+0020-007F; /* محدوده‌ی یونیکد لاتین پایه (انگلیسی) */
+  unicode-range: U+0020-007F;
+}
+@font-face {
+  font-family:'ProductSans2';
+  src: url('Product Sans Bold.ttf') format('ttf');
+  unicode-range: U+0020-007F;
 }
 *{
   Font-family: 'IRANSans', 'ProductSans', sans-serif;
@@ -60,7 +65,7 @@ Img{
 /* dark */
 Body.dark{
   Background:var(--bg-night);
-  Color:#fff;
+  Color:#e6eef6;
 }
 /* -------------------
 /* =========================
@@ -136,9 +141,11 @@ Body.dark .menu-btn,body.dark .icon-btn,body.dark .icon-inside{background:rgba(8
 .side-menu.active{transform:translateX(0)}
 Body.dark .side-menu{background:rgba(48,56,65,0.95);color:#fff}
 .genre-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:8px}
+  display:flex;
+  flex-wrap: wrap;
+  row-gap:3px;
+  column-gap: 3px;
+}
 
 
 /* telegram link */
@@ -153,7 +160,7 @@ Body.dark .side-menu{background:rgba(48,56,65,0.95);color:#fff}
 .container{
   max-width:1100px;
   margin: 0px auto 18px auto;
-  padding: 10px;
+  padding:8px;
   
 }
 .movie-count{
@@ -176,7 +183,12 @@ Body.dark .side-menu{background:rgba(48,56,65,0.95);color:#fff}
 .movies-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
 
 /* movie card */
-.movie-card{border-radius:16px;background:var(--post-day);box-shadow:0 6px 16px rgba(0,0,0,0.08);overflow:hidden;position:relative}
+.movie-card{
+  border-radius:16px;
+  background:var(--post-day);
+  box-shadow:0 6px 16px rgba(0,0,0,0.2);
+  overflow:hidden;
+  position:relative}
 Body.dark .movie-card{background:var(--post-night);color:#e6eef6}
 .cover-container{
   display: flex;
@@ -193,8 +205,7 @@ Body.dark .movie-card{background:var(--post-night);color:#e6eef6}
   height:100%;
   object-fit:contain;
   padding:8px;}
-.movie-info{
-  padding:8px}
+.movie-info{padding:12px}
 .field-label{
   display:block;
   margin-top:6px;
@@ -211,6 +222,7 @@ Body.dark .field-label{color:#ddd}
   Border-radius:6px;
   Margin-bottom:6px;
   Color:#263345;
+  box-shadow:0 6px 16px rgba(0,0,0,0.1);
 }
 Body.dark .field-quote{
   Background: rgba(255,255,255,0.08);
@@ -226,7 +238,22 @@ Body.dark .field-quote{
 .quote-toggle-btn{position:absolute;bottom:6px;right:8px;background:rgba(33,133,213,0.7);color:#fff;border:0;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:.8rem}
 
 /* go btn */
-.go-btn{background:var(--btn-day);color:#fff;border:0;padding:10px;border-radius:8px;width:100%;cursor:pointer;margin-top:8px;display:inline-flex;align-items:center;justify-content:center}
+.go-btn{
+  background:var(--btn-day);
+  color:#fff;
+  border:0;
+  font-size: 17px;
+  font-weight: bolder;
+  padding:10px;
+  border-radius:8px;
+  width:100%;
+  cursor:pointer;
+  margin-top:8px;
+  display:inline-flex;
+  box-shadow:0 6px 16px rgba(0,0,0,0.1);
+  align-items:center;
+  justify-content:center;
+}
 Body.dark .go-btn{background:var(--btn-night)}
 
 /* =========================
@@ -237,6 +264,7 @@ Body.dark .go-btn{background:var(--btn-night)}
   Align-items:center;
   Justify-content:space-between;
   Gap:8px;
+  box-shadow:0 6px 16px rgba(0,0,0,0.1);
   Margin-top:10px;
   Padding:8px;
   Border-radius:10px;
@@ -1056,13 +1084,15 @@ Body.dark .social-item {
   Background: rgba(255,255,255,0.08);
 }
 .movie-title{
+  Font-family: 'IRANSans', 'ProductSans2', sans-serif;
+  box-shadow:0 6px 16px rgba(0,0,0,0.2);
   display: flex;
-  justify-content: space-between; /* اسم چپ، بدج راست */
+  justify-content: space-between;
   align-items: center;
   Background: rgba(0,74,124,0.06);
   Flex:1;
   Width: 100%;
-  Font-weight:700;
+  font-weight: bold;
   Text-align: left;
   Border-radius: 15px;
   Padding: 10px;
@@ -1502,8 +1532,7 @@ Backdrop-filter: blur(var(--blur));
 
 .genre-chip-mini {
   display: inline-block;
-  padding: 3px 8px;
-  margin: 4px 0 0;
+  padding: 5px 10px;
   border-radius: 12px;
   background: rgba(33,133,213,0.9);
   color: #fff;
@@ -1523,22 +1552,12 @@ Backdrop-filter: blur(var(--blur));
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+
 .tab-genres-list {
   display: flex;
   flex-wrap: nowrap;
   padding: 4px 0;
   margin: 0 20px;
-}
-.tab-genres-list:-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
-}
-/* مخفی کردن اسکرول‌بار در کروم/سافاری */
-.tab-genres-list::-webkit-scrollbar {
-  height: 6px;
-}
-.tab-genres-list::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 3px;
 }
 
 .tab-genres-list .genre-chip {
@@ -1795,15 +1814,34 @@ body.dark .genre-chip.active {
   to   { transform: translateX(0); opacity: 1; }
 }
 /* حالت اولیه کارت */
+/* حالت اولیه کارت */
 .movie-card.reveal {
   opacity: 0;
-  transform: translateY(40px);
+  transform: translateY(40px); /* از پایین شروع کن */
   transition: all 0.6s ease;
 }
 
-/* وقتی وارد ویوپورت میشه */
-.movie-card.reveal.active-down,
+/* وقتی وارد ویوپورت میشه و اسکرول به پایین هست */
+.movie-card.reveal.active-down {
+  opacity: 1;
+  transform: translateY(0);
+  animation: slideBottomToTop 0.6s ease;
+}
+
+/* وقتی وارد ویوپورت میشه و اسکرول به بالا هست */
 .movie-card.reveal.active-up {
   opacity: 1;
   transform: translateY(0);
+  animation: slideTopToBottom 0.6s ease;
+}
+
+/* انیمیشن‌ها */
+@keyframes slideBottomToTop {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideTopToBottom {
+  from { transform: translateY(-40px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
 }

@@ -881,6 +881,29 @@ function buildTabGenres(filteredMovies = null) {
 }
 
 const episodeMatches = new Map(); // movie_id → index اپیزود
+// تابع کمکی برای ساخت حباب‌ها
+function renderChips(str) {
+  if (!str || str === '-') return '-';
+  return str.split(' ')
+    .filter(g => g.trim())
+    .map(g => {
+      if (g.startsWith('#')) {
+        const clean = escapeHtml(g);
+        return `<span class="genre-chip-mini" onclick="(function(){
+          const searchEl=document.getElementById('search');
+          searchEl.value='${clean}';
+          searchEl.dispatchEvent(new Event('input'));
+        })();">${clean}</span>`;
+      } else {
+        return `<a href="#" onclick="(function(){
+          const searchEl=document.getElementById('search');
+          searchEl.value='${escapeHtml(g)}';
+          searchEl.dispatchEvent(new Event('input'));
+        })();">${escapeHtml(g)}</a>`;
+      }
+    }).join(' ');
+}
+
 async function renderPagedMovies(skipScroll) {
   if (!moviesGrid || !movieCount) return;
   const q = (searchInput?.value || '').toLowerCase();
@@ -944,25 +967,12 @@ async function renderPagedMovies(skipScroll) {
     const title = escapeHtml(m.title || '-');
     const synopsis = escapeHtml((m.synopsis || '-').trim());
     const director = escapeHtml(m.director || '-');
-    const product = escapeHtml(m.product || '-');
     const stars = escapeHtml(m.stars || '-');
     const imdb = escapeHtml(m.imdb || '-');
     const release_info = escapeHtml(m.release_info || '-');
-    const genreLinks = (m.genre || '')
-      .split(' ')
-      .filter(g => g.trim())
-      .map(g => {
-        if (g.startsWith('#')) {
-          const clean = escapeHtml(g);
-          return `<span class="genre-chip-mini anim-vertical" onclick="(function(){ const searchEl=document.getElementById('search'); searchEl.value='${clean}'; searchEl.dispatchEvent(new Event('input')); })();">${clean}</span>`;
-        } else {
-          return `<a href="#" onclick="(function(){ const searchEl=document.getElementById('search'); searchEl.value='${escapeHtml(g)}'; searchEl.dispatchEvent(new Event('input')); })();">${escapeHtml(g)}</a>`;
-        }
-      })
-      .join(' ');
 
     const card = document.createElement('div');
-    card.classList.add('movie-card' , 'reveal'); // کارت کلّی انیمیشن عمودی
+    card.classList.add('movie-card' , 'reveal');
     card.dataset.movieId = m.id;
 
     const badgeHtml = m.type && m.type !== 'single'
@@ -994,7 +1004,9 @@ async function renderPagedMovies(skipScroll) {
     <div class="field-quote anim-left-right">${director}</div>
 
     <span class="field-label anim-vertical"><img src="images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
-    <div class="field-quote anim-left-right">${product}</div>
+    <div class="field-quote anim-horizontal">
+      ${renderChips(m.product || '-')}
+    </div>
 
     <span class="field-label anim-vertical"><img src="images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
     <div class="field-quote anim-left-right">${stars}</div>
@@ -1011,7 +1023,7 @@ async function renderPagedMovies(skipScroll) {
     <div class="field-quote anim-left-right">${release_info}</div>
 
     <span class="field-label anim-vertical"><img src="images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span>
-    <div class="field-quote anim-horizontal">${genreLinks || '-'}</div>
+    <div class="field-quote genre-grid anim-horizontal">${renderChips(m.genre || '-')}</div>
 
     <div class="episodes-container anim-vertical" data-movie-id="${m.id}">
       <div class="episodes-list anim-left-right"></div>
@@ -1043,15 +1055,10 @@ async function renderPagedMovies(skipScroll) {
 `;
 
     moviesGrid.appendChild(card);
-// 👇 کارت رو به آبزرور معرفی کن
-cardObserver.observe(card);
-   // معرفی همه المنت‌هایی که کلاس‌های انیمیشن دارن
-card.querySelectorAll(
-  '.anim-horizontal, .anim-vertical, .anim-left-right'
-).forEach(el => {
-  animObserver.observe(el);
-});
-
+    cardObserver.observe(card);
+    card.querySelectorAll('.anim-horizontal, .anim-vertical, .anim-left-right').forEach(el => {
+      animObserver.observe(el);
+    });
 
     const goBtn = card.querySelector('.go-btn');
     goBtn?.addEventListener('click', () => {
@@ -1060,8 +1067,7 @@ card.querySelectorAll(
     });
 
     attachCommentsHandlers(card, m.id);
-
-    // 👇 منطق اپیزودها مثل قبل
+// 👇 منطق اپیزودها
     if (m.type === 'collection' || m.type === 'serial') {
       (async () => {
         const { data: eps, error: epsErr } = await supabase
@@ -1108,7 +1114,7 @@ card.querySelectorAll(
             </div>
           `;
         }).join('');
-
+  
         // لینک Go روی اپیزود فعال ست میشه
         goBtn.dataset.link = allEpisodes[activeIndex].link;
 
@@ -1137,11 +1143,12 @@ card.querySelectorAll(
             if (coverBlur) coverBlur.style.backgroundImage = `url('${ep.cover || m.cover}')`;
             card.querySelector('.quote-text').textContent = ep.synopsis || m.synopsis;
             card.querySelectorAll('.field-quote')[1].textContent = ep.director || m.director;
-            card.querySelectorAll('.field-quote')[2].textContent = ep.product || m.product;
+            // Product و Genre با حباب‌های کلیک‌پذیر
+            card.querySelectorAll('.field-quote')[2].innerHTML = renderChips(ep.product || m.product || '-');
             card.querySelectorAll('.field-quote')[3].textContent = ep.stars || m.stars;
             if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
             card.querySelectorAll('.field-quote')[5].textContent = ep.release_info || m.release_info;
-            card.querySelectorAll('.field-quote')[6].textContent = ep.genre || '';
+            card.querySelectorAll('.field-quote')[6].innerHTML = renderChips(ep.genre || m.genre || '-');
           }
 
           if (m.type === 'serial') {
@@ -1199,11 +1206,12 @@ card.querySelectorAll(
               if (coverBlur) coverBlur.style.backgroundImage = `url('${ep.cover || m.cover}')`;
               card.querySelector('.quote-text').textContent = ep.synopsis || m.synopsis;
               card.querySelectorAll('.field-quote')[1].textContent = ep.director || m.director;
-              card.querySelectorAll('.field-quote')[2].textContent = ep.product || m.product;
+              // Product و Genre با حباب‌های کلیک‌پذیر در کلیک دستی
+              card.querySelectorAll('.field-quote')[2].innerHTML = renderChips(ep.product || m.product || '-');
               card.querySelectorAll('.field-quote')[3].textContent = ep.stars || m.stars;
               if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
               card.querySelectorAll('.field-quote')[5].textContent = ep.release_info || m.release_info;
-              card.querySelectorAll('.field-quote')[6].textContent = ep.genre || '';
+              card.querySelectorAll('.field-quote')[6].innerHTML = renderChips(ep.genre || m.genre || '-');
               goBtn.dataset.link = ep.link;
             }
 
