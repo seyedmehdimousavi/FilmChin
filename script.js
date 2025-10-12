@@ -312,6 +312,68 @@ function showDialog({ message = '', type = 'alert', defaultValue = '' } = {}) {
   });
 }
 
+// -------------------- Floating Stories --------------------
+const storyToggle = document.getElementById('storyToggle');
+const storyPanel = document.getElementById('storyPanel');
+const storyToggleIcon = document.getElementById('storyToggleIcon');
+const storiesContainer = storyPanel?.querySelector('.stories');
+const goPaginationBtn = storyPanel?.querySelector('.go-pagination');
+
+// Toggle panel and rotate icon (keep same icon source)
+if (storyToggle && storyPanel && storyToggleIcon) {
+  storyToggle.addEventListener('click', () => {
+    const isOpen = storyPanel.classList.toggle('open');
+    storyToggle.classList.toggle('open', isOpen); // rotation via CSS
+  });
+}
+
+// Fill stories for current page
+function renderStoriesForPage(pageItems) {
+  if (!storiesContainer) return;
+  storiesContainer.innerHTML = pageItems.map((m, idx) => {
+    const rawTitle = (m.title || '').trim();
+    const title = escapeHtml(rawTitle);
+    const cover = escapeHtml(m.cover || 'https://via.placeholder.com/80');
+
+    // شرط: اگر طول عنوان بیشتر از 14 کاراکتر بود → انیمیشن بخوره
+    const isLong = rawTitle.length > 14;
+    const titleHtml = isLong
+      ? `<span>${title}</span>`   // داخل span برای انیمیشن
+      : title;
+
+    return `
+      <div class="story" onclick="scrollToMovie(${idx})">
+        <div class="story-circle">
+          <img src="${cover}" alt="${title}">
+        </div>
+        <span class="story-title ${isLong ? 'scrolling' : ''}" title="${title}">
+          ${titleHtml}
+        </span>
+      </div>
+    `;
+  }).join('');
+}
+
+// Scroll to card
+function scrollToMovie(index) {
+  const cards = document.querySelectorAll('.movie-card');
+  if (cards[index]) {
+    cards[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// Go to pagination
+goPaginationBtn?.addEventListener('click', () => {
+  document.getElementById('pagination')?.scrollIntoView({ behavior: 'smooth' });
+});
+
+// Helper to escape HTML
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, m => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[m]);
+}
+
 // -------------------- Comments --------------------
 async function loadComments(movieId) {
   try {
@@ -1297,6 +1359,9 @@ async function renderPagedMovies(skipScroll) {
   if (!skipScroll) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+  
+  // -------------------- آپدیت استوری‌ها --------------------
+renderStoriesForPage(pageItems);
 }
   // -------------------- Admin guard --------------------
   async function enforceAdminGuard() {
