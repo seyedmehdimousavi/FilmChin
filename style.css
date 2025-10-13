@@ -2041,4 +2041,182 @@ body.dark .genre-chip.active {
   height: 85%;
   border-radius: 12px;
 }
- 
+
+.message-bubble {
+    position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 18px;
+  border-radius: 18px;
+
+  /* شیشه‌ای */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+
+  /* خط دور شیشه */
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  /* سایه برای شناوری */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+
+  color: #000;
+  max-width: 360px;
+  transition: all 0.3s ease;}
+
+body.dark .message-bubble {
+  background: #2c2c2e;
+  color: #f5f5f7;
+}
+
+.msg-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.msg-avatar-wrapper {
+  position: relative;
+  width: 32px;
+  height: 32px;
+}
+
+.msg-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.msg-icon {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  padding: 2px;
+  box-shadow: 0 0 2px rgba(0,0,0,0.2);
+}
+
+.msg-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.msg-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.msg-time {
+  font-size: 12px;
+  color: #888;
+}
+
+.msg-body {
+  font-size: 15px;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.msg-close {
+  align-self: flex-end;
+  background: #007aff;
+  border: none;
+  border-radius: 10px;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.msg-close:hover {
+  background: #005bb5;
+}
+
+body.dark .message-bubble {
+  background: rgba(40, 40, 40, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f5f5f7;
+}
+#adminMessages {
+  position: sticky;
+  top: 15px;              /* بچسبه به بالای صفحه */
+  z-index: 99999;        /* بالاتر از بقیه محتوا */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/* Admin tabs container with sticky positioning */
+.admin-tabs {
+  position: sticky;
+  top: var(--admin-tabs-offset, 64px); /* offset under the admin header */
+  z-index: 150;                        /* above content cards */
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  padding: 8px 0;
+  backdrop-filter: blur(8px) saturate(160%);
+  -webkit-backdrop-filter: blur(8px) saturate(160%);
+}
+
+/* Liquid glass circular icon */
+.admin-tabs .tab-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.admin-tabs .tab-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-tabs .tab-circle img {
+  width: 28px;
+  height: 28px;
+}
+
+/* Active state */
+.admin-tabs .tab-btn.active .tab-circle {
+  transform: scale(1.05);
+  background: rgba(81, 43, 212, 0.35);
+  border-color: rgba(255,255,255,0.40);
+}
+
+/* Dark mode */
+body.dark .admin-tabs {
+  backdrop-filter: blur(8px) saturate(160%);
+  -webkit-backdrop-filter: blur(8px) saturate(160%);
+}
+body.dark .admin-tabs .tab-circle {
+  background: rgba(40, 40, 40, 0.35);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+body.dark .admin-tabs .tab-btn.active .tab-circle {
+  background: rgba(33,133,213,0.35);
+  border-color: rgba(255,255,255,0.30);
+}
+.admin-tabs {
+  position: sticky;
+  top: 70px; /* ارتفاع هدر ادمین */
+  z-index: 150;
+}

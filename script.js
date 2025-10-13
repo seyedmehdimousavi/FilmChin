@@ -661,16 +661,29 @@ async function fetchEpisodes() {
 
   // Messages UI
   function renderMessages() {
-    if (!adminMessagesContainer) return;
-    adminMessagesContainer.innerHTML = '';
-    (messages || []).forEach(m => {
-      const div = document.createElement('div');
-      div.className = 'message-bubble';
-      div.innerHTML = `<span>${escapeHtml(m.text)}</span><button class="msg-close" aria-label="close message">close</button>`;
-      div.querySelector('.msg-close').addEventListener('click', () => div.remove());
-      adminMessagesContainer.appendChild(div);
-    });
-  }
+  if (!adminMessagesContainer) return;
+  adminMessagesContainer.innerHTML = '';
+  (messages || []).forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'message-bubble';
+    div.innerHTML = `
+      <div class="msg-header">
+        <div class="msg-avatar-wrapper">
+          <img class="msg-avatar" src="images/Admin-logo.png" alt="admin">
+          <img class="msg-icon" src="images/icons8-message.apng" alt="msg-icon">
+        </div>
+        <div class="msg-meta">
+          <span class="msg-title">Admin</span>
+          <span class="msg-time">now</span>
+        </div>
+      </div>
+      <div class="msg-body">${escapeHtml(m.text)}</div>
+      <button class="msg-close" aria-label="close message">Mark as Read</button>
+    `;
+    div.querySelector('.msg-close').addEventListener('click', () => div.remove());
+    adminMessagesContainer.appendChild(div);
+  });
+}
 
   // Genre grid
   function buildGenreGrid() {
@@ -2408,63 +2421,107 @@ setInterval(async () => {
   }
 }, 10 * 60 * 1000); // هر 10 دقیقه
 
+// -------------------- Admin Tabs --------------------
+function initAdminTabs() {
+  const tabButtons = document.querySelectorAll(".admin-tabs .tab-btn");
 
+  const sections = {
+    posts: [".send_post", ".released_movies"],
+    messages: [".admin_messages"],
+    comments: ["#unapproved-comments-section"],
+    links: ["#social-links-section"]
+  };
 
-  // -------------------- Initial load --------------------
-  fetchMovies();
-  fetchMessages();
-  checkUnapprovedComments();
-  setInterval(checkUnapprovedComments, 30000);
-  if (document.getElementById('unapprovedComments')) {
-    // Load panel on admin if exists
-    (async function loadUnapprovedComments() {
-      const container = document.getElementById('unapprovedComments');
-      if (!container) return;
-      const ok = await enforceAdminGuard(); if (!ok) return;
-      container.innerHTML = '<div class="loading">Loading Comments…</div>';
-      const { data, error } = await supabase.from('comments').select('*').eq('approved', false).order('created_at', { ascending: false });
-      if (error) { console.error('error in loading comments:', error); container.innerHTML = '<p>error in loading comments</p>'; return; }
-      if (!data || data.length === 0) { container.innerHTML = '<p>there is no unpublished comments</p>'; return; }
-      container.innerHTML = data.map(c => {
-        const movie = movies.find(m => m.id === c.movie_id);
-        const cover = movie?.cover || 'https://via.placeholder.com/80x100?text=No+Image';
-        const title = movie?.title || '';
-        return `
-          <div class="unapproved-bubble">
-            <div class="bubble-left"><img src="${escapeHtml(cover)}" alt="${escapeHtml(title)}" class="bubble-cover"></div>
-            <div class="bubble-center">
-              <div class="bubble-author">${escapeHtml(c.name)}</div>
-              <div class="bubble-text">${escapeHtml(c.text)}</div>
-              <div class="bubble-time">${c.created_at ? new Date(c.created_at).toLocaleString() : ''}</div>
-            </div>
-            <div class="bubble-right">
-              <button class="btn-approve" data-id="${c.id}"><i class="bi bi-check2-circle"></i> Approve</button>
-              <button class="btn-delete" data-id="${c.id}"><i class="bi bi-trash"></i> Delete</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-      container.addEventListener('click', async (e) => {
-        const btn = e.target.closest('button'); if (!btn) return;
-        const id = btn.dataset.id; if (!id) return;
-        if (btn.classList.contains('btn-approve')) {
-          btn.disabled = true;
-          const { error: upErr } = await supabase.from('comments').update({ approved: true, published: true }).eq('id', id);
-          btn.disabled = false;
-          if (upErr) { console.error(upErr); showToast('An error occurred while approving the comment.'); }
-          else { await loadUnapprovedComments(); showToast('Comment approved.'); }
-        }
-        if (btn.classList.contains('btn-delete')) {
-          const ok = await showDialog({ message: 'Should this comment be deleted?', type: 'confirm' });
-          if (!ok) return;
-          btn.disabled = true;
-          const { error: delErr } = await supabase.from('comments').delete().eq('id', id);
-          btn.disabled = false;
-          if (delErr) { console.error(delErr); showToast('Error deleting comment'); }
-          else { await loadUnapprovedComments(); showToast('Comment deleted.'); }
-        }
-      }, { once: true });
-    })();
+  function showSection(key) {
+    // همه سکشن‌ها رو مخفی کن
+    Object.values(sections).flat().forEach(sel => {
+      document.querySelectorAll(sel).forEach(el => {
+        el.style.display = "none";
+      });
+    });
+
+    // سکشن‌های مربوط به تب انتخاب‌شده رو نشون بده
+    (sections[key] || []).forEach(sel => {
+      document.querySelectorAll(sel).forEach(el => {
+        el.style.display = "";
+      });
+    });
   }
-  fetchSocialLinks();
+
+  // پیش‌فرض: تب اول
+  showSection("posts");
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      tabButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      showSection(btn.dataset.target);
+    });
+  });
+}
+
+// -------------------- Initial load --------------------
+// اینجا باید فراخوانی بشه
+if (document.querySelector('.admin-tabs .tab-btn')) {
+  initAdminTabs();
+}
+
+fetchMovies();
+fetchMessages();
+checkUnapprovedComments();
+setInterval(checkUnapprovedComments, 30000);
+
+if (document.getElementById('unapprovedComments')) {
+  // Load panel on admin if exists
+  (async function loadUnapprovedComments() {
+    const container = document.getElementById('unapprovedComments');
+    if (!container) return;
+    const ok = await enforceAdminGuard(); if (!ok) return;
+    container.innerHTML = '<div class="loading">Loading Comments…</div>';
+    const { data, error } = await supabase.from('comments').select('*').eq('approved', false).order('created_at', { ascending: false });
+    if (error) { console.error('error in loading comments:', error); container.innerHTML = '<p>error in loading comments</p>'; return; }
+    if (!data || data.length === 0) { container.innerHTML = '<p>there is no unpublished comments</p>'; return; }
+    container.innerHTML = data.map(c => {
+      const movie = movies.find(m => m.id === c.movie_id);
+      const cover = movie?.cover || 'https://via.placeholder.com/80x100?text=No+Image';
+      const title = movie?.title || '';
+      return `
+        <div class="unapproved-bubble">
+          <div class="bubble-left"><img src="${escapeHtml(cover)}" alt="${escapeHtml(title)}" class="bubble-cover"></div>
+          <div class="bubble-center">
+            <div class="bubble-author">${escapeHtml(c.name)}</div>
+            <div class="bubble-text">${escapeHtml(c.text)}</div>
+            <div class="bubble-time">${c.created_at ? new Date(c.created_at).toLocaleString() : ''}</div>
+          </div>
+          <div class="bubble-right">
+            <button class="btn-approve" data-id="${c.id}"><i class="bi bi-check2-circle"></i> Approve</button>
+            <button class="btn-delete" data-id="${c.id}"><i class="bi bi-trash"></i> Delete</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+    container.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button'); if (!btn) return;
+      const id = btn.dataset.id; if (!id) return;
+      if (btn.classList.contains('btn-approve')) {
+        btn.disabled = true;
+        const { error: upErr } = await supabase.from('comments').update({ approved: true, published: true }).eq('id', id);
+        btn.disabled = false;
+        if (upErr) { console.error(upErr); showToast('An error occurred while approving the comment.'); }
+        else { await loadUnapprovedComments(); showToast('Comment approved.'); }
+      }
+      if (btn.classList.contains('btn-delete')) {
+        const ok = await showDialog({ message: 'Should this comment be deleted?', type: 'confirm' });
+        if (!ok) return;
+        btn.disabled = true;
+        const { error: delErr } = await supabase.from('comments').delete().eq('id', id);
+        btn.disabled = false;
+        if (delErr) { console.error(delErr); showToast('Error deleting comment'); }
+        else { await loadUnapprovedComments(); showToast('Comment deleted.'); }
+      }
+    }, { once: true });
+  })();
+}
+
+fetchSocialLinks();
 });
