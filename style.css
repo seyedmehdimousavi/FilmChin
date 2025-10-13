@@ -1028,6 +1028,8 @@ Body.dark .admin-comment-text {
   Border-radius: 8px;
   Background: rgba(0,74,124,0.08);
   Display: flex;
+  width: 100%;
+  flex-direction: row;
   Align-items: center;
   Gap: 6px;
   Font-weight: bold;
@@ -2219,4 +2221,27 @@ body.dark .admin-tabs .tab-btn.active .tab-circle {
   position: sticky;
   top: 70px; /* ارتفاع هدر ادمین */
   z-index: 150;
+}
+.social-grid.hidden {
+  display: none;
+}
+
+.menu-section {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+#linksHeader{
+  Cursor: pointer;
+  Padding: 10px;
+  Border-radius: 8px;
+  Background: rgba(0,74,124,0.08);
+  Display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  Align-items: center;
+  Gap: 6px;
+  Font-weight: bold;
 }
