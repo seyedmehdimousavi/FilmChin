@@ -76,11 +76,17 @@ Body.dark{
   Justify-content: space-between;
   Align-items:center;
   Padding:12px 14px;
+  margin-top: 60px;
+  height: 60px;
   Gap: .4rem;
   Backdrop-filter:blur(var(--blur)); background:rgba(255,255,255,0.55);
-  Position:sticky;top:0;z-index:120;box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  Position:sticky;
+  top:60px;
+  z-index:120;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
 }
-Body.dark .main-header{background:rgba(30,36,40,0.6)}
+Body.dark .main-header{
+  background:rgba(30,36,40,0.6)}
 
 .search-bar{
   Display: flex;
@@ -1457,7 +1463,7 @@ body.dark .episode-card{
 
 .movie-type-tabs {
   position: sticky;
-  top: 65px;
+  top: 120px;
   z-index: 900;
   display: flex;
   gap: 8px;
@@ -2244,4 +2250,47 @@ body.dark .admin-tabs .tab-btn.active .tab-circle {
   Align-items: center;
   Gap: 6px;
   Font-weight: bold;
+}
+/* بنر بالای سایت */
+.site-banner {
+  position: fixed;
+  top: 0;
+  color: #fff;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  letter-spacing: 1px;
+  z-index: 9999;
+  width: 100%;
+  height: 60px;
+  background: transparent;   /* پس‌زمینه شفاف → رنگ body دیده میشه */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  Backdrop-filter:blur(var(--blur)); background:rgba(255,255,255,0.55);
+}
+Body.dark .site-banner{
+  background:rgba(30,36,40,0.6)}
+/* محتوای داخل بنر */
+.banner-content {
+  display: flex;
+  align-items: center;
+}
+.banner-logo img{
+  width: 30px;
+  padding-top: 5px;
+}
+.banner-logo {
+  font-size: 26px;
+}
+
+.banner-text {
+  font-size: 22px;
+  font-weight: bold;
+  text-transform: lowercase;
+
+  background: linear-gradient(90deg, #ff7a18, #af002d 70%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text; /* برای مرورگرهای جدید */
 }
