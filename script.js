@@ -687,35 +687,27 @@ async function fetchEpisodes() {
 
   // Genre grid
   function buildGenreGrid() {
-  if (!genreGrid) return;
-  const genreSet = new Set();
-  (movies || []).forEach(m => {
-    if (m.genre) m.genre.split(' ').forEach(g => { if (g.trim() !== "") genreSet.add(g); });
-  });
-  genreGrid.innerHTML = '';
-  [...genreSet].sort().forEach(g => {
-    const div = document.createElement('div');
-    div.className = 'genre-chip';
-    div.textContent = g;
-
-    // 👇 این خط اضافه شد
-    div.setAttribute("dir", "auto");
-
-    div.onclick = () => {
-      if (searchInput) {
-        searchInput.value = g;
-        searchInput.setAttribute("dir", "auto"); // 👈 برای سرچ هم درست نمایش داده بشه
-      }
-      currentPage = 1;
-      renderPagedMovies();
-      document.getElementById('sideMenu')?.classList.remove('active');
-      document.getElementById('menuOverlay')?.classList.remove('active');
-      document.body.classList.remove('no-scroll', 'menu-open');
-    };
-    genreGrid.appendChild(div);
-  });
-}
-
+    if (!genreGrid) return;
+    const genreSet = new Set();
+    (movies || []).forEach(m => {
+      if (m.genre) m.genre.split(' ').forEach(g => { if (g.trim() !== "") genreSet.add(g); });
+    });
+    genreGrid.innerHTML = '';
+    [...genreSet].sort().forEach(g => {
+      const div = document.createElement('div');
+      div.className = 'genre-chip';
+      div.textContent = g;
+      div.onclick = () => {
+        if (searchInput) searchInput.value = g;
+        currentPage = 1;
+        renderPagedMovies();
+        document.getElementById('sideMenu')?.classList.remove('active');
+        document.getElementById('menuOverlay')?.classList.remove('active');
+        document.body.classList.remove('no-scroll', 'menu-open');
+      };
+      genreGrid.appendChild(div);
+    });
+  }
   const genreToggle = document.getElementById('genreToggle');
   const genreSubmenu = document.getElementById('genreSubmenu');
   if (genreToggle && genreSubmenu) {
@@ -928,61 +920,41 @@ function buildTabGenres(filteredMovies = null) {
     }
   });
 
-  // تبدیل به آرایه
-  const genres = Object.entries(genreCounts);
-
-  // جدا کردن انگلیسی و فارسی (بعد از حذف #)
-  const englishGenres = genres.filter(([g]) => {
-    const clean = g.startsWith('#') ? g.slice(1) : g;
-    return /^[A-Za-z]/.test(clean);
-  });
-  const persianGenres = genres.filter(([g]) => {
-    const clean = g.startsWith('#') ? g.slice(1) : g;
-    return !/^[A-Za-z]/.test(clean);
-  });
-
-  // مرتب‌سازی هر گروه بر اساس تعداد
-  englishGenres.sort((a, b) => b[1] - a[1]);
-  persianGenres.sort((a, b) => b[1] - a[1]);
-
-  // ترکیب: اول انگلیسی‌ها بعد فارسی‌ها
-  const finalGenres = [...englishGenres, ...persianGenres];
-
   // ساخت ژانرها
   container.innerHTML = '';
-  finalGenres.forEach(([g, count]) => {
-    const chip = document.createElement('div');
-    chip.className = 'genre-chip';
-    chip.textContent = g;
+  Object.keys(genreCounts)
+    .sort((a, b) => genreCounts[b] - genreCounts[a])
+    .forEach(g => {
+      const chip = document.createElement('div');
+      chip.className = 'genre-chip';
+      chip.textContent = g;
 
-    // 👇 این خط اضافه شد
-    chip.setAttribute("dir", "auto");
-
-    if (currentTabGenre === g) {
-      chip.classList.add('active');
-    }
-
-    const countSpan = document.createElement('span');
-    countSpan.className = 'count';
-    countSpan.textContent = count;
-    chip.appendChild(countSpan);
-
-    chip.onclick = () => {
       if (currentTabGenre === g) {
-        chip.classList.remove('active');
-        currentTabGenre = null;
-      } else {
-        container.querySelectorAll('.genre-chip').forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
-        currentTabGenre = g;
       }
-      currentPage = 1;
-      renderPagedMovies();
-    };
 
-    container.appendChild(chip);
-  });
+      const countSpan = document.createElement('span');
+      countSpan.className = 'count';
+      countSpan.textContent = genreCounts[g];
+      chip.appendChild(countSpan);
+
+      chip.onclick = () => {
+        if (currentTabGenre === g) {
+          chip.classList.remove('active');
+          currentTabGenre = null;
+        } else {
+          container.querySelectorAll('.genre-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          currentTabGenre = g;
+        }
+        currentPage = 1;
+        renderPagedMovies();
+      };
+
+      container.appendChild(chip);
+    });
 }
+
 const episodeMatches = new Map(); // movie_id → index اپیزود
 // تابع کمکی برای ساخت حباب‌ها
 function renderChips(str) {
@@ -992,21 +964,21 @@ function renderChips(str) {
     .map(g => {
       if (g.startsWith('#')) {
         const clean = escapeHtml(g);
-        return `<span class="genre-chip-mini" dir="auto" onclick="(function(){
+        return `<span class="genre-chip-mini" onclick="(function(){
           const searchEl=document.getElementById('search');
           searchEl.value='${clean}';
           searchEl.dispatchEvent(new Event('input'));
         })();">${clean}</span>`;
       } else {
-        const clean = escapeHtml(g);
-        return `<a href="#" dir="auto" onclick="(function(){
+        return `<a href="#" onclick="(function(){
           const searchEl=document.getElementById('search');
-          searchEl.value='${clean}';
+          searchEl.value='${escapeHtml(g)}';
           searchEl.dispatchEvent(new Event('input'));
-        })();">${clean}</a>`;
+        })();">${escapeHtml(g)}</a>`;
       }
     }).join(' ');
 }
+
 async function renderPagedMovies(skipScroll) {
   if (!moviesGrid || !movieCount) return;
   const q = (searchInput?.value || '').toLowerCase();
@@ -2126,6 +2098,52 @@ if (addMovieForm && movieList) {
   }
 }
 
+  // -------------------- Admin messages --------------------
+  if (addMessageForm && messageList) {
+    enforceAdminGuard().then(ok => { if (!ok) return; });
+    addMessageForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = (document.getElementById('messageText')?.value || '').trim();
+      if (!text) { showToast('Message cannot be empty'); return; }
+      const { error } = await supabase.from('messages').insert([{ text }]);
+      if (error) { console.error('insert message err', error); showToast('Add message failed'); }
+      else { document.getElementById('messageText').value = ''; await fetchMessages(); showToast('Message added'); }
+    });
+    function essages() {
+      messageList.innerHTML = '';
+      (messages || []).forEach(m => {
+        const el = document.createElement('div');
+        el.className = 'message-item';
+        el.innerHTML = `
+          <span class="message-text">${escapeHtml(m.text)}</span>
+          <div class="message-actions">
+            <button class="btn-edit" data-id="${m.id}"><i class="bi bi-pencil"></i> Edit</button>
+            <button class="btn-delete" data-id="${m.id}"><i class="bi bi-trash"></i> Delete</button>
+          </div>
+        `;
+        messageList.appendChild(el);
+      });
+    }
+    messageList.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button'); if (!btn) return;
+      const id = btn.dataset.id; if (!id) return;
+      if (btn.classList.contains('btn-edit')) {
+        const msg = messages.find(x => String(x.id) === String(id)); if (!msg) return;
+        const newText = await showDialog({ message: 'Edit message:', type: 'prompt', defaultValue: msg.text });
+        if (newText === null) return;
+        const { error } = await supabase.from('messages').update({ text: newText }).eq('id', id);
+        if (error) { console.error('message update err', error); showToast('Update failed'); }
+        else { await fetchMessages(); showToast('Message updated'); }
+      }
+      if (btn.classList.contains('btn-delete')) {
+        const ok = await showDialog({ message: 'Delete this message?', type: 'confirm' });
+        if (!ok) return;
+        const { error } = await supabase.from('messages').delete().eq('id', id);
+        if (error) { console.error('msg delete err', error); showToast('Delete failed'); }
+        else { await fetchMessages(); showToast('Message deleted'); }
+      }
+    });
+  }
 
   // -------------------- Unapproved comments badge --------------------
   async function checkUnapprovedComments() {
@@ -2155,23 +2173,6 @@ if (addMovieForm && movieList) {
       `).join('');
     } catch (err) { console.error('fetchSocialLinks exception', err); }
   }
-  const linksHeader = document.getElementById('linksHeader');
-if (linksHeader) {
-  linksHeader.addEventListener('click', () => {
-    const grid = document.getElementById('socialGrid');
-    grid.classList.toggle('hidden');
-
-    // تغییر آیکون فلش
-    const icon = linksHeader.querySelector('.toggle-icon');
-    if (grid.classList.contains('hidden')) {
-      icon.classList.remove('bi-chevron-up');
-      icon.classList.add('bi-chevron-down');
-    } else {
-      icon.classList.remove('bi-chevron-down');
-      icon.classList.add('bi-chevron-up');
-    }
-  });
-}
   const addSocialForm = document.getElementById('addSocialForm');
   const socialList = document.getElementById('socialList');
   async function fetchAdminSocialLinks() {
