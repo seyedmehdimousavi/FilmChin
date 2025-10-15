@@ -2265,7 +2265,7 @@ body.dark .admin-tabs .tab-btn.active .tab-circle {
   height: 60px;
   background: transparent;   /* پس‌زمینه شفاف → رنگ body دیده میشه */
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   Backdrop-filter:blur(var(--blur)); background:rgba(255,255,255,0.55);
 }
