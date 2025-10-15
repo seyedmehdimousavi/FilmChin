@@ -2163,11 +2163,12 @@ body.dark .message-bubble {
 /* Admin tabs container with sticky positioning */
 .admin-tabs {
   position: sticky;
+  width: 100%;
   top: var(--admin-tabs-offset, 64px); /* offset under the admin header */
   z-index: 150;                        /* above content cards */
   display: flex;
   justify-content: center;
-  gap: 18px;
+  gap: 10px;
   padding: 8px 0;
   backdrop-filter: blur(8px) saturate(160%);
   -webkit-backdrop-filter: blur(8px) saturate(160%);

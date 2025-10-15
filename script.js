@@ -3,6 +3,22 @@ const SUPABASE_URL = 'https://gwsmvcgjdodmkoqupdal.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    if (window.location.pathname.endsWith("index.html") || window.location.pathname === "/") {
+      await supabase.from("visits").insert([{
+        path: window.location.pathname,
+        ua: navigator.userAgent,
+        referrer: document.referrer || null
+      }]);
+    }
+  } catch (err) {
+    console.error("visit log error:", err);
+  }
+});
+
+
 // -------------------- Admin UID --------------------
 const ADMIN_UID = '7314d471-8343-44b3-9fcc-a9ae01d99725';
 
@@ -486,6 +502,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginWithGmail = document.getElementById('loginWithGmail');
 
   const searchInput = document.getElementById('search');
+
+if (searchInput) {
+  searchInput.addEventListener("change", (e) => {
+    const q = e.target.value.trim();
+    if (q) {
+      supabase.from("search_logs").insert([{ query: q }]);
+    }
+  });
+}
+
   const moviesGrid = document.getElementById('moviesGrid');
   const movieCount = document.getElementById('movieCount');
   const genreGrid = document.getElementById('genreGrid');
@@ -771,11 +797,36 @@ async function fetchEpisodes() {
 
   // Search live
   if (searchInput) {
-    searchInput.addEventListener('input', () => {
-      currentPage = 1;
-      renderPagedMovies();
-    });
-  }
+  // وقتی کاربر تایپ می‌کنه → لیست فیلم‌ها فیلتر بشه
+  searchInput.addEventListener('input', () => {
+    currentPage = 1;
+    renderPagedMovies();
+  });
+
+  // وقتی کاربر سرچ رو نهایی کرد (خروج از فیلد)
+  searchInput.addEventListener("change", async (e) => {
+    const q = e.target.value.trim();
+    if (!q) return;
+    try {
+      await supabase.from("search_logs").insert([{ query: q }]);
+    } catch (err) {
+      console.error("search log error:", err);
+    }
+  });
+
+  // وقتی کاربر Enter زد
+  searchInput.addEventListener("keydown", async (e) => {
+    if (e.key === "Enter") {
+      const q = searchInput.value.trim();
+      if (!q) return;
+      try {
+        await supabase.from("search_logs").insert([{ query: q }]);
+      } catch (err) {
+        console.error("search log error:", err);
+      }
+    }
+  });
+}
   
 const searchCloseBtn = document.getElementById('searchCloseBtn');
 
@@ -1164,10 +1215,41 @@ async function renderPagedMovies(skipScroll) {
     });
 
     const goBtn = card.querySelector('.go-btn');
-    goBtn?.addEventListener('click', () => {
-      const link = goBtn.dataset.link || '#';
-      if (link && link !== '#') window.open(link, '_blank');
-    });
+goBtn?.addEventListener('click', async () => {
+  const link = goBtn.dataset.link || '#';
+
+  // 🔹 ثبت لاگ کلیک در Supabase
+  try {
+    const movieId = m.id; // چون m در اسکوپ حلقه هست
+    const epActiveEl = card.querySelector('.episodes-list .episode-card.active');
+    const epIndex = epActiveEl
+      ? Array.from(epActiveEl.parentElement.children).indexOf(epActiveEl)
+      : null;
+
+    const activeTitle = (() => {
+  // اگر اپیزود فعال هست
+  if (epActiveEl) {
+    const titleEl = epActiveEl.querySelector('.episode-title span');
+    return titleEl ? titleEl.textContent : m.title;
+  }
+  // در غیر این صورت عنوان خود فیلم
+  return m.title;
+})();
+
+await supabase.from("click_logs").insert([
+  { movie_id: movieId, episode_index: epIndex, link, title: activeTitle }
+]);
+
+  } catch (err) {
+    console.error("click log error:", err);
+  }
+
+  // 🔹 باز کردن لینک
+  if (link && link !== '#') {
+    window.open(link, '_blank');
+  }
+});
+
 
     attachCommentsHandlers(card, m.id);
 // 👇 منطق اپیزودها
@@ -1839,6 +1921,83 @@ function renderEpisodeForms(eps = []) {
   }
   loadAdminMovies();
 
+async function loadAnalytics() {
+  // فقط اگر ادمین لاگین است
+  const ok = await enforceAdminGuard();
+  if (!ok) return;
+
+  // دریافت داده‌ها از ویوها
+  const { data: visits, error: vErr } = await supabase.from("v_visits_daily").select("*");
+  const { data: searches, error: sErr } = await supabase.from("v_top_searches").select("*").limit(10);
+  const { data: clicks, error: cErr } = await supabase.from("v_top_clicks").select("*").limit(10);
+
+  if (vErr || sErr || cErr) {
+    console.error("analytics errors:", { vErr, sErr, cErr });
+    showToast("Error loading analytics data");
+    return;
+  }
+
+  // داده‌های visits برای Chart.js
+  const labels = (visits || []).map(row => {
+    const d = new Date(row.day);
+    return d.toLocaleDateString();
+  });
+  const values = (visits || []).map(row => Number(row.visits) || 0);
+
+  // رندر چارت
+  const canvas = document.getElementById("visitsChart");
+  if (canvas) {
+    if (canvas._chartInstance) {
+      try { canvas._chartInstance.destroy(); } catch (e) {}
+      canvas._chartInstance = null;
+    }
+    const ctx = canvas.getContext("2d");
+    const chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          label: "Visits",
+          data: values,
+          borderColor: "#2185D5",
+          backgroundColor: "rgba(33,133,213,0.15)",
+          pointRadius: 3,
+          tension: 0.25
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: true },
+          tooltip: { mode: "index", intersect: false }
+        },
+        scales: {
+          x: { grid: { display: false } },
+          y: { beginAtZero: true }
+        }
+      }
+    });
+    canvas._chartInstance = chart;
+  }
+
+  // Top searches
+  const topSearchesEl = document.getElementById("topSearches");
+  if (topSearchesEl) {
+    topSearchesEl.innerHTML = (searches || []).map(row =>
+      `<div class="message-item"><span>${escapeHtml(row.query)}</span><span style="font-weight:bold;">${row.times}</span></div>`
+    ).join("") || "<p>No searches yet.</p>";
+  }
+
+  // Top clicks
+const topClicksEl = document.getElementById("topClicks");
+if (topClicksEl) {
+  topClicksEl.innerHTML = (clicks || []).map(row =>
+    `<div class="message-item"><span>${escapeHtml(row.title || 'Untitled')}</span><span style="font-weight:bold;">${row.clicks}</span></div>`
+  ).join("") || "<p>No clicks yet.</p>";
+}
+}
+
 // -------------------- Admin: add/edit movie --------------------
 if (addMovieForm && movieList) {
   enforceAdminGuard().then(ok => { if (!ok) return; });
@@ -2428,7 +2587,8 @@ function initAdminTabs() {
     posts: [".send_post", ".released_movies"],
     messages: [".admin_messages"],
     comments: ["#unapproved-comments-section"],
-    links: ["#social-links-section"]
+    links: ["#social-links-section"],
+    analytics: ["#analytics"] // ← اضافه شد
   };
 
   function showSection(key) {
@@ -2455,10 +2615,14 @@ function initAdminTabs() {
       tabButtons.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       showSection(btn.dataset.target);
+
+      // ← وقتی تب Analytics فعال شد، داده‌ها را لود کن
+      if (btn.dataset.target === "analytics") {
+        loadAnalytics();
+      }
     });
   });
 }
-
 // -------------------- Initial load --------------------
 // اینجا باید فراخوانی بشه
 if (document.querySelector('.admin-tabs .tab-btn')) {

@@ -29,9 +29,7 @@
 </header>
 
 <main>
-  
-  <section id="adminProfile" class="admin-section">
-    <div class="admin-tabs">
+  <div class="admin-tabs">
   <button class="tab-btn active" data-target="posts" type="button">
     <div class="tab-circle">
       <img src="images/icons8-share.apng" alt="posts">
@@ -52,7 +50,15 @@
       <img src="images/icons8-link.apng" alt="links">
     </div>
   </button>
+  <button class="tab-btn" data-target="analytics" type="button">
+  <div class="tab-circle">
+    <img src="images/icons8-combo-chart.apng" alt="analytics">
+  </div>
+</button>
+
 </div>
+  <section id="adminProfile" class="admin-section">
+    
 
     
     
@@ -139,9 +145,23 @@
       </div>
     </section>
     
+  <section id="analytics" class="admin-section-item-6 admin-section-item" style="display:none;">
+  <h2>Analytics</h2>
+
+  <h3>Daily visits</h3>
+  <canvas id="visitsChart" height="120"></canvas>
+
+  <h3>Top searches</h3>
+  <div id="topSearches"></div>
+
+  <h3>Top clicks</h3>
+  <div id="topClicks"></div>
+</section>
+
   </section>
 </main>
 
 <script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
