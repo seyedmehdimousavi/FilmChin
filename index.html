@@ -50,24 +50,40 @@
 
 <!-- side menu and overlay -->
 <div id="menuOverlay" class="menu-overlay"></div>
+
+
 <nav id="sideMenu" class="side-menu" aria-hidden="true">
+  
   <div class="menu-section">
-  <div id="genreToggle" class="menu-toggle">
-    <i class="bi bi-list"></i> Genres
+    
+     <div class="gs">
+        <div id="genreToggle" class="menu-toggle">
+           <i class="bi bi-list"></i> Genres
+        </div>
+        <div id="genreSubmenu" class="submenu" style="display:none;">
+           <div id="genreGrid" class="genre-grid"></div>
+         </div>
+     </div>
+     <div class="sl">
+       <div id="linksHeader">
+         <div style="display: flex;align-items: center;">
+           <i class="bi bi-link-45deg"></i> Links
+         </div>
+           <i class="bi bi-chevron-down toggle-icon"></i>
+       </div>
+        <div id="socialGrid" class="social-grid hidden"></div>
   </div>
-  <div id="genreSubmenu" class="submenu" style="display:none;">
-    <div id="genreGrid" class="genre-grid"></div>
-  </div>
+
 </div>
 
-  <div id="linksHeader" class="menu-section">
-    <div style="display: flex;align-items: center;">
-      <i class="bi bi-link-45deg"></i> Links
-    </div>
-  <i class="bi bi-chevron-down toggle-icon"></i>
-</div>
-<div id="socialGrid" class="social-grid hidden"></div>
+
+
+
+<div id="appVersion" class="genre-chip version-chip">v1.0.0</div>
+
 </nav>
+
+
 <section class="movie-type-tabs">
   <button data-type="all" class="active">All Movies <span class="count">0</span></button>
   <button data-type="collection">Collections <span class="count">0</span></button>

@@ -2623,6 +2623,42 @@ function initAdminTabs() {
     });
   });
 }
+
+async function loadAppVersion() {
+  try {
+    const { data, error } = await supabase
+      .from('app_meta')
+      .select('value')
+      .eq('key', 'version')
+      .single();
+
+    if (!error && data) {
+      const el = document.getElementById('appVersion');
+      if (el) el.textContent = "v" + data.value;
+    }
+  } catch (err) {
+    console.error("loadAppVersion error:", err);
+  }
+}
+loadAppVersion();
+
+document.getElementById('saveVersionBtn')?.addEventListener('click', async () => {
+  const version = document.getElementById('versionInput').value.trim();
+  if (!version) return;
+
+  const { error } = await supabase
+    .from('app_meta')
+    .upsert({ key: 'version', value: version });
+
+  if (!error) {
+    showToast("Version updated to " + version);
+    loadAppVersion(); // برای آپدیت فوری در سایدمنو
+  } else {
+    showToast("Error updating version");
+  }
+});
+
+
 // -------------------- Initial load --------------------
 // اینجا باید فراخوانی بشه
 if (document.querySelector('.admin-tabs .tab-btn')) {
