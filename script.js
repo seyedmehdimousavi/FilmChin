@@ -686,10 +686,25 @@ async function fetchEpisodes() {
 }
 
   // Messages UI
+  function markMessageAsRead(id) {
+  let readIds = JSON.parse(localStorage.getItem("readMessages") || "[]");
+  if (!readIds.includes(id)) {
+    readIds.push(id);
+    localStorage.setItem("readMessages", JSON.stringify(readIds));
+  }
+}
+
+  function isMessageRead(id) {
+  let readIds = JSON.parse(localStorage.getItem("readMessages") || "[]");
+  return readIds.includes(id);
+}
   function renderMessages() {
   if (!adminMessagesContainer) return;
   adminMessagesContainer.innerHTML = '';
   (messages || []).forEach(m => {
+    // 👇 اگر قبلاً خوانده شده، نمایش نده
+    if (isMessageRead(m.id)) return;
+
     const div = document.createElement('div');
     div.className = 'message-bubble';
     div.innerHTML = `
@@ -706,11 +721,13 @@ async function fetchEpisodes() {
       <div class="msg-body">${escapeHtml(m.text)}</div>
       <button class="msg-close" aria-label="close message">Mark as Read</button>
     `;
-    div.querySelector('.msg-close').addEventListener('click', () => div.remove());
+    div.querySelector('.msg-close').addEventListener('click', () => {
+      markMessageAsRead(m.id); // 👈 ذخیره در localStorage
+      div.remove();
+    });
     adminMessagesContainer.appendChild(div);
   });
 }
-
   // Genre grid
   function buildGenreGrid() {
   if (!genreGrid) return;

@@ -364,7 +364,18 @@ Body.dark .message-bubble{
 /* =========================
   Admin page elements (forms, lists)
   ========================= */
-.admin-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;backdrop-filter:blur(var(--blur));background:rgba(255,255,255,0.6);position:sticky;top:0;z-index:140}
+.admin-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 16px;
+  backdrop-filter:blur(var(--blur));
+  background:rgba(255,255,255,0.6);
+  position:sticky;
+  top:0;
+  z-index:140;
+  
+}
 Body.dark .admin-header{background:rgba(30,36,40,0.6)}
 #adminProfile{
   Max-width:800px;
