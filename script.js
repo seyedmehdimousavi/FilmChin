@@ -4,6 +4,8 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 
+
+
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     if (window.location.pathname.endsWith("index.html") || window.location.pathname === "/") {
@@ -19,8 +21,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 
+
+
 // -------------------- Admin UID --------------------
 const ADMIN_UID = '7314d471-8343-44b3-9fcc-a9ae01d99725';
+
 
 // -------------------- App state --------------------
 let currentUser = null;
@@ -31,6 +36,7 @@ const PAGE_SIZE = 10;
 let currentPage = 1;
 let episodesByMovie = new Map(); // movie_id → [episodes]
 
+let imdbMinRating = null; // اگر null باشه یعنی فیلتری فعال نیست
 // -------------------- Utilities --------------------
 function escapeHtml(str) {
   if (str === undefined || str === null) return '';
@@ -57,10 +63,12 @@ function timeAgo(iso) {
   return `${Math.floor(diff / 86400)}d`;
 }
 
+
 // -------------------- Upload Toast + Progress --------------------
 function showUploadToast(message) {
   const container = document.getElementById("toast-container");
   container.innerHTML = "";
+
 
   const toast = document.createElement("div");
   toast.className = "toast";
@@ -71,15 +79,18 @@ function showUploadToast(message) {
   container.appendChild(toast);
 }
 
+
 function updateUploadProgress(percent) {
   const fill = document.querySelector(".progress-fill");
   if (fill) fill.style.width = percent + "%";
 }
 
+
 function clearUploadToast() {
   const container = document.getElementById("toast-container");
   container.innerHTML = "";
 }
+
 
 // -------------------- Whole-post progress controller --------------------
 let __postProgress = {
@@ -87,11 +98,13 @@ let __postProgress = {
   completedParts: 0
 };
 
+
 function startPostProgress(totalParts, message = "در حال پردازش...") {
   __postProgress = { totalParts, completedParts: 0 };
   showUploadToast(message);
   updateUploadProgress(0);
 }
+
 
 function updatePartProgress(percentWithinPart) {
   const { totalParts, completedParts } = __postProgress;
@@ -103,10 +116,12 @@ function updatePartProgress(percentWithinPart) {
   updateUploadProgress(Math.round(overall));
 }
 
+
 function completePart() {
   __postProgress.completedParts += 1;
   updatePartProgress(100);
 }
+
 
 function finishPostProgress(success = true) {
   updateUploadProgress(100);
@@ -114,14 +129,17 @@ function finishPostProgress(success = true) {
   setTimeout(clearUploadToast, success ? 1800 : 3200);
 }
 
+
 // -------------------- Upload file with real progress via XHR --------------------
 function uploadWithProgress(file, path) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", `${SUPABASE_URL}/storage/v1/object/covers/${path}`);
 
+
     xhr.setRequestHeader("apikey", SUPABASE_KEY);
     xhr.setRequestHeader("Authorization", `Bearer ${SUPABASE_KEY}`);
+
 
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) {
@@ -129,6 +147,7 @@ function uploadWithProgress(file, path) {
         updatePartProgress(percent);
       }
     };
+
 
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
@@ -138,7 +157,9 @@ function uploadWithProgress(file, path) {
       }
     };
 
+
     xhr.onerror = () => reject(new Error("Network error"));
+
 
     const formData = new FormData();
     formData.append("file", file);
@@ -197,6 +218,7 @@ function showToast(message) {
     console.error('showToast error', err);
   }
 }
+
 
 // -------------------- Dialog --------------------
 function showDialog({ message = '', type = 'alert', defaultValue = '' } = {}) {
@@ -328,12 +350,14 @@ function showDialog({ message = '', type = 'alert', defaultValue = '' } = {}) {
   });
 }
 
+
 // -------------------- Floating Stories --------------------
 const storyToggle = document.getElementById('storyToggle');
 const storyPanel = document.getElementById('storyPanel');
 const storyToggleIcon = document.getElementById('storyToggleIcon');
 const storiesContainer = storyPanel?.querySelector('.stories');
 const goPaginationBtn = storyPanel?.querySelector('.go-pagination');
+
 
 // Toggle panel and rotate icon (keep same icon source)
 if (storyToggle && storyPanel && storyToggleIcon) {
@@ -343,6 +367,7 @@ if (storyToggle && storyPanel && storyToggleIcon) {
   });
 }
 
+
 // Fill stories for current page
 function renderStoriesForPage(pageItems) {
   if (!storiesContainer) return;
@@ -351,11 +376,13 @@ function renderStoriesForPage(pageItems) {
     const title = escapeHtml(rawTitle);
     const cover = escapeHtml(m.cover || 'https://via.placeholder.com/80');
 
+
     // شرط: اگر طول عنوان بیشتر از 14 کاراکتر بود → انیمیشن بخوره
     const isLong = rawTitle.length > 14;
     const titleHtml = isLong
       ? `<span>${title}</span>`   // داخل span برای انیمیشن
       : title;
+
 
     return `
       <div class="story" onclick="scrollToMovie(${idx})">
@@ -370,6 +397,7 @@ function renderStoriesForPage(pageItems) {
   }).join('');
 }
 
+
 // Scroll to card
 function scrollToMovie(index) {
   const cards = document.querySelectorAll('.movie-card');
@@ -378,10 +406,12 @@ function scrollToMovie(index) {
   }
 }
 
+
 // Go to pagination
 goPaginationBtn?.addEventListener('click', () => {
   document.getElementById('pagination')?.scrollIntoView({ behavior: 'smooth' });
 });
+
 
 // Helper to escape HTML
 function escapeHtml(text) {
@@ -389,6 +419,7 @@ function escapeHtml(text) {
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   })[m]);
 }
+
 
 // -------------------- Comments --------------------
 async function loadComments(movieId) {
@@ -422,6 +453,7 @@ function attachCommentsHandlers(card, movieId) {
   const textInput = card.querySelector('.comment-text');
   const sendBtn = card.querySelector('.comment-send');
 
+
   function renderComments(arr) {
     const latest = (arr || []).slice(-3).map(c => c.name || 'Guest');
     if (avatarsEl) avatarsEl.innerHTML = latest.map(n => `<div class="avatar">${escapeHtml(initials(n))}</div>`).join('');
@@ -452,6 +484,7 @@ function attachCommentsHandlers(card, movieId) {
   enterBtn?.addEventListener('click', openComments);
   summaryRow?.addEventListener('click', openComments);
   closeBtn?.addEventListener('click', closeComments);
+
 
   sendBtn?.addEventListener('click', async () => {
     let name = (nameInput?.value || 'Guest').trim() || 'Guest';
@@ -485,6 +518,7 @@ function attachCommentsHandlers(card, movieId) {
   refresh();
 }
 
+
 // -------------------- DOM Ready --------------------
 document.addEventListener('DOMContentLoaded', () => {
   // Element references
@@ -492,6 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const menuBtn = document.getElementById('menuBtn');
   const sideMenu = document.getElementById('sideMenu');
   const menuOverlay = document.getElementById('menuOverlay');
+
 
   const profileBtn = document.getElementById('profileBtn');
   const loginModal = document.getElementById('loginModal');
@@ -501,7 +536,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginPassword = document.getElementById('loginPassword');
   const loginWithGmail = document.getElementById('loginWithGmail');
 
+
   const searchInput = document.getElementById('search');
+
 
 if (searchInput) {
   searchInput.addEventListener("change", (e) => {
@@ -512,23 +549,29 @@ if (searchInput) {
   });
 }
 
+
   const moviesGrid = document.getElementById('moviesGrid');
   const movieCount = document.getElementById('movieCount');
   const genreGrid = document.getElementById('genreGrid');
 
+
   const adminMessagesContainer = document.getElementById('adminMessages');
   const paginationContainer = document.getElementById('pagination');
+
 
   const addMovieForm = document.getElementById('addMovieForm');
   const movieList = document.getElementById('movieList');
   const logoutBtn = document.getElementById('logoutBtn');
 
+
   const addMessageForm = document.getElementById('addMessageForm');
   const messageList = document.getElementById('messageList');
   const adminSearch = document.getElementById('adminSearch');
 
+
   // Defensive: hide login modal initially
   if (loginModal) loginModal.style.display = 'none';
+
 
   // Theme toggle
   function applyTheme(dark) {
@@ -544,6 +587,7 @@ if (searchInput) {
   }
   if (themeToggle) themeToggle.addEventListener('click', () => applyTheme(!document.body.classList.contains('dark')));
   if (localStorage.getItem('theme') === 'dark') applyTheme(true);
+
 
   // Side menu
   if (menuBtn && sideMenu && menuOverlay) {
@@ -566,8 +610,7 @@ if (searchInput) {
       if (!clickedInsideMenu && !clickedMenuBtn) closeMenu();
     });
   }
-
-  // Auth
+  
   async function refreshSessionUser() {
     try {
       const { data } = await supabase.auth.getSession();
@@ -581,6 +624,7 @@ if (searchInput) {
   supabase.auth.onAuthStateChange((_event, session) => {
     currentUser = session?.user || null;
   });
+
 
   if (profileBtn) {
     profileBtn.addEventListener('click', async () => {
@@ -630,6 +674,7 @@ if (searchInput) {
     });
   }
 
+
   // Fetch data
   async function fetchMovies() {
     try {
@@ -666,11 +711,13 @@ async function fetchEpisodes() {
       .order('movie_id', { ascending: true })
       .order('order_index', { ascending: true });
 
+
     if (error) {
       console.error('fetch episodes error', error);
       episodesByMovie.clear();
       return;
     }
+
 
     // ساخت کش: movie_id → episodes[]
     episodesByMovie.clear();
@@ -685,6 +732,7 @@ async function fetchEpisodes() {
   }
 }
 
+
   // Messages UI
   function markMessageAsRead(id) {
   let readIds = JSON.parse(localStorage.getItem("readMessages") || "[]");
@@ -693,6 +741,7 @@ async function fetchEpisodes() {
     localStorage.setItem("readMessages", JSON.stringify(readIds));
   }
 }
+
 
   function isMessageRead(id) {
   let readIds = JSON.parse(localStorage.getItem("readMessages") || "[]");
@@ -704,6 +753,7 @@ async function fetchEpisodes() {
   (messages || []).forEach(m => {
     // 👇 اگر قبلاً خوانده شده، نمایش نده
     if (isMessageRead(m.id)) return;
+
 
     const div = document.createElement('div');
     div.className = 'message-bubble';
@@ -741,8 +791,10 @@ async function fetchEpisodes() {
     div.className = 'genre-chip';
     div.textContent = g;
 
+
     // 👇 این خط اضافه شد
     div.setAttribute("dir", "auto");
+
 
     div.onclick = () => {
       if (searchInput) {
@@ -759,6 +811,7 @@ async function fetchEpisodes() {
   });
 }
 
+
   const genreToggle = document.getElementById('genreToggle');
   const genreSubmenu = document.getElementById('genreSubmenu');
   if (genreToggle && genreSubmenu) {
@@ -771,6 +824,7 @@ async function fetchEpisodes() {
       if (!clickedInside) genreSubmenu.style.display = 'none';
     });
   }
+
 
   // Pagination helpers
   function computeTotalPages(length) {
@@ -812,6 +866,7 @@ async function fetchEpisodes() {
     }
   }
 
+
   // Search live
   if (searchInput) {
   // وقتی کاربر تایپ می‌کنه → لیست فیلم‌ها فیلتر بشه
@@ -819,6 +874,17 @@ async function fetchEpisodes() {
     currentPage = 1;
     renderPagedMovies();
   });
+// قرار بده نزدیک ابتدای اسکریپت
+const imdbSlider = document.getElementById('ratingTrack') || document.getElementById('ratingKnob');
+// === IMDb Slider Logic ===
+if (imdbSlider) {
+  imdbSlider.addEventListener("input", (e) => {
+    const val = parseFloat(e.target.value).toFixed(1);
+    imdbValueBubble.textContent = `Rating > ${val}`;
+    imdbMinRating = parseFloat(val);
+  });
+}
+
 
   // وقتی کاربر سرچ رو نهایی کرد (خروج از فیلد)
   searchInput.addEventListener("change", async (e) => {
@@ -830,6 +896,7 @@ async function fetchEpisodes() {
       console.error("search log error:", err);
     }
   });
+
 
   // وقتی کاربر Enter زد
   searchInput.addEventListener("keydown", async (e) => {
@@ -847,6 +914,7 @@ async function fetchEpisodes() {
   
 const searchCloseBtn = document.getElementById('searchCloseBtn');
 
+
 if (searchInput && profileBtn && searchCloseBtn) {
   const toggleSearchDecor = () => {
     const hasText = searchInput.value.trim() !== '';
@@ -854,8 +922,10 @@ if (searchInput && profileBtn && searchCloseBtn) {
     searchCloseBtn.style.display = hasText ? 'flex' : 'none';
   };
 
+
   toggleSearchDecor();
   searchInput.addEventListener('input', toggleSearchDecor);
+
 
   searchCloseBtn.addEventListener('click', () => {
     searchInput.value = '';
@@ -864,12 +934,16 @@ if (searchInput && profileBtn && searchCloseBtn) {
 }
 
 
+
+
 // --------------------
 // Type filter tabs
 // --------------------
 let currentTypeFilter = "all";
 
+
 // شمارنده‌ها
+
 
 function updateTypeCounts() {
   if (!Array.isArray(movies)) return;
@@ -877,6 +951,7 @@ function updateTypeCounts() {
   const collections = movies.filter(m => (m.type || "").toLowerCase() === "collection").length;
   const serials = movies.filter(m => (m.type || "").toLowerCase() === "serial").length;
   const singles = movies.filter(m => (m.type || "").toLowerCase() === "single").length;
+
 
   document.querySelector('[data-type="all"] .count').textContent = all;
   document.querySelector('[data-type="collection"] .count').textContent = collections;
@@ -890,6 +965,7 @@ function filterByType(type) {
   renderPagedMovies();
 }
 
+
 // وصل کردن کلیک روی تب‌ها
 document.querySelectorAll(".movie-type-tabs button").forEach(btn => {
   btn.addEventListener("click", () => {
@@ -897,28 +973,35 @@ document.querySelectorAll(".movie-type-tabs button").forEach(btn => {
     document.querySelectorAll(".movie-type-tabs button").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
 
+
     // ریست کردن سرچ
     if (searchInput) {
       searchInput.value = '';
     }
+
 
     // ریست کردن ژانر انتخاب‌شده (زیر تب‌ها)
     currentTabGenre = null; // متغیر سراسری ژانر
     const genreChips = document.querySelectorAll('.tab-genres-list .genre-chip.active');
     genreChips.forEach(chip => chip.classList.remove('active'));
 
+
     // اعمال فیلتر نوع
     filterByType(btn.dataset.type);
   });
 });
+
+
 // -------------------- تشخیص جهت اسکرول --------------------
 let lastScrollY = window.scrollY;
 let scrollDirection = 'down';
+
 
 window.addEventListener('scroll', () => {
   scrollDirection = window.scrollY > lastScrollY ? 'down' : 'up';
   lastScrollY = window.scrollY;
 });
+
 
 function handleAnimIntersection(entries) {
   entries.forEach(entry => {
@@ -935,6 +1018,7 @@ function handleAnimIntersection(entries) {
     }
   });
 }
+
 
 const animObserver = new IntersectionObserver(handleAnimIntersection, { threshold: 0.1 });
 function handleCardIntersection(entries) {
@@ -955,12 +1039,14 @@ function handleCardIntersection(entries) {
   });
 }
 
+
 const cardObserver = new IntersectionObserver(handleCardIntersection, {
   threshold: 0.1
 });
 // -------------------- Render movies (paged) --------------------
 // متغیر سراسری برای ژانر انتخاب‌شده
 let currentTabGenre = null;
+
 
 function buildTabGenres(filteredMovies = null) {
   const container = document.querySelector('.tab-genres-list');
@@ -981,6 +1067,14 @@ function buildTabGenres(filteredMovies = null) {
     } else if (currentTypeFilter === "single") {
       baseMovies = movies.filter(m => (m.type || "").toLowerCase() === "single");
     }
+  }
+
+  // 🔹 شرط IMDb اضافه شد
+  if (imdbMinRating !== null) {
+    baseMovies = baseMovies.filter(m => {
+      const val = parseFloat(m.imdb || "0");
+      return val >= imdbMinRating;
+    });
   }
 
   // شمارش ژانرها
@@ -1051,6 +1145,7 @@ function buildTabGenres(filteredMovies = null) {
     container.appendChild(chip);
   });
 }
+
 const episodeMatches = new Map(); // movie_id → index اپیزود
 // تابع کمکی برای ساخت حباب‌ها
 function renderChips(str) {
@@ -1079,12 +1174,15 @@ async function renderPagedMovies(skipScroll) {
   if (!moviesGrid || !movieCount) return;
   const q = (searchInput?.value || '').toLowerCase();
 
+
   // هر بار سرچ جدید انجام میشه، مقادیر قبلی پاک بشن
   episodeMatches.clear();
+
 
   // 1. فیلتر سرچ
   let filtered = movies.filter(m => {
     const movieMatch = Object.values(m).some(val => typeof val === 'string' && val.toLowerCase().includes(q));
+
 
     let episodeMatch = false;
     if (!movieMatch && (m.type === 'collection' || m.type === 'serial')) {
@@ -1101,8 +1199,10 @@ async function renderPagedMovies(skipScroll) {
       episodeMatches.delete(m.id);
     }
 
+
     return movieMatch || episodeMatch;
   });
+
 
   // 2. فیلتر نوع
   if (currentTypeFilter !== "all") {
@@ -1115,6 +1215,7 @@ async function renderPagedMovies(skipScroll) {
     });
   }
 
+
   // 3. فیلتر ژانر
   if (currentTabGenre) {
     filtered = filtered.filter(m => {
@@ -1122,16 +1223,35 @@ async function renderPagedMovies(skipScroll) {
     });
   }
 
+// فیلتر IMDb
+if (imdbMinRating !== null) {
+  filtered = filtered.filter(m => {
+    const val = parseFloat(m.imdb || "0");
+    return val >= imdbMinRating;
+  });
+}
+
+if (imdbMinRating !== null) {
+  filtered = filtered.filter(m => {
+    const val = parseFloat(m.imdb || "0");
+    return val >= imdbMinRating;
+  });
+}
+
   if (typeof updateTypeCounts === 'function') updateTypeCounts();
+
 
   const totalPages = computeTotalPages(filtered.length);
   if (currentPage > totalPages) currentPage = totalPages;
 
+
   const start = (currentPage - 1) * PAGE_SIZE;
   const pageItems = filtered.slice(start, start + PAGE_SIZE);
 
+
   moviesGrid.innerHTML = '';
   movieCount.innerText = `Number of movies: ${filtered.length}`;
+
 
   for (const m of pageItems) {
     const cover = escapeHtml(m.cover || 'https://via.placeholder.com/300x200?text=No+Image');
@@ -1142,9 +1262,11 @@ async function renderPagedMovies(skipScroll) {
     const imdb = escapeHtml(m.imdb || '-');
     const release_info = escapeHtml(m.release_info || '-');
 
+
     const card = document.createElement('div');
     card.classList.add('movie-card' , 'reveal');
     card.dataset.movieId = m.id;
+
 
     const badgeHtml = m.type && m.type !== 'single'
       ? `<span class="collection-badge ${m.type === 'collection' ? 'badge-collection' : 'badge-serial'}">
@@ -1153,11 +1275,13 @@ async function renderPagedMovies(skipScroll) {
          </span>`
       : '';
 
+
     card.innerHTML = `
   <div class="cover-container anim-vertical">
     <div class="cover-blur anim-vertical" style="background-image: url('${cover}');"></div>
     <img class="cover-image anim-vertical" src="${cover}" alt="${title}">
   </div>
+
 
   <div class="movie-info anim-vertical">
     <div class="movie-title anim-left-right">
@@ -1165,22 +1289,27 @@ async function renderPagedMovies(skipScroll) {
       ${badgeHtml}
     </div>
 
+
     <span class="field-label anim-vertical"><img src="images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
     <div class="field-quote anim-left-right synopsis-quote">
       <div class="quote-text anim-horizontal">${synopsis}</div>
       <button class="quote-toggle-btn">More</button>
     </div>
 
+
     <span class="field-label anim-vertical"><img src="images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span>
     <div class="field-quote anim-left-right">${director}</div>
+
 
     <span class="field-label anim-vertical"><img src="images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
     <div class="field-quote anim-horizontal">
       ${renderChips(m.product || '-')}
     </div>
 
+
     <span class="field-label anim-vertical"><img src="images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
     <div class="field-quote anim-left-right">${stars}</div>
+
 
     <span class="field-label anim-vertical">
       <img src="images/icons8-imdb-48.png" class="imdb-bell" style="width:20px;height:20px;">
@@ -1190,23 +1319,29 @@ async function renderPagedMovies(skipScroll) {
       <span class="chip imdb-chip anim-horizontal">${imdb}</span>
     </div>
 
+
     <span class="field-label anim-vertical"><img src="images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span>
     <div class="field-quote anim-left-right">${release_info}</div>
 
+
     <span class="field-label anim-vertical"><img src="images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span>
     <div class="field-quote genre-grid anim-horizontal">${renderChips(m.genre || '-')}</div>
+
 
     <div class="episodes-container anim-vertical" data-movie-id="${m.id}">
       <div class="episodes-list anim-left-right"></div>
     </div>
 
+
     <button class="go-btn anim-vertical" data-link="${escapeHtml(m.link || '#')}">Go to file</button>
+
 
     <div class="comment-summary anim-horizontal">
       <div class="avatars anim-vertical"></div>
       <div class="comments-count">0 comments</div>
       <button class="enter-comments"><img src="images/icons8-comment.apng" style="width:22px;height:22px;"></button>
     </div>
+
 
     <div class="comments-panel" aria-hidden="true">
       <div class="comments-panel-inner">
@@ -1225,15 +1360,18 @@ async function renderPagedMovies(skipScroll) {
   </div>
 `;
 
+
     moviesGrid.appendChild(card);
     cardObserver.observe(card);
     card.querySelectorAll('.anim-horizontal, .anim-vertical, .anim-left-right').forEach(el => {
       animObserver.observe(el);
     });
 
+
     const goBtn = card.querySelector('.go-btn');
 goBtn?.addEventListener('click', async () => {
   const link = goBtn.dataset.link || '#';
+
 
   // 🔹 ثبت لاگ کلیک در Supabase
   try {
@@ -1242,6 +1380,7 @@ goBtn?.addEventListener('click', async () => {
     const epIndex = epActiveEl
       ? Array.from(epActiveEl.parentElement.children).indexOf(epActiveEl)
       : null;
+
 
     const activeTitle = (() => {
   // اگر اپیزود فعال هست
@@ -1253,19 +1392,24 @@ goBtn?.addEventListener('click', async () => {
   return m.title;
 })();
 
+
 await supabase.from("click_logs").insert([
   { movie_id: movieId, episode_index: epIndex, link, title: activeTitle }
 ]);
 
+
   } catch (err) {
     console.error("click log error:", err);
   }
+
 
   // 🔹 باز کردن لینک
   if (link && link !== '#') {
     window.open(link, '_blank');
   }
 });
+
+
 
 
     attachCommentsHandlers(card, m.id);
@@ -1278,10 +1422,12 @@ await supabase.from("click_logs").insert([
           .eq('movie_id', m.id)
           .order('order_index', { ascending: true });
 
+
         if (epsErr) {
           console.error('Error loading episodes:', epsErr);
           return;
         }
+
 
         const allEpisodes = [
           { 
@@ -1300,10 +1446,13 @@ await supabase.from("click_logs").insert([
           ...(eps || [])
         ];
 
+
         const listEl = card.querySelector('.episodes-list');
+
 
         // اگر اپیزود match شده بود، همون index فعال میشه
         const activeIndex = episodeMatches.get(m.id) ?? 0;
+
 
         listEl.innerHTML = allEpisodes.map((ep, idx) => {
           const titleText = escapeHtml(ep.title || '');
@@ -1320,9 +1469,11 @@ await supabase.from("click_logs").insert([
         // لینک Go روی اپیزود فعال ست میشه
         goBtn.dataset.link = allEpisodes[activeIndex].link;
 
+
         // آپدیت IMDb chip برای اپیزود فعال
         const imdbChip = card.querySelector('.imdb-chip');
         if (imdbChip) imdbChip.textContent = allEpisodes[activeIndex].imdb || m.imdb;
+
 
         // 🔹 آپدیت badge-count با تعداد اپیزودها + متن
         const badgeCount = card.querySelector('.collection-badge .badge-count');
@@ -1331,9 +1482,11 @@ await supabase.from("click_logs").insert([
           badgeCount.textContent = totalEpisodes + (totalEpisodes > 1 ? " episodes" : " episode");
         }
 
+
         // اگر اپیزود match شده بود
         if (activeIndex > 0) {
           const ep = allEpisodes[activeIndex];
+
 
           if (m.type === 'collection') {
             // تغییر همه مشخصات
@@ -1353,6 +1506,7 @@ await supabase.from("click_logs").insert([
             card.querySelectorAll('.field-quote')[6].innerHTML = renderChips(ep.genre || m.genre || '-');
           }
 
+
           if (m.type === 'serial') {
             // فقط تغییر title + cover + blur + link
             const nameEl = card.querySelector('.movie-name');
@@ -1364,6 +1518,7 @@ await supabase.from("click_logs").insert([
             goBtn.dataset.link = ep.link;
           }
         }
+
 
         // 👇 اسکرول خودکار فقط اگر سرچ باعث match شده باشه
         setTimeout(() => {
@@ -1381,15 +1536,19 @@ await supabase.from("click_logs").insert([
           }
         }, 100);
 
+
         // هندل کلیک روی اپیزودها
         listEl.querySelectorAll('.episode-card').forEach((cardEl, idx) => {
           cardEl.addEventListener('click', () => {
             listEl.querySelectorAll('.episode-card').forEach(c => c.classList.remove('active'));
             cardEl.classList.add('active');
 
+
             const ep = allEpisodes[idx];
 
+
             if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
+
 
             if (m.type === 'serial') {
               const nameEl = card.querySelector('.movie-name');
@@ -1417,6 +1576,7 @@ await supabase.from("click_logs").insert([
               goBtn.dataset.link = ep.link;
             }
 
+
             if (allEpisodes.length > 3) {
               const prevScrollY = window.scrollY;
               cardEl.scrollIntoView({
@@ -1431,6 +1591,7 @@ await supabase.from("click_logs").insert([
           });
         });
 
+
         // اگر badge نبود، با شمارش اضافه شود
         const titleEl = card.querySelector('.movie-title');
         if (titleEl && !titleEl.querySelector('.collection-badge') && (m.type && m.type !== 'single')) {
@@ -1443,16 +1604,19 @@ await supabase.from("click_logs").insert([
     }
   }
 
+
   // -------------------- toggle برای synopsis --------------------
   document.querySelectorAll('.synopsis-quote').forEach(quote => {
     const textEl = quote.querySelector('.quote-text');
     const btn = quote.querySelector('.quote-toggle-btn');
     if (!textEl || !btn) return;
 
+
     const fullText = textEl.textContent.trim();
     if (fullText.length > 200) {
       const shortText = fullText.substring(0, 200) + '…';
       let collapsed = true;
+
 
       function applyState() {
         if (collapsed) {
@@ -1469,17 +1633,21 @@ await supabase.from("click_logs").insert([
         }
       }
 
+
       function toggleQuote() {
         collapsed = !collapsed;
         applyState();
       }
 
+
       applyState();
+
 
       btn.addEventListener('click', e => {
         e.stopPropagation();
         toggleQuote();
       });
+
 
       quote.addEventListener('click', e => {
         if (e.target.closest('a')) return;
@@ -1491,9 +1659,11 @@ await supabase.from("click_logs").insert([
     }
   });
 
+
   // -------------------- صفحه‌بندی و ژانر --------------------
   renderPagination(filtered.length);
   buildTabGenres(filtered);
+
 
   // -------------------- اسکرول به بالا --------------------
   if (!skipScroll) {
@@ -1531,10 +1701,12 @@ renderStoriesForPage(pageItems);
     });
   }
 
+
   // -------------------- Admin list (minimal) --------------------
   let adminCurrentPage = 1;
   let adminTotalPages = 1;
   const adminPageSize = 10;
+
 
   async function loadAdminMovies(page = 1) {
     adminCurrentPage = page;
@@ -1553,6 +1725,7 @@ renderStoriesForPage(pageItems);
 function renderAdminMovieList(list = []) {
   if (!window.movieList) return;
   movieList.innerHTML = '';
+
 
   list.forEach(m => {
     const row = document.createElement('div');
@@ -1579,15 +1752,18 @@ function renderAdminMovieList(list = []) {
       <div class="admin-comments-panel" id="comments-${m.id}" style="display:none;"></div>
     `;
 
+
     // -------------------- Edit --------------------
     row.querySelector('.btn-edit')?.addEventListener('click', async () => {
       editingMovie = m;
       window.editingMovie = m;
 
+
       // پر کردن فیلدهای اصلی
       const fill = id => document.getElementById(id);
       ['title','link','synopsis','director','product','stars','imdb','release_info','genre']
         .forEach(f => { const el = fill(f); if (el) el.value = m[f] || ''; });
+
 
       // نمایش کاور اصلی
       const coverPreview = document.getElementById('cover-preview');
@@ -1596,18 +1772,22 @@ function renderAdminMovieList(list = []) {
         coverPreview.style.display = m.cover ? 'block' : 'none';
       }
 
+
       // آماده‌سازی فرم‌های باندل
       const formsWrap = document.getElementById('bundle-forms');
       if (formsWrap) formsWrap.innerHTML = '';
       const actionsBar = document.getElementById('bundle-actions');
       if (actionsBar) actionsBar.classList.remove('show');
 
+
       // 👇 همیشه مقدار mode رو ست کن
       const modeInput = document.getElementById('mode');
       if (modeInput) modeInput.value = m.type || 'single';
 
+
       if (m.type === 'collection' || m.type === 'serial') {
         if (actionsBar) actionsBar.classList.add('show');
+
 
         // گرفتن آیتم‌ها از دیتابیس
         const { data: eps, error } = await supabase
@@ -1615,6 +1795,7 @@ function renderAdminMovieList(list = []) {
           .select('*')
           .eq('movie_id', m.id)
           .order('order_index', { ascending: true });
+
 
         if (error) {
           console.error('load items err', error);
@@ -1627,8 +1808,10 @@ function renderAdminMovieList(list = []) {
         if (typeof resetMode === 'function') resetMode();
       }
 
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+
 
     // -------------------- Delete --------------------
     row.querySelector('.btn-delete')?.addEventListener('click', async () => {
@@ -1643,6 +1826,7 @@ function renderAdminMovieList(list = []) {
         await fetchMovies(); 
       }
     });
+
 
     // -------------------- Comments toggle --------------------
     const toggleBtn = row.querySelector('.toggle-comments');
@@ -1689,6 +1873,7 @@ function renderAdminMovieList(list = []) {
       }
     });
 
+
     movieList.appendChild(row);
   });
 }
@@ -1700,9 +1885,11 @@ function clearEpisodeForms() {
   if (addBtn) addBtn.style.display = 'none';
 }
 
+
 function fillBundleFormsFromItems(items, formsWrap, mode = 'add', type = 'collection') {
   formsWrap.innerHTML = '';
   if (!items || !items.length) return;
+
 
   // تعیین اینکه آیا items[0] اپیزود اصلی (فرم main) است یا نه
   // در حالت edit اگر عنوان فرم main با عنوان items[0] همخوانی داشت،
@@ -1720,10 +1907,12 @@ function fillBundleFormsFromItems(items, formsWrap, mode = 'add', type = 'collec
     }
   }
 
+
   // اکنون آیتم‌های باندل (اپیزود 2 به بعد) را از startIdx به جلو بساز
   for (let idx = startIdx; idx < items.length; idx++) {
     const ep = items[idx];
     const relativeIdx = idx - startIdx; // 0 برای اپیزود دوم در صفحه
+
 
     if (relativeIdx === 0) {
       // اپیزود دوم → دکمه کالکشن یا سریال (همان دکمه‌ای که ابتدا اجرا می‌شود)
@@ -1747,6 +1936,7 @@ function fillBundleFormsFromItems(items, formsWrap, mode = 'add', type = 'collec
       }
     }
 
+
     // آخرین فرمی که ساخته شد رو پر کن
     const newForm = formsWrap.lastElementChild;
     if (newForm) fillFormWithEpisode(newForm, ep, type);
@@ -1755,36 +1945,46 @@ function fillBundleFormsFromItems(items, formsWrap, mode = 'add', type = 'collec
 function fillFormWithEpisode(formEl, ep, type) {
   if (!formEl || !ep) return;
 
+
   if (type === 'collection') {
     const inpTitle = formEl.querySelector('input[placeholder="Title"]');
     if (inpTitle) inpTitle.value = ep.title || '';
 
+
     const inpFileLink = formEl.querySelector('input[placeholder="File Link"]');
     if (inpFileLink) inpFileLink.value = ep.link || '';
+
 
     const ta = formEl.querySelector('textarea');
     if (ta) ta.value = ep.synopsis || '';
 
+
     const inpDirector = formEl.querySelector('input[placeholder="Director"]');
     if (inpDirector) inpDirector.value = ep.director || '';
+
 
     const inpProduct = formEl.querySelector('input[placeholder="Product"]');
     if (inpProduct) inpProduct.value = ep.product || '';
 
+
     const inpStars = formEl.querySelector('input[placeholder="Stars"]');
     if (inpStars) inpStars.value = ep.stars || '';
+
 
     const inpImdb = formEl.querySelector('input[placeholder="IMDB"]');
     if (inpImdb) inpImdb.value = ep.imdb || '';
 
+
     const inpRelease = formEl.querySelector('input[placeholder="Release Info"]');
     if (inpRelease) inpRelease.value = ep.release_info || '';
+
 
     const inpGenre = formEl.querySelector('input[placeholder="Genre (space-separated)"]');
     if (inpGenre) inpGenre.value = ep.genre || '';
   } else if (type === 'serial') {
     const inpTitle = formEl.querySelector('input[placeholder="Title"]');
     if (inpTitle) inpTitle.value = ep.title || '';
+
 
     const inpLink = formEl.querySelector('input[placeholder="Link"]');
     if (inpLink) inpLink.value = ep.link || '';
@@ -1798,13 +1998,16 @@ function fillFormWithEpisode(formEl, ep, type) {
     if (inpLink && !inpFileLink) inpLink.value = ep.link || '';
   }
 
+
   // هندل کاور (بدون optional chaining در سمت چپ)
   if (ep.cover) {
     formEl.dataset.existingCover = ep.cover;
 
+
     // اگر preview از قبل وجود دارد، آن را بردار و دوباره اضافه کن تا تکراری نشود
     const existingPreview = formEl.querySelector('.bundle-cover-preview');
     if (existingPreview) existingPreview.remove();
+
 
     const preview = document.createElement('img');
     preview.src = ep.cover;
@@ -1820,6 +2023,7 @@ function renderEpisodeForms(eps = []) {
   if (!container) return;
   container.innerHTML = '';
 
+
   eps.forEach((ep, idx) => {
     const form = document.createElement('div');
     form.className = 'episode-form';
@@ -1828,30 +2032,39 @@ function renderEpisodeForms(eps = []) {
       <label>عنوان اپیزود</label>
       <input type="text" name="ep_title_${ep.id}" value="${escapeHtml(ep.title || '')}" />
 
+
       <label>کاور اپیزود</label>
       <input type="file" name="ep_cover_${ep.id}" />
       ${ep.cover ? `<img src="${escapeHtml(ep.cover)}" style="width:80px;height:auto;margin-top:4px;">` : ''}
 
+
       <label>خلاصه</label>
       <textarea name="ep_synopsis_${ep.id}">${escapeHtml(ep.synopsis || '')}</textarea>
+
 
       <label>کارگردان</label>
       <input type="text" name="ep_director_${ep.id}" value="${escapeHtml(ep.director || '')}" />
 
+
       <label>محصول</label>
       <input type="text" name="ep_product_${ep.id}" value="${escapeHtml(ep.product || '')}" />
+
 
       <label>بازیگران</label>
       <input type="text" name="ep_stars_${ep.id}" value="${escapeHtml(ep.stars || '')}" />
 
+
       <label>IMDB</label>
       <input type="text" name="ep_imdb_${ep.id}" value="${escapeHtml(ep.imdb || '')}" />
+
 
       <label>تاریخ انتشار</label>
       <input type="text" name="ep_release_${ep.id}" value="${escapeHtml(ep.release_info || '')}" />
 
+
       <label>ژانر</label>
       <input type="text" name="ep_genre_${ep.id}" value="${escapeHtml(ep.genre || '')}" />
+
 
       <label>لینک فایل</label>
       <input type="text" name="ep_link_${ep.id}" value="${escapeHtml(ep.link || '')}" />
@@ -1859,12 +2072,14 @@ function renderEpisodeForms(eps = []) {
     container.appendChild(form);
   });
 
+
   const addBtn = document.getElementById('add-episode-btn');
   if (addBtn) addBtn.style.display = 'inline-block';
 }
 // -------------------- Admin messages management --------------------
   if (addMessageForm && messageList) {
     enforceAdminGuard().then(ok => { if (!ok) return; });
+
 
     addMessageForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1878,6 +2093,7 @@ function renderEpisodeForms(eps = []) {
         showToast('Message added');
       }
     });
+
 
     function renderAdminMessages() {
       messageList.innerHTML = '';
@@ -1895,11 +2111,13 @@ function renderEpisodeForms(eps = []) {
       });
     }
 
+
     messageList.addEventListener('click', async (e) => {
       const btn = e.target.closest('button');
       if (!btn) return;
       const id = btn.dataset.id;
       if (!id) return;
+
 
       if (btn.classList.contains('btn-edit')) {
         const msg = messages.find(x => String(x.id) === String(id));
@@ -1911,6 +2129,7 @@ function renderEpisodeForms(eps = []) {
         else { await fetchMessages(); showToast('Message updated'); }
       }
 
+
       if (btn.classList.contains('btn-delete')) {
         const ok = await showDialog({ message: 'Delete this message?', type: 'confirm' });
         if (!ok) return;
@@ -1920,8 +2139,10 @@ function renderEpisodeForms(eps = []) {
       }
     });
 
+
     renderAdminMessages();
   }
+
 
   function renderAdminPagination() {
     const container = document.getElementById('admin-pagination');
@@ -1938,15 +2159,18 @@ function renderEpisodeForms(eps = []) {
   }
   loadAdminMovies();
 
+
 async function loadAnalytics() {
   // فقط اگر ادمین لاگین است
   const ok = await enforceAdminGuard();
   if (!ok) return;
 
+
   // دریافت داده‌ها از ویوها
   const { data: visits, error: vErr } = await supabase.from("v_visits_daily").select("*");
   const { data: searches, error: sErr } = await supabase.from("v_top_searches").select("*").limit(10);
   const { data: clicks, error: cErr } = await supabase.from("v_top_clicks").select("*").limit(10);
+
 
   if (vErr || sErr || cErr) {
     console.error("analytics errors:", { vErr, sErr, cErr });
@@ -1954,12 +2178,14 @@ async function loadAnalytics() {
     return;
   }
 
+
   // داده‌های visits برای Chart.js
   const labels = (visits || []).map(row => {
     const d = new Date(row.day);
     return d.toLocaleDateString();
   });
   const values = (visits || []).map(row => Number(row.visits) || 0);
+
 
   // رندر چارت
   const canvas = document.getElementById("visitsChart");
@@ -1998,6 +2224,7 @@ async function loadAnalytics() {
     canvas._chartInstance = chart;
   }
 
+
   // Top searches
   const topSearchesEl = document.getElementById("topSearches");
   if (topSearchesEl) {
@@ -2005,6 +2232,7 @@ async function loadAnalytics() {
       `<div class="message-item"><span>${escapeHtml(row.query)}</span><span style="font-weight:bold;">${row.times}</span></div>`
     ).join("") || "<p>No searches yet.</p>";
   }
+
 
   // Top clicks
 const topClicksEl = document.getElementById("topClicks");
@@ -2015,23 +2243,29 @@ if (topClicksEl) {
 }
 }
 
+
 // -------------------- Admin: add/edit movie --------------------
 if (addMovieForm && movieList) {
   enforceAdminGuard().then(ok => { if (!ok) return; });
 
+
   if (!window.__addMovieSubmitBound) {
     window.__addMovieSubmitBound = true;
+
 
     addMovieForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
 
+
       const ok = await enforceAdminGuard();
       if (!ok) return;
+
 
       // --------- read base fields ---------
       const modeEl = document.getElementById('mode');
       const selectedType = (modeEl?.value || 'single'); // 'single' | 'collection' | 'serial'
+
 
       const title = document.getElementById('title')?.value?.trim() || '';
       const link = document.getElementById('link')?.value?.trim() || '';
@@ -2043,17 +2277,21 @@ if (addMovieForm && movieList) {
       const release_info = document.getElementById('release_info')?.value?.trim() || '';
       const genre = document.getElementById('genre')?.value?.trim() || '';
 
+
       // --------- cover upload (main) ---------
       const coverInput = document.getElementById('coverFile');
       const coverFile = coverInput?.files?.[0];
       let coverUrl = '';
 
+
       const isEditing = Boolean(editingMovie && editingMovie.id);
+
 
       // --------- helpers for bundle forms ---------
       const formsWrapEl = document.getElementById('bundle-forms');
       const bundleChildren = formsWrapEl ? [...formsWrapEl.children] : [];
       const hasBundleForms = bundleChildren.length > 0;
+
 
       const buildItemsFromForms = (movieId, type) => {
         const out = [];
@@ -2064,6 +2302,7 @@ if (addMovieForm && movieList) {
           const linkVal = (type === 'collection') ? linkValCollection : linkValSerial;
           if (!titleVal && !linkVal) return;
 
+
           // کاور آیتم: یا فایل جدید یا کاور قبلی ذخیره‌شده
           let coverVal = '';
           const fileInput = formEl.querySelector('input[type="file"]');
@@ -2072,6 +2311,7 @@ if (addMovieForm && movieList) {
           } else if (formEl.dataset.existingCover) {
             coverVal = formEl.dataset.existingCover;
           }
+
 
           if (type === 'collection') {
             out.push({
@@ -2101,6 +2341,7 @@ if (addMovieForm && movieList) {
         return out;
       };
 
+
       // --------- شمارش کل بخش‌ها برای Progress کلی پست ---------
       const uploadParts =
         (coverFile ? 1 : 0) +
@@ -2109,6 +2350,7 @@ if (addMovieForm && movieList) {
           return acc + (f && f.files && f.files.length > 0 ? 1 : 0);
         }, 0);
 
+
       let dbParts = 1;
       if (isEditing) {
         dbParts = 2;
@@ -2116,8 +2358,10 @@ if (addMovieForm && movieList) {
         dbParts = 3;
       }
 
+
       const totalParts = uploadParts + dbParts;
       startPostProgress(totalParts, "در حال آپلود و ثبت پست...");
+
 
       // --------- آپلود کاور اصلی با Progress واقعی ---------
       if (coverFile) {
@@ -2135,12 +2379,14 @@ if (addMovieForm && movieList) {
         }
       }
 
+
       // --------- آپلود کاور آیتم‌ها با Progress واقعی ---------
       const uploadItemCoversInPlace = async (items) => {
         for (let i = 0; i < bundleChildren.length; i++) {
           const formEl = bundleChildren[i];
           const fileInput = formEl.querySelector('input[type="file"]');
           const file = fileInput?.files?.[0];
+
 
           if (file) {
             try {
@@ -2168,13 +2414,16 @@ if (addMovieForm && movieList) {
       if (isEditing) {
         const movieId = editingMovie.id;
 
+
         let intendedType = selectedType;
+
 
         let items = [];
         if (intendedType !== 'single') {
           items = buildItemsFromForms(movieId, intendedType);
           const okUpload = await uploadItemCoversInPlace(items);
           if (!okUpload) return;
+
 
           await supabase.from('movie_items').delete().eq('movie_id', movieId);
           if (items.length > 0) {
@@ -2184,12 +2433,14 @@ if (addMovieForm && movieList) {
           await supabase.from('movie_items').delete().eq('movie_id', movieId);
         }
 
+
         let finalType = 'single';
         if (intendedType === 'collection' && items.length >= 0) {
           finalType = 'collection';
         } else if (intendedType === 'serial' && items.length >= 0) {
           finalType = 'serial';
         }
+
 
         const updateData = {
           title,
@@ -2205,8 +2456,10 @@ if (addMovieForm && movieList) {
         };
         if (coverUrl) updateData.cover = coverUrl;
 
+
         const { error: updErr } = await supabase.from('movies').update(updateData).eq('id', movieId);
         completePart(); // بخش دیتابیس
+
 
         if (updErr) {
           console.error('update movie error', updErr);
@@ -2214,6 +2467,7 @@ if (addMovieForm && movieList) {
           showToast('Update movie failed');
           return;
         }
+
 
         finishPostProgress(true);
         showToast('Movie updated');
@@ -2224,6 +2478,7 @@ if (addMovieForm && movieList) {
         return;
       }
 
+
       // ==================== ADD ====================
       if (!coverUrl) {
         finishPostProgress(false);
@@ -2231,15 +2486,18 @@ if (addMovieForm && movieList) {
         return;
       }
 
+
       let provisionalType = 'single';
       if (selectedType !== 'single' && hasBundleForms) {
         provisionalType = selectedType;
       }
 
+
       const newMovie = {
         title, cover: coverUrl, link, synopsis, director, product, stars, imdb, release_info, genre,
         type: provisionalType
       };
+
 
       const { data: inserted, error: addErr } = await supabase
         .from('movies')
@@ -2248,6 +2506,7 @@ if (addMovieForm && movieList) {
         .single();
       completePart(); // درج فیلم
 
+
       if (addErr || !inserted) {
         console.error('movie insert err', addErr);
         finishPostProgress(false);
@@ -2255,9 +2514,11 @@ if (addMovieForm && movieList) {
         return;
       }
 
+
       let items = [];
       if (provisionalType !== 'single') {
         items = buildItemsFromForms(inserted.id, provisionalType);
+
 
         if (provisionalType === 'collection' && items.length < 1) {
           finishPostProgress(false);
@@ -2266,8 +2527,10 @@ if (addMovieForm && movieList) {
           return;
         }
 
+
         const okUpload = await uploadItemCoversInPlace(items);
         if (!okUpload) return;
+
 
         if (items.length > 0) {
           const { error: itemsError } = await supabase.from('movie_items').insert(items);
@@ -2282,6 +2545,7 @@ if (addMovieForm && movieList) {
         }
       }
 
+
       let finalType = 'single';
       if (provisionalType === 'collection' && items.length >= 1) {
         finalType = 'collection';
@@ -2289,8 +2553,10 @@ if (addMovieForm && movieList) {
         finalType = 'serial';
       }
 
+
       await supabase.from('movies').update({ type: finalType }).eq('id', inserted.id);
       completePart(); // آپدیت نوع نهایی
+
 
       finishPostProgress(true);
       showToast('Movie added');
@@ -2301,6 +2567,8 @@ if (addMovieForm && movieList) {
     });
   }
 }
+
+
 
 
   // -------------------- Unapproved comments badge --------------------
@@ -2315,6 +2583,7 @@ if (addMovieForm && movieList) {
       else { if (badge) badge.style.display = 'none'; }
     } catch (err) { console.error('Exception in checkUnapprovedComments:', err); const badge = document.getElementById('commentBadge'); if (badge) badge.style.display = 'none'; }
   }
+
 
   // -------------------- Social links --------------------
   async function fetchSocialLinks() {
@@ -2336,6 +2605,7 @@ if (linksHeader) {
   linksHeader.addEventListener('click', () => {
     const grid = document.getElementById('socialGrid');
     grid.classList.toggle('hidden');
+
 
     // تغییر آیکون فلش
     const icon = linksHeader.querySelector('.toggle-icon');
@@ -2403,6 +2673,7 @@ if (linksHeader) {
     fetchAdminSocialLinks();
   }
 
+
   // -------------------- Bundle (Collection / Serial) forms UI --------------------
   const btnCollection = document.getElementById("btn-collection");
   const btnSerial = document.getElementById("btn-serial");
@@ -2411,6 +2682,7 @@ if (linksHeader) {
   const btnAdd = document.getElementById("btn-add-item");
   const btnRemove = document.getElementById("btn-remove-last");
   const modeInput = document.getElementById("mode");
+
 
   if (btnCollection && btnSerial && formsWrap && actionsBar && btnAdd && btnRemove && modeInput) {
     function resetMode() {
@@ -2489,17 +2761,21 @@ if (linksHeader) {
     });
   }
 
+
 const adminSearchInput = document.getElementById('adminSearch');
+
 
 if (adminSearchInput) {
   adminSearchInput.addEventListener('input', async () => {
     const q = adminSearchInput.value.trim().toLowerCase();
+
 
     if (!q) {
       // اگه سرچ خالی بود، لیست کامل رو بیار
       loadAdminMovies(1);
       return;
     }
+
 
     // سرچ در دیتابیس
     const { data, error } = await supabase
@@ -2508,10 +2784,12 @@ if (adminSearchInput) {
       .or(`title.ilike.%${q}%,director.ilike.%${q}%,genre.ilike.%${q}%`)
       .order('created_at', { ascending: false });
 
+
     if (error) {
       console.error('Admin search error:', error);
       return;
     }
+
 
     renderAdminMovieList(data);
     // صفحه‌بندی رو خالی کن چون سرچ معمولاً همه نتایج رو نشون میده
@@ -2520,38 +2798,47 @@ if (adminSearchInput) {
   });
 }
 
+
 // -------------show upload toast
 function showUploadToast(message) {
   const container = document.getElementById("toast-container");
   container.innerHTML = ""; // فقط یکی نشون بده
 
+
   const toast = document.createElement("div");
   toast.className = "toast";
+
 
   const msg = document.createElement("div");
   msg.className = "message";
   msg.textContent = message;
 
+
   const progressBar = document.createElement("div");
   progressBar.className = "progress-bar";
 
+
   const progressFill = document.createElement("div");
   progressFill.className = "progress-fill";
+
 
   progressBar.appendChild(progressFill);
   toast.appendChild(msg);
   toast.appendChild(progressBar);
   container.appendChild(toast);
 
+
   // ذخیره وضعیت در localStorage
   localStorage.setItem("uploadToast", JSON.stringify({ message, progress: 0 }));
 }
+
 
 function updateUploadProgress(percent) {
   const fill = document.querySelector(".progress-fill");
   if (fill) {
     fill.style.width = percent + "%";
   }
+
 
   // ذخیره درصد در localStorage
   const saved = localStorage.getItem("uploadToast");
@@ -2562,11 +2849,13 @@ function updateUploadProgress(percent) {
   }
 }
 
+
 function clearUploadToast() {
   const container = document.getElementById("toast-container");
   container.innerHTML = "";
   localStorage.removeItem("uploadToast");
 }
+
 
 // وقتی صفحه لود شد، وضعیت رو از localStorage بخون
 document.addEventListener("DOMContentLoaded", () => {
@@ -2578,6 +2867,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+
 // هر 10 دقیقه یکبار یک درخواست ساده به سوپابیس
 setInterval(async () => {
   try {
@@ -2585,6 +2875,7 @@ setInterval(async () => {
       .from('movie_items')
       .select('id')
       .limit(1);
+
 
     if (error) {
       console.error('Keep-alive error:', error.message);
@@ -2596,9 +2887,11 @@ setInterval(async () => {
   }
 }, 10 * 60 * 1000); // هر 10 دقیقه
 
+
 // -------------------- Admin Tabs --------------------
 function initAdminTabs() {
   const tabButtons = document.querySelectorAll(".admin-tabs .tab-btn");
+
 
   const sections = {
     posts: [".send_post", ".released_movies"],
@@ -2608,6 +2901,7 @@ function initAdminTabs() {
     analytics: ["#analytics"] // ← اضافه شد
   };
 
+
   function showSection(key) {
     // همه سکشن‌ها رو مخفی کن
     Object.values(sections).flat().forEach(sel => {
@@ -2615,6 +2909,7 @@ function initAdminTabs() {
         el.style.display = "none";
       });
     });
+
 
     // سکشن‌های مربوط به تب انتخاب‌شده رو نشون بده
     (sections[key] || []).forEach(sel => {
@@ -2624,14 +2919,17 @@ function initAdminTabs() {
     });
   }
 
+
   // پیش‌فرض: تب اول
   showSection("posts");
+
 
   tabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
       tabButtons.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       showSection(btn.dataset.target);
+
 
       // ← وقتی تب Analytics فعال شد، داده‌ها را لود کن
       if (btn.dataset.target === "analytics") {
@@ -2641,6 +2939,7 @@ function initAdminTabs() {
   });
 }
 
+
 async function loadAppVersion() {
   try {
     const { data, error } = await supabase
@@ -2648,6 +2947,7 @@ async function loadAppVersion() {
       .select('value')
       .eq('key', 'version')
       .single();
+
 
     if (!error && data) {
       const el = document.getElementById('appVersion');
@@ -2659,13 +2959,16 @@ async function loadAppVersion() {
 }
 loadAppVersion();
 
+
 document.getElementById('saveVersionBtn')?.addEventListener('click', async () => {
   const version = document.getElementById('versionInput').value.trim();
   if (!version) return;
 
+
   const { error } = await supabase
     .from('app_meta')
     .upsert({ key: 'version', value: version });
+
 
   if (!error) {
     showToast("Version updated to " + version);
@@ -2674,18 +2977,120 @@ document.getElementById('saveVersionBtn')?.addEventListener('click', async () =>
     showToast("Error updating version");
   }
 });
+// === IMDb Rating Filter (with persistent toast badge) ===
+const ratingTrack = document.getElementById("ratingTrack");
+const ratingFill = document.getElementById("ratingFill");
+const ratingKnob = document.getElementById("ratingKnob");
+const ratingBubbleValue = document.getElementById("ratingBubbleValue");
+const applyRatingFilterBtn = document.getElementById("applyRatingFilter");
+const activeFiltersContainer = document.getElementById("activeFilters");
 
+let imdbMinRating = null; // اگر null باشه یعنی فیلتری فعال نیست
 
+// Helper: به‌روزرسانی UI اسلایدر بر اساس درصد
+function setSliderPercent(pct) {
+  const clamped = Math.max(0, Math.min(100, pct));
+  ratingFill.style.width = clamped + "%";
+  ratingKnob.style.left = clamped + "%";
+  const value = (clamped / 10).toFixed(1); // 0..100 => 0.0..10.0
+  ratingKnob.setAttribute("aria-valuenow", value);
+  if (ratingBubbleValue) ratingBubbleValue.textContent = value;
+  return parseFloat(value);
+}
+
+// Knob drag logic
+if (ratingTrack && ratingKnob && ratingFill && ratingBubbleValue) {
+  const trackRect = () => ratingTrack.getBoundingClientRect();
+
+  const onMove = (clientX) => {
+    const rect = trackRect();
+    const x = Math.max(rect.left, Math.min(clientX, rect.right));
+    const pct = ((x - rect.left) / rect.width) * 100;
+    setSliderPercent(pct);
+  };
+
+  let dragging = false;
+
+  ratingKnob.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    dragging = true;
+    ratingKnob.classList.add("dragging");
+  });
+  document.addEventListener("mousemove", (e) => {
+    if (dragging) onMove(e.clientX);
+  });
+  document.addEventListener("mouseup", () => {
+    if (dragging) {
+      dragging = false;
+      ratingKnob.classList.remove("dragging");
+    }
+  });
+
+  ratingKnob.addEventListener("touchstart", () => {
+    dragging = true;
+    ratingKnob.classList.add("dragging");
+  }, { passive: true });
+  document.addEventListener("touchmove", (e) => {
+    if (dragging) {
+      const touch = e.touches[0];
+      onMove(touch.clientX);
+    }
+  }, { passive: true });
+  document.addEventListener("touchend", () => {
+    if (dragging) {
+      dragging = false;
+      ratingKnob.classList.remove("dragging");
+    }
+  });
+
+  ratingTrack.addEventListener("click", (e) => {
+    onMove(e.clientX);
+  });
+
+  setSliderPercent(0);
+}
+
+// دکمه اعمال فیلتر
+if (applyRatingFilterBtn) {
+  applyRatingFilterBtn.addEventListener("click", () => {
+    const val = parseFloat(ratingBubbleValue.textContent || "0");
+    imdbMinRating = val > 0 ? val : null;
+    renderPagedMovies();
+
+    if (imdbMinRating !== null) {
+  activeFiltersContainer.innerHTML = `
+    <div class="filter-badge">
+      امتیاز ≥ ${imdbMinRating.toFixed(1)}
+      <button id="btnClearRatingFilter" aria-label="Remove rating filter">×</button>
+    </div>
+  `;
+  document.getElementById("btnClearRatingFilter")
+    .addEventListener("click", clearRatingFilter, { once: true });
+} else {
+  activeFiltersContainer.innerHTML = "";
+}
+  });
+}
+
+// تابع پاک کردن فیلتر
+function clearRatingFilter() {
+  imdbMinRating = null;
+  setSliderPercent(0);
+  renderPagedMovies();
+  activeFiltersContainer.innerHTML = "";
+}
 // -------------------- Initial load --------------------
 // اینجا باید فراخوانی بشه
 if (document.querySelector('.admin-tabs .tab-btn')) {
   initAdminTabs();
 }
 
+
 fetchMovies();
 fetchMessages();
 checkUnapprovedComments();
 setInterval(checkUnapprovedComments, 30000);
+
 
 if (document.getElementById('unapprovedComments')) {
   // Load panel on admin if exists
@@ -2738,6 +3143,7 @@ if (document.getElementById('unapprovedComments')) {
     }, { once: true });
   })();
 }
+
 
 fetchSocialLinks();
 });

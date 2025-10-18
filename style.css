@@ -173,10 +173,8 @@ Body.dark .side-menu{background:rgba(48,56,65,0.95);color:#fff}
   
 }
 .movie-count{
-  Margin-bottom:8px;
     Display: inline-block;
     Font-weight: bold;
-    Margin-bottom: 8px;
     Padding: 12px 16px;
     Border-radius: 10px;
     Background: rgba(0,74,124,0.06);
@@ -1575,8 +1573,7 @@ Backdrop-filter: blur(var(--blur));
 .tab-genres-list {
   display: flex;
   flex-wrap: nowrap;
-  padding: 4px 0;
-  margin: 0 20px;
+  padding: 0;
 }
 
 .tab-genres-list .genre-chip {
@@ -1614,7 +1611,7 @@ Backdrop-filter: blur(var(--blur));
   display: flex;
   align-items: center;
   padding: 6px 12px;
-  margin: 4px;
+  margin: 0 4px;
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -2310,4 +2307,185 @@ Body.dark .site-banner{
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text; /* برای مرورگرهای جدید */
+}
+/* ===== rating filter styles ===== */
+.rating-filter {
+  padding: 14px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  direction: ltr;
+  background: rgba(0,74,124,0.05);
+  border-radius: 10px;
+  margin-top: 10px;
+}
+body.dark .rating-filter {
+  background: rgba(255,255,255,0.05);
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.rating-filter-title {
+  font-size: 14px;
+  margin: 0 0 8px 0;
+  font-weight: bold;
+  color: #0d47a1;
+}
+body.dark .rating-filter-title {
+  color: #ffd95e; /* طلایی روشن در دارک مود */
+}
+.rating-process-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rating-min, .rating-max {
+  width: 22px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: bold;
+  color: #555;
+}
+body.dark .rating-min,
+body.dark .rating-max {
+  color: #ccc;
+}
+
+.rating-track {
+  position: relative;
+  height: 12px;
+  flex: 1;
+  background: rgba(0,0,0,0.1);
+  border-radius: 12px;
+  overflow: visible;
+}
+body.dark .rating-track {
+  background: rgba(255,255,255,0.12);
+}
+.rating-track-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #f5c518, #ff8c00); /* طلایی → نارنجی */
+  border-radius: 12px;
+  transition: width 0.08s linear;
+}
+.rating-knob {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  transform: translate(-50%,-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #f5c518;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rating-knob:active { cursor: grabbing; }
+body.dark .rating-knob {
+  background: #222;
+  border: 2px solid #ffd95e;
+}
+
+.rating-bubble {
+  position: absolute;
+  bottom: 140%;
+  left: 50%;
+  transform: translateX(-50%) scale(0.9);
+  padding: 6px 9px;
+  font-size: 13px;
+  white-space: nowrap;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+  pointer-events: none;
+  transition: transform 0.08s ease, opacity 0.08s ease;
+  opacity: 0;
+  font-weight: bold;
+  background: #f5c518;
+  color: #111;
+  z-index: 9999;
+}
+body.dark .rating-bubble {
+  background: #ffd95e;
+  color: #222;
+}
+.rating-knob.dragging .rating-bubble,
+.rating-knob:hover .rating-bubble {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+/* controls */
+.rating-controls { margin-top: 10px; display:flex; gap:8px; justify-content:flex-start; }
+.btn.small { padding:6px 10px; font-size:13px; border-radius:6px; cursor:pointer; }
+
+#applyRatingFilter {
+  width: 100%;
+  background: linear-gradient(135deg, #f5c518, #ff8c00);
+  color: #111;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+#applyRatingFilter:hover {
+  background: linear-gradient(135deg, #ffda4d, #ffa733);
+}
+body.dark #applyRatingFilter {
+  background: linear-gradient(135deg, #ffd95e, #ff8c00);
+  color: #222;
+}
+
+
+
+/* ===== floating toast (top fixed) ===== */
+#imdbFilterToast .toast-label { font-size: 14px; }
+#imdbFilterToast .toast-close {
+  margin-left: 6px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  outline: none;
+}
+.active-filters-toast {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2147483647; /* بالاتر از همه */
+  display: flex;
+  gap: 8px;
+  pointer-events: none; /* تا روی بقیه کلیک‌ها تاثیر نذاره */
+}
+
+.active-filters-toast .filter-badge {
+  background: linear-gradient(135deg, #f5c518, #ff8c00);
+  color: #111;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  pointer-events: auto;
+}
+body.dark .active-filters-toast .filter-badge {
+  background: linear-gradient(135deg, #ffd95e, #ff8c00);
+  color: #222;
+}
+.active-filters-toast .filter-badge button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
 }
