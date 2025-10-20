@@ -6,7 +6,7 @@
   --bg-night: #1A2026;
   --post-day: #FAFAFA;
   --post-night: #212A33;
-  --btn-day: #004A7C;
+  --btn-day: linear-gradient(90deg, hsla(191, 75%, 60%, 1) 0%, hsla(248, 87%, 36%, 1) 100%);
   --btn-night: #2185D5;
   --muted: #6b7280;
   --blur: 10px;
@@ -16,6 +16,26 @@
   --red-hover: #c0392b;
   --primary-bg: #512bd4;
   --promo-accent-color: #dcd5f6;
+  --gradient-purple-magenta: linear-gradient(128.87deg, #512bd4 14.05%, #d600aa 89.3%);
+}
+:root {
+  --bg-night: linear-gradient(135deg, #1A2026, #2f3a45);     /* مشکی → خاکستری آبی تیره */
+
+  --post-day: linear-gradient(135deg, #fff, #fafafa);     /* سفید → خاکستری ملایم */
+  --post-night: linear-gradient(135deg, #212A33, #37424f);   /* آبی تیره → خاکستری آبی روشن‌تر */
+
+  --btn-day: linear-gradient(135deg, #004A7C, #0091d5);      /* آبی نفتی → آبی فیروزه‌ای */
+  --btn-night: linear-gradient(135deg, #2185D5, #0d47a1);    /* آبی روشن → آبی سرمه‌ای */
+
+  --green: linear-gradient(135deg, #2ecc71, #1e8449);        /* سبز روشن → سبز تیره */
+  --green-hover: linear-gradient(135deg, #27ae60, #145a32);
+
+  --red: linear-gradient(135deg, #e74c3c, #922b21);          /* قرمز روشن → قرمز شرابی */
+  --red-hover: linear-gradient(135deg, #c0392b, #641e16);
+
+  --primary-bg: linear-gradient(135deg, #512bd4, #8e44ad);   /* بنفش تیره → بنفش روشن‌تر */
+  --promo-accent-color: linear-gradient(135deg, #dcd5f6, #ddd5f6);
+
   --gradient-purple-magenta: linear-gradient(128.87deg, #512bd4 14.05%, #d600aa 89.3%);
 }
 @font-face {
@@ -73,17 +93,26 @@ Body.dark{
   ========================= */
 .main-header{
   Display:flex;
-  Justify-content: space-between;
-  Align-items:center;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 60px;
+  Backdrop-filter:blur(var(--blur));
+  background: rgba(255,255,255,0.55);
+  Position:sticky;
+  top: 0;
+  z-index:120;
+  height: 120px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+.header{
+  Display:flex;
+  align-items: center;
+  justify-content: space-between;
   Padding:12px 14px;
-  margin-top: 60px;
+  width: 100%;
   height: 60px;
   Gap: .4rem;
-  Backdrop-filter:blur(var(--blur)); background:rgba(255,255,255,0.55);
-  Position:sticky;
-  top:60px;
-  z-index:120;
-  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  
 }
 Body.dark .main-header{
   background:rgba(30,36,40,0.6)}
@@ -223,7 +252,7 @@ Body.dark .field-label{color:#ddd}
 
 /* quote style */
 .field-quote{
-  Background: rgba(0,74,124,0.06);
+  Background: linear-gradient(90deg, hsla(204, 77%, 44%, 0.1) 0%, hsla(204, 100%, 24%, 0.06)  100%);
   Border-left:4px solid rgba(33,133,213,0.9);
   Padding:8px;
   Border-radius:6px;
@@ -337,7 +366,7 @@ Body.dark .comment-input-row .comment-send{background:#F7F7F7;color:#222}
   gap: 10px;
   Padding:12px 16px;
   Border-radius:10px;
-  background-color: var(--promo-accent-color);
+  background: var(--promo-accent-color);
   Color:#141414;
   Line-height:1.5
 }
@@ -348,7 +377,7 @@ Body.dark .message-bubble{
 .message-bubble .msg-close{
   text-align: center;
   align-items: center;
-  background-color: var(--primary-bg);
+  background: var(--primary-bg);
   border:0;
   border-radius: 10px;
   font-size: 15px;
@@ -422,8 +451,18 @@ Body.dark .movie-item,body.dark .message-item{background:var(--post-night)}
   Display:flex;
   Flex-direction: column;
   Gap:8px}
-.movie-actions .btn-edit,.message-actions .btn-edit{background:var(--green);border:0;color:#fff;padding:6px 10px;border-radius:6px;cursor:pointer}
-.movie-actions .btn-edit:hover,.message-actions .btn-edit:hover{background:var(--green-hover)}
+.movie-actions .btn-edit,.message-actions .btn-edit{
+  background:var(--green);
+  border:0;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+}
+.movie-actions .btn-edit:hover,.message-actions .btn-edit:hover{
+  background:var(--green-hover);
+  
+}
 .movie-actions .btn-delete,.message-actions .btn-delete{background:var(--red);border:0;color:#fff;padding:6px 10px;border-radius:6px;cursor:pointer}
 .movie-actions .btn-delete:hover,.message-actions .btn-delete:hover{background:var(--red-hover)}
 
@@ -448,7 +487,6 @@ Body.dark .page-bubble.active{background:var(--btn-night)}
   Responsive tweaks
   ========================= */
 @media (max-width:600px){
-  .main-header{padding:8px 10px}
   .search-bar{min-height:44px;padding:6px;
   }
   .search-bar input{padding:8px;
@@ -481,7 +519,7 @@ Align-items: center;
   z-index: 1000;
   inset: 0;
   backdrop-filter: blur(6px);
-  background-color: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.3);
 }
 
 /* جعبه لاگین وسط صفحه */
@@ -500,7 +538,7 @@ Align-items: center;
 
 /* حالت دارک مود */
 Body.dark #loginModal .login-box {
-  Background-color: #2f3640;
+  Background: #2f3640;
   Color: #f1f1f1;
 }
 
@@ -583,7 +621,7 @@ Body.dark #loginModal .close-btn:hover {
 
 /* دکمه بازگشت */
 .back-link {
-  Background-color: #2185D5;
+  Background: #2185D5;
   Color: #fff;
   Padding: 6px 12px;
   Border-radius: 6px;
@@ -595,12 +633,12 @@ Body.dark #loginModal .close-btn:hover {
   Transition: background 0.2s;
 }
 .back-link:hover {
-  Background-color: #1769a8;
+  Background: #1769a8;
 }
 
 /* دکمه خروج */
 #logoutBtn.logout-btn {
-  Background-color: #E62727;
+  Background: #E62727;
   Color: #fff;
   Border: none;
   Padding: 6px 12px;
@@ -613,7 +651,7 @@ Body.dark #loginModal .close-btn:hover {
   Transition: background 0.2s;
 }
 #logoutBtn.logout-btn:hover {
-  Background-color: #c71f1f;
+  Background: #c71f1f;
 }
 
 /* فرم‌های ادمین */
@@ -640,7 +678,7 @@ Body.dark #loginModal .close-btn:hover {
 
 /* دکمه ثبت و ارسال */
 .admin-submit {
-  Background-color: #2185D5;
+  Background: #2185D5;
   Color: #fff;
   Border: none;
   Padding: 10px;
@@ -651,7 +689,7 @@ Body.dark #loginModal .close-btn:hover {
   Transition: background 0.2s;
 }
 .admin-submit:hover {
-  Background-color: #1769a8;
+  Background: #1769a8;
 }
 
 /* لیست پیام‌ها */
@@ -668,7 +706,7 @@ Body.dark #loginModal .close-btn:hover {
   Gap: 6px;
 }
 .action-buttons .btn-edit {
-  Background-color: #2185D5;
+  Background: #2185D5;
   Color: #fff;
   Border: none;
   Padding: 6px 10px;
@@ -677,10 +715,10 @@ Body.dark #loginModal .close-btn:hover {
   Cursor: pointer;
 }
 .action-buttons .btn-edit:hover {
-  Background-color: #1769a8;
+  Background: #1769a8;
 }
 .action-buttons .btn-delete {
-  Background-color: #E62727;
+  Background: #E62727;
   Color: #fff;
   Border: none;
   Padding: 6px 10px;
@@ -689,7 +727,7 @@ Body.dark #loginModal .close-btn:hover {
   Cursor: pointer;
 }
 .action-buttons .btn-delete:hover {
-  Background-color: #c71f1f;
+  Background: #c71f1f;
 }
 .admin-actions{
   Display: flex;
@@ -1434,13 +1472,7 @@ body.dark .episode-card{
   white-space: nowrap;
 }
 
-.badge-serial {
-  background: #ff9800; /* نارنجی برای سریال */
-}
 
-.badge-collection {
-  background: #2196f3; /* آبی برای کالکشن */
-}
 .movie-title-row {
   display: flex;
   justify-content: space-between;
@@ -1466,13 +1498,7 @@ body.dark .episode-card{
   background: #ff9800; /* نارنجی برای سریال */
 }
 
-.badge-collection {
-  background: #2196f3; /* آبی برای کالکشن */
-}
-
 .movie-type-tabs {
-  position: sticky;
-  top: 120px;
   z-index: 900;
   display: flex;
   gap: 8px;
@@ -1490,6 +1516,8 @@ Backdrop-filter: blur(var(--blur));
   mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
   mask-repeat: no-repeat;
   mask-size: 100% 100%;
+  position: sticky;
+  top: 120px;
 }
 
 .movie-type-tabs::-webkit-scrollbar {
@@ -1506,7 +1534,7 @@ Backdrop-filter: blur(var(--blur));
 
 .movie-type-tabs button {
   flex: 0 0 auto;         /* جلوگیری از کشیده شدن */
-  background-color: var(--promo-accent-color);
+  background: var(--promo-accent-color);
   border: 1px solid #ddd;
   border-radius: 20px;
   padding: 6px 14px;
@@ -1529,7 +1557,7 @@ Backdrop-filter: blur(var(--blur));
   height: 22px;      /* ارتفاع ثابت */
   padding: 0 6px;    /* کمی فاصله برای اعداد دو یا سه رقمی */
   border-radius: 50%;
-  background-color: var(--primary-bg);
+  background: var(--primary-bg);
   color: #fff;
   font-size: 12px;
   font-weight: bold;
@@ -1537,14 +1565,14 @@ Backdrop-filter: blur(var(--blur));
   box-sizing: border-box;
 }
 .movie-type-tabs button.active {
-  background-color: var(--primary-bg);
+  background: var(--primary-bg);
   color: #fff;
   border-color: var(--promo-accent-color);
 }
 
 .movie-type-tabs button.active .count {
-  background: #fff;
-  color: var(--primary-bg);
+ background: white;
+color: #512bd4;
 }
 
 .genre-chip-mini {
@@ -1562,7 +1590,7 @@ Backdrop-filter: blur(var(--blur));
 .genre-chip-mini:hover { background: #e3eef6; }
 .genre-chip-mini:active {
   transform: scale(0.96);
-  background-color: var(--promo-accent-color);
+  background: var(--promo-accent-color);
   
 }
 .tab-genres-wrapper {
@@ -1651,7 +1679,7 @@ body.dark .genre-chip.active {
 }
 
 .imdb-chip {
-  background-color: #f5c518; /* رنگ طلایی IMDb */
+  background: #f5c518; /* رنگ طلایی IMDb */
   color: #000;
   font-size: 13px;
   padding: 2px 6px;
@@ -1724,8 +1752,11 @@ body.dark .genre-chip.active {
   color: #fff; /* متن اصلی badge سفید */
 }
 
-.badge-collection { background: #0d6efd; } /* نارنجی */
-.badge-serial     { background: #ff9800; } /* آبی */
+.badge-collection {
+  background: linear-gradient(45deg, hsla(211, 100%, 65%, 1) 0%, hsla(211, 100%, 50%, 1) 100%);
+  
+}
+.badge-serial     { background: linear-gradient(90deg, hsla(36, 82%, 58%, 1) 0%, hsla(36, 100%, 50%, 1) 100%)} /* آبی */
 
 .collection-badge .badge-count {
   display: inline-flex;
@@ -2267,8 +2298,6 @@ body.dark .admin-tabs .tab-btn.active .tab-circle {
 }
 /* بنر بالای سایت */
 .site-banner {
-  position: fixed;
-  top: 0;
   color: #fff;
   font-family: sans-serif;
   font-weight: bold;
@@ -2281,8 +2310,8 @@ body.dark .admin-tabs .tab-btn.active .tab-circle {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  Backdrop-filter:blur(var(--blur)); background:rgba(255,255,255,0.55);
 }
+
 Body.dark .site-banner{
   background:rgba(30,36,40,0.6)}
 /* محتوای داخل بنر */
@@ -2308,6 +2337,7 @@ Body.dark .site-banner{
   -webkit-text-fill-color: transparent;
   background-clip: text; /* برای مرورگرهای جدید */
 }
+
 /* ===== rating filter styles ===== */
 .rating-filter {
   padding: 14px;
@@ -2483,9 +2513,10 @@ body.dark .active-filters-toast .filter-badge {
   color: #222;
 }
 .active-filters-toast .filter-badge button {
-  background: transparent;
+  background: #f1f1f1;
   border: none;
-  color: #fff;
+  border-radius: 15%;
+  color: #ff8c00;
   font-size: 16px;
   cursor: pointer;
 }
