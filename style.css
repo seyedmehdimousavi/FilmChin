@@ -167,7 +167,8 @@ Body.dark .menu-btn,body.dark .icon-btn,body.dark .icon-inside{background:rgba(8
   height:100%;
   width:300px;
   max-width:86vw;
-  padding:16px;
+  padding:10px;
+  padding-top: 90px;
   background:linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,255,255,0.85));
   backdrop-filter:blur(10px);
   box-shadow:2px 0 12px rgba(0,0,0,0.22);
