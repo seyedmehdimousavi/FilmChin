@@ -19,10 +19,9 @@
   --gradient-purple-magenta: linear-gradient(128.87deg, #512bd4 14.05%, #d600aa 89.3%);
 }
 :root {
-  --bg-night: linear-gradient(135deg, #1A2026, #2f3a45);     /* مشکی → خاکستری آبی تیره */
 
   --post-day: linear-gradient(135deg, #fff, #fafafa);     /* سفید → خاکستری ملایم */
-  --post-night: linear-gradient(135deg, #212A33, #37424f);   /* آبی تیره → خاکستری آبی روشن‌تر */
+  --post-night: linear-gradient(180deg, #212A33, #37424f);   /* آبی تیره → خاکستری آبی روشن‌تر */
 
   --btn-day: linear-gradient(135deg, #004A7C, #0091d5);      /* آبی نفتی → آبی فیروزه‌ای */
   --btn-night: linear-gradient(135deg, #2185D5, #0d47a1);    /* آبی روشن → آبی سرمه‌ای */
@@ -253,12 +252,13 @@ Body.dark .field-label{color:#ddd}
 /* quote style */
 .field-quote{
   Background: linear-gradient(90deg, hsla(204, 77%, 44%, 0.1) 0%, hsla(204, 100%, 24%, 0.06)  100%);
+  border: 1px solid rgba(0,74,124,0.05);
   Border-left:4px solid rgba(33,133,213,0.9);
   Padding:8px;
   Border-radius:6px;
   Margin-bottom:6px;
   Color:#263345;
-  box-shadow:0 6px 16px rgba(0,0,0,0.1);
+  box-shadow:0 6px 16px rgba(0,0,0,0.09);
 }
 Body.dark .field-quote{
   Background: rgba(255,255,255,0.08);
@@ -1140,7 +1140,7 @@ Body.dark .social-item {
 }
 .movie-title{
   Font-family: 'IRANSans', 'ProductSans2', sans-serif;
-  box-shadow:0 6px 16px rgba(0,0,0,0.2);
+  box-shadow:0 6px 16px rgba(0,0,0,0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1151,10 +1151,12 @@ Body.dark .social-item {
   Text-align: left;
   Border-radius: 15px;
   Padding: 10px;
+  border: 1px solid rgba(0,74,124,0.1);
 }
 body.dark .movie-title{
   Background: rgba(255,255,255,0.08);
   Color:#e6eef6;
+  border: 1px solid rgba(0,74,124,0.1);
 }
 /* تیترهای اصلی */
 .admin-header h1 {
@@ -1539,7 +1541,7 @@ Backdrop-filter: blur(var(--blur));
   border-radius: 20px;
   padding: 6px 14px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
   color: #333;
   cursor: pointer;
   display: inline-flex;
@@ -2312,9 +2314,7 @@ body.dark .admin-tabs .tab-btn.active .tab-circle {
   justify-content: center;
 }
 
-Body.dark .site-banner{
-  background:rgba(30,36,40,0.6)}
-/* محتوای داخل بنر */
+
 .banner-content {
   display: flex;
   align-items: center;
