@@ -1,10 +1,13 @@
 // -------------------- Supabase config --------------------
 const SUPABASE_URL = 'https://gwsmvcgjdodmkoqupdal.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-
-
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
@@ -18,14 +21,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (err) {
     console.error("visit log error:", err);
   }
+
+  await loadAuthState();
 });
-
-
-
 
 // -------------------- Admin UID --------------------
 const ADMIN_UID = '7314d471-8343-44b3-9fcc-a9ae01d99725';
-
 
 // -------------------- App state --------------------
 let currentUser = null;
@@ -34,9 +35,377 @@ let messages = [];
 let editingMovie = null;
 const PAGE_SIZE = 10;
 let currentPage = 1;
-let episodesByMovie = new Map(); // movie_id → [episodes]
+let episodesByMovie = new Map();
+let imdbMinRating = null;
 
-let imdbMinRating = null; // اگر null باشه یعنی فیلتری فعال نیست
+// ---- Central auth state loader (fixed) ----
+async function loadAuthState() {
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) {
+      console.error("session error:", error);
+      currentUser = null;
+      localStorage.removeItem("currentUser");
+      setUserProfile(null);
+      return null;
+    }
+
+    const user = session?.user;
+    if (!user) {
+      currentUser = null;
+      localStorage.removeItem("currentUser");
+      setUserProfile(null);
+      return null;
+    }
+
+    // ادمین
+    if (user.id === ADMIN_UID) {
+      currentUser = {
+        id: user.id,
+        email: user.email,
+        username: "Admin",
+        avatarUrl: null,
+        isAdmin: true
+      };
+      localStorage.setItem("currentUser", JSON.stringify(currentUser));
+      setUserProfile(null);
+      return currentUser;
+    }
+
+    // گرفتن اطلاعات کاربر از users
+    const { data: dbUser, error: dbErr } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (dbErr) {
+      console.error("dbUser error:", dbErr);
+      currentUser = null;
+      localStorage.removeItem("currentUser");
+      setUserProfile(null);
+      return null;
+    }
+
+    if (!dbUser) {
+      currentUser = null;
+      localStorage.removeItem("currentUser");
+      setUserProfile(null);
+      return null;
+    }
+
+    const avatarUrl = dbUser?.avatar_url
+      ? supabase.storage.from('avatars').getPublicUrl(dbUser.avatar_url).data.publicUrl
+      : null;
+
+    currentUser = {
+      id: user.id,
+      email: user.email,
+      username: dbUser?.username || user.email,
+      avatarUrl,
+      isAdmin: dbUser?.is_admin || false
+    };
+
+    localStorage.setItem("currentUser", JSON.stringify(currentUser));
+    setUserProfile(avatarUrl);
+    const usernameEl = document.getElementById("profileUsername");
+if (usernameEl && currentUser) {
+  usernameEl.textContent = currentUser.username;
+}
+    return currentUser;
+  } catch (err) {
+    console.error("loadAuthState error:", err);
+    currentUser = null;
+    localStorage.removeItem("currentUser");
+    setUserProfile(null);
+    return null;
+  }
+}
+
+// -------------------- Toast & Spinner helpers --------------------
+function showToast(message, type = "success") {
+  const c = document.getElementById("toast-container");
+  if (!c) return;
+  const el = document.createElement("div");
+  el.className = `toast ${type}`;
+  el.textContent = message;
+  c.appendChild(el);
+  requestAnimationFrame(() => el.classList.add("show"));
+  setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(), 250); }, 3000);
+}
+function setButtonLoading(btn, text) {
+  if (!btn) return;
+  btn.dataset.originalText = btn.innerHTML;
+  btn.classList.add("btn-loading");
+  btn.innerHTML = `<span class="spinner"></span>${text}`;
+  btn.disabled = true;
+}
+function clearButtonLoading(btn) {
+  if (!btn) return;
+  btn.classList.remove("btn-loading");
+  btn.innerHTML = btn.dataset.originalText || "Submit";
+  btn.disabled = false;
+}
+
+// -------------------- User Auth --------------------
+const signupEmail = document.getElementById("signupEmail");
+const signupUsername = document.getElementById("signupUsername");
+const signupPassword = document.getElementById("signupPassword");
+const signupAvatar = document.getElementById("signupAvatar");
+
+const loginUsername = document.getElementById("loginUsername");
+const loginPassword = document.getElementById("loginPassword");
+const profileBtn = document.getElementById('profileBtn');
+const authModal = document.getElementById('authModal');
+const profileMenu = document.getElementById('profileMenu');
+
+// تب‌ها
+document.querySelectorAll('.auth-tabs .tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.auth-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelector(`.tab-content[data-tab="${btn.dataset.tab}"]`).classList.add('active');
+  });
+});
+
+// محدودیت حجم عکس پروفایل
+signupAvatar?.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (file && file.size > 500 * 1024) {
+    alert("حجم عکس نباید بیشتر از 500KB باشد");
+    e.target.value = "";
+  }
+});
+
+// -------------------- ثبت‌نام دو مرحله‌ای --------------------
+const signupForm = document.getElementById("signupForm");
+const signupStep1 = document.getElementById("signupStep1");
+const signupStep2 = document.getElementById("signupStep2");
+const signupNextBtn = document.getElementById("signupNextBtn");
+
+let signupStage = 1;
+let pendingUserId = null;
+let pendingEmail = null;
+let pendingUsername = null;
+let pendingPassword = null;
+
+// دکمه بعدی در مرحله اول یا تکمیل در مرحله دوم
+signupNextBtn?.addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  if (signupStage === 1) {
+    const email = signupEmail.value.trim();
+    const username = signupUsername.value.trim();
+    const password = signupPassword.value.trim();
+
+    if (!email || !username || !password) {
+      showToast("لطفاً تمام فیلدها را پر کنید.", "error");
+      return;
+    }
+
+    setButtonLoading(signupNextBtn, "در حال ثبت‌نام...");
+
+    try {
+      const { data: signData, error: signErr } = await supabase.auth.signUp({ email, password });
+      if (signErr || !signData?.user) throw signErr || new Error("ثبت‌نام ناموفق");
+
+      pendingUserId = signData.user.id;
+      pendingEmail = email;
+      pendingUsername = username;
+      pendingPassword = password;
+
+      if (!signData.session) {
+        const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInErr) throw signInErr;
+      }
+
+      signupStep1.classList.remove("active-step");
+      signupStep1.style.display = "none";
+      signupStep2.style.display = "block";
+      requestAnimationFrame(() => signupStep2.classList.add("active-step"));
+
+      signupStage = 2;
+      signupNextBtn.innerHTML = "تکمیل ثبت‌نام";
+      showToast("اکنون تصویر پروفایل خود را انتخاب کنید ✅", "success");
+    } catch (err) {
+      console.error("signup step1 error:", err);
+      showToast("خطا در ثبت حساب ❌", "error");
+    } finally {
+      clearButtonLoading(signupNextBtn);
+    }
+
+  } else if (signupStage === 2) {
+    const avatar = signupAvatar.files[0];
+    if (!avatar) {
+      showToast("لطفاً تصویر پروفایل را انتخاب کنید.", "error");
+      return;
+    }
+
+    setButtonLoading(signupNextBtn, "در حال آپلود...");
+
+    try {
+      // بررسی session معتبر
+      const { data: sessionCheck } = await supabase.auth.getSession();
+      if (!sessionCheck?.session) {
+        console.warn("⚠️ session lost before avatar upload, attempting re-login...");
+        const { error: reLoginErr } = await supabase.auth.signInWithPassword({
+          email: pendingEmail,
+          password: pendingPassword
+        });
+        if (reLoginErr) throw reLoginErr;
+      }
+
+      const filePath = `${pendingUserId}/${Date.now()}_${avatar.name}`;
+      const { error: uploadErr } = await supabase.storage.from('avatars').upload(filePath, avatar);
+      if (uploadErr) throw uploadErr;
+
+      const { data: publicData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      const avatarUrl = publicData?.publicUrl || null;
+
+      const { error: upsertErr } = await supabase.from('users').upsert([
+        {
+          id: pendingUserId,
+          email: pendingEmail,
+          username: pendingUsername,
+          password: pendingPassword,
+          avatar_url: filePath,
+          is_admin: false
+        }
+      ], { onConflict: 'id' });
+
+      if (upsertErr) throw upsertErr;
+
+      currentUser = { id: pendingUserId, email: pendingEmail, username: pendingUsername, avatarUrl, isAdmin: false };
+setUserProfile(avatarUrl);
+const usernameEl = document.getElementById("profileUsername");
+if (usernameEl && currentUser) {
+  usernameEl.textContent = currentUser.username;
+}
+      showToast("ثبت‌نام تکمیل شد ✅", "success");
+      authModal.style.display = "none";
+    } catch (err) {
+      console.error("signup step2 error:", err);
+      showToast("خطا در آپلود آواتار ❌", "error");
+    } finally {
+      clearButtonLoading(signupNextBtn);
+      signupStage = 1;
+      pendingUserId = null;
+      pendingEmail = null;
+      pendingUsername = null;
+      pendingPassword = null;
+
+      signupForm.reset();
+      requestAnimationFrame(() => {
+        signupStep1.style.display = "block";
+        signupStep2.style.display = "none";
+        signupStep1.classList.add("active-step");
+        signupStep2.classList.remove("active-step");
+        signupNextBtn.innerHTML = `<img src="images/nextsignup.png" alt="Next" style="height:22px;vertical-align:middle;">`;
+      });
+    }
+  }
+});
+
+// -------------------- Login --------------------
+document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = e.currentTarget.querySelector("button[type='submit']");
+  setButtonLoading(btn, "در حال ورود...");
+
+  try {
+    const email = loginUsername.value.trim();
+    const password = loginPassword.value.trim();
+
+    const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+    if (signInErr || !signInData.user) throw signInErr;
+
+    const userId = signInData.user.id;
+    const { data: dbUser } = await supabase.from('users').select('*').eq('id', userId).maybeSingle();
+
+    const avatarUrl = dbUser?.avatar_url
+      ? supabase.storage.from('avatars').getPublicUrl(dbUser.avatar_url).data.publicUrl
+      : null;
+
+    currentUser = { id: userId, username: dbUser?.username || email, avatarUrl, isAdmin: dbUser?.is_admin || false };
+setUserProfile(avatarUrl);
+const usernameEl = document.getElementById("profileUsername");
+if (usernameEl && currentUser) {
+  usernameEl.textContent = currentUser.username;
+}
+    showToast("ورود موفقیت‌آمیز ✅", "success");
+    authModal.style.display = "none";
+  } catch (err) {
+    console.error("login error:", err);
+    showToast("خطا در ورود ❌", "error");
+  } finally {
+    clearButtonLoading(btn);
+  }
+});
+
+// تغییر آیکون پروفایل
+function setUserProfile(avatarUrl) {
+  const profileBtnEl = document.getElementById("profileBtn");
+  if (!profileBtnEl) return;
+  if (avatarUrl) {
+    profileBtnEl.innerHTML = `<img src="${avatarUrl}" style="width:44px;height:44px;border-radius:50%;">`;
+  } else {
+    profileBtnEl.innerHTML = `<img src="images/icons8-user-96.png" alt="user"/>`;
+  }
+}
+
+// کلیک روی پروفایل
+profileBtn?.addEventListener("click", async () => {
+  await loadAuthState();
+  if (!currentUser) {
+    authModal.style.display = "flex";
+    return;
+  }
+
+  if (currentUser?.isAdmin) {
+    window.location.href = "admin.html";
+  } else {
+    profileMenu.classList.toggle("hidden");
+  }
+});
+
+// خروج از حساب
+async function doLogoutAndRefresh() {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    showToast("خروج انجام شد ✅", "success");
+  } catch (err) {
+    console.error("signOut error:", err);
+    showToast("خطا در خروج ❌", "error");
+  } finally {
+    currentUser = null;
+setUserProfile(null);
+    profileMenu?.classList.add("hidden");
+    setTimeout(() => {
+      if (window.location.pathname.includes('admin')) {
+        window.location.href = 'index.html';
+      } else {
+        window.location.reload();
+      }
+    }, 200);
+  }
+}
+
+document.querySelectorAll('#logoutBtn').forEach(btn => {
+  btn.removeEventListener?.('click', doLogoutAndRefresh);
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    doLogoutAndRefresh();
+  });
+});
+
+// بستن مودال با کلیک بیرون
+window.addEventListener("click", (e) => {
+  if (authModal && e.target === authModal) authModal.style.display = "none";
+  if (profileMenu && !profileMenu.classList.contains("hidden") && !profileBtn.contains(e.target))
+    profileMenu.classList.add("hidden");
+});
 // -------------------- Utilities --------------------
 function escapeHtml(str) {
   if (str === undefined || str === null) return '';
@@ -529,12 +898,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   const profileBtn = document.getElementById('profileBtn');
-  const loginModal = document.getElementById('loginModal');
-  const closeLoginModal = document.getElementById('closeLoginModal');
-  const loginForm = document.getElementById('loginForm');
-  const loginEmail = document.getElementById('loginEmail');
-  const loginPassword = document.getElementById('loginPassword');
-  const loginWithGmail = document.getElementById('loginWithGmail');
+  
 
 
   const searchInput = document.getElementById('search');
@@ -568,9 +932,6 @@ if (searchInput) {
   const messageList = document.getElementById('messageList');
   const adminSearch = document.getElementById('adminSearch');
 
-
-  // Defensive: hide login modal initially
-  if (loginModal) loginModal.style.display = 'none';
 
 
   // Theme toggle
@@ -611,69 +972,6 @@ if (searchInput) {
     });
   }
   
-  async function refreshSessionUser() {
-    try {
-      const { data } = await supabase.auth.getSession();
-      currentUser = data?.session?.user || null;
-    } catch (e) {
-      console.error('session get error', e);
-      currentUser = null;
-    }
-  }
-  refreshSessionUser();
-  supabase.auth.onAuthStateChange((_event, session) => {
-    currentUser = session?.user || null;
-  });
-
-
-  if (profileBtn) {
-    profileBtn.addEventListener('click', async () => {
-      await refreshSessionUser();
-      if (currentUser && currentUser.id === ADMIN_UID) {
-        window.location.href = 'admin.html';
-      } else if (loginModal) {
-        loginModal.style.display = 'block';
-      } else {
-        showToast('Login modal not found');
-      }
-    });
-  }
-  if (closeLoginModal && loginModal) {
-    closeLoginModal.addEventListener('click', () => { loginModal.style.display = 'none'; });
-    window.addEventListener('click', (e) => { if (e.target === loginModal) loginModal.style.display = 'none'; });
-  }
-  if (loginForm && loginEmail && loginPassword) {
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = loginEmail.value.trim();
-      const password = loginPassword.value.trim();
-      if (!email || !password) { showToast('Please enter email and password'); return; }
-      const submitBtn = loginForm.querySelector('button[type="submit"]');
-      submitBtn.disabled = true; const origText = submitBtn.textContent; submitBtn.textContent = 'Signing in...';
-      try {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) { console.error('login error', error); showToast('Login failed'); }
-        else { loginModal.style.display = 'none'; window.location.href = 'admin.html'; }
-      } catch (err) {
-        console.error(err); showToast('Login failed');
-      } finally {
-        submitBtn.disabled = false; submitBtn.textContent = origText || 'Log in';
-      }
-    });
-  }
-  if (loginWithGmail) {
-    loginWithGmail.addEventListener('click', async (e) => {
-      e.preventDefault();
-      try {
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo: `${window.location.origin}/admin.html` }
-        });
-        if (error) console.error('oauth error', error);
-      } catch (err) { console.error(err); }
-    });
-  }
-
 
   // Fetch data
   async function fetchMovies() {
@@ -1674,33 +1972,44 @@ await supabase.from("click_logs").insert([
 renderStoriesForPage(pageItems);
 }
   // -------------------- Admin guard --------------------
-  async function enforceAdminGuard() {
-    try {
-      const { data } = await supabase.auth.getSession();
-      const session = data?.session;
-      if (!session || session.user.id !== ADMIN_UID) {
-        if (window.location.pathname.endsWith('admin.html')) window.location.href = 'index.html';
-        return false;
-      }
-      currentUser = session.user;
-      return true;
-    } catch (err) {
-      console.error('enforceAdminGuard error', err);
-      if (window.location.pathname.endsWith('admin.html')) window.location.href = 'index.html';
+async function enforceAdminGuard() {
+  try {
+    // اگر وضعیت کاربر هنوز مقداردهی نشده، یک‌بار لود کن
+    if (!currentUser) {
+      await loadAuthState();
+    }
+
+    const isAdmin = Boolean(currentUser && currentUser.isAdmin);
+
+    // اگر در صفحه ادمین هستیم و ادمین نیست → برگرد به index
+    if (!isAdmin && window.location.pathname.endsWith('admin.html')) {
+      window.location.href = 'index.html';
       return false;
     }
-  }
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-      logoutBtn.disabled = true;
-      try {
-        const { error } = await supabase.auth.signOut();
-        if (error) { console.error('logout error', error); showToast('Logout failed'); logoutBtn.disabled = false; }
-        else { window.location.href = 'index.html'; }
-      } catch (err) { console.error('logout exception', err); logoutBtn.disabled = false; }
-    });
-  }
 
+    return isAdmin;
+  } catch (err) {
+    console.error('enforceAdminGuard error', err);
+    if (window.location.pathname.endsWith('admin.html')) {
+      window.location.href = 'index.html';
+    }
+    return false;
+  }
+}
+  if (logoutBtn) {
+  logoutBtn.addEventListener('click', async () => {
+    logoutBtn.disabled = true;
+    try {
+      await supabase.auth.signOut();
+      currentUser = null;
+      setUserProfile(null);
+      window.location.href = 'index.html';
+    } catch (err) {
+      console.error('logout exception', err);
+      logoutBtn.disabled = false;
+    }
+  });
+}
 
   // -------------------- Admin list (minimal) --------------------
   let adminCurrentPage = 1;
@@ -2573,16 +2882,38 @@ if (addMovieForm && movieList) {
 
   // -------------------- Unapproved comments badge --------------------
   async function checkUnapprovedComments() {
-    try {
-      await refreshSessionUser();
-      const badge = document.getElementById('commentBadge');
-      if (!currentUser || currentUser.id !== ADMIN_UID) { if (badge) badge.style.display = 'none'; return; }
-      const { data, error } = await supabase.from('comments').select('id').eq('approved', false).limit(1);
-      if (error) { console.error('Error checking unapproved comments:', error); if (badge) badge.style.display = 'none'; return; }
-      if (data && data.length > 0) { if (badge) badge.style.display = 'grid'; }
-      else { if (badge) badge.style.display = 'none'; }
-    } catch (err) { console.error('Exception in checkUnapprovedComments:', err); const badge = document.getElementById('commentBadge'); if (badge) badge.style.display = 'none'; }
+  try {
+    const badge = document.getElementById('commentBadge');
+
+    // فقط اگر ادمین لاگین کرده باشه
+    if (!currentUser || !currentUser.isAdmin) {
+      if (badge) badge.style.display = 'none';
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('comments')
+      .select('id')
+      .eq('approved', false)
+      .limit(1);
+
+    if (error) {
+      console.error('Error checking unapproved comments:', error);
+      if (badge) badge.style.display = 'none';
+      return;
+    }
+
+    if (data && data.length > 0) {
+      if (badge) badge.style.display = 'grid';
+    } else {
+      if (badge) badge.style.display = 'none';
+    }
+  } catch (err) {
+    console.error('Exception in checkUnapprovedComments:', err);
+    const badge = document.getElementById('commentBadge');
+    if (badge) badge.style.display = 'none';
   }
+}
 
 
   // -------------------- Social links --------------------

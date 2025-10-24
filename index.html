@@ -35,6 +35,16 @@
   <button id="menuBtn" class="menu-btn" aria-label="menu">
     <img width="96" height="96" src="images/icons8-menu.apng" alt="menu--v2" style="display:flex;align-items:center;"/>
   </button>
+  <!-- منوی پروفایل بعد از لاگین -->
+<div id="profileMenu" class="profile-menu hidden">
+  <div class="profile-bubble">
+    <div class="profile-username" id="profileUsername">UserName</div>
+    <button class="profile-edit">ویرایش مشخصات</button>
+    <hr class="profile-divider"/>
+    <button id="logoutBtn" class="profile-logout">Logout</button>
+  </div>
+</div>
+
 
   <input id="search" type="text" placeholder="Search..." dir="auto"/>
 
@@ -131,26 +141,46 @@
   <div id="pagination" class="pagination-container" aria-label="pagination"></div>
 </div>
 
-<!-- login modal (hidden by default) -->
-<div id="loginModal" class="login-modal" aria-hidden="true">
-  <div class="login-box" role="dialog" aria-labelledby="loginTitle">
-    <button id="closeLoginModal" class="close-btn" aria-label="close">&times;</button>
-    <h2 id="loginTitle">Admin login</h2>
-    <form id="loginForm" class="login-form" novalidate>
-      <div class="input-group">
-        <span class="icon"><i class="bi bi-person"></i></span>
-        <input id="loginEmail" type="email" placeholder="Email" required />
+<!-- Auth Modal -->
+<div id="authModal" class="login-modal" aria-hidden="true">
+  <div class="login-box">
+    <!-- تب‌ها -->
+    <div class="auth-tabs">
+      <button class="tab-btn active" data-tab="login">Login</button>
+      <button class="tab-btn" data-tab="signup">Sign Up</button>
+    </div>
+
+    <!-- فرم لاگین -->
+    <form id="loginForm" class="tab-content active" data-tab="login">
+      <input type="text" id="loginUsername" placeholder="Gmail or Username" required />
+      <input type="password" id="loginPassword" placeholder="Password" required />
+      <button type="submit" class="login-btn">Login</button>
+    </form>
+
+    <!-- فرم ثبت‌نام دو مرحله‌ای -->
+    <form id="signupForm" class="tab-content" data-tab="signup" enctype="multipart/form-data">
+      <!-- مرحله ۱ -->
+      <div id="signupStep1" class="fade-step active-step">
+        <input type="email" id="signupEmail" placeholder="Gmail" required />
+        <input type="text" id="signupUsername" placeholder="Username" required />
+        <input type="password" id="signupPassword" placeholder="Password" required />
       </div>
-      <div class="input-group">
-        <span class="icon"><i class="bi bi-lock"></i></span>
-        <input id="loginPassword" type="password" placeholder="Password" required />
+
+      <!-- مرحله ۲ -->
+      <div id="signupStep2" class="fade-step" style="display:none;">
+        <input type="file" id="signupAvatar" accept="image/*" required />
+        <small style="font-size:12px;color:#888;">حداکثر حجم عکس: 500KB</small>
       </div>
-      <button type="submit" class="login-btn">Log in</button>
-      <div class="social-login">
-      </div>
+
+      <button type="button" id="signupNextBtn" class="login-btn signup-next-btn">
+  <img src="/images/icons8-next.apng" alt="next" id="signupNextIcon" style="height:22px;vertical-align:middle;">
+  <span id="signupBtnText"></span>
+</button>
     </form>
   </div>
 </div>
+
+
 <!-- کانتینر شناور -->
 <div class="floating-wrapper">
   <!-- پنل استوری‌ها -->

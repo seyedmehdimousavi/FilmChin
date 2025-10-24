@@ -99,7 +99,7 @@ Body.dark{
   background: rgba(255,255,255,0.55);
   Position:sticky;
   top: 0;
-  z-index:120;
+  z-index:12000;
   height: 120px;
   box-shadow:0 2px 8px rgba(0,0,0,0.1);
 }
@@ -167,8 +167,7 @@ Body.dark .menu-btn,body.dark .icon-btn,body.dark .icon-inside{background:rgba(8
   height:100%;
   width:300px;
   max-width:86vw;
-  padding:10px;
-  padding-top: 90px;
+  padding:16px;
   background:linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,255,255,0.85));
   backdrop-filter:blur(10px);
   box-shadow:2px 0 12px rgba(0,0,0,0.22);
@@ -815,6 +814,9 @@ Body.dark #loginModal .close-btn:hover {
 }
 #profileBtn {
   Position: relative;
+  width: 45px !important;
+  height: 45px !important;
+  padding: 0 !important;
 }
 .comment-text,
 .comment-text-content,
@@ -1058,7 +1060,6 @@ Body.dark .admin-comment-text {
   Border-radius: 6px;
   Cursor: pointer;
 }
-.icon-inside,
 .imdb-bell,
 .genre-bell{
   Display: inline-block;
@@ -2490,7 +2491,7 @@ body.dark #applyRatingFilter {
   top: 12px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 2147483647; /* بالاتر از همه */
+  z-index: 2147647; /* بالاتر از همه */
   display: flex;
   gap: 8px;
   pointer-events: none; /* تا روی بقیه کلیک‌ها تاثیر نذاره */
@@ -2520,4 +2521,237 @@ body.dark .active-filters-toast .filter-badge {
   color: #ff8c00;
   font-size: 16px;
   cursor: pointer;
+}
+/* 🔹 مودال ورود/ثبت‌نام - پیش‌فرض مخفی */
+.login-modal {
+  display: none;              /* در شروع مخفی */
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5); /* پس‌زمینه تار */
+  align-items: center;
+  justify-content: center;
+}
+
+/* جعبه داخل مودال */
+.login-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  animation: fadeIn 0.25s ease;
+}
+
+/* انیمیشن ساده برای باز شدن */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 🔹 تب‌های بالای فرم */
+.auth-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.auth-tabs .tab-btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  cursor: pointer;
+  background: rgba(0,74,124,0.08);
+  border-radius: 6px;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.auth-tabs .tab-btn.active {
+  background: var(--btn-day);
+  color: #fff;
+}
+
+/* 🔹 محتوای تب‌ها */
+.tab-content {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tab-content.active {
+  display: flex;
+}
+
+/* 🔹 ورودی‌ها */
+#authModal input[type="text"],
+#authModal input[type="email"],
+#authModal input[type="password"],
+#authModal input[type="file"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#authModal input[type="file"] {
+  padding: 6px;
+}
+
+/* 🔹 دکمه‌ها */
+#authModal .login-btn {
+  background: var(--btn-day);
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.2s ease;
+}
+
+#authModal .login-btn:hover {
+  background: #005a99;
+}
+
+/* 🔹 منوی پروفایل بعد از لاگین */
+.profile-menu {
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  background: var(--post-day);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 8px;
+  z-index: 2100;
+}
+
+.profile-menu.hidden {
+  display: none;
+}
+
+.profile-menu button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.profile-menu button:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.fade-step {
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.4s ease;
+  transform: translateY(10px);
+}
+.fade-step.active-step {
+  display: block !important;
+  opacity: 1;
+  transform: translateY(0);
+}
+.signup-next-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+.signup-next-btn.btn-loading {
+  opacity: 0.8;
+}
+#profileBtn img{
+  width: 40px !important;
+  height: 40px !important;
+}
+.search-bar {
+  position: relative; /* والد مرجع برای منوی پروفایل */
+}
+
+#profileMenu {
+  position: absolute;
+  top: 0; 
+  right: 0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 6px 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+}
+
+#profileMenu.hidden {
+  display: none;
+}
+/* حباب پروفایل */
+.profile-menu {
+  position: absolute;
+  top: 60px; /* بسته به ارتفاع هدر */
+  right: 10px;
+  z-index: 999999 !important;
+}
+
+.profile-bubble {
+  color: var(--bubble-text, #111);
+  border-radius: 10px;
+  padding: 5px;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* هماهنگی با حالت شب/روز */
+body.dark .profile-bubble {
+  --bubble-bg: #222;
+  --bubble-text: #eee;
+}
+
+/* نام کاربر */
+.profile-username {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+/* دکمه ویرایش */
+.profile-edit {
+  background: rgba(128,128,128,0.1) !important;
+  border: none;
+  color: inherit;
+  text-align: left;
+  padding: 6px 0;
+  cursor: pointer;
+}
+
+/* خط جداکننده */
+.profile-divider {
+  border: none;
+  border-top: 1px solid rgba(128,128,128,0.3);
+  margin: 6px 0;
+}
+
+/* دکمه خروج */
+.profile-logout {
+  background: rgba(255,0,0,0.1) !important; /* قرمز کم‌رنگ با اوپسیتی */
+  border: none;
+  color: #d00;
+  font-weight: bold;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+.profile-logout:hover {
+  background: rgba(255,0,0,0.2);
 }
