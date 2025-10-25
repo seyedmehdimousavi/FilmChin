@@ -59,18 +59,42 @@ async function loadAuthState() {
     }
 
     // ادمین
-    if (user.id === ADMIN_UID) {
-      currentUser = {
-        id: user.id,
-        email: user.email,
-        username: "Admin",
-        avatarUrl: null,
-        isAdmin: true
-      };
-      localStorage.setItem("currentUser", JSON.stringify(currentUser));
-      setUserProfile(null);
-      return currentUser;
-    }
+if (user.id === ADMIN_UID) {
+  // گرفتن اطلاعات ادمین از جدول users
+  const { data: dbUser, error: dbErr } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (dbErr || !dbUser) {
+    console.error("dbUser error (admin):", dbErr);
+    currentUser = {
+      id: user.id,
+      email: user.email,
+      username: "Admin",
+      avatarUrl: null,
+      isAdmin: true
+    };
+    setUserProfile(null);
+    return currentUser;
+  }
+
+  const avatarUrl = dbUser?.avatar_url
+    ? supabase.storage.from('avatars').getPublicUrl(dbUser.avatar_url).data.publicUrl
+    : null;
+
+  currentUser = {
+    id: user.id,
+    email: user.email,
+    username: dbUser?.username || "Admin",
+    avatarUrl,
+    isAdmin: true
+  };
+
+  setUserProfile(avatarUrl);
+  return currentUser;
+}
 
     // گرفتن اطلاعات کاربر از users
     const { data: dbUser, error: dbErr } = await supabase
