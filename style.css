@@ -144,7 +144,7 @@ Body.dark .main-header{
   Height:40px;
 }
 .menu-btn,.icon-btn,.icon-inside{
-  Height:44px;
+  Height: 44px;
   Width: 44px;
   Border-radius:50%;
   Border:0;
@@ -489,7 +489,8 @@ Body.dark .page-bubble.active{background:var(--btn-night)}
 @media (max-width:600px){
   .search-bar{min-height:44px;padding:6px;
   }
-  .search-bar input{padding:8px;
+  .search-bar input{
+    padding:8px;
  Height:36px;font-size:.95rem}
   .menu-btn,.icon-btn,.icon-inside{height:38px;width: 38px;}
 }
@@ -2675,7 +2676,8 @@ body.dark .active-filters-toast .filter-badge {
   height: 40px !important;
 }
 .search-bar {
-  position: relative; /* والد مرجع برای منوی پروفایل */
+  height: 50px;
+  position: relative;
 }
 
 #profileMenu {

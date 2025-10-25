@@ -524,39 +524,45 @@ function finishPostProgress(success = true) {
 
 
 // -------------------- Upload file with real progress via XHR --------------------
-function uploadWithProgress(file, path) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", `${SUPABASE_URL}/storage/v1/object/covers/${path}`);
-
-
-    xhr.setRequestHeader("apikey", SUPABASE_KEY);
-    xhr.setRequestHeader("Authorization", `Bearer ${SUPABASE_KEY}`);
-
-
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable) {
-        const percent = Math.round((e.loaded / e.total) * 100);
-        updatePartProgress(percent);
+async function uploadWithProgress(file, path) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // گرفتن توکن کاربر لاگین‌شده
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error || !session) {
+        return reject(new Error("No active session. Please login as admin."));
       }
-    };
 
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `${SUPABASE_URL}/storage/v1/object/covers/${path}`);
 
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        resolve({ ok: true });
-      } else {
-        reject(new Error(`Upload failed (${xhr.status})`));
-      }
-    };
+      // apikey هم باید باشه، ولی Authorization باید با توکن session باشه
+      xhr.setRequestHeader("apikey", SUPABASE_KEY);
+      xhr.setRequestHeader("Authorization", `Bearer ${session.access_token}`);
 
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const percent = Math.round((e.loaded / e.total) * 100);
+          updatePartProgress(percent);
+        }
+      };
 
-    xhr.onerror = () => reject(new Error("Network error"));
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve({ ok: true });
+        } else {
+          reject(new Error(`Upload failed (${xhr.status})`));
+        }
+      };
 
+      xhr.onerror = () => reject(new Error("Network error"));
 
-    const formData = new FormData();
-    formData.append("file", file);
-    xhr.send(formData);
+      const formData = new FormData();
+      formData.append("file", file);
+      xhr.send(formData);
+    } catch (err) {
+      reject(err);
+    }
   });
 }
  
