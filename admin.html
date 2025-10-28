@@ -55,7 +55,11 @@
     <img src="images/icons8-combo-chart.apng" alt="analytics">
   </div>
 </button>
-
+<button class="tab-btn" data-target="users" type="button">
+  <div class="tab-circle">
+    <img src="/images/icons8-users-48.png" alt="users">
+  </div>
+</button>
 </div>
   <section id="adminProfile" class="admin-section">
     
@@ -166,6 +170,26 @@
   <div id="topClicks"></div>
 </section>
 
+<section id="users" class="admin-section-item-7 admin-section-item" style="display:none;">
+  <h2>Users & Admins</h2>
+
+  <!-- Admins list -->
+  <div class="card grey-box" style="margin-bottom:20px;padding:10px;border-radius:8px;background:#f0f0f0;">
+    <h3>Admins List</h3>
+    <div id="adminsContainer" class="white-box" style="background:#fff;padding:10px;border-radius:6px;"></div>
+  </div>
+
+  <!-- Users list -->
+  <div class="card grey-box" style="padding:10px;border-radius:8px;background:#f0f0f0;">
+    <h3>Users List</h3>
+    <div class="search-bar" style="display:flex;align-items:center;gap:8px;">
+      <input type="text" id="userSearch" placeholder="Search..." style="flex:1;padding:6px;">
+      <button id="clearSearch">✕</button>
+    </div>
+    <div id="usersContainer" class="white-box" style="background:#fff;padding:10px;border-radius:6px;margin-top:10px;"></div>
+    <div id="usersPagination" class="pagination-users"></div>
+  </div>
+</section>
   </section>
 </main>
 

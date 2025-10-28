@@ -25,8 +25,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadAuthState();
 });
 
-// -------------------- Admin UID --------------------
-const ADMIN_UID = '7314d471-8343-44b3-9fcc-a9ae01d99725';
 
 // -------------------- App state --------------------
 let currentUser = null;
@@ -58,44 +56,6 @@ async function loadAuthState() {
       return null;
     }
 
-    // ادمین
-if (user.id === ADMIN_UID) {
-  // گرفتن اطلاعات ادمین از جدول users
-  const { data: dbUser, error: dbErr } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (dbErr || !dbUser) {
-    console.error("dbUser error (admin):", dbErr);
-    currentUser = {
-      id: user.id,
-      email: user.email,
-      username: "Admin",
-      avatarUrl: null,
-      isAdmin: true
-    };
-    setUserProfile(null);
-    return currentUser;
-  }
-
-  const avatarUrl = dbUser?.avatar_url
-    ? supabase.storage.from('avatars').getPublicUrl(dbUser.avatar_url).data.publicUrl
-    : null;
-
-  currentUser = {
-    id: user.id,
-    email: user.email,
-    username: dbUser?.username || "Admin",
-    avatarUrl,
-    isAdmin: true
-  };
-
-  setUserProfile(avatarUrl);
-  return currentUser;
-}
-
     // گرفتن اطلاعات کاربر از users
     const { data: dbUser, error: dbErr } = await supabase
       .from('users')
@@ -122,20 +82,25 @@ if (user.id === ADMIN_UID) {
       ? supabase.storage.from('avatars').getPublicUrl(dbUser.avatar_url).data.publicUrl
       : null;
 
-    currentUser = {
-      id: user.id,
-      email: user.email,
-      username: dbUser?.username || user.email,
-      avatarUrl,
-      isAdmin: dbUser?.is_admin || false
-    };
+    const role = dbUser?.role
+  ? dbUser.role
+  : (dbUser?.is_admin ? 'admin' : 'user');
+
+currentUser = {
+  id: user.id,
+  email: user.email,
+  username: dbUser?.username || user.email,
+  avatarUrl,
+  role
+};
+
 
     localStorage.setItem("currentUser", JSON.stringify(currentUser));
     setUserProfile(avatarUrl);
     const usernameEl = document.getElementById("profileUsername");
-if (usernameEl && currentUser) {
-  usernameEl.textContent = currentUser.username;
-}
+    if (usernameEl && currentUser) {
+      usernameEl.textContent = currentUser.username;
+    }
     return currentUser;
   } catch (err) {
     console.error("loadAuthState error:", err);
@@ -231,6 +196,27 @@ signupNextBtn?.addEventListener("click", async (e) => {
     setButtonLoading(signupNextBtn, "در حال ثبت‌نام...");
 
     try {
+      // 🔹 چک بلاک بودن قبل از ثبت‌نام
+      const { data: blocked, error: blockErr } = await supabase
+        .from('blocked_users')
+        .select('id')
+        .or(`email.eq.${email},username.eq.${username}`)
+        .maybeSingle();
+
+      if (blockErr) {
+        console.error("blocked_users check error:", blockErr);
+        showToast("خطا در بررسی بلاک ❌", "error");
+        clearButtonLoading(signupNextBtn);
+        return;
+      }
+
+      if (blocked) {
+        showToast("این ایمیل یا نام کاربری بلاک شده است ❌", "error");
+        clearButtonLoading(signupNextBtn);
+        return;
+      }
+
+      // ادامه ثبت‌نام
       const { data: signData, error: signErr } = await supabase.auth.signUp({ email, password });
       if (signErr || !signData?.user) throw signErr || new Error("ثبت‌نام ناموفق");
 
@@ -294,18 +280,18 @@ signupNextBtn?.addEventListener("click", async (e) => {
           username: pendingUsername,
           password: pendingPassword,
           avatar_url: filePath,
-          is_admin: false
+          role: 'user'
         }
       ], { onConflict: 'id' });
 
       if (upsertErr) throw upsertErr;
 
-      currentUser = { id: pendingUserId, email: pendingEmail, username: pendingUsername, avatarUrl, isAdmin: false };
-setUserProfile(avatarUrl);
-const usernameEl = document.getElementById("profileUsername");
-if (usernameEl && currentUser) {
-  usernameEl.textContent = currentUser.username;
-}
+      currentUser = { id: pendingUserId, email: pendingEmail, username: pendingUsername, avatarUrl, role: 'user' };
+      setUserProfile(avatarUrl);
+      const usernameEl = document.getElementById("profileUsername");
+      if (usernameEl && currentUser) {
+        usernameEl.textContent = currentUser.username;
+      }
       showToast("ثبت‌نام تکمیل شد ✅", "success");
       authModal.style.display = "none";
     } catch (err) {
@@ -341,6 +327,27 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
     const email = loginUsername.value.trim();
     const password = loginPassword.value.trim();
 
+    // 🔹 چک بلاک بودن قبل از ورود
+    const { data: blocked, error: blockErr } = await supabase
+      .from('blocked_users')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle();
+
+    if (blockErr) {
+      console.error("blocked_users check error:", blockErr);
+      showToast("خطا در بررسی بلاک ❌", "error");
+      clearButtonLoading(btn);
+      return;
+    }
+
+    if (blocked) {
+      showToast("این حساب بلاک شده است ❌", "error");
+      clearButtonLoading(btn);
+      return;
+    }
+
+    // ادامه ورود
     const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
     if (signInErr || !signInData.user) throw signInErr;
 
@@ -351,12 +358,18 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
       ? supabase.storage.from('avatars').getPublicUrl(dbUser.avatar_url).data.publicUrl
       : null;
 
-    currentUser = { id: userId, username: dbUser?.username || email, avatarUrl, isAdmin: dbUser?.is_admin || false };
-setUserProfile(avatarUrl);
-const usernameEl = document.getElementById("profileUsername");
-if (usernameEl && currentUser) {
-  usernameEl.textContent = currentUser.username;
-}
+    const role = dbUser?.role
+      ? dbUser.role
+      : (dbUser?.is_admin ? 'admin' : 'user');
+
+    currentUser = { id: userId, username: dbUser?.username || email, avatarUrl, role };
+
+    setUserProfile(avatarUrl);
+    const usernameEl = document.getElementById("profileUsername");
+    if (usernameEl && currentUser) {
+      usernameEl.textContent = currentUser.username;
+    }
+
     showToast("ورود موفقیت‌آمیز ✅", "success");
     authModal.style.display = "none";
   } catch (err) {
@@ -386,11 +399,12 @@ profileBtn?.addEventListener("click", async () => {
     return;
   }
 
-  if (currentUser?.isAdmin) {
-    window.location.href = "admin.html";
-  } else {
-    profileMenu.classList.toggle("hidden");
-  }
+  const isAdminRole = ['owner', 'admin'].includes(currentUser?.role);
+if (isAdminRole) {
+  window.location.href = "admin.html";
+} else {
+  profileMenu.classList.toggle("hidden");
+}
 });
 
 // خروج از حساب
@@ -2009,7 +2023,7 @@ async function enforceAdminGuard() {
       await loadAuthState();
     }
 
-    const isAdmin = Boolean(currentUser && currentUser.isAdmin);
+    const isAdmin = Boolean(currentUser && ['owner','admin'].includes(currentUser.role));
 
     // اگر در صفحه ادمین هستیم و ادمین نیست → برگرد به index
     if (!isAdmin && window.location.pathname.endsWith('admin.html')) {
@@ -2499,17 +2513,30 @@ function renderEpisodeForms(eps = []) {
   loadAdminMovies();
 
 
+
+
+
+// === Access Guards ===
+function canOwnerActions() {
+  return currentUser && currentUser.role === 'owner';
+}
+function denyIfNotOwner() {
+  if (!canOwnerActions()) {
+    showToast("شما دسترسی ندارید ❌", "error");
+    return true;
+  }
+  return false;
+}
+
 async function loadAnalytics() {
   // فقط اگر ادمین لاگین است
   const ok = await enforceAdminGuard();
   if (!ok) return;
 
-
   // دریافت داده‌ها از ویوها
   const { data: visits, error: vErr } = await supabase.from("v_visits_daily").select("*");
   const { data: searches, error: sErr } = await supabase.from("v_top_searches").select("*").limit(10);
   const { data: clicks, error: cErr } = await supabase.from("v_top_clicks").select("*").limit(10);
-
 
   if (vErr || sErr || cErr) {
     console.error("analytics errors:", { vErr, sErr, cErr });
@@ -2517,14 +2544,12 @@ async function loadAnalytics() {
     return;
   }
 
-
   // داده‌های visits برای Chart.js
   const labels = (visits || []).map(row => {
     const d = new Date(row.day);
     return d.toLocaleDateString();
   });
   const values = (visits || []).map(row => Number(row.visits) || 0);
-
 
   // رندر چارت
   const canvas = document.getElementById("visitsChart");
@@ -2563,7 +2588,6 @@ async function loadAnalytics() {
     canvas._chartInstance = chart;
   }
 
-
   // Top searches
   const topSearchesEl = document.getElementById("topSearches");
   if (topSearchesEl) {
@@ -2572,15 +2596,388 @@ async function loadAnalytics() {
     ).join("") || "<p>No searches yet.</p>";
   }
 
-
   // Top clicks
-const topClicksEl = document.getElementById("topClicks");
-if (topClicksEl) {
-  topClicksEl.innerHTML = (clicks || []).map(row =>
-    `<div class="message-item"><span>${escapeHtml(row.title || 'Untitled')}</span><span style="font-weight:bold;">${row.clicks}</span></div>`
-  ).join("") || "<p>No clicks yet.</p>";
+  const topClicksEl = document.getElementById("topClicks");
+  if (topClicksEl) {
+    topClicksEl.innerHTML = (clicks || []).map(row =>
+      `<div class="message-item"><span>${escapeHtml(row.title || 'Untitled')}</span><span style="font-weight:bold;">${row.clicks}</span></div>`
+    ).join("") || "<p>No clicks yet.</p>";
+  }
 }
+
+async function loadUsers(search = '') {
+  if (!currentUser || !['owner','admin'].includes(currentUser.role)) {
+    showToast("شما دسترسی مشاهده کاربران را ندارید ❌", "error");
+    return;
+  }
+
+  let query = supabase
+    .from('users')
+    .select('id, username, email, avatar_url, created_at, role', { count: 'exact' })
+    .eq('role','user')
+    .order('created_at',{ascending:false})
+    .range((usersPage - 1) * USERS_PAGE_SIZE, usersPage * USERS_PAGE_SIZE - 1);
+
+  if (search) query = query.ilike('username', `%${search}%`);
+
+  const { data, error, count } = await query;
+  if (error) {
+    console.error("loadUsers error:", error);
+    showToast("خطا در دریافت لیست کاربران ❌", "error");
+    return;
+  }
+
+  const container = document.getElementById('usersContainer');
+  container.innerHTML = `
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>کاور</th>
+          <th>نام کاربری</th>
+          <th>ایمیل</th>
+          <th>سمت</th>
+          <th>تاریخ عضویت</th>
+          <th>عملیات</th>
+        </tr>
+      </thead>
+      <tbody id="usersTableBody"></tbody>
+    </table>
+  `;
+
+  const tbody = document.getElementById('usersTableBody');
+
+  data.forEach(u => {
+    const avatar = u.avatar_url
+      ? supabase.storage.from('avatars').getPublicUrl(u.avatar_url).data.publicUrl
+      : 'images/icons8-user-96.png';
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><img src="${avatar}" alt="avatar" class="avatar-img"></td>
+      <td>${u.username}</td>
+      <td>${u.email}</td>
+      <td><span class="role-badge ${u.role}">${u.role}</span></td>
+      <td>${new Date(u.created_at).toLocaleDateString()}</td>
+      <td>
+        ${
+          currentUser.role === 'owner'
+            ? `<button class="btn-danger" onclick="blockUser('${u.id}','${u.email}','${u.username}')">Block</button>
+               <button class="btn-primary" onclick="promoteToAdmin('${u.id}')">Promote</button>`
+            : ''
+        }
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  renderUsersPagination(count || 0);
 }
+
+// هندلر سرچ
+document.getElementById('userSearch')?.addEventListener('input', (e) => {
+  const value = e.target.value.trim();
+  usersPage = 1; // برگرده به صفحه اول
+  loadUsers(value);
+});
+
+// هندلر دکمه ✕
+document.getElementById('clearSearch')?.addEventListener('click', () => {
+  const input = document.getElementById('userSearch');
+  input.value = '';
+  usersPage = 1;
+  loadUsers('');
+});
+
+
+async function loadAdmins() {
+  if (!currentUser || !['owner','admin'].includes(currentUser.role)) {
+    showToast("شما دسترسی مشاهده ادمین‌ها را ندارید ❌", "error");
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, username, email, avatar_url, role')
+    .in('role', ['owner','admin'])
+    .order('role', { ascending: true });
+
+  if (error) {
+    console.error("loadAdmins error:", error);
+    showToast("خطا در دریافت لیست ادمین‌ها ❌", "error");
+    return;
+  }
+
+  const container = document.getElementById('adminsContainer');
+  container.innerHTML = `
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>کاور</th>
+          <th>نام کاربری</th>
+          <th>ایمیل</th>
+          <th>سمت</th>
+          <th>عملیات</th>
+        </tr>
+      </thead>
+      <tbody id="adminsTableBody"></tbody>
+    </table>
+  `;
+
+  const tbody = document.getElementById('adminsTableBody');
+
+  data.forEach(u => {
+    const avatar = u.avatar_url
+      ? supabase.storage.from('avatars').getPublicUrl(u.avatar_url).data.publicUrl
+      : 'images/icons8-user-96.png';
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><img src="${avatar}" alt="avatar" class="avatar-img"></td>
+      <td>${u.username}</td>
+      <td>${u.email}</td>
+      <td><span class="role-badge ${u.role}">${u.role}</span></td>
+      <td>
+        ${
+          currentUser.role === 'owner' && u.role !== 'owner'
+            ? `<button class="btn-danger" onclick="demoteToUser('${u.id}')">Demote</button>
+               <button class="btn-danger" onclick="blockUser('${u.id}','${u.email}','${u.username}')">Block</button>`
+            : ''
+        }
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+let usersPage = 1;
+const USERS_PAGE_SIZE = 10;
+function renderUsersPagination(total) {
+  const container = document.getElementById('usersPagination');
+  const pages = Math.max(1, Math.ceil(total / USERS_PAGE_SIZE));
+  container.innerHTML = '';
+
+  for (let p = 1; p <= pages; p++) {
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-subtle pagination-users-btn';
+    btn.textContent = p;
+    if (p === usersPage) btn.disabled = true;
+    btn.addEventListener('click', () => {
+      usersPage = p;
+      const q = document.getElementById('userSearch')?.value?.trim() || '';
+      loadUsers(q);
+    });
+    container.appendChild(btn);
+  }
+}
+// === Confirm Modal ===
+async function confirmDialog(message, { title = "Confirm", confirmText = "Confirm", cancelText = "Cancel" } = {}) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-card">
+        <h3 class="modal-title">${title}</h3>
+        <p class="modal-message">${message}</p>
+        <div class="modal-actions">
+          <button class="btn btn-subtle" data-role="cancel">${cancelText}</button>
+          <button class="btn btn-danger" data-role="ok">${confirmText}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    const cleanup = () => overlay.remove();
+    overlay.addEventListener('click', (e) => {
+      const role = e.target?.dataset?.role;
+      if (role === 'ok') { cleanup(); resolve(true); }
+      if (role === 'cancel' || e.target === overlay) { cleanup(); resolve(false); }
+    });
+  });
+}
+
+// === Owner Password Modal ===
+async function passwordDialog({ title = "Owner confirmation", placeholder = "Owner password", confirmText = "Confirm", cancelText = "Cancel" } = {}) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-card">
+        <h3 class="modal-title">${title}</h3>
+        <input type="password" class="modal-input" id="ownerConfirmInput" placeholder="${placeholder}" />
+        <div class="modal-actions">
+          <button class="btn btn-subtle" data-role="cancel">${cancelText}</button>
+          <button class="btn btn-primary" data-role="ok">${confirmText}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    const input = overlay.querySelector('#ownerConfirmInput');
+    input?.focus();
+
+    const cleanup = () => overlay.remove();
+    overlay.addEventListener('click', (e) => {
+      const role = e.target?.dataset?.role;
+      if (role === 'ok') {
+        const val = input.value.trim();
+        cleanup();
+        resolve(val || null);
+      }
+      if (role === 'cancel' || e.target === overlay) {
+        cleanup();
+        resolve(null);
+      }
+    });
+  });
+}
+
+// === Block User ===
+async function blockUser(userId, email) {
+  if (denyIfNotOwner()) return;
+
+  const ok = await confirmDialog(`Block ${email}?`, { confirmText: "Block", cancelText: "Cancel" });
+  if (!ok) return;
+
+  try {
+    const { data: existing, error: selErr } = await supabase
+      .from('blocked_users')
+      .select('email')
+      .eq('email', email)
+      .limit(1);
+
+    if (selErr) {
+      console.error('Error checking blocked_users:', selErr);
+      showToast('Error checking blocked list');
+      return;
+    }
+
+    if (!existing || existing.length === 0) {
+      const { error: insErr } = await supabase
+        .from('blocked_users')
+        .insert([{ email, user_id: userId }]);
+      if (insErr) {
+        console.error('Error inserting into blocked_users:', insErr);
+        showToast('Error adding to blocked list');
+        return;
+      }
+    }
+
+    const { error: updErr } = await supabase
+      .from('users')
+      .update({ is_blocked: true })
+      .eq('id', userId);
+
+    if (updErr) {
+      console.error('Error updating users.is_blocked:', updErr);
+      showToast('Error flagging user as blocked');
+      return;
+    }
+
+    showToast(`User ${email} blocked`);
+    try { await loadUsers?.(); } catch {}
+    try { await loadAdmins?.(); } catch {}
+  } catch (err) {
+    console.error('blockUser exception:', err);
+    showToast('Unexpected error while blocking user');
+  }
+}
+
+// === Demote to User ===
+async function demoteToUser(userId) {
+  if (denyIfNotOwner()) return;
+
+  const ok = await confirmDialog("Remove admin privileges?", { confirmText: "Confirm", cancelText: "Cancel" });
+  if (!ok) return;
+
+  try {
+    const password = await passwordDialog({ title: "Owner confirmation", placeholder: "Owner password" });
+    if (!password) return;
+
+    const { data: ownerData, error: ownerErr } = await supabase
+      .from('users')
+      .select('id, password')
+      .eq('id', currentUser.id)
+      .maybeSingle();
+
+    if (ownerErr || !ownerData) {
+      console.error("Owner check error:", ownerErr);
+      showToast("خطا در بررسی Owner ❌", "error");
+      return;
+    }
+
+    if (ownerData.password !== password) {
+      showToast("رمز تأیید اشتباه است ❌", "error");
+      return;
+    }
+
+    const { error: updErr } = await supabase
+      .from('users')
+      .update({ role: 'user' })
+      .eq('id', userId);
+
+    if (updErr) {
+      console.error("demoteToUser error:", updErr);
+      showToast("خطا در تغییر نقش ❌", "error");
+      return;
+    }
+
+    showToast("ادمین با موفقیت به User تغییر یافت ✅", "success");
+    loadAdmins();
+    loadUsers();
+  } catch (err) {
+    console.error("demoteToUser exception:", err);
+    showToast("خطای غیرمنتظره ❌", "error");
+  }
+}
+
+// === Promote to Admin ===
+async function promoteToAdmin(userId) {
+  if (denyIfNotOwner()) return;
+
+  const password = await passwordDialog({ title: "Owner confirmation", placeholder: "Owner password" });
+  if (!password) return;
+
+  try {
+    const { data: ownerData, error: ownerErr } = await supabase
+      .from('users')
+      .select('id, password')
+      .eq('id', currentUser.id)
+      .maybeSingle();
+
+    if (ownerErr || !ownerData) {
+      console.error("Owner check error:", ownerErr);
+      showToast("خطا در بررسی Owner ❌", "error");
+      return;
+    }
+
+    if (ownerData.password !== password) {
+      showToast("رمز تأیید اشتباه است ❌", "error");
+      return;
+    }
+
+    const { error: updErr } = await supabase
+      .from('users')
+      .update({ role: 'admin' })
+      .eq('id', userId);
+
+    if (updErr) {
+      console.error("promoteToAdmin error:", updErr);
+      showToast("خطا در ارتقا ❌", "error");
+      return;
+    }
+
+    showToast("کاربر با موفقیت به Admin ارتقا یافت ✅", "success");
+    loadUsers();
+    loadAdmins();
+  } catch (err) {
+    console.error("promoteToAdmin exception:", err);
+    showToast("خطای غیرمنتظره ❌", "error");
+  }
+}
+
+// make functions available globally
+window.promoteToAdmin = promoteToAdmin;
+window.blockUser = blockUser;
+window.demoteToUser = demoteToUser;
+
 
 
 // -------------------- Admin: add/edit movie --------------------
@@ -2915,11 +3312,12 @@ if (addMovieForm && movieList) {
   try {
     const badge = document.getElementById('commentBadge');
 
-    // فقط اگر ادمین لاگین کرده باشه
-    if (!currentUser || !currentUser.isAdmin) {
-      if (badge) badge.style.display = 'none';
-      return;
-    }
+   // فقط اگر نقش کاربر owner یا admin باشه
+if (!currentUser || !['owner','admin'].includes(currentUser.role)) {
+  if (badge) badge.style.display = 'none';
+  return;
+}
+
 
     const { data, error } = await supabase
       .from('comments')
@@ -3253,15 +3651,14 @@ setInterval(async () => {
 function initAdminTabs() {
   const tabButtons = document.querySelectorAll(".admin-tabs .tab-btn");
 
-
   const sections = {
     posts: [".send_post", ".released_movies"],
     messages: [".admin_messages"],
     comments: ["#unapproved-comments-section"],
     links: ["#social-links-section"],
-    analytics: ["#analytics"] // ← اضافه شد
+    analytics: ["#analytics"],
+    users: ["#users"] // ← تب جدید اضافه شد
   };
-
 
   function showSection(key) {
     // همه سکشن‌ها رو مخفی کن
@@ -3271,7 +3668,6 @@ function initAdminTabs() {
       });
     });
 
-
     // سکشن‌های مربوط به تب انتخاب‌شده رو نشون بده
     (sections[key] || []).forEach(sel => {
       document.querySelectorAll(sel).forEach(el => {
@@ -3280,10 +3676,8 @@ function initAdminTabs() {
     });
   }
 
-
   // پیش‌فرض: تب اول
   showSection("posts");
-
 
   tabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -3291,10 +3685,15 @@ function initAdminTabs() {
       btn.classList.add("active");
       showSection(btn.dataset.target);
 
-
-      // ← وقتی تب Analytics فعال شد، داده‌ها را لود کن
+      // وقتی تب Analytics فعال شد
       if (btn.dataset.target === "analytics") {
         loadAnalytics();
+      }
+
+      // وقتی تب Users فعال شد
+      if (btn.dataset.target === "users") {
+        loadAdmins();
+        loadUsers();
       }
     });
   });
