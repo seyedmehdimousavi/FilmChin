@@ -1725,7 +1725,9 @@ body.dark .genre-chip.active {
 
 .toast {
   background: #fafafa;
-  color: #fff;
+  color: #000;
+  text-align: center;
+  direction: rtl;
   padding: 12px 16px;
   margin-bottom: 10px;
   border-radius: 6px;
@@ -2217,11 +2219,12 @@ body.dark .message-bubble {
   top: var(--admin-tabs-offset, 64px); /* offset under the admin header */
   z-index: 150;                        /* above content cards */
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   gap: 10px;
   padding: 8px 0;
   backdrop-filter: blur(8px) saturate(160%);
   -webkit-backdrop-filter: blur(8px) saturate(160%);
+  overflow-x: scroll;
 }
 
 /* Liquid glass circular icon */
@@ -2233,8 +2236,8 @@ body.dark .message-bubble {
 }
 
 .admin-tabs .tab-circle {
-  width: 56px;
-  height: 56px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   display: flex;
   align-items: center;
