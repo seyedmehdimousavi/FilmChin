@@ -10,7 +10,7 @@
   --btn-night: #2185D5;
   --muted: #6b7280;
   --blur: 10px;
-  --green: #2ecc71;
+  --green: #2ECC71;
   --green-hover: #27ae60;
   --red: #e74c3c;
   --red-hover: #c0392b;
@@ -26,8 +26,8 @@
   --btn-day: linear-gradient(135deg, #004A7C, #0091d5);      /* آبی نفتی → آبی فیروزه‌ای */
   --btn-night: linear-gradient(135deg, #2185D5, #0d47a1);    /* آبی روشن → آبی سرمه‌ای */
 
-  --green: linear-gradient(135deg, #2ecc71, #1e8449);        /* سبز روشن → سبز تیره */
-  --green-hover: linear-gradient(135deg, #27ae60, #145a32);
+  --green: linear-gradient(135deg, #2ECC716E, #1E84495C);        /* سبز روشن → سبز تیره */
+  --green-hover: linear-gradient(135deg, #27AE6091, #145A3294);
 
   --red: linear-gradient(135deg, #e74c3c, #922b21);          /* قرمز روشن → قرمز شرابی */
   --red-hover: linear-gradient(135deg, #c0392b, #641e16);
@@ -460,7 +460,7 @@ Body.dark .movie-item,body.dark .message-item{background:var(--post-night)}
 .movie-actions .btn-edit,.message-actions .btn-edit{
   background:var(--green);
   border:0;
-  color:#fff;
+  color: #228302;
   padding:6px 10px;
   border-radius:6px;
   cursor:pointer;
@@ -1100,7 +1100,6 @@ Body.dark .admin-comment-text {
 Body.dark .menu-toggle {
   Background: rgba(255,255,255,0.08);
 }
-
 .submenu {
   Margin-top: 6px;
   Padding-left: 10px;
@@ -1486,6 +1485,10 @@ body.dark .episode-card{
 
 .movie-title-row {
   display: flex;
+  background: #80B5CB7D;
+  color: #015F79;
+  border-radius: 6px;
+  padding: 3px;
   justify-content: space-between;
   align-items: center;
 }
@@ -1506,7 +1509,7 @@ body.dark .episode-card{
 }
 
 .badge-serial {
-  background: #ff9800; /* نارنجی برای سریال */
+  background: #FF9800; /* نارنجی برای سریال */
 }
 
 .movie-type-tabs {
@@ -1588,15 +1591,20 @@ color: #512bd4;
 
 .genre-chip-mini {
   display: inline-block;
-  padding: 5px 10px;
   border-radius: 12px;
-  background: rgba(33,133,213,0.9);
-  color: #fff;
-  font-size: 12px;
+  background: rgba(0, 123, 255, 0.15);
+  color: #007bff;
   line-height: 1;
   cursor: pointer;
   user-select: none;
   transition: background 160ms ease, transform 120ms ease;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: bold;
+}
+body.dark .genre-chip-mini{
+  background: rgba(0, 123, 255, 0.35);
+  color: #FFFFFFE3;
 }
 .genre-chip-mini:hover { background: #e3eef6; }
 .genre-chip-mini:active {
@@ -2309,6 +2317,9 @@ body.dark .admin-tabs .tab-btn.active .tab-circle {
   Align-items: center;
   Gap: 6px;
   Font-weight: bold;
+}
+body.dark #linksHeader {
+  Background: rgba(255,255,255,0.08);
 }
 /* بنر بالای سایت */
 .site-banner {
