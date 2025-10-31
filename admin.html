@@ -20,14 +20,50 @@
 <body class="admin-body">
 <!-- Toast Container -->
 <div id="toast-container"></div>
-<header class="admin-header">
-  <h1>Admin Panel</h1>
-  <div class="admin-actions">
-    <a href="index.html" class="back-link"><i class="bi bi-arrow-left-circle"></i></a>
-    <button id="logoutBtn" class="logout-btn" type="button"><img src="images/icons8-logout-64.png" style="width: 20px;">log out</button>
+<header class="main-header">
+  <!-- 🔹 بنر بالای سایت -->
+  <div class="site-banner">
+    <div class="banner-content">
+      <span class="banner-logo">
+        <img src="/images/banner-icon.png" alt="banner-logo" />
+      </span>
+      <span class="banner-text">filmchiin.ir</span>
+    </div>
+  </div>
+
+  <!-- 🔹 هدر -->
+  <div class="header">
+    <div class="search-bar">
+      <!-- دکمه برگشت به سایت -->
+      <a href="index.html" id="backToSiteBtn" class="menu-btn" aria-label="back">
+        <img width="32" height="32" src="images/icons8-back-to-50.png" alt="back"/>
+      </a>
+
+      <!-- منوی پروفایل (مثل index) -->
+      <div id="profileMenu" class="profile-menu hidden">
+        <div class="profile-bubble">
+          <div class="profile-username" id="profileUsername">Admin</div>
+          <button class="profile-edit">ویرایش مشخصات</button>
+          <hr class="profile-divider"/>
+          <button id="logoutBtn" class="profile-logout">خروج</button>
+        </div>
+      </div>
+
+      <!-- متن ثابت Admin Panel به جای سرچ -->
+      <div class="admin-title">Admin Panel</div>
+
+      <!-- دکمه پروفایل -->
+      <button id="profileBtn" class="icon-inside" aria-label="profile">
+        <img src="images/icons8-user-96.png" alt="user"/>
+      </button>
+    </div>
+
+    <!-- دکمه تغییر تم -->
+    <button id="themeToggle" class="icon-btn" aria-label="toggle theme">
+      <img src="images/icons8-moon.apng" alt="dark-mode"/>
+    </button>
   </div>
 </header>
-
 <main>
   <div class="admin-tabs">
   <button class="tab-btn active" data-target="posts" type="button">

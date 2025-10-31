@@ -400,11 +400,19 @@ profileBtn?.addEventListener("click", async () => {
   }
 
   const isAdminRole = ['owner', 'admin'].includes(currentUser?.role);
-if (isAdminRole) {
-  window.location.href = "admin.html";
-} else {
-  profileMenu.classList.toggle("hidden");
-}
+
+  if (isAdminRole) {
+    if (window.location.pathname.includes("admin.html")) {
+      // ادمین داخل پنل → فقط حباب باز بشه
+      profileMenu.classList.toggle("hidden");
+    } else {
+      // ادمین داخل سایت → بره به پنل
+      window.location.href = "admin.html";
+    }
+  } else {
+    // کاربر عادی → همیشه حباب باز بشه
+    profileMenu.classList.toggle("hidden");
+  }
 });
 
 // خروج از حساب

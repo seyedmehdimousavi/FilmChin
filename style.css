@@ -57,7 +57,7 @@
   Font-family: 'IRANSans', 'ProductSans', sans-serif;
   Font-size: 15px;
   Font-weight: 400;
-  Letter-spacing: -0.2px;
+  /* Letter-spacing: -0.2px;s */
   Text-rendering:optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -110,7 +110,6 @@ Body.dark{
   Padding:12px 14px;
   width: 100%;
   height: 60px;
-  Gap: .4rem;
   
 }
 Body.dark .main-header{
@@ -150,7 +149,10 @@ Body.dark .main-header{
   Border:0;
   Background:rgba(255,255,255,0);
   Cursor:pointer;
-  Font-size:18px
+  Font-size:18px;
+  display : flex;
+  align-items: center;
+  justify-content: center;
 }
 Body.dark .menu-btn,body.dark .icon-btn,body.dark .icon-inside{background:rgba(80,80,80,0)}
 
@@ -167,7 +169,8 @@ Body.dark .menu-btn,body.dark .icon-btn,body.dark .icon-inside{background:rgba(8
   height:100%;
   width:300px;
   max-width:86vw;
-  padding:16px;
+  padding:10px;
+  scrollbar-width: none;
   background:linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,255,255,0.85));
   backdrop-filter:blur(10px);
   box-shadow:2px 0 12px rgba(0,0,0,0.22);
@@ -413,7 +416,7 @@ Body.dark .admin-header{background:rgba(30,36,40,0.6)}
 #adminProfile{
   Max-width:800px;
   Margin:30px auto;
-  Padding:20px;
+  Padding: 10px;
   Border-radius:16px
 }
 #adminProfile input,#adminProfile textarea{
@@ -458,19 +461,20 @@ Body.dark .movie-item,body.dark .message-item{background:var(--post-night)}
   Flex-direction: column;
   Gap:8px}
 .movie-actions .btn-edit,.message-actions .btn-edit{
-  background:var(--green);
   border:0;
   color: #228302;
+  font-weight: bold;
   padding:6px 10px;
   border-radius:6px;
   cursor:pointer;
 }
-.movie-actions .btn-edit:hover,.message-actions .btn-edit:hover{
-  background:var(--green-hover);
-  
-}
-.movie-actions .btn-delete,.message-actions .btn-delete{background:var(--red);border:0;color:#fff;padding:6px 10px;border-radius:6px;cursor:pointer}
-.movie-actions .btn-delete:hover,.message-actions .btn-delete:hover{background:var(--red-hover)}
+.movie-actions .btn-delete,.message-actions .btn-delete{
+  border:0;
+  color:red;
+  font-weight: bold;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer}
 
 /* =========================
   Pagination (bubbles)
@@ -498,7 +502,10 @@ Body.dark .page-bubble.active{background:var(--btn-night)}
   .search-bar input{
     padding:8px;
  Height:36px;font-size:.95rem}
-  .menu-btn,.icon-btn,.icon-inside{height:38px;width: 38px;}
+  .menu-btn,.icon-btn,.icon-inside{
+            height: 40px;
+        width: 40px;
+      }
 }
 .comment-input-row{
   Flex-direction:column;
@@ -725,16 +732,12 @@ Body.dark #loginModal .close-btn:hover {
   Background: #1769a8;
 }
 .action-buttons .btn-delete {
-  Background: #E62727;
-  Color: #fff;
+  Color: red;
   Border: none;
   Padding: 6px 10px;
   Border-radius: 4px;
   Font-size: 13px;
   Cursor: pointer;
-}
-.action-buttons .btn-delete:hover {
-  Background: #c71f1f;
 }
 .admin-actions{
   Display: flex;
@@ -761,14 +764,6 @@ Body.dark #loginModal .close-btn:hover {
 }
 .btn-approve{
   Background:var(--btn-day);
-  Border:0;
-  Color:#fff;
-  Padding:6px 10px;
-  Border-radius:6px;
-  Cursor:pointer;
-  }
-  .btn-delete{
-    Background:var(--red);
   Border:0;
   Color:#fff;
   Padding:6px 10px;
@@ -923,9 +918,6 @@ Body.dark .bubble-text {
   Cursor: pointer;
 }
 
-.bubble-right .btn-delete:hover {
-  Background: var(--red-hover);
-}
 .movie-info-admin {
   Flex: 1;
   Display: flex;
@@ -1018,7 +1010,10 @@ Body.dark .movie-item {
   Gap: 5px;
 }
 
-Body.dark .toggle-comments { color: var(--btn-night); }
+Body.dark .toggle-comments {
+  Background: rgba(255, 255, 255, 0.08);
+    Color: #e6eef6;
+}
 
 .admin-comments-panel {
   Padding: 8px;
@@ -1383,8 +1378,6 @@ Body.admin-body.dark h2 {
   overflow-x: auto;
   overflow-y: hidden;
   white-space: nowrap;
-  gap: 10px; /* فاصله بین اپیزودها */
-  padding: 10px;
   overflow-x: auto;
     white-space: nowrap;
     -ms-overflow-style: none;
@@ -1395,7 +1388,7 @@ Body.admin-body.dark h2 {
 /* لیست اپیزودها */
 .episodes-list {
   display: flex;
-  gap: 8px;
+  padding-right: 10px;
   margin-top: 6px;
 }
 
@@ -1406,6 +1399,7 @@ Body.admin-body.dark h2 {
   overflow: hidden;
   width: 80px;
   display: flex;
+  margin: 10px 0 10px 10px;
   flex-direction: column;
   align-items: center;
   text-align: center;
@@ -1485,8 +1479,8 @@ body.dark .episode-card{
 
 .movie-title-row {
   display: flex;
-  background: #80B5CB7D;
-  color: #015F79;
+      background: #e0e9fa;
+    color: #003170;
   border-radius: 6px;
   padding: 3px;
   justify-content: space-between;
@@ -1606,7 +1600,6 @@ body.dark .genre-chip-mini{
   background: rgba(0, 123, 255, 0.35);
   color: #FFFFFFE3;
 }
-.genre-chip-mini:hover { background: #e3eef6; }
 .genre-chip-mini:active {
   transform: scale(0.96);
   background: var(--promo-accent-color);
@@ -1615,6 +1608,7 @@ body.dark .genre-chip-mini{
 .tab-genres-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
 .tab-genres-list {
@@ -1629,6 +1623,8 @@ body.dark .genre-chip-mini{
   border-radius: 999px;
   background: #eef3f7;
   color: #0b3d5c;
+   margin: 0 4px;
+    gap: 3px;
   font-size: 13px;
   cursor: pointer;
   white-space: nowrap;
@@ -1655,13 +1651,13 @@ body.dark .genre-chip-mini{
   color: #000;
 }
 .genre-chip {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  padding: 6px 12px;
-  margin: 0 4px;
-  border-radius: 16px;
-  cursor: pointer;
   transition: all 0.2s ease;
+  padding: 4px 10px;
+  border-radius: 16px;
+  background: #eee;
+  cursor: pointer;
 }
 Body.dark .genre-chip{
   background: #eef3f7;
@@ -1680,15 +1676,6 @@ body.dark .genre-chip.active {
   background: #007bff;
   color: #fff;
   font-weight: bold;
-}
-.genre-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 16px;
-  background: #eee;
-  cursor: pointer;
 }
 .chip {
   display: inline-block;
@@ -1964,6 +1951,7 @@ body.dark .genre-chip.active {
 
 .stories {
   display: flex;
+  scrollbar-width: none;
   overflow-x: auto;
   padding: 12px;
   gap: 12px;
@@ -2222,16 +2210,23 @@ body.dark .message-bubble {
 }
 /* Admin tabs container with sticky positioning */
 .admin-tabs {
-  position: sticky;
+   position: sticky;
+  top: 120px;
+  z-index: 150;
   width: 100%;
-  top: var(--admin-tabs-offset, 64px); /* offset under the admin header */
-  z-index: 150;                        /* above content cards */
   display: flex;
   justify-content: space-around;
   gap: 10px;
   padding: 8px 0;
-  backdrop-filter: blur(8px) saturate(160%);
-  -webkit-backdrop-filter: blur(8px) saturate(160%);
+  scrollbar-width: none;
+     Backdrop-filter: blur(var(--blur));
+    width: 100%;
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0) 100%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0) 100%);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
   overflow-x: scroll;
 }
 
@@ -2285,17 +2280,11 @@ body.dark .admin-tabs .tab-btn.active .tab-circle {
   background: rgba(33,133,213,0.35);
   border-color: rgba(255,255,255,0.30);
 }
-.admin-tabs {
-  position: sticky;
-  top: 70px; /* ارتفاع هدر ادمین */
-  z-index: 150;
-}
 .social-grid.hidden {
   display: none;
 }
 
 .menu-section {
-  cursor: pointer;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -2827,6 +2816,7 @@ body.dark .role-badge.user {
 /* ===== Rows and containers ===== */
 #adminsContainer,
 #usersContainer {
+  scrollbar-width: none;
   display: block;
   width: 100%;
   overflow-x: auto;         /* اسکرول افقی وقتی محتوا زیاد شد */
@@ -3044,6 +3034,7 @@ body.dark .modal-input { background: #3a3a3a; border-color: #555; color: #e0e0e0
   cursor: pointer;
   font-size: 12px;
   margin: 2px;
+  width: 100%;
 }
 
 .btn-danger { background:#dc3545; color:#fff; }
@@ -3147,3 +3138,79 @@ body.dark .btn-primary {
 body.dark .role-badge.user { background:#004d40; color:#80cbc4; }
 body.dark .role-badge.admin { background:#665c00; color:#ffeb3b; }
 body.dark .role-badge.owner { background:#1b5e20; color:#a5d6a7; }
+
+.admin-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  flex: 1;
+  text-align: center;
+}
+
+body.dark .admin-title {
+  color: #f5f5f5;
+}
+
+/* 🔹 حالت تاریک */
+body.dark .profile-menu {
+  background: #1e1e1e;
+  border-color: #333;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+body.dark .profile-username {
+  color: #f5f5f5;
+}
+
+body.dark .profile-edit,
+body.dark .profile-logout {
+  color: #ddd;
+}
+
+body.dark .profile-edit:hover,
+body.dark .profile-logout:hover {
+  background: #2a2a2a;
+}
+#users .search-bar{
+      display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: #fff;
+    border-radius: 12px;
+}
+#clearSearch{
+    border: 0;
+    padding: 6px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    border-radius: 6px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+#usersPagination{
+      display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: #fff;
+    margin-top: 5px;
+    border-radius: 9px;
+    gap: 5px;
+}
+#users h3{
+      padding: 10px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: normal;
+    margin: 10px 0;
+    background: #e0e9fa;
+    color: #005d79;
+    border-radius: 10px;
+}
+#genreSubmenu .genre-chip{
+  font-size: 12px;
+}
