@@ -3418,3 +3418,13 @@ body.dark-mode .carousel-bg::after {
     rgba(30,30,30,1) 100%   /* پایینی تیره کامل */
   );
 }
+.carousel-btn{
+    border: 0;
+    display: flex;
+    padding: 6px;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
