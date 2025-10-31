@@ -3214,3 +3214,207 @@ body.dark .profile-logout:hover {
 #genreSubmenu .genre-chip{
   font-size: 12px;
 }
+.movie-top {
+  position: relative;
+}
+.popular-toggle {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background: rgba(255,255,255,0.3);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10; /* 👈 این باعث میشه روی کاور بیاد */
+}
+.heart-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.popular-section {
+  position: relative;
+  text-align: center;
+  border-radius: 6px;
+
+}
+.popular-section h2 {
+  margin-bottom: 20px;
+}
+.carousel-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.carousel-item h3 {
+  font-size: 14px;   /* کوچیک‌تر */
+  margin: 6px 0;
+}
+
+.carousel-item button.more-info {
+  font-size: 12px;   /* کوچیک‌تر */
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #333;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+.carousel-item.active button.more-info {
+  display: block;
+}
+.carousel-bg {
+  position: absolute;
+  top:0; left:0; right:0; bottom:0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px) brightness(1.2);
+  z-index: -1;
+}
+.carousel-window {
+  overflow: hidden;
+  width: 100%;
+  max-width: 360px; /* برای موبایل */
+  margin: 0 auto;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.carousel-item {
+  flex: 0 0 33.33%; /* هر کارت یک‌سوم عرض ویندو */
+  text-align: center;
+  opacity: 0.6;
+  transform: scale(0.9);
+  transition: transform 0.3s, opacity 0.3s;
+  padding: 0 5px; /* کمی فاصله بین کارت‌ها */
+  box-sizing: border-box;
+}
+
+.carousel-item.active {
+  opacity: 1;
+  transform: scale(1.1); /* وسطی بزرگ‌تر */
+}
+
+.carousel-item img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.carousel-item button.more-info {
+  display: none;
+}
+
+.carousel-item.active button.more-info {
+  display: inline-block;
+  margin-top: 10px;
+}
+.movie-modal {
+  display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+    z-index: 10011134;
+}
+
+.movie-modal-content {
+    width: 85%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+    border-radius: 8px;
+    position: relative;
+}
+
+.movie-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+.movie-modal-content::-webkit-scrollbar-thumb {
+  background: #aaa;
+  border-radius: 3px;
+}
+.carousel-window {
+  height: 320px; /* یا هرچی متناسب کارت‌ها */
+}
+.movie-modal-content .close-btn:hover {
+  background: #c0392b;
+}
+.movie-modal-content .close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+    /* padding: 10px; */
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+}
+.movie-modal-content .close-btn:hover {
+  background: #c0392b;
+}
+.carousel-bg {
+  position: absolute;
+  top:0; left:0; right:0; bottom:0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px) brightness(1.2);
+  z-index: -1;
+  border-radius: 12px; /* 🔹 گوشه‌های گرد */
+  overflow: hidden;
+}
+
+.carousel-bg::after {
+  content: "";
+  position: absolute;
+  top:0; left:0; right:0; bottom:0;
+  background: linear-gradient(to bottom,
+    rgba(255,255,255,0) 70%,   /* بالایی شفاف */
+    rgba(255,255,255,1) 100%   /* پایینی محو کامل */
+  );
+}
+/* حالت شب برای مودال */
+body.dark-mode .movie-modal-content {
+  background: #1e1e1e;
+  color: #f0f0f0;
+}
+
+body.dark-mode .movie-modal-content .field-label {
+  color: #ccc;
+}
+
+body.dark-mode .movie-modal-content .go-btn {
+  background: #3498db;
+  color: #fff;
+}
+
+body.dark-mode .movie-modal-content .close-btn {
+  background: #e74c3c;
+  color: #fff;
+}
+
+body.dark-mode .movie-modal-content .close-btn:hover {
+  background: #c0392b;
+}
+body.dark-mode .carousel-bg::after {
+  content: "";
+  position: absolute;
+  top:0; left:0; right:0; bottom:0;
+  background: linear-gradient(to bottom,
+    rgba(30,30,30,0) 70%,   /* بالایی شفاف */
+    rgba(30,30,30,1) 100%   /* پایینی تیره کامل */
+  );
+}

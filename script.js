@@ -2087,12 +2087,17 @@ function renderAdminMovieList(list = []) {
   if (!window.movieList) return;
   movieList.innerHTML = '';
 
-
   list.forEach(m => {
     const row = document.createElement('div');
     row.className = 'movie-item';
     row.innerHTML = `
       <div class="movie-top">
+        <!-- دکمه قلب -->
+        <button class="popular-toggle" data-id="${m.id}" aria-label="toggle popular">
+          <img src="images/${m.is_popular ? 'icons8-heart-50-fill.png' : 'icons8-heart-50.png'}" 
+               alt="heart" class="heart-icon"/>
+        </button>
+
         <img class="movie-cover" src="${escapeHtml(m.cover || '')}" alt="${escapeHtml(m.title || '')}">
         <div class="movie-info-admin">
           <div class="movie-title-row">
@@ -2113,50 +2118,70 @@ function renderAdminMovieList(list = []) {
       <div class="admin-comments-panel" id="comments-${m.id}" style="display:none;"></div>
     `;
 
+    // -------------------- Popular toggle (قلب) --------------------
+    const heartBtn = row.querySelector('.popular-toggle');
+    heartBtn?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const id = e.currentTarget.dataset.id;
+      const isNowPopular = !m.is_popular;
+
+      try {
+        const { error } = await supabase
+          .from('movies')
+          .update({ is_popular: isNowPopular })
+          .eq('id', id)
+          .returns('minimal'); // 👈 هیچ داده‌ای برنمی‌گردونه
+
+        if (error) {
+          console.error('popular toggle error:', error);
+          showToast('خطا در تغییر وضعیت محبوب ❌');
+          return;
+        }
+
+        showToast(isNowPopular ? 'به پرطرفدارها اضافه شد ✅' : 'از پرطرفدارها حذف شد ✅');
+
+        // رفرش لیست از دیتابیس
+        await fetchMovies();
+        await fetchPopularMovies();
+      } catch (err) {
+        console.error('popular toggle error:', err);
+        showToast('خطای غیرمنتظره ❌');
+      }
+    });
 
     // -------------------- Edit --------------------
     row.querySelector('.btn-edit')?.addEventListener('click', async () => {
       editingMovie = m;
       window.editingMovie = m;
 
-
-      // پر کردن فیلدهای اصلی
       const fill = id => document.getElementById(id);
       ['title','link','synopsis','director','product','stars','imdb','release_info','genre']
         .forEach(f => { const el = fill(f); if (el) el.value = m[f] || ''; });
 
-
-      // نمایش کاور اصلی
       const coverPreview = document.getElementById('cover-preview');
       if (coverPreview) {
         coverPreview.src = m.cover || '';
         coverPreview.style.display = m.cover ? 'block' : 'none';
       }
 
-
-      // آماده‌سازی فرم‌های باندل
       const formsWrap = document.getElementById('bundle-forms');
       if (formsWrap) formsWrap.innerHTML = '';
       const actionsBar = document.getElementById('bundle-actions');
       if (actionsBar) actionsBar.classList.remove('show');
 
-
-      // 👇 همیشه مقدار mode رو ست کن
       const modeInput = document.getElementById('mode');
       if (modeInput) modeInput.value = m.type || 'single';
-
 
       if (m.type === 'collection' || m.type === 'serial') {
         if (actionsBar) actionsBar.classList.add('show');
 
-
-        // گرفتن آیتم‌ها از دیتابیس
         const { data: eps, error } = await supabase
           .from('movie_items')
           .select('*')
           .eq('movie_id', m.id)
           .order('order_index', { ascending: true });
-
 
         if (error) {
           console.error('load items err', error);
@@ -2165,14 +2190,11 @@ function renderAdminMovieList(list = []) {
           fillBundleFormsFromItems(eps || [], formsWrap, "edit", m.type || "collection");
         }
       } else {
-        // reset به حالت single
         if (typeof resetMode === 'function') resetMode();
       }
 
-
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-
 
     // -------------------- Delete --------------------
     row.querySelector('.btn-delete')?.addEventListener('click', async () => {
@@ -2184,10 +2206,10 @@ function renderAdminMovieList(list = []) {
         showToast('Delete failed'); 
       } else { 
         showToast('Movie deleted'); 
-        await fetchMovies(); 
+        await fetchMovies();
+        await fetchPopularMovies();
       }
     });
-
 
     // -------------------- Comments toggle --------------------
     const toggleBtn = row.querySelector('.toggle-comments');
@@ -2234,10 +2256,446 @@ function renderAdminMovieList(list = []) {
       }
     });
 
-
     movieList.appendChild(row);
   });
 }
+
+function renderPopularMovies(list = []) {
+  const container = document.getElementById("popularMoviesList");
+  if (!container) return;
+  container.innerHTML = '';
+
+  list.forEach(m => {
+    const row = document.createElement('div');
+    row.className = 'movie-item';
+    row.innerHTML = `
+      <div class="movie-top">
+        <button class="popular-toggle" data-id="${m.id}" aria-label="toggle popular">
+          <img src="images/${m.is_popular ? 'icons8-heart-50-fill.png' : 'icons8-heart-50.png'}" 
+               alt="heart" class="heart-icon"/>
+        </button>
+        <img class="movie-cover" src="${escapeHtml(m.cover || '')}" alt="${escapeHtml(m.title || '')}">
+        <div class="movie-info-admin">
+          <div class="movie-title-row">
+            <span class="movie-name">${escapeHtml(m.title || '')}</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // هندلر قلب
+    const heartBtn = row.querySelector('.popular-toggle');
+    heartBtn?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const id = e.currentTarget.dataset.id;
+      const isNowPopular = !m.is_popular;
+
+      try {
+        const { error } = await supabase
+          .from('movies')
+          .update({ is_popular: isNowPopular })
+          .eq('id', id)
+          .returns('minimal');
+
+        if (error) {
+          console.error('popular toggle error:', error);
+          showToast('خطا در تغییر وضعیت محبوب ❌');
+          return;
+        }
+
+        showToast(isNowPopular ? 'به پرطرفدارها اضافه شد ✅' : 'از پرطرفدارها حذف شد ✅');
+
+        // رفرش هر دو لیست
+        await fetchMovies();
+        await fetchPopularMovies();
+      } catch (err) {
+        console.error('popular toggle error:', err);
+        showToast('خطای غیرمنتظره ❌');
+      }
+    });
+
+    container.appendChild(row);
+  });
+}
+async function fetchPopularMovies() {
+  try {
+    const { data, error } = await supabase
+      .from('movies')
+      .select('*')
+      .eq('is_popular', true)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('fetchPopularMovies error:', error);
+      return;
+    }
+
+    renderPopularMovies(data || []);
+  } catch (err) {
+    console.error('fetchPopularMovies unexpected error:', err);
+  }
+}
+let currentIndex = 0;
+let autoSlide;
+
+async function fetchPopularForIndex() {
+  const { data, error } = await supabase
+    .from('movies')
+    .select('*')
+    .eq('is_popular', true)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('fetchPopularForIndex error:', error);
+    return;
+  }
+  renderPopularCarousel(data || []);
+}
+
+
+function renderPopularCarousel(list = []) {
+  const track = document.querySelector('#popular-carousel .carousel-track');
+  const bg = document.querySelector('#popular-carousel .carousel-bg');
+  if (!track) return;
+  track.innerHTML = '';
+
+  // 🔹 برای loop بی‌نهایت: دو کپی از اول و آخر
+  const extended = [
+    list[list.length - 2], list[list.length - 1],
+    ...list,
+    list[0], list[1]
+  ];
+
+  extended.forEach((m) => {
+    const item = document.createElement('div');
+    item.className = 'carousel-item';
+    item.innerHTML = `
+      <img src="${escapeHtml(m.cover || '')}" alt="${escapeHtml(m.title || '')}">
+      <h3>${escapeHtml(m.title || '')}</h3>
+      <button class="more-info">اطلاعات بیشتر</button>
+    `;
+    item.querySelector('.more-info').addEventListener('click', () => openMovieModal(m));
+    track.appendChild(item);
+  });
+
+  const items = track.querySelectorAll('.carousel-item');
+  const windowEl = document.querySelector('.carousel-window');
+  const itemWidth = windowEl.offsetWidth / 3; // سه کارت همزمان
+
+  let currentIndex = 2; // چون دو کپی اول داریم
+  track.style.transform = `translateX(-${itemWidth * currentIndex}px)`;
+  updateActive();
+
+  function updateActive() {
+    items.forEach(el => el.classList.remove('active'));
+    const middle = currentIndex + 1;
+    if (items[middle]) {
+      items[middle].classList.add('active');
+      bg.style.backgroundImage = `url(${extended[middle].cover})`;
+    }
+  }
+
+  function slideTo(index) {
+    track.style.transition = 'transform 0.5s ease';
+    track.style.transform = `translateX(-${itemWidth * index}px)`;
+    currentIndex = index;
+    resetAutoSlide(); // 🔹 هر بار دستی یا خودکار عوض شد، تایمر ریست بشه
+  }
+
+  track.addEventListener('transitionend', () => {
+    if (currentIndex <= 1) {
+      track.style.transition = 'none';
+      currentIndex = list.length;
+      track.style.transform = `translateX(-${itemWidth * currentIndex}px)`;
+    }
+    if (currentIndex >= list.length + 2) {
+      track.style.transition = 'none';
+      currentIndex = 2;
+      track.style.transform = `translateX(-${itemWidth * currentIndex}px)`;
+    }
+    updateActive();
+  });
+
+  function next() { slideTo(currentIndex + 1); }
+  function prev() { slideTo(currentIndex - 1); }
+
+  document.querySelector('#popular-carousel .next').onclick = () => { next(); };
+  document.querySelector('#popular-carousel .prev').onclick = () => { prev(); };
+
+  // 🔹 تایمر خودکار با قابلیت ریست
+  let autoSlide;
+  function resetAutoSlide() {
+    clearInterval(autoSlide);
+    autoSlide = setInterval(next, 4000);
+  }
+  resetAutoSlide();
+
+  // -------------------- 👇 Drag/Swipe ساده --------------------
+  let startX = 0;
+  let currentTranslate = 0;
+  let prevTranslate = -itemWidth * currentIndex;
+  let isDragging = false;
+
+  function getX(e) {
+    return e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+  }
+
+  function startDrag(e) {
+    isDragging = true;
+    startX = getX(e);
+    track.style.transition = 'none';
+    clearInterval(autoSlide); // در حین کشیدن، تایمر متوقف بشه
+  }
+
+  function dragMove(e) {
+    if (!isDragging) return;
+    const currentX = getX(e);
+    const diff = currentX - startX;
+    currentTranslate = prevTranslate + diff;
+    track.style.transform = `translateX(${currentTranslate}px)`;
+  }
+
+  function endDrag() {
+    if (!isDragging) return;
+    isDragging = false;
+    const movedBy = currentTranslate - prevTranslate;
+
+    if (movedBy < -itemWidth / 2) {
+      next();
+    } else if (movedBy > itemWidth / 2) {
+      prev();
+    } else {
+      slideTo(currentIndex); // برگرد سر جاش
+    }
+    prevTranslate = -itemWidth * currentIndex;
+    resetAutoSlide(); // 🔹 بعد از کشیدن هم تایمر ریست بشه
+  }
+
+  // رویدادها
+  track.addEventListener('mousedown', startDrag);
+  track.addEventListener('touchstart', startDrag);
+
+  track.addEventListener('mousemove', dragMove);
+  track.addEventListener('touchmove', dragMove);
+
+  track.addEventListener('mouseup', endDrag);
+  track.addEventListener('mouseleave', endDrag);
+  track.addEventListener('touchend', endDrag);
+}
+
+// مودال 
+function openMovieModal(m) {
+  const modal = document.getElementById('movie-modal');
+  const content = modal.querySelector('.movie-modal-content');
+
+  const cover = escapeHtml(m.cover || 'https://via.placeholder.com/300x200?text=No+Image');
+  const title = escapeHtml(m.title || '-');
+  const synopsis = escapeHtml((m.synopsis || '-').trim());
+  const director = escapeHtml(m.director || '-');
+  const stars = escapeHtml(m.stars || '-');
+  const imdb = escapeHtml(m.imdb || '-');
+  const release_info = escapeHtml(m.release_info || '-');
+
+  const badgeHtml = m.type && m.type !== 'single'
+    ? `<span class="collection-badge ${m.type === 'collection' ? 'badge-collection' : 'badge-serial'}">
+         ${m.type === 'collection' ? 'Collection' : 'Series'}
+         <span class="badge-count">0</span>
+       </span>`
+    : '';
+
+  // کارت مستقیم داخل مودال + دکمه بستن زیر Go to file
+  content.innerHTML = `
+    <div class="movie-card expanded">
+      <div class="cover-container">
+        <div class="cover-blur" style="background-image: url('${cover}');"></div>
+        <img class="cover-image" src="${cover}" alt="${title}">
+      </div>
+
+      <div class="movie-info">
+        <div class="movie-title">
+          <span class="movie-name">${title}</span>
+          ${badgeHtml}
+        </div>
+
+        <span class="field-label"><img src="images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
+        <div class="field-quote synopsis-quote">
+          <div class="quote-text">${synopsis}</div>
+          <button class="quote-toggle-btn">More</button>
+        </div>
+
+        <span class="field-label"><img src="images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span>
+        <div class="field-quote">${director}</div>
+
+        <span class="field-label"><img src="images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
+        <div class="field-quote">${renderChips(m.product || '-')}</div>
+
+        <span class="field-label"><img src="images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
+        <div class="field-quote">${stars}</div>
+
+        <span class="field-label">
+          <img src="images/icons8-imdb-48.png" style="width:20px;height:20px;"> IMDB:
+        </span>
+        <div class="field-quote"><span class="chip imdb-chip">${imdb}</span></div>
+
+        <span class="field-label"><img src="images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span>
+        <div class="field-quote">${release_info}</div>
+
+        <span class="field-label"><img src="images/icons8-comedy-96.png" style="width:20px;height:20px;"> Genre:</span>
+        <div class="field-quote genre-grid">${renderChips(m.genre || '-')}</div>
+
+        <div class="episodes-container" data-movie-id="${m.id}">
+          <div class="episodes-list"></div>
+        </div>
+
+        <button class="go-btn" data-link="${escapeHtml(m.link || '#')}">Go to file</button>
+        <button class="close-btn">بستن</button>
+      </div>
+    </div>
+  `;
+
+  // نمایش مودال
+  modal.style.display = 'flex';
+
+  // جلوگیری از بسته شدن مودال با کلیک داخل محتوا
+  content.addEventListener('click', (e) => e.stopPropagation());
+
+  // بستن مودال
+  content.querySelector('.close-btn').onclick = () => { modal.style.display = 'none'; };
+  modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+
+  // اسکرول داخلی
+  content.style.maxHeight = '90vh';
+  content.style.overflowY = 'auto';
+
+  // هندلر دکمه Go to file
+  const goBtn = content.querySelector('.go-btn');
+  if (goBtn) {
+    goBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const link = goBtn.dataset.link || '#';
+      try {
+        const activeTitle = m.title;
+        await supabase.from("click_logs").insert([
+          { movie_id: m.id, episode_index: null, link, title: activeTitle }
+        ]);
+      } catch (err) {
+        console.error("click log error:", err);
+      }
+      if (link && link !== '#') window.open(link, '_blank');
+    });
+  }
+
+  // toggle سینوپسیس
+  initModalSynopsisToggle(content);
+
+  // 🔹 اگر سریال یا کالکشن بود، اپیزودها رو لود کن و badge رو آپدیت کن
+  if (m.type === 'collection' || m.type === 'serial') {
+    (async () => {
+      const { data: eps, error } = await supabase
+        .from('movie_items')
+        .select('*')
+        .eq('movie_id', m.id)
+        .order('order_index', { ascending: true });
+
+      if (error) {
+        console.error('Error loading episodes:', error);
+        return;
+      }
+
+      const allEpisodes = [{ ...m }, ...(eps || [])];
+      const listEl = content.querySelector('.episodes-list');
+      listEl.innerHTML = allEpisodes.map((ep, idx) => `
+        <div class="episode-card ${idx === 0 ? 'active' : ''}" data-link="${ep.link}">
+          <img src="${escapeHtml(ep.cover || m.cover)}" alt="${escapeHtml(ep.title)}">
+          <div class="episode-title"><span>${escapeHtml(ep.title)}</span></div>
+        </div>
+      `).join('');
+
+      // 🔹 آپدیت badge-count
+      const badgeCount = content.querySelector('.collection-badge .badge-count');
+      if (badgeCount) {
+        badgeCount.textContent = allEpisodes.length + (allEpisodes.length > 1 ? " episodes" : " episode");
+      }
+
+      listEl.querySelectorAll('.episode-card').forEach((cardEl, idx) => {
+        cardEl.addEventListener('click', () => {
+          listEl.querySelectorAll('.episode-card').forEach(c => c.classList.remove('active'));
+          cardEl.classList.add('active');
+          const ep = allEpisodes[idx];
+          content.querySelector('.movie-name').textContent = ep.title || m.title;
+          content.querySelector('.cover-image').src = ep.cover || m.cover;
+          content.querySelector('.cover-blur').style.backgroundImage = `url('${ep.cover || m.cover}')`;
+          content.querySelector('.quote-text').textContent = ep.synopsis || m.synopsis;
+          goBtn.dataset.link = ep.link || m.link;
+        });
+      });
+    })();
+  }
+}
+
+
+function initModalSynopsisToggle(rootEl) {
+  const quote = rootEl.querySelector('.synopsis-quote');
+  if (!quote) return;
+  const textEl = quote.querySelector('.quote-text');
+  const btn = quote.querySelector('.quote-toggle-btn');
+  if (!textEl || !btn) return;
+
+  const fullText = textEl.textContent.trim();
+
+  if (fullText.length > 200) {
+    const shortText = fullText.substring(0, 200) + '…';
+    let collapsed = true;
+
+    function applyState() {
+      if (collapsed) {
+        textEl.textContent = shortText;
+        quote.style.overflow = 'hidden';
+        quote.style.maxHeight = '120px';
+        quote.classList.add('collapsed');
+        btn.textContent = 'More';
+      } else {
+        textEl.textContent = fullText;
+        quote.style.maxHeight = '1000px';
+        quote.classList.remove('collapsed');
+        btn.textContent = 'Less';
+      }
+    }
+
+    function toggleQuote() {
+      collapsed = !collapsed;
+      applyState();
+    }
+
+    applyState();
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleQuote();
+    });
+
+    quote.addEventListener('click', (e) => {
+      // اگر روی لینک/چیب/دکمه کلیک شد، toggle نشه
+      if (
+        e.target.closest('a') ||
+        e.target.closest('button') ||
+        e.target.closest('.chip') ||
+        e.target.closest('.genre-grid') ||
+        e.target.closest('.field-quote')
+      ) {
+        return;
+      }
+      toggleQuote();
+    });
+  } else {
+    // اگر کوتاهه، دکمه رو حذف کن
+    if (btn) btn.remove();
+  }
+}
+
 // پاک کردن فرم‌های اپیزود (وقتی فیلم تکی باشه)
 function clearEpisodeForms() {
   const container = document.getElementById('episodes-container');
@@ -3219,6 +3677,7 @@ if (addMovieForm && movieList) {
         addMovieForm.reset();
         if (typeof window.resetMode === 'function') window.resetMode();
         await fetchMovies();
+        await fetchPopularMovies();
         return;
       }
 
@@ -3307,6 +3766,7 @@ if (addMovieForm && movieList) {
       addMovieForm.reset();
       if (typeof window.resetMode === 'function') window.resetMode();
       await fetchMovies();
+      await fetchPopularMovies();
       return;
     });
   }
@@ -3855,6 +4315,8 @@ if (document.querySelector('.admin-tabs .tab-btn')) {
 
 
 fetchMovies();
+fetchPopularMovies();
+fetchPopularForIndex();
 fetchMessages();
 checkUnapprovedComments();
 setInterval(checkUnapprovedComments, 30000);
