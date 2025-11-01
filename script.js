@@ -2376,15 +2376,18 @@ function renderPopularCarousel(list = []) {
       <h3>${escapeHtml(m.title || '')}</h3>
       <button class="more-info">اطلاعات بیشتر</button>
     `;
-    item.querySelector('.more-info').addEventListener('click', () => openMovieModal(m));
+    item.querySelector('.more-info').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openMovieModal(m);
+    });
     track.appendChild(item);
   });
 
   const items = track.querySelectorAll('.carousel-item');
   const windowEl = document.querySelector('.carousel-window');
-  const itemWidth = windowEl.offsetWidth / 3; // سه کارت همزمان
+  const itemWidth = windowEl.offsetWidth / 3;
 
-  let currentIndex = 2; // چون دو کپی اول داریم
+  let currentIndex = 2;
   track.style.transform = `translateX(-${itemWidth * currentIndex}px)`;
   updateActive();
 
@@ -2401,7 +2404,7 @@ function renderPopularCarousel(list = []) {
     track.style.transition = 'transform 0.5s ease';
     track.style.transform = `translateX(-${itemWidth * index}px)`;
     currentIndex = index;
-    resetAutoSlide(); // 🔹 هر بار دستی یا خودکار عوض شد، تایمر ریست بشه
+    resetAutoSlide();
   }
 
   track.addEventListener('transitionend', () => {
@@ -2424,218 +2427,160 @@ function renderPopularCarousel(list = []) {
   document.querySelector('#popular-carousel .next').onclick = () => { next(); };
   document.querySelector('#popular-carousel .prev').onclick = () => { prev(); };
 
-  // 🔹 تایمر خودکار با قابلیت ریست
+  // 🔹 تایمر خودکار
   let autoSlide;
   function resetAutoSlide() {
     clearInterval(autoSlide);
     autoSlide = setInterval(next, 4000);
   }
   resetAutoSlide();
-
-  // -------------------- 👇 Drag/Swipe ساده --------------------
-  let startX = 0;
-  let currentTranslate = 0;
-  let prevTranslate = -itemWidth * currentIndex;
-  let isDragging = false;
-
-  function getX(e) {
-    return e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
-  }
-
-  function startDrag(e) {
-    isDragging = true;
-    startX = getX(e);
-    track.style.transition = 'none';
-    clearInterval(autoSlide); // در حین کشیدن، تایمر متوقف بشه
-  }
-
-  function dragMove(e) {
-    if (!isDragging) return;
-    const currentX = getX(e);
-    const diff = currentX - startX;
-    currentTranslate = prevTranslate + diff;
-    track.style.transform = `translateX(${currentTranslate}px)`;
-  }
-
-  function endDrag() {
-    if (!isDragging) return;
-    isDragging = false;
-    const movedBy = currentTranslate - prevTranslate;
-
-    if (movedBy < -itemWidth / 2) {
-      next();
-    } else if (movedBy > itemWidth / 2) {
-      prev();
-    } else {
-      slideTo(currentIndex); // برگرد سر جاش
-    }
-    prevTranslate = -itemWidth * currentIndex;
-    resetAutoSlide(); // 🔹 بعد از کشیدن هم تایمر ریست بشه
-  }
-
-  // رویدادها
-  track.addEventListener('mousedown', startDrag);
-  track.addEventListener('touchstart', startDrag);
-
-  track.addEventListener('mousemove', dragMove);
-  track.addEventListener('touchmove', dragMove);
-
-  track.addEventListener('mouseup', endDrag);
-  track.addEventListener('mouseleave', endDrag);
-  track.addEventListener('touchend', endDrag);
 }
-
 // مودال 
+
 function openMovieModal(m) {
   const modal = document.getElementById('movie-modal');
   const content = modal.querySelector('.movie-modal-content');
 
-  const cover = escapeHtml(m.cover || 'https://via.placeholder.com/300x200?text=No+Image');
-  const title = escapeHtml(m.title || '-');
-  const synopsis = escapeHtml((m.synopsis || '-').trim());
-  const director = escapeHtml(m.director || '-');
-  const stars = escapeHtml(m.stars || '-');
-  const imdb = escapeHtml(m.imdb || '-');
-  const release_info = escapeHtml(m.release_info || '-');
+  // 🔹 رندر اولیه کارت
+  function renderCard(data, allEpisodes = []) {
+    const cover = escapeHtml(data.cover || 'https://via.placeholder.com/300x200?text=No+Image');
+    const title = escapeHtml(data.title || '-');
+    const synopsis = escapeHtml((data.synopsis || '-').trim());
+    const director = escapeHtml(data.director || '-');
+    const stars = escapeHtml(data.stars || '-');
+    const imdb = escapeHtml(data.imdb || '-');
+    const release_info = escapeHtml(data.release_info || '-');
 
-  const badgeHtml = m.type && m.type !== 'single'
-    ? `<span class="collection-badge ${m.type === 'collection' ? 'badge-collection' : 'badge-serial'}">
-         ${m.type === 'collection' ? 'Collection' : 'Series'}
-         <span class="badge-count">0</span>
-       </span>`
-    : '';
+    const badgeHtml = data.type && data.type !== 'single'
+      ? `<span class="collection-badge ${data.type === 'collection' ? 'badge-collection' : 'badge-serial'}">
+           ${data.type === 'collection' ? 'Collection' : 'Series'}
+           <span class="badge-count">${allEpisodes.length}</span>
+         </span>`
+      : '';
 
-  // کارت مستقیم داخل مودال + دکمه بستن زیر Go to file
-  content.innerHTML = `
-    <div class="movie-card expanded">
-      <div class="cover-container">
-        <div class="cover-blur" style="background-image: url('${cover}');"></div>
-        <img class="cover-image" src="${cover}" alt="${title}">
+    return `
+      <div class="movie-card expanded">
+        <div class="cover-container">
+          <div class="cover-blur" style="background-image: url('${cover}');"></div>
+          <img class="cover-image" src="${cover}" alt="${title}">
+        </div>
+
+        <div class="movie-info">
+          <div class="movie-title">
+            <span class="movie-name">${title}</span>
+            ${badgeHtml}
+          </div>
+
+          <span class="field-label">Synopsis:</span>
+          <div class="field-quote synopsis-quote">
+            <div class="quote-text">${synopsis}</div>
+            <button class="quote-toggle-btn">More</button>
+          </div>
+
+          <span class="field-label">Director:</span>
+          <div class="field-quote director-field">${director}</div>
+
+          <span class="field-label">Product:</span>
+          <div class="field-quote product-field">${renderChips(data.product || '-')}</div>
+
+          <span class="field-label">Stars:</span>
+          <div class="field-quote stars-field">${stars}</div>
+
+          <span class="field-label">IMDB:</span>
+          <div class="field-quote"><span class="chip imdb-chip">${imdb}</span></div>
+
+          <span class="field-label">Release:</span>
+          <div class="field-quote release-field">${release_info}</div>
+
+          <span class="field-label">Genre:</span>
+          <div class="field-quote genre-grid">${renderChips(data.genre || '-')}</div>
+
+          <div class="episodes-container" data-movie-id="${data.id}">
+            <div class="episodes-list"></div>
+          </div>
+
+          <button class="go-btn" data-link="${escapeHtml(data.link || '#')}">Go to file</button>
+          <button class="close-btn">بستن</button>
+        </div>
       </div>
+    `;
+  }
 
-      <div class="movie-info">
-        <div class="movie-title">
-          <span class="movie-name">${title}</span>
-          ${badgeHtml}
-        </div>
+  // 🔹 تابع آپدیت فقط اطلاعات (نه لیست اپیزودها)
+  function updateInfo(ep) {
+    content.querySelector('.movie-name').textContent = ep.title || '-';
+    content.querySelector('.cover-image').src = ep.cover || m.cover;
+    content.querySelector('.cover-blur').style.backgroundImage = `url('${ep.cover || m.cover}')`;
+    content.querySelector('.quote-text').textContent = ep.synopsis || '-';
+    content.querySelector('.director-field').textContent = ep.director || '-';
+    content.querySelector('.product-field').innerHTML = renderChips(ep.product || '-');
+    content.querySelector('.stars-field').textContent = ep.stars || '-';
+    content.querySelector('.imdb-chip').textContent = ep.imdb || '-';
+    content.querySelector('.release-field').textContent = ep.release_info || '-';
+    content.querySelector('.genre-grid').innerHTML = renderChips(ep.genre || '-');
+    content.querySelector('.go-btn').dataset.link = ep.link || '#';
 
-        <span class="field-label"><img src="images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
-        <div class="field-quote synopsis-quote">
-          <div class="quote-text">${synopsis}</div>
-          <button class="quote-toggle-btn">More</button>
-        </div>
+    initModalSynopsisToggle(content);
+  }
 
-        <span class="field-label"><img src="images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span>
-        <div class="field-quote">${director}</div>
-
-        <span class="field-label"><img src="images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
-        <div class="field-quote">${renderChips(m.product || '-')}</div>
-
-        <span class="field-label"><img src="images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
-        <div class="field-quote">${stars}</div>
-
-        <span class="field-label">
-          <img src="images/icons8-imdb-48.png" style="width:20px;height:20px;"> IMDB:
-        </span>
-        <div class="field-quote"><span class="chip imdb-chip">${imdb}</span></div>
-
-        <span class="field-label"><img src="images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span>
-        <div class="field-quote">${release_info}</div>
-
-        <span class="field-label"><img src="images/icons8-comedy-96.png" style="width:20px;height:20px;"> Genre:</span>
-        <div class="field-quote genre-grid">${renderChips(m.genre || '-')}</div>
-
-        <div class="episodes-container" data-movie-id="${m.id}">
-          <div class="episodes-list"></div>
-        </div>
-
-        <button class="go-btn" data-link="${escapeHtml(m.link || '#')}">Go to file</button>
-        <button class="close-btn">بستن</button>
-      </div>
-    </div>
-  `;
-
-  // نمایش مودال
+  // رندر اولیه
+  content.innerHTML = renderCard(m);
   modal.style.display = 'flex';
-
-  // جلوگیری از بسته شدن مودال با کلیک داخل محتوا
   content.addEventListener('click', (e) => e.stopPropagation());
-
-  // بستن مودال
   content.querySelector('.close-btn').onclick = () => { modal.style.display = 'none'; };
   modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
 
-  // اسکرول داخلی
-  content.style.maxHeight = '90vh';
-  content.style.overflowY = 'auto';
-
-  // هندلر دکمه Go to file
-  const goBtn = content.querySelector('.go-btn');
-  if (goBtn) {
-    goBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const link = goBtn.dataset.link || '#';
-      try {
-        const activeTitle = m.title;
-        await supabase.from("click_logs").insert([
-          { movie_id: m.id, episode_index: null, link, title: activeTitle }
-        ]);
-      } catch (err) {
-        console.error("click log error:", err);
-      }
-      if (link && link !== '#') window.open(link, '_blank');
-    });
+  // هندل Go to file
+  function bindGoBtn(data) {
+    const goBtn = content.querySelector('.go-btn');
+    if (goBtn) {
+      goBtn.onclick = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const link = goBtn.dataset.link || '#';
+        if (link && link !== '#') window.open(link, '_blank');
+      };
+    }
   }
-
-  // toggle سینوپسیس
+  bindGoBtn(m);
   initModalSynopsisToggle(content);
 
-  // 🔹 اگر سریال یا کالکشن بود، اپیزودها رو لود کن و badge رو آپدیت کن
+  // 🔹 اگر سریال یا کالکشن بود
   if (m.type === 'collection' || m.type === 'serial') {
     (async () => {
-      const { data: eps, error } = await supabase
+      const { data: eps } = await supabase
         .from('movie_items')
         .select('*')
         .eq('movie_id', m.id)
         .order('order_index', { ascending: true });
 
-      if (error) {
-        console.error('Error loading episodes:', error);
-        return;
-      }
-
       const allEpisodes = [{ ...m }, ...(eps || [])];
       const listEl = content.querySelector('.episodes-list');
       listEl.innerHTML = allEpisodes.map((ep, idx) => `
-        <div class="episode-card ${idx === 0 ? 'active' : ''}" data-link="${ep.link}">
+        <div class="episode-card ${idx === 0 ? 'active' : ''}" data-idx="${idx}">
           <img src="${escapeHtml(ep.cover || m.cover)}" alt="${escapeHtml(ep.title)}">
-          <div class="episode-title"><span>${escapeHtml(ep.title)}</span></div>
+          <div class="episode-title">${escapeHtml(ep.title)}</div>
         </div>
       `).join('');
 
-      // 🔹 آپدیت badge-count
+      // آپدیت badge-count
       const badgeCount = content.querySelector('.collection-badge .badge-count');
       if (badgeCount) {
         badgeCount.textContent = allEpisodes.length + (allEpisodes.length > 1 ? " episodes" : " episode");
       }
 
+      // هندل کلیک روی اپیزودها
       listEl.querySelectorAll('.episode-card').forEach((cardEl, idx) => {
         cardEl.addEventListener('click', () => {
           listEl.querySelectorAll('.episode-card').forEach(c => c.classList.remove('active'));
           cardEl.classList.add('active');
-          const ep = allEpisodes[idx];
-          content.querySelector('.movie-name').textContent = ep.title || m.title;
-          content.querySelector('.cover-image').src = ep.cover || m.cover;
-          content.querySelector('.cover-blur').style.backgroundImage = `url('${ep.cover || m.cover}')`;
-          content.querySelector('.quote-text').textContent = ep.synopsis || m.synopsis;
-          goBtn.dataset.link = ep.link || m.link;
+          updateInfo(allEpisodes[idx]);
+          bindGoBtn(allEpisodes[idx]);
         });
       });
     })();
   }
 }
-
 
 function initModalSynopsisToggle(rootEl) {
   const quote = rootEl.querySelector('.synopsis-quote');
