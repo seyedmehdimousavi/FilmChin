@@ -109,9 +109,60 @@
 </div>
 </div>
 
+<section class="side-menu-bottom">
+  <!-- Message to admin bubble -->
+<div id="chatBubble" class="chat-bubble">
+  <div class="chat-bubble-header">
+    <span class="chat-bubble-title">پیام به ادمین</span>
+    <span id="chatBubbleBadge" class="badge" style="display:none;">!</span>
+  </div>
 
+  <!-- ردیف جمع‌شده (کالپس) -->
+  <div class="chat-input-row" id="chatInputRow">
+    <input id="chatInput" type="text" placeholder="پیام به ادمین" />
+    <div class="chat-actions">
+      <button id="chatAttachBtn" class="chat-icon-btn" aria-label="attach">
+        <img src="images/icons8-attach-60.png" alt="attach" />
+      </button>
+      <input id="chatAttachFile" type="file" accept="image/*" hidden />
+      <button id="chatSendBtn" class="chat-icon-btn disabled" aria-label="send">
+        <img src="images/icons8-send-90.png" alt="send" />
+      </button>
+    </div>
+  </div>
 
-<div id="appVersion" class="genre-chip version-chip">v1.0.0</div>
+  <!-- نمای تمام‌صفحه در سایدمنو -->
+  <div id="chatOverlay" class="chat-overlay" aria-hidden="true">
+    <div class="chat-overlay-header">
+      <button id="userChatBackBtn" class="chat-back-btn" aria-label="back">close</button>
+      <img id="chatAdminAvatar" class="chat-admin-avatar" src="images/Admin-logo.png" alt="admin" />
+      <div class="chat-overlay-title">پیام به ادمین</div>
+    </div>
+
+    <div id="chatMessagesList" class="chat-messages-list"></div>
+
+    <!-- کامپوزر پایین -->
+    <div class="chat-composer">
+      <button id="overlayAttachBtn" class="chat-icon-btn" aria-label="attach">
+        <img src="images/icons8-attach-60.png" alt="attach" />
+      </button>
+      <input id="overlayAttachFile" type="file" accept="image/*" hidden />
+      <input id="overlayInput" type="text" placeholder="بنویس..." />
+      <button id="overlaySendBtn" class="chat-icon-btn disabled" aria-label="send">
+        <img src="images/icons8-send-90.png" alt="send" />
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="designer-credit">
+  Design :
+  <div style="display: flex;align-items: center; justify-content: space-between; gap: 4px;">
+    <a href="tg://resolve?domain=SeyedMahdiMousavi" target="_blank" class="designer-bubble">Mehdi</a>
+  <div id="appVersion" class="genre-chip version-chip">v1.0.0</div>
+  </div>
+</div>
+</section>
 
 </nav>
 
@@ -135,11 +186,11 @@
   <section id="popular-carousel" class="popular-section">
   <h2>فیلم‌های پرطرفدار</h2>
   <div class="carousel-container">
-    <button class="carousel-btn prev">‹</button>
+    <button class="carousel-btn prev"><img src="images/icons8-back-to-64.png" alt="prev button" /></button>
     <div class="carousel-window">
       <div class="carousel-track"></div>
     </div>
-    <button class="carousel-btn next">›</button>
+    <button class="carousel-btn next"><img src="images/icons8-next-page-64.png" alt="next button" /></button>
   </div>
   <div class="carousel-bg"></div>
 </section>
@@ -218,4 +269,3 @@
 <!-- script (app logic) -->
 <script src="script.js"></script>
 </body>
-</html>

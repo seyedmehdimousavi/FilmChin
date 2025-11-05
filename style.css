@@ -62,6 +62,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   Transition: all ease-out .4s;
+  scrollbar-width: none !important;
 }
 *,:before,:after{box-sizing:border-box}
 Html{scroll-behavior:smooth}
@@ -114,7 +115,6 @@ Body.dark{
 }
 Body.dark .main-header{
   background:rgba(30,36,40,0.6)}
-
 .search-bar{
   Display: flex;
     Justify-content: space-between;
@@ -333,14 +333,22 @@ Body.dark .avatar{background:linear-gradient(135deg,#2185D5,#004A7C)}
 .movie-card{position:relative}
 .comments-panel{position:absolute;left:0;right:0;bottom:0;height:0;overflow:hidden;opacity:0;transition:height .26s ease,opacity .18s ease;z-index:40;display:flex;justify-content:center;align-items:flex-end}
 .comments-panel.open{height:100%;opacity:1}
-.comments-panel-inner{width:100%;display:flex;flex-direction:column;max-height:100%;backdrop-filter:blur(6px);border-radius:12px 12px 0 0;overflow:hidden}
+.comments-panel-inner{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  max-height:100%;
+  backdrop-filter:blur(9px);
+  border-radius:12px 12px 0 0;
+  overflow:hidden;
+}
 .comments-panel-header{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid rgba(0,0,0,0.04);background:rgba(255,255,255,0.6)}
 Body.dark .comments-panel-header{background:rgba(30,36,40,0.6);border-bottom:1px solid rgba(255,255,255,0.04)}
 .comments-list{padding:10px;overflow:auto;max-height:calc(100% - 140px);display:flex;flex-direction:column;gap:8px}
 .comment-row{display:flex;gap:8px;align-items:flex-start}
 .comment-avatar{min-width:36px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#004A7C,#2185D5);color:#fff;font-weight:700}
 .comment-body{flex:1}
-.comment-meta{font-size:.85rem;color:var(--muted);margin-bottom:4px}
+.comment-meta{font-size:.85rem;margin-bottom:4px}
 .comment-text-content{padding:8px 10px;border-radius:8px;background:rgba(232,241,245,0.9);color:#222}
 Body.dark .comment-text-content{background:rgba(58,71,80,0.9);color:#e6eef6}
 
@@ -358,8 +366,18 @@ Align-items: stretch;
 Body.dark .comment-input-row{background:rgba(30,36,40,0.45)}
 .comment-input-row .comment-name{width:140px;padding:8px;border-radius:8px;border:1px solid #ccc}
 .comment-input-row .comment-text{flex:1;padding:8px;border-radius:8px;border:1px solid #ccc;resize:vertical}
-.comment-input-row .comment-send{background:#F7F7F7;border:0;padding:10px 14px;border-radius:8px;cursor:pointer;color:#222}
-Body.dark .comment-input-row .comment-send{background:#F7F7F7;color:#222}
+.comment-input-row .comment-send{
+  background: var(--btn-day);
+  color: #fff;
+  border:0;
+  padding:10px 14px;
+  border-radius:8px;
+  cursor:pointer;
+}
+Body.dark .comment-input-row .comment-send{
+  background: var(--btn-day);
+    color: #fff;
+}
 /* =========================
   Messages (admin bubbles)
   ========================= */
@@ -519,6 +537,7 @@ Align-items: center;
 .comments-close{
   Font-size: 27px;
   Width: 33px;
+  line-height: 0;
   Height: 33px;
   Border-radius: 8px;
   Border: 1px solid #ccc;
@@ -1015,32 +1034,6 @@ Body.dark .toggle-comments {
     Color: #e6eef6;
 }
 
-.admin-comments-panel {
-  Padding: 8px;
-  Border-radius: 8px;
-  Background: rgba(227,242,253,0.6);
-  Display: none;
-  Flex-direction: column;
-  Gap: 8px;
-}
-Body.dark .admin-comments-panel {
-  Background: rgba(58,71,80,0.85);
-}
-
-.admin-comment-row {
-  Display: flex;
-  Gap: 8px;
-  Align-items: flex-start;
-  Background: rgba(255,255,255,0.6);
-  Padding: 6px;
-  Border-radius: 8px;
-}
-Body.dark .admin-comment-row {
-  Background: rgba(30,36,40,0.6);
-}
-
-.admin-comment-body { flex: 1; }
-.admin-comment-meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
 
 .admin-comment-text {
   Background: rgba(232,241,245,0.9);
@@ -1139,6 +1132,7 @@ Body.dark .submenu {
   Font-weight: bold;
 }
 Body.dark .social-item {
+  
   Background: rgba(255,255,255,0.08);
 }
 .movie-title{
@@ -2078,25 +2072,7 @@ body.dark .genre-chip.active {
   transition: all 0.4s ease;
 }
 
-/* هاور یا لمس → مستطیل کوچک با نسبت 9:15 */
-.story-circle:hover,
-.story-circle:active {
-  width: 70px;   /* 9 واحد */
-  height: 115px;  /* 15 واحد */
-  border-radius: 12px;
-}
 
-.story-circle:hover::before,
-.story-circle:active::before {
-  border-radius: 12px;
-}
-
-.story-circle:hover img,
-.story-circle:active img {
-  width: 85%;
-  height: 85%;
-  border-radius: 12px;
-}
 
 .message-bubble {
     position: relative;
@@ -2155,12 +2131,6 @@ body.dark .message-bubble {
   background: #fff;
   padding: 2px;
   box-shadow: 0 0 2px rgba(0,0,0,0.2);
-}
-
-.msg-meta {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
 }
 
 .msg-title {
@@ -2288,6 +2258,7 @@ body.dark .admin-tabs .tab-btn.active .tab-circle {
   display: flex;
   flex-direction: column;
   width: 100%;
+  margin-top: 65px;
   gap: 10px;
   justify-content: space-between;
   align-items: center;
@@ -2357,7 +2328,6 @@ body.dark #linksHeader {
   direction: ltr;
   background: rgba(0,74,124,0.05);
   border-radius: 10px;
-  margin-top: 10px;
 }
 body.dark .rating-filter {
   background: rgba(255,255,255,0.05);
@@ -3253,13 +3223,18 @@ body.dark .profile-logout:hover {
 }
 
 .carousel-item button.more-info {
-  font-size: 12px;   /* کوچیک‌تر */
+  font-size: 12px;
+  font-weight: bold;
   padding: 4px 8px;
-  border-radius: 4px;
-  background: #333;
-  color: #fff;
+  border-radius: 6px;
+  background: #fff;
+  color: #333;
   border: none;
   cursor: pointer;
+}
+body.dark .carousel-item button.more-info {
+  background: #333;
+  color: #fff;
 }
 .carousel-item.active button.more-info {
   display: block;
@@ -3277,6 +3252,7 @@ body.dark .profile-logout:hover {
   width: 100%;
   max-width: 360px; /* برای موبایل */
   margin: 0 auto;
+  padding-top: 15px;
 }
 
 .carousel-track {
@@ -3301,7 +3277,7 @@ body.dark .profile-logout:hover {
 
 .carousel-item img {
   width: 100%;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .carousel-item button.more-info {
@@ -3323,6 +3299,7 @@ body.dark .profile-logout:hover {
     justify-content: center;
     align-items: center;
     z-index: 10011134;
+    scrollbar-width: none;
 }
 
 .movie-modal-content {
@@ -3331,22 +3308,12 @@ body.dark .profile-logout:hover {
     max-height: 90vh;
     overflow-y: auto;
     scrollbar-width: none;
-    border-radius: 8px;
+    border-radius: 6px;
     position: relative;
 }
 
-.movie-modal-content::-webkit-scrollbar {
-  width: 6px;
-}
-.movie-modal-content::-webkit-scrollbar-thumb {
-  background: #aaa;
-  border-radius: 3px;
-}
 .carousel-window {
-  height: 320px; /* یا هرچی متناسب کارت‌ها */
-}
-.movie-modal-content .close-btn:hover {
-  background: #c0392b;
+  height: 320px;
 }
 .movie-modal-content .close-btn {
   display: flex;
@@ -3373,7 +3340,7 @@ body.dark .profile-logout:hover {
   background-position: center;
   filter: blur(20px) brightness(1.2);
   z-index: -1;
-  border-radius: 12px; /* 🔹 گوشه‌های گرد */
+  border-radius: 6px; /* 🔹 گوشه‌های گرد */
   overflow: hidden;
 }
 
@@ -3384,6 +3351,15 @@ body.dark .profile-logout:hover {
   background: linear-gradient(to bottom,
     rgba(255,255,255,0) 70%,   /* بالایی شفاف */
     rgba(255,255,255,1) 100%   /* پایینی محو کامل */
+  );
+}
+Body.dark .carousel-bg::after {
+  content: "";
+  position: absolute;
+  top:0; left:0; right:0; bottom:0;
+  background: linear-gradient(to bottom,
+    rgba(0,0,0,0) 70%,   /* بالایی شفاف */
+    #1A2026 100%   /* پایینی محو کامل */
   );
 }
 /* حالت شب برای مودال */
@@ -3409,22 +3385,308 @@ body.dark-mode .movie-modal-content .close-btn {
 body.dark-mode .movie-modal-content .close-btn:hover {
   background: #c0392b;
 }
-body.dark-mode .carousel-bg::after {
-  content: "";
-  position: absolute;
-  top:0; left:0; right:0; bottom:0;
-  background: linear-gradient(to bottom,
-    rgba(30,30,30,0) 70%,   /* بالایی شفاف */
-    rgba(30,30,30,1) 100%   /* پایینی تیره کامل */
-  );
-}
+
 .carousel-btn{
     border: 0;
+    background: rgba(255,255,255,0.2);
     display: flex;
-    padding: 6px;
-    width: 30px;
-    height: 30px;
     align-items: center;
     justify-content: center;
+    width: 30px;
+    /* height: 30px; */
+    padding: 0 !important;
     border-radius: 50%;
+}
+body.dark .carousel-btn{
+    border: 0;
+    background: rgba(0,0,0,0.2);
+}
+.carousel-btn img{
+  margin: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+.episode-title {
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.popular-section h2{
+  display: inline-block;
+  padding: 3px 6px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 1.5rem;
+  background: rgba(255, 255, 255, 0.2);
+}
+body.dark .popular-section h2{
+  background: rgba(0, 0, 0, 0.2);
+}
+/* بخش اصلی */
+.designer-credit {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #333;
+  justify-content: space-between;
+  Border-radius: 8px;
+  Background: rgba(0,74,124,0.08);
+  Padding: 5px;
+  Box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  width: 100%;
+  font-weight: bold;
+}
+body.dark .designer-credit{
+  Background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+/* حباب لینک */
+.designer-credit .designer-bubble {
+  background: rgba(0, 123, 255, 0.15);
+  color: #007bff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s, transform 0.2s;
+  cursor: pointer;
+}
+
+.designer-credit .designer-bubble:hover {
+  background: rgba(0, 123, 255, 0.15);
+  color: #007bff;
+  transform: scale( +2px);
+}
+
+/* ------------------ دارک مود ------------------ */
+body.dark .designer-credit {
+  color: #ccc; /* متن خاکستری روشن */
+}
+
+body.dark .designer-credit .designer-bubble {
+  background: rgba(0, 123, 255, 0.35);
+  color: #FFFFFFE3;
+}
+
+body.dark .designer-credit .designer-bubble:hover {
+  background: #ca6f1e;   /* نارنجی تیره‌تر در هاور */
+}
+.version-chip{
+  Background: rgba(0,74,124,0.06);
+  Border-radius: 10px;
+  Padding: 5px;
+  Box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin: 0;
+  font-size: 10px;
+}
+body.dark .version-chip{
+  Background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+.links-toggle{
+  font-weight: bold;
+}
+/* ===== Chat to admin bubble ===== */
+.chat-bubble {
+  width: 100%;
+  background: rgba(0,74,124,0.08);
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  position: relative;
+}
+body.dark .chat-bubble { background: rgba(255,255,255,0.08); }
+
+.chat-bubble-header {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.chat-bubble-title { font-weight: bold; }
+
+/* ردیف ورودی جمع‌شده */
+.chat-input-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.chat-bubble.chat-open .chat-input-row {
+  display: none !important;
+}
+.chat-input-row input {
+  width: 70%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #222;
+}
+body.dark .chat-input-row input { background: #202020; color: #f1f1f1; border-color: #444; }
+.chat-actions { display: flex; align-items: center; gap: 6px; }
+.chat-icon-btn {
+  border: none; background: transparent; width: 36px; height: 36px;
+  display: grid; place-items: center; border-radius: 8px; cursor: pointer;
+}
+.chat-icon-btn.disabled { opacity: 0.5; cursor: default; pointer-events: none; }
+.chat-icon-btn img { width: 22px; height: 22px; }
+
+/* اوورلی تمام‌صفحه داخل سایدمنو */
+
+.chat-overlay {
+position: fixed;
+  inset: 0;
+  z-index: 2147480000;
+  backdrop-filter: blur(12px); background: rgba(0,0,0,0.45);
+  grid-template-rows: auto 1fr auto;
+}
+#chatOverlay {
+  display: none; /* پیش‌فرض مخفی */
+}
+#chatOverlay[aria-hidden="false"] {
+  display: grid !important; /* وقتی باز شد */
+}
+.chat-overlay-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  background: rgba(255,255,255,0.85);
+}
+body.dark .chat-overlay-header { background: rgba(30,36,40,0.85); color: #fff; }
+
+.chat-back-btn {
+  border: none; background: #fff; color: #111; border-radius: 8px;
+  padding: 6px 10px; cursor: pointer;
+}
+body.dark .chat-back-btn { background: #333; color: #fff; }
+
+.chat-admin-avatar { width: 28px; height: 28px; border-radius: 50%; }
+.chat-overlay-title { font-weight: bold; margin-left: auto; }
+
+/* لیست پیام‌ها */
+.chat-messages-list {
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* حباب پیام‌ها (شبیه iPhone) */
+.msg-row {
+  display: flex; width: 100%; }
+.msg-row.user { justify-content: flex-end; }
+.msg-row.admin { justify-content: flex-start; }
+
+.msg-bubble {
+  max-width: 76%; border-radius: 14px; padding: 8px 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: inline-flex; flex-direction: column; gap: 6px;
+}
+.msg-bubble.user {
+  background: linear-gradient(135deg, #2ECC716E, #1E84495C);
+  color: #0b3d5c;
+}
+.msg-bubble.admin {
+  background: #fff; color: #222; border: 1px solid rgba(0,0,0,0.08);
+}
+body.dark .msg-bubble.admin {
+  background: rgba(255,255,255,0.08);
+  color: #e6eef6; border: 1px solid rgba(255,255,255,0.14);
+}
+
+.msg-image { width: 220px; max-width: 76vw; border-radius: 10px; object-fit: cover; }
+.msg-text { white-space: pre-wrap; word-wrap: break-word; overflow-wrap: anywhere; }
+
+.msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #666;
+  line-height: 1;
+      justify-content: end;
+
+}
+.msg-meta span{
+  font-size: .7rem;
+}
+body.dark .msg-meta { color: #bbb; }
+.msg-meta img { width: 14px; height: 14px; }
+
+/* کامپوزر پایین اوورلی */
+.chat-composer {
+  display: flex;
+   align-items: center;
+   padding: 8px;
+  background: rgba(255,255,255,0.85);
+}
+body.dark .chat-composer { background: rgba(30,36,40,0.85); }
+.chat-composer input {
+  flex: 1;
+    width: 50px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    color: #222;
+}
+body.dark .chat-composer input { background: #202020; color: #f1f1f1; border-color: #444; }
+
+/* بدج روی دکمه منو */
+#menuBtn .chat-menu-badge {
+  position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+  border-radius: 50%; background: red; color: #fff; display: grid; place-items: center;
+  font-size: 11px; font-weight: bold;
+}
+
+/* گرید پروفایل‌های کاربران در پنل ادمین */
+.user-threads-grid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.user-thread-card {
+  background: var(--post-day);
+  border-radius: 10px;
+  padding: 10px;
+  width: 30%;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+body.dark .user-thread-card { background: var(--post-night); color: #e6eef6; }
+.user-thread-card img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+.user-thread-name { font-weight: bold; }
+.user-thread-snippet {
+  font-size: 12px; color: #666;
+  max-width: 90%; text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+body.dark .user-thread-snippet { color: #bbb; }
+.admin-tabs .tab-circle {
+  position: relative;
+}
+.admin-tabs .tab-circle .badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: red;
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+}
+.side-menu-bottom{
+  display: flex;
+    flex-direction: column;
+    gap: 9px;
 }

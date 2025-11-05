@@ -72,10 +72,11 @@
     </div>
   </button>
   <button class="tab-btn" data-target="messages" type="button">
-    <div class="tab-circle">
-      <img src="images/icons8-message.apng" alt="messages">
-    </div>
-  </button>
+  <div class="tab-circle">
+    <img src="images/icons8-message.apng" alt="messages">
+    <span id="adminMessagesBadge" class="badge" style="display:none;">!</span>
+  </div>
+</button>
   <button class="tab-btn" data-target="comments" type="button">
     <div class="tab-circle">
       <img src="images/icons8-comment.apng" alt="comments">
@@ -153,7 +154,39 @@
       <div id="messageList" class="message-list" aria-live="polite"></div>
 
     </section>
+    
+    <!-- پیام‌های کاربران -->
+<section id="usersMessages" class="admin-section-item admin_messages_users">
+  <h2>پیام‌های کاربران</h2>
 
+  <!-- گرید پروفایل‌ها -->
+  <div id="userThreadsGrid" class="user-threads-grid"></div>
+
+  <!-- پیجینیشن اختصاصی -->
+  <div id="userThreadsPagination" class="pagination-users"></div>
+
+  <!-- اوورلی نمایش گفت‌وگو -->
+  <div id="adminThreadOverlay" class="chat-overlay" aria-hidden="true">
+    <div class="chat-overlay-header">
+      <button id="adminThreadBackBtn" class="chat-back-btn" aria-label="back">&larr;</button>
+      <img id="adminThreadAvatar" class="chat-admin-avatar" src="images/icons8-user-96.png" alt="user" />
+      <div id="adminThreadTitle" class="chat-overlay-title">گفت‌وگو</div>
+    </div>
+
+    <div id="adminThreadMessages" class="chat-messages-list"></div>
+
+    <div class="chat-composer">
+      <button id="adminThreadAttachBtn" class="chat-icon-btn" aria-label="attach">
+        <img src="images/icons8-pin-96.png" alt="attach" />
+      </button>
+      <input id="adminThreadAttachFile" type="file" accept="image/*" hidden />
+      <input id="adminThreadInput" type="text" placeholder="پاسخ بنویسید..." />
+      <button id="adminThreadSendBtn" class="chat-icon-btn disabled" aria-label="send">
+        <img src="images/icons8-send-90.png" alt="send" />
+      </button>
+    </div>
+  </div>
+</section>
 
     <section id="unapproved-comments-section" class="admin-section-item-3 admin-section-item">
       <h2>Unpublished Comments</h2>

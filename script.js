@@ -1013,6 +1013,7 @@ if (searchInput) {
       sideMenu.classList.remove('active');
       menuOverlay.classList.remove('active');
       document.body.classList.remove('no-scroll', 'menu-open');
+      closeChatOverlay();
     };
     menuBtn.addEventListener('click', openMenu);
     menuOverlay.addEventListener('click', closeMenu);
@@ -2376,15 +2377,18 @@ function renderPopularCarousel(list = []) {
       <h3>${escapeHtml(m.title || '')}</h3>
       <button class="more-info">اطلاعات بیشتر</button>
     `;
-    item.querySelector('.more-info').addEventListener('click', () => openMovieModal(m));
+    item.querySelector('.more-info').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openMovieModal(m);
+    });
     track.appendChild(item);
   });
 
   const items = track.querySelectorAll('.carousel-item');
   const windowEl = document.querySelector('.carousel-window');
-  const itemWidth = windowEl.offsetWidth / 3; // سه کارت همزمان
+  const itemWidth = windowEl.offsetWidth / 3;
 
-  let currentIndex = 2; // چون دو کپی اول داریم
+  let currentIndex = 2;
   track.style.transform = `translateX(-${itemWidth * currentIndex}px)`;
   updateActive();
 
@@ -2401,7 +2405,7 @@ function renderPopularCarousel(list = []) {
     track.style.transition = 'transform 0.5s ease';
     track.style.transform = `translateX(-${itemWidth * index}px)`;
     currentIndex = index;
-    resetAutoSlide(); // 🔹 هر بار دستی یا خودکار عوض شد، تایمر ریست بشه
+    resetAutoSlide();
   }
 
   track.addEventListener('transitionend', () => {
@@ -2424,218 +2428,160 @@ function renderPopularCarousel(list = []) {
   document.querySelector('#popular-carousel .next').onclick = () => { next(); };
   document.querySelector('#popular-carousel .prev').onclick = () => { prev(); };
 
-  // 🔹 تایمر خودکار با قابلیت ریست
+  // 🔹 تایمر خودکار
   let autoSlide;
   function resetAutoSlide() {
     clearInterval(autoSlide);
     autoSlide = setInterval(next, 4000);
   }
   resetAutoSlide();
-
-  // -------------------- 👇 Drag/Swipe ساده --------------------
-  let startX = 0;
-  let currentTranslate = 0;
-  let prevTranslate = -itemWidth * currentIndex;
-  let isDragging = false;
-
-  function getX(e) {
-    return e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
-  }
-
-  function startDrag(e) {
-    isDragging = true;
-    startX = getX(e);
-    track.style.transition = 'none';
-    clearInterval(autoSlide); // در حین کشیدن، تایمر متوقف بشه
-  }
-
-  function dragMove(e) {
-    if (!isDragging) return;
-    const currentX = getX(e);
-    const diff = currentX - startX;
-    currentTranslate = prevTranslate + diff;
-    track.style.transform = `translateX(${currentTranslate}px)`;
-  }
-
-  function endDrag() {
-    if (!isDragging) return;
-    isDragging = false;
-    const movedBy = currentTranslate - prevTranslate;
-
-    if (movedBy < -itemWidth / 2) {
-      next();
-    } else if (movedBy > itemWidth / 2) {
-      prev();
-    } else {
-      slideTo(currentIndex); // برگرد سر جاش
-    }
-    prevTranslate = -itemWidth * currentIndex;
-    resetAutoSlide(); // 🔹 بعد از کشیدن هم تایمر ریست بشه
-  }
-
-  // رویدادها
-  track.addEventListener('mousedown', startDrag);
-  track.addEventListener('touchstart', startDrag);
-
-  track.addEventListener('mousemove', dragMove);
-  track.addEventListener('touchmove', dragMove);
-
-  track.addEventListener('mouseup', endDrag);
-  track.addEventListener('mouseleave', endDrag);
-  track.addEventListener('touchend', endDrag);
 }
-
 // مودال 
+
 function openMovieModal(m) {
   const modal = document.getElementById('movie-modal');
   const content = modal.querySelector('.movie-modal-content');
 
-  const cover = escapeHtml(m.cover || 'https://via.placeholder.com/300x200?text=No+Image');
-  const title = escapeHtml(m.title || '-');
-  const synopsis = escapeHtml((m.synopsis || '-').trim());
-  const director = escapeHtml(m.director || '-');
-  const stars = escapeHtml(m.stars || '-');
-  const imdb = escapeHtml(m.imdb || '-');
-  const release_info = escapeHtml(m.release_info || '-');
+  // 🔹 رندر اولیه کارت
+  function renderCard(data, allEpisodes = []) {
+    const cover = escapeHtml(data.cover || 'https://via.placeholder.com/300x200?text=No+Image');
+    const title = escapeHtml(data.title || '-');
+    const synopsis = escapeHtml((data.synopsis || '-').trim());
+    const director = escapeHtml(data.director || '-');
+    const stars = escapeHtml(data.stars || '-');
+    const imdb = escapeHtml(data.imdb || '-');
+    const release_info = escapeHtml(data.release_info || '-');
 
-  const badgeHtml = m.type && m.type !== 'single'
-    ? `<span class="collection-badge ${m.type === 'collection' ? 'badge-collection' : 'badge-serial'}">
-         ${m.type === 'collection' ? 'Collection' : 'Series'}
-         <span class="badge-count">0</span>
-       </span>`
-    : '';
+    const badgeHtml = data.type && data.type !== 'single'
+      ? `<span class="collection-badge ${data.type === 'collection' ? 'badge-collection' : 'badge-serial'}">
+           ${data.type === 'collection' ? 'Collection' : 'Series'}
+           <span class="badge-count">${allEpisodes.length}</span>
+         </span>`
+      : '';
 
-  // کارت مستقیم داخل مودال + دکمه بستن زیر Go to file
-  content.innerHTML = `
-    <div class="movie-card expanded">
-      <div class="cover-container">
-        <div class="cover-blur" style="background-image: url('${cover}');"></div>
-        <img class="cover-image" src="${cover}" alt="${title}">
+    return `
+      <div class="movie-card expanded">
+        <div class="cover-container">
+          <div class="cover-blur" style="background-image: url('${cover}');"></div>
+          <img class="cover-image" src="${cover}" alt="${title}">
+        </div>
+
+        <div class="movie-info">
+          <div class="movie-title">
+            <span class="movie-name">${title}</span>
+            ${badgeHtml}
+          </div>
+
+          <span class="field-label">Synopsis:</span>
+          <div class="field-quote synopsis-quote">
+            <div class="quote-text">${synopsis}</div>
+            <button class="quote-toggle-btn">More</button>
+          </div>
+
+          <span class="field-label">Director:</span>
+          <div class="field-quote director-field">${director}</div>
+
+          <span class="field-label">Product:</span>
+          <div class="field-quote product-field">${renderChips(data.product || '-')}</div>
+
+          <span class="field-label">Stars:</span>
+          <div class="field-quote stars-field">${stars}</div>
+
+          <span class="field-label">IMDB:</span>
+          <div class="field-quote"><span class="chip imdb-chip">${imdb}</span></div>
+
+          <span class="field-label">Release:</span>
+          <div class="field-quote release-field">${release_info}</div>
+
+          <span class="field-label">Genre:</span>
+          <div class="field-quote genre-grid">${renderChips(data.genre || '-')}</div>
+
+          <div class="episodes-container" data-movie-id="${data.id}">
+            <div class="episodes-list"></div>
+          </div>
+
+          <button class="go-btn" data-link="${escapeHtml(data.link || '#')}">Go to file</button>
+          <button class="close-btn">بستن</button>
+        </div>
       </div>
+    `;
+  }
 
-      <div class="movie-info">
-        <div class="movie-title">
-          <span class="movie-name">${title}</span>
-          ${badgeHtml}
-        </div>
+  // 🔹 تابع آپدیت فقط اطلاعات (نه لیست اپیزودها)
+  function updateInfo(ep) {
+    content.querySelector('.movie-name').textContent = ep.title || '-';
+    content.querySelector('.cover-image').src = ep.cover || m.cover;
+    content.querySelector('.cover-blur').style.backgroundImage = `url('${ep.cover || m.cover}')`;
+    content.querySelector('.quote-text').textContent = ep.synopsis || '-';
+    content.querySelector('.director-field').textContent = ep.director || '-';
+    content.querySelector('.product-field').innerHTML = renderChips(ep.product || '-');
+    content.querySelector('.stars-field').textContent = ep.stars || '-';
+    content.querySelector('.imdb-chip').textContent = ep.imdb || '-';
+    content.querySelector('.release-field').textContent = ep.release_info || '-';
+    content.querySelector('.genre-grid').innerHTML = renderChips(ep.genre || '-');
+    content.querySelector('.go-btn').dataset.link = ep.link || '#';
 
-        <span class="field-label"><img src="images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
-        <div class="field-quote synopsis-quote">
-          <div class="quote-text">${synopsis}</div>
-          <button class="quote-toggle-btn">More</button>
-        </div>
+    initModalSynopsisToggle(content);
+  }
 
-        <span class="field-label"><img src="images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span>
-        <div class="field-quote">${director}</div>
-
-        <span class="field-label"><img src="images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
-        <div class="field-quote">${renderChips(m.product || '-')}</div>
-
-        <span class="field-label"><img src="images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
-        <div class="field-quote">${stars}</div>
-
-        <span class="field-label">
-          <img src="images/icons8-imdb-48.png" style="width:20px;height:20px;"> IMDB:
-        </span>
-        <div class="field-quote"><span class="chip imdb-chip">${imdb}</span></div>
-
-        <span class="field-label"><img src="images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span>
-        <div class="field-quote">${release_info}</div>
-
-        <span class="field-label"><img src="images/icons8-comedy-96.png" style="width:20px;height:20px;"> Genre:</span>
-        <div class="field-quote genre-grid">${renderChips(m.genre || '-')}</div>
-
-        <div class="episodes-container" data-movie-id="${m.id}">
-          <div class="episodes-list"></div>
-        </div>
-
-        <button class="go-btn" data-link="${escapeHtml(m.link || '#')}">Go to file</button>
-        <button class="close-btn">بستن</button>
-      </div>
-    </div>
-  `;
-
-  // نمایش مودال
+  // رندر اولیه
+  content.innerHTML = renderCard(m);
   modal.style.display = 'flex';
-
-  // جلوگیری از بسته شدن مودال با کلیک داخل محتوا
   content.addEventListener('click', (e) => e.stopPropagation());
-
-  // بستن مودال
   content.querySelector('.close-btn').onclick = () => { modal.style.display = 'none'; };
   modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
 
-  // اسکرول داخلی
-  content.style.maxHeight = '90vh';
-  content.style.overflowY = 'auto';
-
-  // هندلر دکمه Go to file
-  const goBtn = content.querySelector('.go-btn');
-  if (goBtn) {
-    goBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const link = goBtn.dataset.link || '#';
-      try {
-        const activeTitle = m.title;
-        await supabase.from("click_logs").insert([
-          { movie_id: m.id, episode_index: null, link, title: activeTitle }
-        ]);
-      } catch (err) {
-        console.error("click log error:", err);
-      }
-      if (link && link !== '#') window.open(link, '_blank');
-    });
+  // هندل Go to file
+  function bindGoBtn(data) {
+    const goBtn = content.querySelector('.go-btn');
+    if (goBtn) {
+      goBtn.onclick = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const link = goBtn.dataset.link || '#';
+        if (link && link !== '#') window.open(link, '_blank');
+      };
+    }
   }
-
-  // toggle سینوپسیس
+  bindGoBtn(m);
   initModalSynopsisToggle(content);
 
-  // 🔹 اگر سریال یا کالکشن بود، اپیزودها رو لود کن و badge رو آپدیت کن
+  // 🔹 اگر سریال یا کالکشن بود
   if (m.type === 'collection' || m.type === 'serial') {
     (async () => {
-      const { data: eps, error } = await supabase
+      const { data: eps } = await supabase
         .from('movie_items')
         .select('*')
         .eq('movie_id', m.id)
         .order('order_index', { ascending: true });
 
-      if (error) {
-        console.error('Error loading episodes:', error);
-        return;
-      }
-
       const allEpisodes = [{ ...m }, ...(eps || [])];
       const listEl = content.querySelector('.episodes-list');
       listEl.innerHTML = allEpisodes.map((ep, idx) => `
-        <div class="episode-card ${idx === 0 ? 'active' : ''}" data-link="${ep.link}">
+        <div class="episode-card ${idx === 0 ? 'active' : ''}" data-idx="${idx}">
           <img src="${escapeHtml(ep.cover || m.cover)}" alt="${escapeHtml(ep.title)}">
-          <div class="episode-title"><span>${escapeHtml(ep.title)}</span></div>
+          <div class="episode-title">${escapeHtml(ep.title)}</div>
         </div>
       `).join('');
 
-      // 🔹 آپدیت badge-count
+      // آپدیت badge-count
       const badgeCount = content.querySelector('.collection-badge .badge-count');
       if (badgeCount) {
         badgeCount.textContent = allEpisodes.length + (allEpisodes.length > 1 ? " episodes" : " episode");
       }
 
+      // هندل کلیک روی اپیزودها
       listEl.querySelectorAll('.episode-card').forEach((cardEl, idx) => {
         cardEl.addEventListener('click', () => {
           listEl.querySelectorAll('.episode-card').forEach(c => c.classList.remove('active'));
           cardEl.classList.add('active');
-          const ep = allEpisodes[idx];
-          content.querySelector('.movie-name').textContent = ep.title || m.title;
-          content.querySelector('.cover-image').src = ep.cover || m.cover;
-          content.querySelector('.cover-blur').style.backgroundImage = `url('${ep.cover || m.cover}')`;
-          content.querySelector('.quote-text').textContent = ep.synopsis || m.synopsis;
-          goBtn.dataset.link = ep.link || m.link;
+          updateInfo(allEpisodes[idx]);
+          bindGoBtn(allEpisodes[idx]);
         });
       });
     })();
   }
 }
-
 
 function initModalSynopsisToggle(rootEl) {
   const quote = rootEl.querySelector('.synopsis-quote');
@@ -4116,12 +4062,13 @@ setInterval(async () => {
 
 
 // -------------------- Admin Tabs --------------------
+// -------------------- Admin Tabs --------------------
 function initAdminTabs() {
   const tabButtons = document.querySelectorAll(".admin-tabs .tab-btn");
 
   const sections = {
-    posts: [".send_post", ".released_movies"],
-    messages: [".admin_messages"],
+    posts: [".send_post", ".released_movies", "#popular-movies-section"], // 🔹 اضافه شد
+    messages: [".admin_messages", "#usersMessages"], // 🔹 سکشن پیام‌های کاربران هم اضافه شد
     comments: ["#unapproved-comments-section"],
     links: ["#social-links-section"],
     analytics: ["#analytics"],
@@ -4163,11 +4110,14 @@ function initAdminTabs() {
         loadAdmins();
         loadUsers();
       }
+
+      // وقتی تب Messages فعال شد
+      if (btn.dataset.target === "messages") {
+        loadUserThreads(1); // 🔹 لود لیست کاربران
+      }
     });
   });
 }
-
-
 async function loadAppVersion() {
   try {
     const { data, error } = await supabase
@@ -4307,6 +4257,555 @@ function clearRatingFilter() {
   renderPagedMovies();
   activeFiltersContainer.innerHTML = "";
 }
+
+
+// ===== Chat to Admin =====
+
+// State
+let chatThreadId = null;
+let chatUnreadForUser = false;
+
+// Elements
+const chatBubble = document.getElementById('chatBubble');
+const chatBubbleBadge = document.getElementById('chatBubbleBadge');
+
+const chatInput = document.getElementById('chatInput');
+const chatSendBtn = document.getElementById('chatSendBtn');
+const chatAttachBtn = document.getElementById('chatAttachBtn');
+const chatAttachFile = document.getElementById('chatAttachFile');
+
+const chatOverlay = document.getElementById('chatOverlay');
+const chatBackBtn = document.getElementById('chatBackBtn');
+const chatMessagesList = document.getElementById('chatMessagesList');
+
+const overlayInput = document.getElementById('overlayInput');
+const overlaySendBtn = document.getElementById('overlaySendBtn');
+const overlayAttachBtn = document.getElementById('overlayAttachBtn');
+const overlayAttachFile = document.getElementById('overlayAttachFile');
+
+// Badge روی دکمه منو
+let chatMenuBadgeEl;
+
+// فعال/غیرفعال شدن ارسال با متن
+function updateSendEnabled() {
+  const hasTextCollapsed = (chatInput?.value || '').trim().length > 0;
+  const hasTextExpanded = (overlayInput?.value || '').trim().length > 0;
+
+  if (chatSendBtn) chatSendBtn.classList.toggle('disabled', !hasTextCollapsed);
+  if (overlaySendBtn) overlaySendBtn.classList.toggle('disabled', !hasTextExpanded);
+}
+chatInput?.addEventListener('input', updateSendEnabled);
+overlayInput?.addEventListener('input', updateSendEnabled);
+
+// باز کردن اوورلی با فوکوس یا کلیک روی حباب
+
+const userChatBackBtn = document.getElementById('userChatBackBtn');
+
+function openChatOverlay() {
+  if (!currentUser) {
+    showToast('برای ارسال پیام ابتدا لاگین کنید');
+    return;
+  }
+
+  // پاک کردن بدج‌ها
+  chatBubbleBadge?.style && (chatBubbleBadge.style.display = 'none');
+  if (typeof chatMenuBadgeEl !== 'undefined' && chatMenuBadgeEl) {
+    chatMenuBadgeEl.remove();
+  }
+
+  // اوورلی باز شود
+  chatOverlay?.setAttribute('aria-hidden', 'false');
+
+  // کلاس وضعیت روی والد برای مخفی کردن ردیف ورودی
+  chatBubble?.classList.add('chat-open');
+
+  loadOrCreateThreadAndMessages();
+}
+
+function closeChatOverlay() {
+  // اوورلی بسته شود
+  chatOverlay?.setAttribute('aria-hidden', 'true');
+
+  // حذف کلاس وضعیت از والد برای نمایش دوباره ردیف ورودی
+  chatBubble?.classList.remove('chat-open');
+}
+
+// اتصال‌ها
+chatInput?.addEventListener('focus', (e) => {
+  e.stopPropagation();
+  openChatOverlay();
+});
+
+chatBubble?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  openChatOverlay();
+});
+
+userChatBackBtn?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  closeChatOverlay();
+});
+
+
+
+chatInput?.addEventListener('focus', openChatOverlay);
+chatBubble?.addEventListener('click', openChatOverlay);
+
+
+// سنجاق
+chatAttachBtn?.addEventListener('click', () => chatAttachFile?.click());
+overlayAttachBtn?.addEventListener('click', () => overlayAttachFile?.click());
+
+// آپلود عکس
+async function uploadChatImage(file) {
+  if (!file || !currentUser) return null;
+  const path = `${currentUser.id}/${Date.now()}_${file.name}`;
+  const { data, error } = await supabase.storage.from('chat').upload(path, file);
+  if (error) { console.error('chat image upload error', error); showToast('خطا در آپلود تصویر ❌'); return null; }
+  const { data: pub } = supabase.storage.from('chat').getPublicUrl(data.path);
+  return pub?.publicUrl || null;
+}
+
+// ساخت یا گرفتن نخ
+async function ensureThread() {
+  if (!currentUser) return null;
+  if (chatThreadId) return chatThreadId;
+
+  const { data: existing, error } = await supabase
+    .from('user_admin_threads')
+    .select('id')
+    .eq('user_id', currentUser.id)
+    .maybeSingle();
+  if (error) { console.error('thread fetch error', error); return null; }
+  if (existing?.id) { chatThreadId = existing.id; return chatThreadId; }
+
+  const { data: created, error: insErr } = await supabase
+    .from('user_admin_threads')
+    .insert([{ user_id: currentUser.id }])
+    .select()
+    .single();
+  if (insErr) { console.error('thread create error', insErr); return null; }
+  chatThreadId = created.id;
+  return chatThreadId;
+}
+
+// لود پیام‌ها
+async function loadMessages() {
+  if (!chatThreadId) return;
+  const { data, error } = await supabase
+    .from('user_admin_messages')
+    .select('*')
+    .eq('thread_id', chatThreadId)
+    .order('created_at', { ascending: true })
+    .limit(500);
+  if (error) { console.error('load chat messages error', error); return; }
+  renderChatMessages(data || []);
+
+  // پیام‌های ادمین → seen_by_user
+  await supabase
+    .from('user_admin_messages')
+    .update({ seen_by_user: true })
+    .eq('thread_id', chatThreadId)
+    .eq('role', 'admin')
+    .eq('seen_by_user', false);
+
+  // نخ → unread_for_user false
+  await supabase.from('user_admin_threads')
+    .update({ unread_for_user: false })
+    .eq('id', chatThreadId);
+}
+
+function renderChatMessages(arr) {
+  chatMessagesList.innerHTML = (arr || []).map(m => {
+    const sideClass = m.role === 'user' ? 'user' : 'admin';
+    const imageHtml = m.image_url ? `<img class="msg-image" src="${escapeHtml(m.image_url)}" alt="image">` : '';
+    const textHtml = m.text ? `<div class="msg-text">${escapeHtml(m.text)}</div>` : '';
+    const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // فقط برای پیام‌های ارسالی کاربر تیک داشته باشیم
+    let tickIcon = '';
+    if (m.role === 'user') {
+      tickIcon = m.seen_by_admin
+        ? `<img src="images/icons8-double-tick-50.png" alt="seen">`
+        : `<img src="images/icons8-tick-96.png" alt="sent">`;
+    } else {
+      tickIcon = ''; // پیام‌های ورودی (ادمین) بدون تیک
+    }
+
+    return `
+      <div class="msg-row ${sideClass}">
+        <div class="msg-bubble ${sideClass}">
+          ${imageHtml}
+          ${textHtml}
+          <div class="msg-meta">
+            <span>${escapeHtml(time)}</span>
+            ${tickIcon}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  setTimeout(() => { chatMessagesList.scrollTop = chatMessagesList.scrollHeight; }, 60);
+}
+
+async function loadOrCreateThreadAndMessages() {
+  const tid = await ensureThread();
+  if (!tid) return;
+  await loadMessages();
+}
+
+// ارسال از حالت جمع‌شده
+chatSendBtn?.addEventListener('click', async () => {
+  if (chatSendBtn.classList.contains('disabled')) return;
+  const text = (chatInput?.value || '').trim();
+  if (!text) return;
+  await sendChat({ text });
+  chatInput.value = '';
+  updateSendEnabled();
+});
+
+// ارسال از اوورلی
+overlaySendBtn?.addEventListener('click', async () => {
+  if (overlaySendBtn.classList.contains('disabled')) return;
+  const text = (overlayInput?.value || '').trim();
+  if (!text) return;
+  await sendChat({ text, overlay: true });
+  overlayInput.value = '';
+  updateSendEnabled();
+});
+
+// سنجاق حالت جمع‌شده
+chatAttachFile?.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const url = await uploadChatImage(file);
+  if (!url) return;
+  await sendChat({ image_url: url });
+  e.target.value = '';
+});
+
+// سنجاق در اوورلی
+overlayAttachFile?.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const url = await uploadChatImage(file);
+  if (!url) return;
+  await sendChat({ image_url: url, overlay: true });
+  e.target.value = '';
+});
+
+async function sendChat({ text = null, image_url = null, overlay = false } = {}) {
+  if (!currentUser) { showToast('ابتدا لاگین کنید'); return; }
+  const tid = await ensureThread();
+  if (!tid) return;
+
+  const payload = {
+    thread_id: tid,
+    user_id: currentUser.id,
+    role: 'user',
+    text: text || null,
+    image_url: image_url || null,
+    sent: true
+  };
+  const { error } = await supabase.from('user_admin_messages').insert([payload]);
+  if (error) { console.error('send chat error', error); showToast('ارسال ناموفق ❌'); return; }
+
+  // نخ → unread_for_admin true
+  await supabase.from('user_admin_threads')
+    .update({ unread_for_admin: true, last_message_at: new Date().toISOString() })
+    .eq('id', tid);
+
+  if (chatOverlay && chatOverlay.style.display === 'grid') {
+    await loadMessages();
+  } else {
+    // بدج روی حباب و منو
+    chatBubbleBadge?.style && (chatBubbleBadge.style.display = 'grid');
+    if (menuBtn && !chatMenuBadgeEl) {
+      chatMenuBadgeEl = document.createElement('span');
+      chatMenuBadgeEl.className = 'chat-menu-badge';
+      chatMenuBadgeEl.textContent = '!';
+      menuBtn.style.position = 'relative';
+      menuBtn.appendChild(chatMenuBadgeEl);
+    }
+  }
+}
+
+// پول وضعیت نخ برای بدج‌ها
+async function pollChatFlags() {
+  if (!currentUser) return;
+  const { data } = await supabase
+    .from('user_admin_threads')
+    .select('id, unread_for_user')
+    .eq('user_id', currentUser.id)
+    .maybeSingle();
+
+  chatThreadId = data?.id || chatThreadId;
+  const unread = !!data?.unread_for_user;
+
+  const chatBubbleBadge = document.getElementById('chatBubbleBadge');
+  const menuBtn = document.getElementById('menuBtn');
+  let chatMenuBadgeEl = menuBtn?.querySelector('.chat-menu-badge');
+
+  if (unread) {
+    if (chatBubbleBadge) chatBubbleBadge.style.display = 'grid';
+    if (menuBtn && !chatMenuBadgeEl) {
+      chatMenuBadgeEl = document.createElement('span');
+      chatMenuBadgeEl.className = 'chat-menu-badge';
+      chatMenuBadgeEl.textContent = '!';
+      menuBtn.style.position = 'relative';
+      menuBtn.appendChild(chatMenuBadgeEl);
+    }
+  } else {
+    if (chatBubbleBadge) chatBubbleBadge.style.display = 'none';
+    if (chatMenuBadgeEl) chatMenuBadgeEl.remove();
+  }
+}
+
+pollChatFlags();
+const CHAT_POLL_MS = 8000; // 8s
+setInterval(pollChatFlags, CHAT_POLL_MS);
+
+
+
+
+// ===== پیام‌های کاربران در پنل ادمین =====
+let threadsPage = 1;
+const THREADS_PAGE_SIZE = 9;
+
+async function loadUserThreads(page = 1) {
+  threadsPage = page;
+  const from = (page - 1) * THREADS_PAGE_SIZE;
+  const to = page * THREADS_PAGE_SIZE - 1;
+
+  const { data, error, count } = await supabase
+    .from('user_admin_threads')
+    .select('id, user_id, last_message_at, unread_for_admin', { count: 'exact' })
+    .order('last_message_at', { ascending: false })
+    .range(from, to);
+
+  if (error) { 
+    console.error('load threads error', error); 
+    return; 
+  }
+
+  const grid = document.getElementById('userThreadsGrid');
+  grid.innerHTML = '';
+
+  for (const t of (data || [])) {
+    const { data: user } = await supabase.from('users')
+      .select('username, avatar_url')
+      .eq('id', t.user_id)
+      .maybeSingle();
+
+    const avatar = user?.avatar_url
+      ? supabase.storage.from('avatars').getPublicUrl(user.avatar_url).data.publicUrl
+      : 'images/icons8-user-96.png';
+
+    const { data: lastMsg } = await supabase
+      .from('user_admin_messages')
+      .select('text, image_url')
+      .eq('thread_id', t.id)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    const snippet = lastMsg?.[0]?.text
+      ? lastMsg[0].text
+      : (lastMsg?.[0]?.image_url ? '[تصویر]' : '');
+
+    const card = document.createElement('div');
+    card.className = 'user-thread-card';
+    card.innerHTML = `
+      <img src="${avatar}" alt="avatar">
+      <div class="user-thread-name">${user?.username || 'کاربر'}</div>
+      <div class="user-thread-snippet">${snippet || ''}</div>
+      ${t.unread_for_admin ? '<span class="thread-badge">!</span>' : ''}
+    `;
+    card.addEventListener('click', () => openAdminThread(t.id, user, avatar));
+    grid.appendChild(card);
+  }
+
+  renderThreadsPagination(count || 0);
+}
+
+function renderThreadsPagination(total) {
+  const cont = document.getElementById('userThreadsPagination');
+  const pages = Math.max(1, Math.ceil(total / THREADS_PAGE_SIZE));
+  cont.innerHTML = '';
+  for (let p = 1; p <= pages; p++) {
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-subtle pagination-users-btn';
+    btn.textContent = p;
+    if (p === threadsPage) btn.disabled = true;
+    btn.addEventListener('click', () => loadUserThreads(p));
+    cont.appendChild(btn);
+  }
+}
+
+// ===== اوورلی گفت‌وگو با کاربر =====
+const adminThreadOverlay = document.getElementById('adminThreadOverlay');
+const adminThreadBackBtn = document.getElementById('adminThreadBackBtn');
+const adminThreadMessages = document.getElementById('adminThreadMessages');
+const adminThreadInput = document.getElementById('adminThreadInput');
+const adminThreadSendBtn = document.getElementById('adminThreadSendBtn');
+const adminThreadAttachBtn = document.getElementById('adminThreadAttachBtn');
+const adminThreadAttachFile = document.getElementById('adminThreadAttachFile');
+
+let currentAdminThreadId = null;
+
+// فعال/غیرفعال شدن دکمه ارسال
+function updateAdminSendEnabled() {
+  const hasText = (adminThreadInput?.value || '').trim().length > 0;
+  adminThreadSendBtn?.classList.toggle('disabled', !hasText);
+}
+adminThreadInput?.addEventListener('input', updateAdminSendEnabled);
+
+// باز کردن اوورلی
+async function openAdminThread(threadId, user, avatar) {
+  document.getElementById('adminThreadTitle').textContent = user?.username || 'کاربر';
+  document.getElementById('adminThreadAvatar').src = avatar;
+
+  currentAdminThreadId = threadId;
+  adminThreadOverlay.setAttribute('aria-hidden', 'false');
+  adminThreadOverlay.style.display = 'grid';
+
+  await loadAdminThreadMessages();
+
+  // پیام‌های کاربر → seen_by_admin
+  await supabase.from('user_admin_messages')
+    .update({ seen_by_admin: true })
+    .eq('thread_id', threadId)
+    .eq('role', 'user')
+    .eq('seen_by_admin', false);
+
+  // نخ → unread_for_admin false
+  await supabase.from('user_admin_threads')
+    .update({ unread_for_admin: false })
+    .eq('id', threadId);
+}
+
+// بستن اوورلی
+adminThreadBackBtn?.addEventListener('click', () => {
+  adminThreadOverlay.setAttribute('aria-hidden', 'true');
+  adminThreadOverlay.style.display = 'none';
+  adminThreadInput.value = '';
+  updateAdminSendEnabled();
+});
+
+// لود پیام‌های یک نخ
+async function loadAdminThreadMessages() {
+  const { data, error } = await supabase
+    .from('user_admin_messages')
+    .select('*')
+    .eq('thread_id', currentAdminThreadId)
+    .order('created_at', { ascending: true })
+    .limit(500);
+
+  if (error) { 
+    console.error('load admin thread error', error); 
+    return; 
+  }
+
+  adminThreadMessages.innerHTML = (data || []).map(m => {
+    const sideClass = m.role === 'admin' ? 'user' : 'admin'; // ادمین سمت راست (سبز)، کاربر سمت چپ (سفید)
+    const imageHtml = m.image_url ? `<img class="msg-image" src="${m.image_url}" alt="image">` : '';
+    const textHtml = m.text ? `<div class="msg-text">${m.text}</div>` : '';
+    const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // فقط پیام‌های ارسالی ادمین تیک داشته باشن
+    let tickIcon = '';
+    if (m.role === 'admin') {
+      tickIcon = m.seen_by_user
+        ? `<img src="images/icons8-double-tick-50.png" alt="seen">`
+        : `<img src="images/icons8-tick-96.png" alt="sent">`;
+    } else {
+      tickIcon = ''; // پیام‌های ورودی از کاربر بدون تیک
+    }
+
+    return `
+      <div class="msg-row ${sideClass}">
+        <div class="msg-bubble ${sideClass}">
+          ${imageHtml}
+          ${textHtml}
+          <div class="msg-meta">
+            <span>${time}</span>
+            ${tickIcon}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  setTimeout(() => { 
+    adminThreadMessages.scrollTop = adminThreadMessages.scrollHeight; 
+  }, 60);
+}
+// ارسال پیام
+adminThreadSendBtn?.addEventListener('click', async () => {
+  if (adminThreadSendBtn.classList.contains('disabled')) return;
+  const text = (adminThreadInput?.value || '').trim();
+  if (!text || !currentAdminThreadId) return;
+  await adminSendMessage({ text });
+  adminThreadInput.value = '';
+  updateAdminSendEnabled();
+});
+
+// ارسال عکس
+adminThreadAttachBtn?.addEventListener('click', () => adminThreadAttachFile?.click());
+adminThreadAttachFile?.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (!file || !currentAdminThreadId) return;
+  const url = await uploadChatImage(file);
+  if (!url) return;
+  await adminSendMessage({ image_url: url });
+  e.target.value = '';
+});
+
+async function adminSendMessage({ text = null, image_url = null } = {}) {
+  const { error } = await supabase.from('user_admin_messages').insert([{
+    thread_id: currentAdminThreadId,
+    user_id: currentUser.id, // ادمین
+    role: 'admin',
+    text: text || null,
+    image_url: image_url || null,
+    sent: true
+  }]);
+  if (error) { console.error('admin send error', error); showToast('ارسال ناموفق ❌'); return; }
+
+  // نخ → unread_for_user true
+  await supabase.from('user_admin_threads')
+    .update({ unread_for_user: true, last_message_at: new Date().toISOString() })
+    .eq('id', currentAdminThreadId);
+
+  await loadAdminThreadMessages();
+}
+
+// ===== بدج پیام‌های کاربران برای ادمین =====
+const adminMessagesBadge = document.getElementById('adminMessagesBadge');
+
+async function pollAdminUnread() {
+  if (!adminMessagesBadge) return; // 🔹 اگر در این صفحه نبود، کاری نکن
+
+  const { data, error } = await supabase
+    .from('user_admin_threads')
+    .select('id')
+    .eq('unread_for_admin', true);
+
+  if (error) {
+    console.error('pollAdminUnread error', error);
+    return;
+  }
+
+  if (data && data.length > 0) {
+    adminMessagesBadge.style.display = 'grid';
+  } else {
+    adminMessagesBadge.style.display = 'none';
+  }
+}
+
+// هر ۳۰ ثانیه یکبار چک کن
+setInterval(pollAdminUnread, 30000);
+pollAdminUnread();
+
 // -------------------- Initial load --------------------
 // اینجا باید فراخوانی بشه
 if (document.querySelector('.admin-tabs .tab-btn')) {
