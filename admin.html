@@ -19,85 +19,85 @@
 </head>
 <body class="admin-body">
 <!-- Toast Container -->
-<div id="toast-container"></div>
+<section id="toast-container"></section>
 <header class="main-header">
   <!-- 🔹 بنر بالای سایت -->
-  <div class="site-banner">
-    <div class="banner-content">
+  <section class="site-banner">
+    <section class="banner-content">
       <span class="banner-logo">
         <img src="/images/banner-icon.png" alt="banner-logo" />
       </span>
       <span class="banner-text">filmchiin.ir</span>
-    </div>
-  </div>
+    </section>
+  </section>
 
   <!-- 🔹 هدر -->
-  <div class="header">
-    <div class="search-bar">
+  <section class="header">
+    <section class="search-bar">
       <!-- دکمه برگشت به سایت -->
       <a href="index.html" id="backToSiteBtn" class="menu-btn" aria-label="back">
         <img width="32" height="32" src="images/icons8-back-to-50.png" alt="back"/>
       </a>
 
       <!-- منوی پروفایل (مثل index) -->
-      <div id="profileMenu" class="profile-menu hidden">
-        <div class="profile-bubble">
-          <div class="profile-username" id="profileUsername">Admin</div>
+      <section id="profileMenu" class="profile-menu hidden">
+        <section class="profile-bubble">
+          <section class="profile-username" id="profileUsername">Admin</section>
           <button class="profile-edit">ویرایش مشخصات</button>
-          <hr class="profile-divider"/>
+          <hr class="profile-sectionider"/>
           <button id="logoutBtn" class="profile-logout">خروج</button>
-        </div>
-      </div>
+        </section>
+      </section>
 
       <!-- متن ثابت Admin Panel به جای سرچ -->
-      <div class="admin-title">Admin Panel</div>
+      <section class="admin-title">Admin Panel</section>
 
       <!-- دکمه پروفایل -->
       <button id="profileBtn" class="icon-inside" aria-label="profile">
         <img src="images/icons8-user-96.png" alt="user"/>
       </button>
-    </div>
+    </section>
 
     <!-- دکمه تغییر تم -->
     <button id="themeToggle" class="icon-btn" aria-label="toggle theme">
       <img src="images/icons8-moon.apng" alt="dark-mode"/>
     </button>
-  </div>
+  </section>
 </header>
 <main>
-  <div class="admin-tabs">
+  <section class="admin-tabs">
   <button class="tab-btn active" data-target="posts" type="button">
-    <div class="tab-circle">
+    <section class="tab-circle">
       <img src="images/icons8-share.apng" alt="posts">
-    </div>
+    </section>
   </button>
   <button class="tab-btn" data-target="messages" type="button">
-  <div class="tab-circle">
+  <section class="tab-circle">
     <img src="images/icons8-message.apng" alt="messages">
     <span id="adminMessagesBadge" class="badge" style="display:none;">!</span>
-  </div>
+  </section>
 </button>
   <button class="tab-btn" data-target="comments" type="button">
-    <div class="tab-circle">
+    <section class="tab-circle">
       <img src="images/icons8-comment.apng" alt="comments">
-    </div>
+    </section>
   </button>
   <button class="tab-btn" data-target="links" type="button">
-    <div class="tab-circle">
+    <section class="tab-circle">
       <img src="images/icons8-link.apng" alt="links">
-    </div>
+    </section>
   </button>
   <button class="tab-btn" data-target="analytics" type="button">
-  <div class="tab-circle">
+  <section class="tab-circle">
     <img src="images/icons8-combo-chart.apng" alt="analytics">
-  </div>
+  </section>
 </button>
 <button class="tab-btn" data-target="users" type="button">
-  <div class="tab-circle">
+  <section class="tab-circle">
     <img src="/images/icons8-users-48.png" alt="users">
-  </div>
+  </section>
 </button>
-</div>
+</section>
   <section id="adminProfile" class="admin-section">
     
 
@@ -121,19 +121,19 @@
   <input id="genre" type="text" placeholder="Genre (space-separated)" />
 <input type="hidden" id="mode" name="mode" value="single">
   <!-- دکمه‌های Collection / Serial -->
-  <div id="bundle-toggle" class="admin-form">
+  <section id="bundle-toggle" class="admin-form">
     <button type="button" id="btn-collection" class="admin-submit">Collection</button>
     <button type="button" id="btn-serial" class="admin-submit">Serial</button>
-  </div>
+  </section>
 
   <!-- کانتینر فرم‌های پویا -->
-  <div id="bundle-forms"></div>
+  <section id="bundle-forms"></section>
 
   <!-- دکمه‌های افزودن/حذف -->
-  <div id="bundle-actions" class="admin-form" hidden>
+  <section id="bundle-actions" class="admin-form" hidden>
     <button type="button" id="btn-add-item" class="admin-submit"></button>
     <button type="button" id="btn-remove-last" class="admin-submit danger"></button>
-  </div>
+  </section>
 
   <!-- دکمه ارسال -->
   <button type="submit" class="admin-submit">
@@ -151,7 +151,7 @@
         <textarea id="messageText" placeholder="Write a message..."></textarea>
         <button type="submit" class="admin-submit">Submit message <i class="bi bi-chat-dots"></i></button>
       </form>
-      <div id="messageList" class="message-list" aria-live="polite"></div>
+      <section id="messageList" class="message-list" aria-live="polite"></section>
 
     </section>
     
@@ -160,22 +160,22 @@
   <h2>پیام‌های کاربران</h2>
 
   <!-- گرید پروفایل‌ها -->
-  <div id="userThreadsGrid" class="user-threads-grid"></div>
+  <section id="userThreadsGrid" class="user-threads-grid"></section>
 
   <!-- پیجینیشن اختصاصی -->
-  <div id="userThreadsPagination" class="pagination-users"></div>
+  <section id="userThreadsPagination" class="pagination-users"></section>
 
   <!-- اوورلی نمایش گفت‌وگو -->
-  <div id="adminThreadOverlay" class="chat-overlay" aria-hidden="true">
-    <div class="chat-overlay-header">
+  <section id="adminThreadOverlay" class="chat-overlay" aria-hidden="true">
+    <section class="chat-overlay-header">
       <button id="adminThreadBackBtn" class="chat-back-btn" aria-label="back">&larr;</button>
       <img id="adminThreadAvatar" class="chat-admin-avatar" src="images/icons8-user-96.png" alt="user" />
-      <div id="adminThreadTitle" class="chat-overlay-title">گفت‌وگو</div>
-    </div>
+      <section id="adminThreadTitle" class="chat-overlay-title">گفت‌وگو</section>
+    </section>
 
-    <div id="adminThreadMessages" class="chat-messages-list"></div>
+    <section id="adminThreadMessages" class="chat-messages-list"></section>
 
-    <div class="chat-composer">
+    <section class="chat-composer">
       <button id="adminThreadAttachBtn" class="chat-icon-btn" aria-label="attach">
         <img src="images/icons8-pin-96.png" alt="attach" />
       </button>
@@ -184,13 +184,13 @@
       <button id="adminThreadSendBtn" class="chat-icon-btn disabled" aria-label="send">
         <img src="images/icons8-send-90.png" alt="send" />
       </button>
-    </div>
-  </div>
+    </section>
+  </section>
 </section>
 
     <section id="unapproved-comments-section" class="admin-section-item-3 admin-section-item">
       <h2>Unpublished Comments</h2>
-      <div id="unapprovedComments"></div>
+      <section id="unapprovedComments"></section>
     </section>
 
 
@@ -202,33 +202,33 @@
            <input id="socialUrl" type="text" placeholder="Link" required />
            <button type="submit" class="admin-submit">Add link</button>
         </form>
-        <div id="socialList" class="message-list"></div>
+        <section id="socialList" class="message-list"></section>
         
         
-        <div class="admin-section">
+        <section class="admin-section">
   <h3>App Version</h3>
   <input type="text" id="versionInput" placeholder="مثلاً 1.3.3">
   <button id="saveVersionBtn">Save</button>
-</div>
+</section>
     </section>
     
     <section class="released_movies admin-section-item-5 admin-section-item">
        <!-- admin search (after messages, before movie list) -->
-      <div class="admin-search-wrapper">
+      <section class="admin-search-wrapper">
         <h2>Search in released movies</h2>
         <input id="adminSearch" class="admin-search-input" type="text" placeholder="Search movies..." />
-      </div>
-      <div>
+      </section>
+      <section>
         <h2>Released Movies</h2>
         <!-- movie list -->
-        <div id="movieList" class="movie-list"></div>
-        <div id="admin-pagination" class="pagination-container"></div>
-      </div>
+        <section id="movieList" class="movie-list"></section>
+        <section id="admin-pagination" class="pagination-container"></section>
+      </section>
     </section>
     
   <section id="popular-movies-section" class="admin-section-item">
   <h2>فیلم‌های پرطرفدار</h2>
-  <div id="popularMoviesList" class="movie-list"></div>
+  <section id="popularMoviesList" class="movie-list"></section>
 </section>
     
   <section id="analytics" class="admin-section-item-6 admin-section-item" style="display:none;">
@@ -238,31 +238,31 @@
   <canvas id="visitsChart" height="120"></canvas>
 
   <h3>Top searches</h3>
-  <div id="topSearches"></div>
+  <section id="topSearches"></section>
 
   <h3>Top clicks</h3>
-  <div id="topClicks"></div>
+  <section id="topClicks"></section>
 </section>
 
 <section id="users" class="admin-section-item-7 admin-section-item" style="display:none;">
   <h2>Users & Admins</h2>
 
   <!-- Admins list -->
-  <div class="card grey-box" style="margin-bottom:20px;padding:10px;border-radius:8px;background:#f0f0f0;">
+  <section class="card grey-box" style="margin-bottom:20px;padding:10px;border-radius:8px;background:#f0f0f0;">
     <h3>Admins List</h3>
-    <div id="adminsContainer" class="white-box" style="background:#fff;padding:10px;border-radius:6px;"></div>
-  </div>
+    <section id="adminsContainer" class="white-box" style="background:#fff;padding:10px;border-radius:6px;"></section>
+  </section>
 
   <!-- Users list -->
-  <div class="card grey-box" style="padding:10px;border-radius:8px;background:#f0f0f0;">
+  <section class="card grey-box" style="padding:10px;border-radius:8px;background:#f0f0f0;">
     <h3>Users List</h3>
-    <div class="search-bar" style="display:flex;align-items:center;gap:8px;">
+    <section class="search-bar" style="display:flex;align-items:center;gap:8px;">
       <input type="text" id="userSearch" placeholder="Search..." style="flex:1;padding:6px;">
       <button id="clearSearch">✕</button>
-    </div>
-    <div id="usersContainer" class="white-box" style="background:#fff;padding:10px;border-radius:6px;margin-top:10px;"></div>
-    <div id="usersPagination" class="pagination-users"></div>
-  </div>
+    </section>
+    <section id="usersContainer" class="white-box" style="background:#fff;padding:10px;border-radius:6px;margin-top:10px;"></section>
+    <section id="usersPagination" class="pagination-users"></section>
+  </section>
 </section>
   </section>
 </main>

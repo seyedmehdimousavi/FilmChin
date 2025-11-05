@@ -2263,7 +2263,7 @@ body.dark .admin-tabs .tab-btn.active .tab-circle {
   justify-content: space-between;
   align-items: center;
 }
-.menu-section >div{
+.menu-section >section{
   width: 100%;
 }
 #linksHeader{
@@ -3538,6 +3538,7 @@ body.dark .chat-input-row input { background: #202020; color: #f1f1f1; border-co
 .chat-overlay {
 position: fixed;
   inset: 0;
+  top: 65px;
   z-index: 2147480000;
   backdrop-filter: blur(12px); background: rgba(0,0,0,0.45);
   grid-template-rows: auto 1fr auto;
