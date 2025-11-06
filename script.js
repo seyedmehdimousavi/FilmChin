@@ -4806,6 +4806,25 @@ async function pollAdminUnread() {
 setInterval(pollAdminUnread, 30000);
 pollAdminUnread();
 
+let lastScrollTop = 0;
+const header = document.querySelector('.main-header');
+const tabs   = document.querySelector('.movie-type-tabs');
+
+window.addEventListener('scroll', () => {
+  const st = window.pageYOffset || document.documentElement.scrollTop;
+
+  if (st > lastScrollTop && st > 100) {
+    // اسکرول به پایین → مخفی کن
+    header?.classList.add('hide');
+    tabs?.classList.add('hide');
+  } else if (st < lastScrollTop) {
+    // اسکرول به بالا → نمایش بده
+    header?.classList.remove('hide');
+    tabs?.classList.remove('hide');
+  }
+
+  lastScrollTop = st <= 0 ? 0 : st;
+}, { passive: true });
 // -------------------- Initial load --------------------
 // اینجا باید فراخوانی بشه
 if (document.querySelector('.admin-tabs .tab-btn')) {

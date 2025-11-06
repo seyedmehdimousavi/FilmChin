@@ -71,6 +71,7 @@ Body{
   Background:var(--bg-day);
   Color:#222;
   Transition:background .25s,color .25s;
+  margin-top: 170px;
 }
 A{
   Color:inherit;
@@ -3818,4 +3819,90 @@ body.dark .user-thread-snippet { color: #bbb; }
   display: flex;
     flex-direction: column;
     gap: 9px;
+}
+.main-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 120px;
+  backdrop-filter: blur(var(--blur));
+  background: rgba(255,255,255,0.55);
+  position: fixed; /* به جای sticky */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 12000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.main-header.hide {
+  transform: translateY(-100%);
+}
+
+.movie-type-tabs {
+  z-index: 900;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  white-space: nowrap;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  padding: 8px 16px;
+  backdrop-filter: blur(var(--blur));
+  width: 100%;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  position: fixed; /* به جای sticky */
+  top: 120px;       /* زیر هدر */
+  left: 0;
+  right: 0;
+  transition: transform 0.3s ease;
+}
+
+.movie-type-tabs.hide {
+  transform: translateY(-100%);
+}
+.main-header {
+  position: fixed; /* به جای sticky */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  z-index: 12000;
+  transition: transform 0.3s ease;
+}
+
+.main-header.hide {
+  transform: translateY(-100%);
+}
+
+.movie-type-tabs {
+  position: fixed; /* به جای sticky */
+  top: 120px;      /* دقیقا زیر هدر */
+  left: 0;
+  right: 0;
+  z-index: 900;
+  transition: transform 0.3s ease;
+}
+
+.movie-type-tabs.hide {
+  transform: translateY(-220px); /* هدر (120px) + تب‌ها (حدود 100px ارتفاع) */
+}
+.main-header {
+  transition: transform 0.3s ease; /* سرعت کمتر */
+}
+.main-header.hide {
+  transform: translateY(-100%);
+}
+
+.movie-type-tabs {
+  transition: transform 0.6s ease; /* سرعت بیشتر */
+}
+.movie-type-tabs.hide {
+  transform: translateY(-220px);
 }
