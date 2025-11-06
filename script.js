@@ -4494,6 +4494,7 @@ overlayAttachFile?.addEventListener('change', async (e) => {
   e.target.value = '';
 });
 
+
 async function sendChat({ text = null, image_url = null, overlay = false } = {}) {
   if (!currentUser) { showToast('ابتدا لاگین کنید'); return; }
   const tid = await ensureThread();
