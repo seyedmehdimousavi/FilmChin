@@ -115,7 +115,7 @@ currentUser = {
 function showToast(message, type = "success") {
   const c = document.getElementById("toast-container");
   if (!c) return;
-  const el = document.createElement("section");
+  const el = document.createElement("div");
   el.className = `toast ${type}`;
   el.textContent = message;
   c.appendChild(el);
@@ -485,11 +485,11 @@ function showUploadToast(message) {
   container.innerHTML = "";
 
 
-  const toast = document.createElement("section");
+  const toast = document.createElement("div");
   toast.className = "toast";
   toast.innerHTML = `
-    <section class="message">${message}</section>
-    <section class="progress-bar"><section class="progress-fill" style="width:0%"></section></section>
+    <div class="message">${message}</div>
+    <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
   `;
   container.appendChild(toast);
 }
@@ -593,7 +593,7 @@ function showToast(message) {
   try {
     let container = document.getElementById('topToastContainer');
     if (!container) {
-      container = document.createElement('section');
+      container = document.createElement('div');
       container.id = 'topToastContainer';
       container.style.position = 'fixed';
       container.style.top = '12px';
@@ -607,7 +607,7 @@ function showToast(message) {
       container.style.pointerEvents = 'none';
       document.body.appendChild(container);
     }
-    const toast = document.createElement('section');
+    const toast = document.createElement('div');
     toast.className = 'top-toast';
     toast.style.pointerEvents = 'auto';
     toast.style.maxWidth = 'min(920px, 95%)';
@@ -645,7 +645,7 @@ function showToast(message) {
 function showDialog({ message = '', type = 'alert', defaultValue = '' } = {}) {
   return new Promise((resolve) => {
     try {
-      const overlay = document.createElement('section');
+      const overlay = document.createElement('div');
       overlay.style.position = 'fixed';
       overlay.style.top = '0';
       overlay.style.left = '0';
@@ -656,7 +656,7 @@ function showDialog({ message = '', type = 'alert', defaultValue = '' } = {}) {
       overlay.style.alignItems = 'center';
       overlay.style.justifyContent = 'center';
       overlay.style.zIndex = '2147483646';
-      const box = document.createElement('section');
+      const box = document.createElement('div');
       box.style.background = '#fff';
       box.style.color = '#111';
       box.style.padding = '18px';
@@ -669,7 +669,7 @@ function showDialog({ message = '', type = 'alert', defaultValue = '' } = {}) {
       box.style.gap = '12px';
       box.setAttribute('role', 'dialog');
       box.setAttribute('aria-modal', 'true');
-      const msg = document.createElement('section');
+      const msg = document.createElement('div');
       msg.style.fontSize = '16px';
       msg.style.textAlign = 'center';
       msg.style.whiteSpace = 'pre-wrap';
@@ -689,7 +689,7 @@ function showDialog({ message = '', type = 'alert', defaultValue = '' } = {}) {
         box.appendChild(inputEl);
         setTimeout(() => inputEl && inputEl.focus(), 50);
       }
-      const btnRow = document.createElement('section');
+      const btnRow = document.createElement('div');
       btnRow.style.display = 'flex';
       btnRow.style.gap = '10px';
       btnRow.style.marginTop = '6px';
@@ -806,14 +806,14 @@ function renderStoriesForPage(pageItems) {
 
 
     return `
-      <section class="story" onclick="scrollToMovie(${idx})">
-        <section class="story-circle">
+      <div class="story" onclick="scrollToMovie(${idx})">
+        <div class="story-circle">
           <img src="${cover}" alt="${title}">
-        </section>
+        </div>
         <span class="story-title ${isLong ? 'scrolling' : ''}" title="${title}">
           ${titleHtml}
         </span>
-      </section>
+      </div>
     `;
   }).join('');
 }
@@ -877,17 +877,17 @@ function attachCommentsHandlers(card, movieId) {
 
   function renderComments(arr) {
     const latest = (arr || []).slice(-3).map(c => c.name || 'Guest');
-    if (avatarsEl) avatarsEl.innerHTML = latest.map(n => `<section class="avatar">${escapeHtml(initials(n))}</section>`).join('');
+    if (avatarsEl) avatarsEl.innerHTML = latest.map(n => `<div class="avatar">${escapeHtml(initials(n))}</div>`).join('');
     if (countEl) countEl.textContent = `${(arr || []).length} comments`;
     if (commentsList) {
       commentsList.innerHTML = (arr || []).map(c => `
-        <section class="comment-row">
-          <section class="comment-avatar">${escapeHtml(initials(c.name))}</section>
-          <section class="comment-body">
-            <section class="comment-meta"><strong>${escapeHtml(c.name)}</strong> · <span class="comment-time">${timeAgo(c.created_at)}</span></section>
-            <section class="comment-text-content">${escapeHtml(c.text)}</section>
-          </section>
-        </section>
+        <div class="comment-row">
+          <div class="comment-avatar">${escapeHtml(initials(c.name))}</div>
+          <div class="comment-body">
+            <div class="comment-meta"><strong>${escapeHtml(c.name)}</strong> · <span class="comment-time">${timeAgo(c.created_at)}</span></div>
+            <div class="comment-text-content">${escapeHtml(c.text)}</div>
+          </div>
+        </div>
       `).join('');
       setTimeout(() => { commentsList.scrollTop = commentsList.scrollHeight; }, 60);
     }
@@ -1106,27 +1106,27 @@ async function fetchEpisodes() {
     if (isMessageRead(m.id)) return;
 
 
-    const section = document.createElement('section');
-    section.className = 'message-bubble';
-    section.innerHTML = `
-      <section class="msg-header">
-        <section class="msg-avatar-wrapper">
+    const div = document.createElement('div');
+    div.className = 'message-bubble';
+    div.innerHTML = `
+      <div class="msg-header">
+        <div class="msg-avatar-wrapper">
           <img class="msg-avatar" src="images/Admin-logo.png" alt="admin">
           <img class="msg-icon" src="images/icons8-message.apng" alt="msg-icon">
-        </section>
-        <section class="msg-meta">
+        </div>
+        <div class="msg-meta">
           <span class="msg-title">Admin</span>
           <span class="msg-time">now</span>
-        </section>
-      </section>
-      <section class="msg-body">${escapeHtml(m.text)}</section>
+        </div>
+      </div>
+      <div class="msg-body">${escapeHtml(m.text)}</div>
       <button class="msg-close" aria-label="close message">Mark as Read</button>
     `;
-    section.querySelector('.msg-close').addEventListener('click', () => {
+    div.querySelector('.msg-close').addEventListener('click', () => {
       markMessageAsRead(m.id); // 👈 ذخیره در localStorage
-      section.remove();
+      div.remove();
     });
-    adminMessagesContainer.appendChild(section);
+    adminMessagesContainer.appendChild(div);
   });
 }
   // Genre grid
@@ -1138,16 +1138,16 @@ async function fetchEpisodes() {
   });
   genreGrid.innerHTML = '';
   [...genreSet].sort().forEach(g => {
-    const section = document.createElement('section');
-    section.className = 'genre-chip';
-    section.textContent = g;
+    const div = document.createElement('div');
+    div.className = 'genre-chip';
+    div.textContent = g;
 
 
     // 👇 این خط اضافه شد
-    section.setAttribute("dir", "auto");
+    div.setAttribute("dir", "auto");
 
 
-    section.onclick = () => {
+    div.onclick = () => {
       if (searchInput) {
         searchInput.value = g;
         searchInput.setAttribute("dir", "auto"); // 👈 برای سرچ هم درست نمایش داده بشه
@@ -1158,7 +1158,7 @@ async function fetchEpisodes() {
       document.getElementById('menuOverlay')?.classList.remove('active');
       document.body.classList.remove('no-scroll', 'menu-open');
     };
-    genreGrid.appendChild(section);
+    genreGrid.appendChild(div);
   });
 }
 
@@ -1464,7 +1464,7 @@ function buildTabGenres(filteredMovies = null) {
   // ساخت ژانرها
   container.innerHTML = '';
   finalGenres.forEach(([g, count]) => {
-    const chip = document.createElement('section');
+    const chip = document.createElement('div');
     chip.className = 'genre-chip';
     chip.textContent = g;
 
@@ -1614,7 +1614,7 @@ if (imdbMinRating !== null) {
     const release_info = escapeHtml(m.release_info || '-');
 
 
-    const card = document.createElement('section');
+    const card = document.createElement('div');
     card.classList.add('movie-card' , 'reveal');
     card.dataset.movieId = m.id;
 
@@ -1628,87 +1628,87 @@ if (imdbMinRating !== null) {
 
 
     card.innerHTML = `
-  <section class="cover-container anim-vertical">
-    <section class="cover-blur anim-vertical" style="background-image: url('${cover}');"></section>
+  <div class="cover-container anim-vertical">
+    <div class="cover-blur anim-vertical" style="background-image: url('${cover}');"></div>
     <img class="cover-image anim-vertical" src="${cover}" alt="${title}">
-  </section>
+  </div>
 
 
-  <section class="movie-info anim-vertical">
-    <section class="movie-title anim-left-right">
+  <div class="movie-info anim-vertical">
+    <div class="movie-title anim-left-right">
       <span class="movie-name anim-horizontal">${title}</span>
       ${badgeHtml}
-    </section>
+    </div>
 
 
     <span class="field-label anim-vertical"><img src="images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
-    <section class="field-quote anim-left-right synopsis-quote">
-      <section class="quote-text anim-horizontal">${synopsis}</section>
+    <div class="field-quote anim-left-right synopsis-quote">
+      <div class="quote-text anim-horizontal">${synopsis}</div>
       <button class="quote-toggle-btn">More</button>
-    </section>
+    </div>
 
 
     <span class="field-label anim-vertical"><img src="images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span>
-    <section class="field-quote anim-left-right">${director}</section>
+    <div class="field-quote anim-left-right">${director}</div>
 
 
     <span class="field-label anim-vertical"><img src="images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
-    <section class="field-quote anim-horizontal">
+    <div class="field-quote anim-horizontal">
       ${renderChips(m.product || '-')}
-    </section>
+    </div>
 
 
     <span class="field-label anim-vertical"><img src="images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
-    <section class="field-quote anim-left-right">${stars}</section>
+    <div class="field-quote anim-left-right">${stars}</div>
 
 
     <span class="field-label anim-vertical">
       <img src="images/icons8-imdb-48.png" class="imdb-bell" style="width:20px;height:20px;">
       IMDB:
     </span>
-    <section class="field-quote anim-left-right">
+    <div class="field-quote anim-left-right">
       <span class="chip imdb-chip anim-horizontal">${imdb}</span>
-    </section>
+    </div>
 
 
     <span class="field-label anim-vertical"><img src="images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span>
-    <section class="field-quote anim-left-right">${release_info}</section>
+    <div class="field-quote anim-left-right">${release_info}</div>
 
 
     <span class="field-label anim-vertical"><img src="images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span>
-    <section class="field-quote genre-grid anim-horizontal">${renderChips(m.genre || '-')}</section>
+    <div class="field-quote genre-grid anim-horizontal">${renderChips(m.genre || '-')}</div>
 
 
-    <section class="episodes-container anim-vertical" data-movie-id="${m.id}">
-      <section class="episodes-list anim-left-right"></sectiontiontiontion>
-    </section>
+    <div class="episodes-container anim-vertical" data-movie-id="${m.id}">
+      <div class="episodes-list anim-left-right"></div>
+    </div>
 
 
     <button class="go-btn anim-vertical" data-link="${escapeHtml(m.link || '#')}">Go to file</button>
 
 
-    <section class="comment-summary anim-horizontal">
-      <section class="avatars anim-vertical"></section>
-      <section class="comments-count">0 comments</section>
+    <div class="comment-summary anim-horizontal">
+      <div class="avatars anim-vertical"></div>
+      <div class="comments-count">0 comments</div>
       <button class="enter-comments"><img src="images/icons8-comment.apng" style="width:22px;height:22px;"></button>
-    </section>
+    </div>
 
 
-    <section class="comments-panel" aria-hidden="true">
-      <section class="comments-panel-inner">
-        <section class="comments-panel-header"><section class="comments-title">Comments</section></section>
-        <section class="comments-list"></section>
-        <section class="comment-input-row">
-          <section class="name-comments-close">
+    <div class="comments-panel" aria-hidden="true">
+      <div class="comments-panel-inner">
+        <div class="comments-panel-header"><div class="comments-title">Comments</div></div>
+        <div class="comments-list"></div>
+        <div class="comment-input-row">
+          <div class="name-comments-close">
             <input class="comment-name" placeholder="Your name" maxlength="60" />
             <button class="comments-close">&times;</button>
-          </section>
+          </div>
           <textarea class="comment-text" placeholder="Write a comment..." rows="2"></textarea>
           <button class="comment-send">Send</button>
-        </section>
-      </section>
-    </section>
-  </section>
+        </div>
+      </div>
+    </div>
+  </div>
 `;
 
 
@@ -1809,11 +1809,11 @@ await supabase.from("click_logs").insert([
           const titleText = escapeHtml(ep.title || '');
           const scrollable = titleText.length > 16 ? 'scrollable' : '';
           return `
-            <section class="episode-card ${idx === activeIndex ? 'active' : ''}" data-link="${ep.link}">
+            <div class="episode-card ${idx === activeIndex ? 'active' : ''}" data-link="${ep.link}">
               <img src="${escapeHtml(ep.cover || 'https://via.placeholder.com/120x80?text=No+Cover')}" 
                    alt="${titleText}" class="episode-cover ">
-              <section class="episode-title ${scrollable}"><span>${titleText}</span></section>
-            </section>
+              <div class="episode-title ${scrollable}"><span>${titleText}</span></div>
+            </div>
           `;
         }).join('');
   
@@ -2089,10 +2089,10 @@ function renderAdminMovieList(list = []) {
   movieList.innerHTML = '';
 
   list.forEach(m => {
-    const row = document.createElement('section');
+    const row = document.createElement('div');
     row.className = 'movie-item';
     row.innerHTML = `
-      <section class="movie-top">
+      <div class="movie-top">
         <!-- دکمه قلب -->
         <button class="popular-toggle" data-id="${m.id}" aria-label="toggle popular">
           <img src="images/${m.is_popular ? 'icons8-heart-50-fill.png' : 'icons8-heart-50.png'}" 
@@ -2100,23 +2100,23 @@ function renderAdminMovieList(list = []) {
         </button>
 
         <img class="movie-cover" src="${escapeHtml(m.cover || '')}" alt="${escapeHtml(m.title || '')}">
-        <section class="movie-info-admin">
-          <section class="movie-title-row">
+        <div class="movie-info-admin">
+          <div class="movie-title-row">
             <span class="movie-name">${escapeHtml(m.title || '')}</span>
             ${m.type && m.type !== 'single' 
               ? `<span class="badge-type ${m.type === 'collection' ? 'badge-collection' : 'badge-serial'}">
                    ${m.type === 'collection' ? 'Collection' : 'Series'}
                  </span>` 
               : ''}
-          </section>
-          <section class="toggle-comments" data-id="${m.id}">Comments <i class="bi bi-chevron-down"></i></section>
-        </section>
-        <section class="movie-actions">
+          </div>
+          <div class="toggle-comments" data-id="${m.id}">Comments <i class="bi bi-chevron-down"></i></div>
+        </div>
+        <div class="movie-actions">
           <button class="btn-edit"><i class="bi bi-pencil"></i> Edit</button>
           <button class="btn-delete"><i class="bi bi-trash"></i> Delete</button>
-        </section>
-      </section>
-      <section class="admin-comments-panel" id="comments-${m.id}" style="display:none;"></section>
+        </div>
+      </div>
+      <div class="admin-comments-panel" id="comments-${m.id}" style="display:none;"></div>
     `;
 
     // -------------------- Popular toggle (قلب) --------------------
@@ -2229,14 +2229,14 @@ function renderAdminMovieList(list = []) {
           panel.innerHTML = '<p>No comments found.</p>';
         } else {
           panel.innerHTML = data.map(c => `
-            <section class="admin-comment-row">
-              <section class="comment-avatar">${escapeHtml(initials(c.name))}</section>
-              <section class="admin-comment-body">
-                <section class="admin-comment-meta"><strong>${escapeHtml(c.name)}</strong> · ${new Date(c.created_at).toLocaleString()}</section>
-                <section class="admin-comment-text">${escapeHtml(c.text)}</section>
-              </section>
+            <div class="admin-comment-row">
+              <div class="comment-avatar">${escapeHtml(initials(c.name))}</div>
+              <div class="admin-comment-body">
+                <div class="admin-comment-meta"><strong>${escapeHtml(c.name)}</strong> · ${new Date(c.created_at).toLocaleString()}</div>
+                <div class="admin-comment-text">${escapeHtml(c.text)}</div>
+              </div>
               <button class="admin-comment-delete" data-id="${c.id}">Delete</button>
-            </section>
+            </div>
           `).join('');
           panel.querySelectorAll('.admin-comment-delete').forEach(btn => {
             btn.addEventListener('click', async () => {
@@ -2267,21 +2267,21 @@ function renderPopularMovies(list = []) {
   container.innerHTML = '';
 
   list.forEach(m => {
-    const row = document.createElement('section');
+    const row = document.createElement('div');
     row.className = 'movie-item';
     row.innerHTML = `
-      <section class="movie-top">
+      <div class="movie-top">
         <button class="popular-toggle" data-id="${m.id}" aria-label="toggle popular">
           <img src="images/${m.is_popular ? 'icons8-heart-50-fill.png' : 'icons8-heart-50.png'}" 
                alt="heart" class="heart-icon"/>
         </button>
         <img class="movie-cover" src="${escapeHtml(m.cover || '')}" alt="${escapeHtml(m.title || '')}">
-        <section class="movie-info-admin">
-          <section class="movie-title-row">
+        <div class="movie-info-admin">
+          <div class="movie-title-row">
             <span class="movie-name">${escapeHtml(m.title || '')}</span>
-          </section>
-        </section>
-      </section>
+          </div>
+        </div>
+      </div>
     `;
 
     // هندلر قلب
@@ -2370,7 +2370,7 @@ function renderPopularCarousel(list = []) {
   ];
 
   extended.forEach((m) => {
-    const item = document.createElement('section');
+    const item = document.createElement('div');
     item.className = 'carousel-item';
     item.innerHTML = `
       <img src="${escapeHtml(m.cover || '')}" alt="${escapeHtml(m.title || '')}">
@@ -2460,50 +2460,50 @@ function openMovieModal(m) {
       : '';
 
     return `
-      <section class="movie-card expanded">
-        <section class="cover-container">
-          <section class="cover-blur" style="background-image: url('${cover}');"></section>
+      <div class="movie-card expanded">
+        <div class="cover-container">
+          <div class="cover-blur" style="background-image: url('${cover}');"></div>
           <img class="cover-image" src="${cover}" alt="${title}">
-        </sectiontiontiontiontion>
+        </div>
 
-        <sectiontion class="movie-info">
-          <section class="movie-title">
+        <div class="movie-info">
+          <div class="movie-title">
             <span class="movie-name">${title}</span>
             ${badgeHtml}
-          </section>
+          </div>
 
           <span class="field-label">Synopsis:</span>
-          <section class="field-quote synopsis-quote">
-            <section class="quote-text">${synopsis}</section>
+          <div class="field-quote synopsis-quote">
+            <div class="quote-text">${synopsis}</div>
             <button class="quote-toggle-btn">More</button>
-          </section>
+          </div>
 
           <span class="field-label">Director:</span>
-          <section class="field-quote director-field">${director}</section>
+          <div class="field-quote director-field">${director}</div>
 
           <span class="field-label">Product:</span>
-          <section class="field-quote product-field">${renderChips(data.product || '-')}</section>
+          <div class="field-quote product-field">${renderChips(data.product || '-')}</div>
 
           <span class="field-label">Stars:</span>
-          <section class="field-quote stars-field">${stars}</section>
+          <div class="field-quote stars-field">${stars}</div>
 
           <span class="field-label">IMDB:</span>
-          <section class="field-quote"><span class="chip imdb-chip">${imdb}</span></section>
+          <div class="field-quote"><span class="chip imdb-chip">${imdb}</span></div>
 
           <span class="field-label">Release:</span>
-          <section class="field-quote release-field">${release_info}</section>
+          <div class="field-quote release-field">${release_info}</div>
 
           <span class="field-label">Genre:</span>
-          <section class="field-quote genre-grid">${renderChips(data.genre || '-')}</section>
+          <div class="field-quote genre-grid">${renderChips(data.genre || '-')}</div>
 
-          <section class="episodes-container" data-movie-id="${data.id}">
-            <section class="episodes-list"></section>
-          </section>
+          <div class="episodes-container" data-movie-id="${data.id}">
+            <div class="episodes-list"></div>
+          </div>
 
           <button class="go-btn" data-link="${escapeHtml(data.link || '#')}">Go to file</button>
           <button class="close-btn">بستن</button>
-        </section>
-      </section>
+        </div>
+      </div>
     `;
   }
 
@@ -2558,10 +2558,10 @@ function openMovieModal(m) {
       const allEpisodes = [{ ...m }, ...(eps || [])];
       const listEl = content.querySelector('.episodes-list');
       listEl.innerHTML = allEpisodes.map((ep, idx) => `
-        <section class="episode-card ${idx === 0 ? 'active' : ''}" data-idx="${idx}">
+        <div class="episode-card ${idx === 0 ? 'active' : ''}" data-idx="${idx}">
           <img src="${escapeHtml(ep.cover || m.cover)}" alt="${escapeHtml(ep.title)}">
-          <section class="episode-title">${escapeHtml(ep.title)}</section>
-        </section>
+          <div class="episode-title">${escapeHtml(ep.title)}</div>
+        </div>
       `).join('');
 
       // آپدیت badge-count
@@ -2790,7 +2790,7 @@ function renderEpisodeForms(eps = []) {
 
 
   eps.forEach((ep, idx) => {
-    const form = document.createElement('section');
+    const form = document.createElement('div');
     form.className = 'episode-form';
     form.innerHTML = `
       <h4>اپیزود ${idx + 1}</h4>
@@ -2863,14 +2863,14 @@ function renderEpisodeForms(eps = []) {
     function renderAdminMessages() {
       messageList.innerHTML = '';
       (messages || []).forEach(m => {
-        const el = document.createElement('section');
+        const el = document.createElement('div');
         el.className = 'message-item';
         el.innerHTML = `
           <span class="message-text">${escapeHtml(m.text)}</span>
-          <section class="message-actions">
+          <div class="message-actions">
             <button class="btn-edit" data-id="${m.id}"><i class="bi bi-pencil"></i> Edit</button>
             <button class="btn-delete" data-id="${m.id}"><i class="bi bi-trash"></i> Delete</button>
-          </section>
+          </div>
         `;
         messageList.appendChild(el);
       });
@@ -3004,7 +3004,7 @@ async function loadAnalytics() {
   const topSearchesEl = document.getElementById("topSearches");
   if (topSearchesEl) {
     topSearchesEl.innerHTML = (searches || []).map(row =>
-      `<section class="message-item"><span>${escapeHtml(row.query)}</span><span style="font-weight:bold;">${row.times}</span></section>`
+      `<div class="message-item"><span>${escapeHtml(row.query)}</span><span style="font-weight:bold;">${row.times}</span></div>`
     ).join("") || "<p>No searches yet.</p>";
   }
 
@@ -3012,7 +3012,7 @@ async function loadAnalytics() {
   const topClicksEl = document.getElementById("topClicks");
   if (topClicksEl) {
     topClicksEl.innerHTML = (clicks || []).map(row =>
-      `<section class="message-item"><span>${escapeHtml(row.title || 'Untitled')}</span><span style="font-weight:bold;">${row.clicks}</span></section>`
+      `<div class="message-item"><span>${escapeHtml(row.title || 'Untitled')}</span><span style="font-weight:bold;">${row.clicks}</span></div>`
     ).join("") || "<p>No clicks yet.</p>";
   }
 }
@@ -3184,17 +3184,17 @@ function renderUsersPagination(total) {
 // === Confirm Modal ===
 async function confirmDialog(message, { title = "Confirm", confirmText = "Confirm", cancelText = "Cancel" } = {}) {
   return new Promise(resolve => {
-    const overlay = document.createElement('section');
+    const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
-      <section class="modal-card">
+      <div class="modal-card">
         <h3 class="modal-title">${title}</h3>
         <p class="modal-message">${message}</p>
-        <section class="modal-actions">
+        <div class="modal-actions">
           <button class="btn btn-subtle" data-role="cancel">${cancelText}</button>
           <button class="btn btn-danger" data-role="ok">${confirmText}</button>
-        </section>
-      </section>`;
+        </div>
+      </div>`;
     document.body.appendChild(overlay);
 
     const cleanup = () => overlay.remove();
@@ -3209,17 +3209,17 @@ async function confirmDialog(message, { title = "Confirm", confirmText = "Confir
 // === Owner Password Modal ===
 async function passwordDialog({ title = "Owner confirmation", placeholder = "Owner password", confirmText = "Confirm", cancelText = "Cancel" } = {}) {
   return new Promise(resolve => {
-    const overlay = document.createElement('section');
+    const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
-      <section class="modal-card">
+      <div class="modal-card">
         <h3 class="modal-title">${title}</h3>
         <input type="password" class="modal-input" id="ownerConfirmInput" placeholder="${placeholder}" />
-        <section class="modal-actions">
+        <div class="modal-actions">
           <button class="btn btn-subtle" data-role="cancel">${cancelText}</button>
           <button class="btn btn-primary" data-role="ok">${confirmText}</button>
-        </section>
-      </section>`;
+        </div>
+      </div>`;
     document.body.appendChild(overlay);
 
     const input = overlay.querySelector('#ownerConfirmInput');
@@ -3797,13 +3797,13 @@ if (linksHeader) {
     const { data, error } = await supabase.from('social_links').select('*').order('created_at', { ascending: false });
     if (error) { console.error(error); return; }
     socialList.innerHTML = (data || []).map(s => `
-      <section class="message-item">
+      <div class="message-item">
         <span class="message-text">${escapeHtml(s.title)}</span>
-        <section class="message-actions">
+        <div class="message-actions">
           <button class="btn-edit" data-id="${s.id}"><i class="bi bi-pencil"></i> Edit</button>
           <button class="btn-delete" data-id="${s.id}"><i class="bi bi-trash"></i> Delete</button>
-        </section>
-      </section>
+        </div>
+      </div>
     `).join('');
   }
   if (addSocialForm) {
@@ -3896,9 +3896,9 @@ if (linksHeader) {
       }
     }
     function addCollectionForm() {
-      const section = document.createElement("section");
-      section.className = "admin-form bundle-item";
-      section.innerHTML = `
+      const div = document.createElement("div");
+      div.className = "admin-form bundle-item";
+      div.innerHTML = `
         <input type="text" placeholder="Title" />
         <input type="file" accept="image/*" />
         <input type="text" placeholder="File Link" />
@@ -3910,17 +3910,17 @@ if (linksHeader) {
         <input type="text" placeholder="Release Info" />
         <input type="text" placeholder="Genre (space-separated)" />
       `;
-      formsWrap.appendChild(section);
+      formsWrap.appendChild(div);
     }
     function addSerialForm() {
-      const section = document.createElement("section");
-      section.className = "admin-form bundle-item";
-      section.innerHTML = `
+      const div = document.createElement("div");
+      div.className = "admin-form bundle-item";
+      div.innerHTML = `
         <input type="text" placeholder="Title" />
         <input type="file" accept="image/*" />
         <input type="text" placeholder="Link" />
       `;
-      formsWrap.appendChild(section);
+      formsWrap.appendChild(div);
     }
     btnCollection.addEventListener("click", () => setMode("collection"));
     btnSerial.addEventListener("click", () => setMode("serial"));
@@ -3978,20 +3978,20 @@ function showUploadToast(message) {
   container.innerHTML = ""; // فقط یکی نشون بده
 
 
-  const toast = document.createElement("section");
+  const toast = document.createElement("div");
   toast.className = "toast";
 
 
-  const msg = document.createElement("section");
+  const msg = document.createElement("div");
   msg.className = "message";
   msg.textContent = message;
 
 
-  const progressBar = document.createElement("section");
+  const progressBar = document.createElement("div");
   progressBar.className = "progress-bar";
 
 
-  const progressFill = document.createElement("section");
+  const progressFill = document.createElement("div");
   progressFill.className = "progress-fill";
 
 
@@ -4237,10 +4237,10 @@ if (applyRatingFilterBtn) {
 
     if (imdbMinRating !== null) {
   activeFiltersContainer.innerHTML = `
-    <section class="filter-badge">
+    <div class="filter-badge">
       امتیاز ≥ ${imdbMinRating.toFixed(1)}
       <button id="btnClearRatingFilter" aria-label="Remove rating filter">×</button>
-    </section>
+    </div>
   `;
   document.getElementById("btnClearRatingFilter")
     .addEventListener("click", clearRatingFilter, { once: true });
@@ -4419,7 +4419,7 @@ function renderChatMessages(arr) {
   chatMessagesList.innerHTML = (arr || []).map(m => {
     const sideClass = m.role === 'user' ? 'user' : 'admin';
     const imageHtml = m.image_url ? `<img class="msg-image" src="${escapeHtml(m.image_url)}" alt="image">` : '';
-    const textHtml = m.text ? `<section class="msg-text">${escapeHtml(m.text)}</section>` : '';
+    const textHtml = m.text ? `<div class="msg-text">${escapeHtml(m.text)}</div>` : '';
     const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     // فقط برای پیام‌های ارسالی کاربر تیک داشته باشیم
@@ -4433,16 +4433,16 @@ function renderChatMessages(arr) {
     }
 
     return `
-      <section class="msg-row ${sideClass}">
-        <section class="msg-bubble ${sideClass}">
+      <div class="msg-row ${sideClass}">
+        <div class="msg-bubble ${sideClass}">
           ${imageHtml}
           ${textHtml}
-          <section class="msg-meta">
+          <div class="msg-meta">
             <span>${escapeHtml(time)}</span>
             ${tickIcon}
-          </section>
-        </section>
-      </section>
+          </div>
+        </div>
+      </div>
     `;
   }).join('');
   setTimeout(() => { chatMessagesList.scrollTop = chatMessagesList.scrollHeight; }, 60);
@@ -4493,7 +4493,6 @@ overlayAttachFile?.addEventListener('change', async (e) => {
   await sendChat({ image_url: url, overlay: true });
   e.target.value = '';
 });
-
 
 async function sendChat({ text = null, image_url = null, overlay = false } = {}) {
   if (!currentUser) { showToast('ابتدا لاگین کنید'); return; }
@@ -4613,12 +4612,12 @@ async function loadUserThreads(page = 1) {
       ? lastMsg[0].text
       : (lastMsg?.[0]?.image_url ? '[تصویر]' : '');
 
-    const card = document.createElement('section');
+    const card = document.createElement('div');
     card.className = 'user-thread-card';
     card.innerHTML = `
       <img src="${avatar}" alt="avatar">
-      <section class="user-thread-name">${user?.username || 'کاربر'}</section>
-      <section class="user-thread-snippet">${snippet || ''}</section>
+      <div class="user-thread-name">${user?.username || 'کاربر'}</div>
+      <div class="user-thread-snippet">${snippet || ''}</div>
       ${t.unread_for_admin ? '<span class="thread-badge">!</span>' : ''}
     `;
     card.addEventListener('click', () => openAdminThread(t.id, user, avatar));
@@ -4709,7 +4708,7 @@ async function loadAdminThreadMessages() {
   adminThreadMessages.innerHTML = (data || []).map(m => {
     const sideClass = m.role === 'admin' ? 'user' : 'admin'; // ادمین سمت راست (سبز)، کاربر سمت چپ (سفید)
     const imageHtml = m.image_url ? `<img class="msg-image" src="${m.image_url}" alt="image">` : '';
-    const textHtml = m.text ? `<section class="msg-text">${m.text}</section>` : '';
+    const textHtml = m.text ? `<div class="msg-text">${m.text}</div>` : '';
     const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     // فقط پیام‌های ارسالی ادمین تیک داشته باشن
@@ -4723,16 +4722,16 @@ async function loadAdminThreadMessages() {
     }
 
     return `
-      <section class="msg-row ${sideClass}">
-        <section class="msg-bubble ${sideClass}">
+      <div class="msg-row ${sideClass}">
+        <div class="msg-bubble ${sideClass}">
           ${imageHtml}
           ${textHtml}
-          <section class="msg-meta">
+          <div class="msg-meta">
             <span>${time}</span>
             ${tickIcon}
-          </section>
-        </section>
-      </section>
+          </div>
+        </div>
+      </div>
     `;
   }).join('');
 
@@ -4826,6 +4825,7 @@ window.addEventListener('scroll', () => {
 
   lastScrollTop = st <= 0 ? 0 : st;
 }, { passive: true });
+
 // -------------------- Initial load --------------------
 // اینجا باید فراخوانی بشه
 if (document.querySelector('.admin-tabs .tab-btn')) {
@@ -4847,7 +4847,7 @@ if (document.getElementById('unapprovedComments')) {
     const container = document.getElementById('unapprovedComments');
     if (!container) return;
     const ok = await enforceAdminGuard(); if (!ok) return;
-    container.innerHTML = '<section class="loading">Loading Comments…</section>';
+    container.innerHTML = '<div class="loading">Loading Comments…</div>';
     const { data, error } = await supabase.from('comments').select('*').eq('approved', false).order('created_at', { ascending: false });
     if (error) { console.error('error in loading comments:', error); container.innerHTML = '<p>error in loading comments</p>'; return; }
     if (!data || data.length === 0) { container.innerHTML = '<p>there is no unpublished comments</p>'; return; }
@@ -4856,18 +4856,18 @@ if (document.getElementById('unapprovedComments')) {
       const cover = movie?.cover || 'https://via.placeholder.com/80x100?text=No+Image';
       const title = movie?.title || '';
       return `
-        <section class="unapproved-bubble">
-          <section class="bubble-left"><img src="${escapeHtml(cover)}" alt="${escapeHtml(title)}" class="bubble-cover"></section>
-          <section class="bubble-center">
-            <section class="bubble-author">${escapeHtml(c.name)}</section>
-            <section class="bubble-text">${escapeHtml(c.text)}</section>
-            <section class="bubble-time">${c.created_at ? new Date(c.created_at).toLocaleString() : ''}</section>
-          </section>
-          <section class="bubble-right">
+        <div class="unapproved-bubble">
+          <div class="bubble-left"><img src="${escapeHtml(cover)}" alt="${escapeHtml(title)}" class="bubble-cover"></div>
+          <div class="bubble-center">
+            <div class="bubble-author">${escapeHtml(c.name)}</div>
+            <div class="bubble-text">${escapeHtml(c.text)}</div>
+            <div class="bubble-time">${c.created_at ? new Date(c.created_at).toLocaleString() : ''}</div>
+          </div>
+          <div class="bubble-right">
             <button class="btn-approve" data-id="${c.id}"><i class="bi bi-check2-circle"></i> Approve</button>
             <button class="btn-delete" data-id="${c.id}"><i class="bi bi-trash"></i> Delete</button>
-          </section>
-        </section>
+          </div>
+        </div>
       `;
     }).join('');
     container.addEventListener('click', async (e) => {

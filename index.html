@@ -15,36 +15,35 @@
 </head>
 <body class="index-body">
 <!-- Toast Container -->
-<section id="toast-container"></section>
+<div id="toast-container"></div>
 <!-- Active Filters Toast -->
-<section id="activeFilters" class="active-filters-toast"></section>
+<div id="activeFilters" class="active-filters-toast"></div>
 <!-- Header (sticky with blur) -->
-
 
 <header class="main-header">
   <!-- 🔹 بنر بالای سایت -->
-<section class="site-banner">
-  <section class="banner-content">
+<div class="site-banner">
+  <div class="banner-content">
     <span class="banner-logo">
       <img src="/images/banner-icon.png" alt="banner-logo" />
     </span>
     <span class="banner-text">filmchiin.ir</span>
-  </section>
-</section>
-<section class="header">
-<section class="search-bar">
+  </div>
+</div>
+<div class="header">
+<div class="search-bar">
   <button id="menuBtn" class="menu-btn" aria-label="menu">
     <img width="96" height="96" src="images/icons8-menu-64.png" alt="menu--v2" style="display:flex;align-items:center;"/>
   </button> 
   <!-- منوی پروفایل بعد از لاگین -->
-<section id="profileMenu" class="profile-menu hidden">
-  <section class="profile-bubble">
-    <section class="profile-username" id="profileUsername">UserName</section>
+<div id="profileMenu" class="profile-menu hidden">
+  <div class="profile-bubble">
+    <div class="profile-username" id="profileUsername">UserName</div>
     <button class="profile-edit">ویرایش مشخصات</button>
-    <hr class="profile-sectionider"/>
+    <hr class="profile-divider"/>
     <button id="logoutBtn" class="profile-logout">Logout</button>
-  </section>
-</section>
+  </div>
+</div>
 
 
   <input id="search" type="text" placeholder="Search..." dir="auto"/>
@@ -57,71 +56,71 @@
 
   <!-- دکمه close ساده (بدون کلاس icon-inside) -->
   <button id="searchCloseBtn" class="close-btn" style="display:none;" aria-label="close">✕</button>
-</section>
+</div>
     <button id="themeToggle" class="icon-btn" aria-label="toggle theme" style="display: flex;align-items: center;"><img src="images/icons8-moon.apng" alt="bright-moon"/></button>
-</section>
+</div>
     
 </header>
 
 <!-- side menu and overlay -->
-<section id="menuOverlay" class="menu-overlay"></section>
+<div id="menuOverlay" class="menu-overlay"></div>
 
 
 <nav id="sideMenu" class="side-menu" aria-hidden="true">
   
-  <section class="menu-section">
+  <div class="menu-section">
     
-     <section class="gs">
-        <section id="genreToggle" class="menu-toggle">
+     <div class="gs">
+        <div id="genreToggle" class="menu-toggle">
            <i class="bi bi-list"></i> Genres
-        </section>
-        <section id="genreSubmenu" class="submenu" style="display:none;">
-           <section id="genreGrid" class="genre-grid"></section>
-         </section>
-     </section>
-     <section class="sl">
-       <section id="linksHeader">
-         <section class="links-toggle" style="display: flex;align-items: center;">
+        </div>
+        <div id="genreSubmenu" class="submenu" style="display:none;">
+           <div id="genreGrid" class="genre-grid"></div>
+         </div>
+     </div>
+     <div class="sl">
+       <div id="linksHeader">
+         <div class="links-toggle" style="display: flex;align-items: center;">
            <i class="bi bi-link-45deg"></i> Links
-         </section>
+         </div>
            <i class="bi bi-chevron-down toggle-icon links-toggle"></i>
-       </section>
-        <section id="socialGrid" class="social-grid hidden"></section>
-  </section>
-  <section id="ratingFilter" class="rating-filter">
+       </div>
+        <div id="socialGrid" class="social-grid hidden"></div>
+  </div>
+  <div id="ratingFilter" class="rating-filter">
   <h4 class="rating-filter-title">Sort by imdb rating</h4>
 
-  <section class="rating-process-wrapper">
-    <section class="rating-min">0</section>
-    <section class="rating-track" id="ratingTrack" aria-hidden="false">
-      <section class="rating-track-fill" id="ratingFill"></section>
-      <section class="rating-knob" id="ratingKnob" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0">
-        <section class="rating-bubble" id="ratingBubble" aria-hidden="true">
+  <div class="rating-process-wrapper">
+    <div class="rating-min">0</div>
+    <div class="rating-track" id="ratingTrack" aria-hidden="false">
+      <div class="rating-track-fill" id="ratingFill"></div>
+      <div class="rating-knob" id="ratingKnob" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0">
+        <div class="rating-bubble" id="ratingBubble" aria-hidden="true">
           Rating &gt; <span id="ratingBubbleValue">0.0</span>
-        </section>
-      </section>
-    </section>
-    <section class="rating-max">10</section>
-  </section>
+        </div>
+      </div>
+    </div>
+    <div class="rating-max">10</div>
+  </div>
 
-  <section class="rating-controls">
+  <div class="rating-controls">
     <button id="applyRatingFilter" class="btn small">Apply</button>
-  </section>
-</section>
-</section>
+  </div>
+</div>
+</div>
 
 <section class="side-menu-bottom">
   <!-- Message to admin bubble -->
-<section id="chatBubble" class="chat-bubble">
-  <section class="chat-bubble-header">
+<div id="chatBubble" class="chat-bubble">
+  <div class="chat-bubble-header">
     <span class="chat-bubble-title">پیام به ادمین</span>
     <span id="chatBubbleBadge" class="badge" style="display:none;">!</span>
-  </section>
+  </div>
 
   <!-- ردیف جمع‌شده (کالپس) -->
-  <section class="chat-input-row" id="chatInputRow">
+  <div class="chat-input-row" id="chatInputRow">
     <input id="chatInput" type="text" placeholder="پیام به ادمین" />
-    <section class="chat-actions">
+    <div class="chat-actions">
       <button id="chatAttachBtn" class="chat-icon-btn" aria-label="attach">
         <img src="images/icons8-attach-60.png" alt="attach" />
       </button>
@@ -129,23 +128,22 @@
       <button id="chatSendBtn" class="chat-icon-btn disabled" aria-label="send">
         <img src="images/icons8-send-90.png" alt="send" />
       </button>
-    </section>
-  </section>
+    </div>
+  </div>
 
   <!-- نمای تمام‌صفحه در سایدمنو -->
-  <section id="chatOverlay" class="chat-overlay" aria-hidden="true">
-    <section class="chat-overlay-header">
+  <div id="chatOverlay" class="chat-overlay" aria-hidden="true">
+    <div class="chat-overlay-header">
       <button id="userChatBackBtn" class="chat-back-btn" aria-label="back">close</button>
       <img id="chatAdminAvatar" class="chat-admin-avatar" src="images/Admin-logo.png" alt="admin" />
-      <section class="chat-overlay-title">پیام به ادمین</section>
-    </section>
+      <div class="chat-overlay-title">پیام به ادمین</div>
+    </div>
 
-    <section id="chatMessagesList" class="chat-messages-list"></section>
+    <div id="chatMessagesList" class="chat-messages-list"></div>
 
     <!-- کامپوزر پایین -->
-    <section class="chat-composer">
-      
-      <input id="overlayInput" type="text" placeholder="بنویس..." />
+    <div class="chat-composer">
+            <input id="overlayInput" type="text" placeholder="بنویس..." />
       <button id="overlayAttachBtn" class="chat-icon-btn" aria-label="attach">
         <img src="images/icons8-attach-60.png" alt="attach" />
       </button>
@@ -153,17 +151,17 @@
       <button id="overlaySendBtn" class="chat-icon-btn disabled" aria-label="send">
         <img src="images/icons8-send-90.png" alt="send" />
       </button>
-    </section>
-  </section>
-</section>
+    </div>
+  </div>
+</div>
 
-<section class="designer-credit">
+<div class="designer-credit">
   Design :
-  <section style="display: flex;align-items: center; justify-content: space-between; gap: 4px;">
+  <div style="display: flex;align-items: center; justify-content: space-between; gap: 4px;">
     <a href="tg://resolve?domain=SeyedMahdiMousavi" target="_blank" class="designer-bubble">Mehdi</a>
-  <section id="appVersion" class="genre-chip version-chip">v1.0.0</section>
-  </section>
-</section>
+  <div id="appVersion" class="genre-chip version-chip">v1.0.0</div>
+  </div>
+</div>
 </section>
 
 </nav>
@@ -175,51 +173,51 @@
   <button data-type="series">Series <span class="count">0</span></button>
   <button data-type="single">Single Films <span class="count">0</span></button>
 </section>
-<section class="tab-genres-wrapper">
-  <section class="tab-genres-list"></section>
-</section>
+<div class="tab-genres-wrapper">
+  <div class="tab-genres-list"></div>
+</div>
 
 <!-- main container -->
-<section class="container">
+<div class="container">
   <!-- admin messages (bubbles above movies) -->
-  <section id="adminMessages" class="messages-container" aria-live="polite"></section>
+  <div id="adminMessages" class="messages-container" aria-live="polite"></div>
  
   
   <section id="popular-carousel" class="popular-section">
   <h2>فیلم‌های پرطرفدار</h2>
-  <section class="carousel-container">
+  <div class="carousel-container">
     <button class="carousel-btn prev"><img src="images/icons8-back-to-64.png" alt="prev button" /></button>
-    <section class="carousel-window">
-      <section class="carousel-track"></section>
-    </section>
+    <div class="carousel-window">
+      <div class="carousel-track"></div>
+    </div>
     <button class="carousel-btn next"><img src="images/icons8-next-page-64.png" alt="next button" /></button>
-  </section>
-  <section class="carousel-bg"></section>
+  </div>
+  <div class="carousel-bg"></div>
 </section>
 
 <!-- مودال اطلاعات بیشتر -->
-<section id="movie-modal" class="movie-modal">
-  <section class="movie-modal-content"></section>
-</section>
+<div id="movie-modal" class="movie-modal">
+  <div class="movie-modal-content"></div>
+</div>
 
   <!-- movies count -->
-  <section id="movieCount" class="movie-count">Number of movies: 0</section>
+  <div id="movieCount" class="movie-count">Number of movies: 0</div>
   
   <!-- movies grid -->
-  <section id="moviesGrid" class="movies-grid" role="list"></section>
+  <div id="moviesGrid" class="movies-grid" role="list"></div>
 
   <!-- pagination -->
-  <section id="pagination" class="pagination-container" aria-label="pagination"></section>
-</section>
+  <div id="pagination" class="pagination-container" aria-label="pagination"></div>
+</div>
 
 <!-- Auth Modal -->
-<section id="authModal" class="login-modal" aria-hidden="true">
-  <section class="login-box">
+<div id="authModal" class="login-modal" aria-hidden="true">
+  <div class="login-box">
     <!-- تب‌ها -->
-    <section class="auth-tabs">
+    <div class="auth-tabs">
       <button class="tab-btn active" data-tab="login">Login</button>
       <button class="tab-btn" data-tab="signup">Sign Up</button>
-    </section>
+    </div>
 
     <!-- فرم لاگین -->
     <form id="loginForm" class="tab-content active" data-tab="login">
@@ -231,43 +229,43 @@
     <!-- فرم ثبت‌نام دو مرحله‌ای -->
     <form id="signupForm" class="tab-content" data-tab="signup" enctype="multipart/form-data">
       <!-- مرحله ۱ -->
-      <section id="signupStep1" class="fade-step active-step">
+      <div id="signupStep1" class="fade-step active-step">
         <input type="email" id="signupEmail" placeholder="Gmail" required />
         <input type="text" id="signupUsername" placeholder="Username" required />
         <input type="password" id="signupPassword" placeholder="Password" required />
-      </section>
+      </div>
 
       <!-- مرحله ۲ -->
-      <section id="signupStep2" class="fade-step" style="display:none;">
+      <div id="signupStep2" class="fade-step" style="display:none;">
         <input type="file" id="signupAvatar" accept="image/*" required />
         <small style="font-size:12px;color:#888;">حداکثر حجم عکس: 500KB</small>
-      </section>
+      </div>
 
       <button type="button" id="signupNextBtn" class="login-btn signup-next-btn">
   <img src="/images/icons8-next.apng" alt="next" id="signupNextIcon" style="height:22px;vertical-align:middle;">
   <span id="signupBtnText"></span>
 </button>
     </form>
-  </section>
-</section>
+  </div>
+</div>
 
 
 <!-- کانتینر شناور -->
-<section class="floating-wrapper">
+<div class="floating-wrapper">
   <!-- پنل استوری‌ها -->
-  <section id="storyPanel" class="story-panel" aria-hidden="true">
-    <section class="stories" role="list"></section>
+  <div id="storyPanel" class="story-panel" aria-hidden="true">
+    <div class="stories" role="list"></div>
     <button class="go-pagination" type="button">
       go to pagination 
       <img src="images/icons8-double-down.apng" alt="down" style="width:16px;height:16px;vertical-align:middle;"/>
     </button>
-  </section>
+  </div>
 
   <!-- دکمه شناور -->
-  <section id="storyToggle" class="floating-btn" aria-label="toggle stories">
+  <div id="storyToggle" class="floating-btn" aria-label="toggle stories">
     <img id="storyToggleIcon" src="images/icons8-double-left.apng" alt="toggle"/>
-  </section>
-</section>
+  </div>
+</div>
 <!-- script (app logic) -->
 <script src="script.js"></script>
 </body>
