@@ -779,15 +779,13 @@ const storyToggleIcon = document.getElementById('storyToggleIcon');
 const storiesContainer = storyPanel?.querySelector('.stories');
 const goPaginationBtn = storyPanel?.querySelector('.go-pagination');
 
-
-// Toggle panel and rotate icon (keep same icon source)
+// Toggle panel and rotate icon
 if (storyToggle && storyPanel && storyToggleIcon) {
   storyToggle.addEventListener('click', () => {
     const isOpen = storyPanel.classList.toggle('open');
     storyToggle.classList.toggle('open', isOpen); // rotation via CSS
   });
 }
-
 
 // Fill stories for current page
 function renderStoriesForPage(pageItems) {
@@ -797,13 +795,11 @@ function renderStoriesForPage(pageItems) {
     const title = escapeHtml(rawTitle);
     const cover = escapeHtml(m.cover || 'https://via.placeholder.com/80');
 
-
     // شرط: اگر طول عنوان بیشتر از 14 کاراکتر بود → انیمیشن بخوره
     const isLong = rawTitle.length > 14;
     const titleHtml = isLong
-      ? `<span>${title}</span>`   // داخل span برای انیمیشن
+      ? `<span>${title}</span>` // داخل span برای انیمیشن
       : title;
-
 
     return `
       <div class="story" onclick="scrollToMovie(${idx})">
@@ -818,7 +814,6 @@ function renderStoriesForPage(pageItems) {
   }).join('');
 }
 
-
 // Scroll to card
 function scrollToMovie(index) {
   const cards = document.querySelectorAll('.movie-card');
@@ -827,12 +822,17 @@ function scrollToMovie(index) {
   }
 }
 
-
-// Go to pagination
+// Go to pagination + close panel
 goPaginationBtn?.addEventListener('click', () => {
+  // 1️⃣ اسکرول به pagination
   document.getElementById('pagination')?.scrollIntoView({ behavior: 'smooth' });
-});
 
+  // 2️⃣ بستن پنل در صورت باز بودن
+  if (storyPanel.classList.contains('open')) {
+    storyPanel.classList.remove('open');
+    storyToggle.classList.remove('open'); // هماهنگی با دکمه شناور
+  }
+});
 
 // Helper to escape HTML
 function escapeHtml(text) {
@@ -1344,56 +1344,89 @@ document.querySelectorAll(".movie-type-tabs button").forEach(btn => {
 
 
 // -------------------- تشخیص جهت اسکرول --------------------
+
 let lastScrollY = window.scrollY;
 let scrollDirection = 'down';
-
 
 window.addEventListener('scroll', () => {
   scrollDirection = window.scrollY > lastScrollY ? 'down' : 'up';
   lastScrollY = window.scrollY;
 });
 
+const observerOptions = {
+  threshold: [0, 0.01, 0.1, 0.5],
+  rootMargin: '0px 0px 0px 0px'
+};
 
-function handleAnimIntersection(entries) {
+function animCallback(entries) {
   entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      if (scrollDirection === 'down') {
-        entry.target.classList.add('active-down');
-        entry.target.classList.remove('active-up');
+    const el = entry.target;
+    const r = entry.intersectionRatio;
+    // initialize previousY if missing
+    if (!el.dataset.prevY) el.dataset.prevY = entry.boundingClientRect.top;
+    const prevY = parseFloat(el.dataset.prevY);
+    const curY = entry.boundingClientRect.top;
+    const direction = curY < prevY ? 'down' : 'up';
+    el.dataset.prevY = curY;
+
+    // current state: hidden / visible
+    const state = el.dataset.animState || 'hidden';
+
+    // Hysteresis: only add visible state when ratio is comfortably above threshold
+    if (r > 0 && state !== 'visible') {
+      // choose class based on direction when the element became visible
+      if (direction === 'down') {
+        el.classList.add('active-down');
+        el.classList.remove('active-up');
       } else {
-        entry.target.classList.add('active-up');
-        entry.target.classList.remove('active-down');
+        el.classList.add('active-up');
+        el.classList.remove('active-down');
       }
-    } else {
-      entry.target.classList.remove('active-down', 'active-up');
+      el.dataset.animState = 'visible';
+    }
+
+    // Only remove visible state when ratio falls well below threshold
+    if (r <= 0.08 && state === 'visible') {
+      el.classList.remove('active-down', 'active-up');
+      el.dataset.animState = 'hidden';
     }
   });
 }
 
-
-const animObserver = new IntersectionObserver(handleAnimIntersection, { threshold: 0.1 });
-function handleCardIntersection(entries) {
+function cardCallback(entries) {
   entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      // وقتی کارت وارد صفحه شد
-      if (scrollDirection === 'down') {
-        entry.target.classList.add('active-down');
-        entry.target.classList.remove('active-up');
+    const el = entry.target;
+    const r = entry.intersectionRatio;
+    if (!el.dataset.prevY) el.dataset.prevY = entry.boundingClientRect.top;
+    const prevY = parseFloat(el.dataset.prevY);
+    const curY = entry.boundingClientRect.top;
+    const direction = curY < prevY ? 'down' : 'up';
+    el.dataset.prevY = curY;
+
+    const state = el.dataset.cardState || 'hidden';
+
+    if (r > 0 && state !== 'visible') {
+      if (direction === 'down') {
+        el.classList.add('active-down');
+        el.classList.remove('active-up');
       } else {
-        entry.target.classList.add('active-up');
-        entry.target.classList.remove('active-down');
+        el.classList.add('active-up');
+        el.classList.remove('active-down');
       }
-    } else {
-      // وقتی کارت از صفحه خارج شد
-      entry.target.classList.remove('active-down', 'active-up');
+      el.dataset.cardState = 'visible';
+    }
+
+    if (r <= 0.05 && state === 'visible') {
+      el.classList.remove('active-down', 'active-up');
+      el.dataset.cardState = 'hidden';
     }
   });
 }
 
+const animObserver = new IntersectionObserver(animCallback, observerOptions);
+const cardObserver = new IntersectionObserver(cardCallback, observerOptions);
 
-const cardObserver = new IntersectionObserver(handleCardIntersection, {
-  threshold: 0.1
-});
+
 // -------------------- Render movies (paged) --------------------
 // متغیر سراسری برای ژانر انتخاب‌شده
 let currentTabGenre = null;

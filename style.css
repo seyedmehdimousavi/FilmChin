@@ -3905,3 +3905,22 @@ body.dark .user-thread-snippet { color: #bbb; }
 .movie-type-tabs.hide {
   transform: translateY(-220px);
 }
+.movie-card,
+.movie-card .anim-horizontal,
+.movie-card .anim-vertical,
+.movie-card .anim-left-right {
+  will-change: transform, opacity;
+  transition: transform 300ms ease, opacity 300ms ease;
+}
+
+/* وقتی active-down */
+.movie-card.active-down { opacity: 1; transform: translateY(0); }
+.movie-card.active-up   { opacity: 1; transform: translateY(0); }
+
+/* حالت اولیه (مخفی) مثال از پایین */
+.movie-card { opacity: 0; transform: translateY(40px); }
+.movie-card.active-down,
+.movie-card.active-up {
+  opacity: 1;
+  transform: translateY(0);
+}
