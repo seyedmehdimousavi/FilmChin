@@ -4859,6 +4859,23 @@ window.addEventListener('scroll', () => {
   lastScrollTop = st <= 0 ? 0 : st;
 }, { passive: true });
 
+const goTopBtn = document.getElementById("goTopBtn");
+
+if (goTopBtn) {
+  goTopBtn.addEventListener("click", () => {
+    // اسکرول نرم به بالای صفحه
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // اضافه کردن کلاس active برای انیمیشن
+    goTopBtn.classList.add("active");
+
+    // بعد از 1 ثانیه حذف کلاس active
+    setTimeout(() => {
+      goTopBtn.classList.remove("active");
+    }, 1000);
+  });
+}
+
 // -------------------- Initial load --------------------
 // اینجا باید فراخوانی بشه
 if (document.querySelector('.admin-tabs .tab-btn')) {
