@@ -3925,6 +3925,13 @@ body.dark .user-thread-snippet { color: #bbb; }
   transform: translateY(0);
 }
 
+.movie-card.no-reveal,
+#movie-modal .movie-card {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+  will-change: auto;
+}
 
 .go-top-button {
   width: 50px;

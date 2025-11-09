@@ -2493,7 +2493,7 @@ function openMovieModal(m) {
       : '';
 
     return `
-      <div class="movie-card expanded">
+      <div class="movie-card expanded no-reveal">
         <div class="cover-container">
           <div class="cover-blur" style="background-image: url('${cover}');"></div>
           <img class="cover-image" src="${cover}" alt="${title}">
