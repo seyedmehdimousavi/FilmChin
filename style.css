@@ -3964,7 +3964,6 @@ body.dark .user-thread-snippet { color: #bbb; }
 }
 
 .go-top-button.active .svgIcon {
-  /* width: 20px; */
   transition-duration: 0.3s;
   transform: translateY(-200%);
 }
@@ -3974,7 +3973,6 @@ body.dark .user-thread-snippet { color: #bbb; }
   bottom: -20px;
   content: "Back to Top";
   color: white;
-  /* transition-duration: .3s; */
   font-size: 0px;
 }
 
@@ -3982,6 +3980,5 @@ body.dark .user-thread-snippet { color: #bbb; }
   font-size: 13px;
   opacity: 1;
   bottom: unset;
-  /* transform: translateY(-30px); */
   transition-duration: 0.3s;
 }

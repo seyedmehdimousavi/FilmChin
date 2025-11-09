@@ -3791,29 +3791,27 @@ if (!currentUser || !['owner','admin'].includes(currentUser.role)) {
 }
 
 
-  // -------------------- Social links --------------------
-  async function fetchSocialLinks() {
-    try {
-      const { data, error } = await supabase.from('social_links').select('*').order('created_at', { ascending: false });
-      if (error) { console.error('fetch social links error', error); return; }
-      const grid = document.getElementById('socialGrid');
-      if (!grid) return;
-      grid.innerHTML = (data || []).map(s => `
-        <a href="${escapeHtml(s.url)}" target="_blank" rel="noopener" class="social-item">
-          <img src="${escapeHtml(s.icon)}" alt="${escapeHtml(s.title)}">
-          <span>${escapeHtml(s.title)}</span>
-        </a>
-      `).join('');
-    } catch (err) { console.error('fetchSocialLinks exception', err); }
-  }
-  const linksHeader = document.getElementById('linksHeader');
+// -------------------- Social links --------------------
+async function fetchSocialLinks() {
+  try {
+    const { data, error } = await supabase.from('social_links').select('*').order('created_at', { ascending: false });
+    if (error) { console.error('fetch social links error', error); return; }
+    const grid = document.getElementById('socialGrid');
+    if (!grid) return;
+    grid.innerHTML = (data || []).map(s => `
+      <a href="${escapeHtml(s.url)}" target="_blank" rel="noopener" class="social-item">
+        <img src="${escapeHtml(s.icon)}" alt="${escapeHtml(s.title)}">
+        <span>${escapeHtml(s.title)}</span>
+      </a>
+    `).join('');
+  } catch (err) { console.error('fetchSocialLinks exception', err); }
+}
+
+const linksHeader = document.getElementById('linksHeader');
 if (linksHeader) {
   linksHeader.addEventListener('click', () => {
     const grid = document.getElementById('socialGrid');
     grid.classList.toggle('hidden');
-
-
-    // تغییر آیکون فلش
     const icon = linksHeader.querySelector('.toggle-icon');
     if (grid.classList.contains('hidden')) {
       icon.classList.remove('bi-chevron-up');
@@ -3824,62 +3822,115 @@ if (linksHeader) {
     }
   });
 }
-  const addSocialForm = document.getElementById('addSocialForm');
-  const socialList = document.getElementById('socialList');
-  async function fetchAdminSocialLinks() {
-    const { data, error } = await supabase.from('social_links').select('*').order('created_at', { ascending: false });
-    if (error) { console.error(error); return; }
-    socialList.innerHTML = (data || []).map(s => `
-      <div class="message-item">
-        <span class="message-text">${escapeHtml(s.title)}</span>
-        <div class="message-actions">
-          <button class="btn-edit" data-id="${s.id}"><i class="bi bi-pencil"></i> Edit</button>
-          <button class="btn-delete" data-id="${s.id}"><i class="bi bi-trash"></i> Delete</button>
-        </div>
+
+const addSocialForm = document.getElementById('addSocialForm');
+const socialList = document.getElementById('socialList');
+let editingSocialId = null;
+
+async function fetchAdminSocialLinks() {
+  const { data, error } = await supabase.from('social_links').select('*').order('created_at', { ascending: false });
+  if (error) { console.error(error); return; }
+  socialList.innerHTML = (data || []).map(s => `
+    <div class="message-item">
+      <span class="message-text">${escapeHtml(s.title)}</span>
+      <div class="message-actions">
+        <button class="btn-edit" data-id="${s.id}"><i class="bi bi-pencil"></i> Edit</button>
+        <button class="btn-delete" data-id="${s.id}"><i class="bi bi-trash"></i> Delete</button>
       </div>
-    `).join('');
-  }
-  if (addSocialForm) {
-    addSocialForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const title = document.getElementById('socialTitle').value.trim();
-      const url = document.getElementById('socialUrl').value.trim();
-      const file = document.getElementById('socialIcon')?.files?.[0];
-      if (!title || !url) { showToast('Title and link are required.'); return; }
-      let iconUrl = '';
-      if (file) {
-        const filename = `social/${Date.now()}_${file.name}`;
-        const { data: upData, error: upErr } = await supabase.storage.from('covers').upload(filename, file, { upsert: true });
-        if (upErr) { showToast('Error uploading icon'); return; }
-        const { data: publicUrl } = supabase.storage.from('covers').getPublicUrl(upData.path);
-        iconUrl = publicUrl.publicUrl;
-      }
-      const { error } = await supabase.from('social_links').insert([{ title, url, icon: iconUrl }]);
-      if (error) { console.error(error); showToast('Error adding link'); }
-      else { addSocialForm.reset(); await fetchAdminSocialLinks(); await fetchSocialLinks(); showToast('Link added.'); }
-    });
-    socialList.addEventListener('click', async (e) => {
-      const btn = e.target.closest('button'); if (!btn) return;
-      const id = btn.dataset.id; if (!id) return;
-      if (btn.classList.contains('btn-delete')) {
-        const ok = await showDialog({ message: 'Should it be deleted?', type: 'confirm' });
-        if (!ok) return;
-        const { error } = await supabase.from('social_links').delete().eq('id', id);
-        if (error) showToast('An error occurred while deleting.');
-        else { await fetchAdminSocialLinks(); await fetchSocialLinks(); }
-      }
-      if (btn.classList.contains('btn-edit')) {
-        const newTitle = await showDialog({ message: 'New title:', type: 'prompt', defaultValue: '' });
-        if (newTitle === null) return;
-        const { error } = await supabase.from('social_links').update({ title: newTitle }).eq('id', id);
-        if (error) showToast('Error editing');
-        else { await fetchAdminSocialLinks(); await fetchSocialLinks(); }
-      }
-    });
-    fetchAdminSocialLinks();
-  }
+    </div>
+  `).join('');
+}
 
+if (addSocialForm) {
+  addSocialForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
+    const titleEl = document.getElementById('socialTitle');
+    const urlEl = document.getElementById('socialUrl');
+    const iconEl = document.getElementById('socialIcon');
+    const title = titleEl.value.trim();
+    const url = urlEl.value.trim();
+
+    if (!title || !url) {
+      showToast('Title and link are required.');
+      return;
+    }
+
+    let iconUrl = null;
+    if (iconEl.files && iconEl.files[0]) {
+      const file = iconEl.files[0];
+      const filename = `social/${Date.now()}_${file.name}`;
+      const { data: upData, error: upErr } = await supabase.storage.from('covers').upload(filename, file, { upsert: true });
+      if (upErr) { showToast('Error uploading icon'); return; }
+      const { data: publicUrl } = supabase.storage.from('covers').getPublicUrl(upData.path);
+      iconUrl = publicUrl.publicUrl;
+    }
+
+    try {
+      if (editingSocialId) {
+        // update
+        const payload = { title, url };
+        if (iconUrl) payload.icon = iconUrl;
+        const { error } = await supabase.from('social_links').update(payload).eq('id', editingSocialId);
+        if (error) throw error;
+        showToast('Link updated.');
+        editingSocialId = null;
+        addSocialForm.querySelector('.admin-submit').textContent = 'Add link';
+      } else {
+        // insert
+        const { error } = await supabase.from('social_links').insert([{ title, url, icon: iconUrl }]);
+        if (error) throw error;
+        showToast('Link added.');
+      }
+
+      addSocialForm.reset();
+      await fetchAdminSocialLinks();
+      await fetchSocialLinks();
+    } catch (err) {
+      console.error(err);
+      showToast('An error occurred.');
+    }
+  });
+
+  socialList.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    if (!id) return;
+
+    if (btn.classList.contains('btn-delete')) {
+      const ok = await showDialog({ message: 'Delete this link?', type: 'confirm' });
+      if (!ok) return;
+      const { error } = await supabase.from('social_links').delete().eq('id', id);
+      if (error) showToast('Error deleting');
+      else { await fetchAdminSocialLinks(); await fetchSocialLinks(); }
+      return;
+    }
+
+    if (btn.classList.contains('btn-edit')) {
+      const { data, error } = await supabase.from('social_links').select('*').eq('id', id).maybeSingle();
+      if (error || !data) {
+        showToast('Unable to load link.');
+        return;
+      }
+
+      // پر کردن فرم
+      document.getElementById('socialTitle').value = data.title || '';
+      document.getElementById('socialUrl').value = data.url || '';
+      const preview = document.getElementById('socialIconPreview');
+      if (preview) {
+        preview.src = data.icon || '';
+        preview.style.display = data.icon ? '' : 'none';
+      }
+
+      editingSocialId = id;
+      addSocialForm.querySelector('.admin-submit').textContent = 'Update link';
+      addSocialForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+
+  fetchAdminSocialLinks();
+}
   // -------------------- Bundle (Collection / Serial) forms UI --------------------
   const btnCollection = document.getElementById("btn-collection");
   const btnSerial = document.getElementById("btn-serial");
@@ -4095,17 +4146,16 @@ setInterval(async () => {
 
 
 // -------------------- Admin Tabs --------------------
-// -------------------- Admin Tabs --------------------
 function initAdminTabs() {
   const tabButtons = document.querySelectorAll(".admin-tabs .tab-btn");
 
   const sections = {
-    posts: [".send_post", ".released_movies", "#popular-movies-section"], // 🔹 اضافه شد
-    messages: [".admin_messages", "#usersMessages"], // 🔹 سکشن پیام‌های کاربران هم اضافه شد
+    posts: [".send_post", ".released_movies", "#popular-movies-section"],
+    messages: [".admin_messages", "#usersMessages"],
     comments: ["#unapproved-comments-section"],
     links: ["#social-links-section"],
     analytics: ["#analytics"],
-    users: ["#users"] // ← تب جدید اضافه شد
+    users: ["#users"]
   };
 
   function showSection(key) {
@@ -4144,13 +4194,34 @@ function initAdminTabs() {
         loadUsers();
       }
 
-      // وقتی تب Messages فعال شد
+      // ✅ وقتی تب Messages فعال شد
       if (btn.dataset.target === "messages") {
-        loadUserThreads(1); // 🔹 لود لیست کاربران
+        // اول: اطمینان از بسته بودن پنل چت
+        try {
+          const adminThreadOverlay = document.getElementById('adminThreadOverlay');
+          const adminThreadMessages = document.getElementById('adminThreadMessages');
+          if (adminThreadOverlay) {
+            adminThreadOverlay.setAttribute('aria-hidden', 'true');
+            adminThreadOverlay.style.display = 'none';
+          }
+          if (adminThreadMessages) {
+            adminThreadMessages.innerHTML = ''; // خالی کردن محتوای چت تا ظاهر نشه
+          }
+          if (typeof currentAdminThreadId !== 'undefined') {
+            currentAdminThreadId = null;
+          }
+        } catch (err) {
+          console.warn('Error hiding adminThreadOverlay:', err);
+        }
+
+        // بعد: لود لیست کاربران
+        loadUserThreads(1);
+        
       }
     });
   });
 }
+
 async function loadAppVersion() {
   try {
     const { data, error } = await supabase
@@ -4875,7 +4946,6 @@ if (goTopBtn) {
     }, 1000);
   });
 }
-
 // -------------------- Initial load --------------------
 // اینجا باید فراخوانی بشه
 if (document.querySelector('.admin-tabs .tab-btn')) {
