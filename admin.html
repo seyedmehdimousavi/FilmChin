@@ -43,9 +43,16 @@
       <div id="profileMenu" class="profile-menu hidden">
         <div class="profile-bubble">
           <div class="profile-username" id="profileUsername">Admin</div>
-          <button class="profile-edit">ویرایش مشخصات</button>
+          <div class="button-wrap">
+               <button class="profile-edit"><span>Edit profile</span></button>
+               <div class="button-shadow">
+               </div>
+          </div>
           <hr class="profile-divider"/>
-          <button id="logoutBtn" class="profile-logout">خروج</button>
+          <div class="button-wrap">
+              <button id="logoutBtn" class="profile-logout">logout</button>
+              <div class="button-shadow"></div>
+          </div>
         </div>
       </div>
 
@@ -266,7 +273,6 @@
 </section>
   </section>
 </main>
-
 <script src="script.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>

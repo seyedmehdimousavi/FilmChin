@@ -1501,7 +1501,6 @@ function buildTabGenres(filteredMovies = null) {
     chip.className = 'genre-chip';
     chip.textContent = g;
 
-    // 👇 این خط اضافه شد
     chip.setAttribute("dir", "auto");
 
     if (currentTabGenre === g) {
@@ -1530,8 +1529,7 @@ function buildTabGenres(filteredMovies = null) {
   });
 }
 
-const episodeMatches = new Map(); // movie_id → index اپیزود
-// تابع کمکی برای ساخت حباب‌ها
+const episodeMatches = new Map();
 function renderChips(str) {
   if (!str || str === '-') return '-';
   return str.split(' ')
@@ -1677,7 +1675,9 @@ if (imdbMinRating !== null) {
     <span class="field-label anim-vertical"><img src="images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
     <div class="field-quote anim-left-right synopsis-quote">
       <div class="quote-text anim-horizontal">${synopsis}</div>
-      <button class="quote-toggle-btn">More</button>
+      <div class="button-wrap">
+            <button class="quote-toggle-btn"><span>More</span></button>
+            </div>
     </div>
 
 
@@ -1716,14 +1716,16 @@ if (imdbMinRating !== null) {
       <div class="episodes-list anim-left-right"></div>
     </div>
 
-
-    <button class="go-btn anim-vertical" data-link="${escapeHtml(m.link || '#')}">Go to file</button>
+     <div class="button-wrap">
+         <button class="go-btn anim-vertical" data-link="${escapeHtml(m.link || '#')}"><span>Go to file</span></button>
+         <div class="button-shadow"></div>
+     </div>
 
 
     <div class="comment-summary anim-horizontal">
-      <div class="avatars anim-vertical"></div>
+      <div class="avatars"></div>
       <div class="comments-count">0 comments</div>
-      <button class="enter-comments"><img src="images/icons8-comment.apng" style="width:22px;height:22px;"></button>
+      <div class="enter-comments"><img src="images/icons8-comment.apng" style="width:22px;height:22px;"></div>
     </div>
 
 
@@ -1734,10 +1736,18 @@ if (imdbMinRating !== null) {
         <div class="comment-input-row">
           <div class="name-comments-close">
             <input class="comment-name" placeholder="Your name" maxlength="60" />
-            <button class="comments-close">&times;</button>
+            <div class="button-wrap">
+            <button class="comments-close"><span>close</span></button>
+            <div class="button-shadow"></div>
+            </div>
           </div>
           <textarea class="comment-text" placeholder="Write a comment..." rows="2"></textarea>
-          <button class="comment-send">Send</button>
+          
+          <div class="button-wrap">
+          <button class="comment-send"><span>Send</span></button>
+          <div class="button-shadow"></div>
+          </div>
+          
         </div>
       </div>
     </div>
@@ -2408,8 +2418,11 @@ function renderPopularCarousel(list = []) {
     item.innerHTML = `
       <img src="${escapeHtml(m.cover || '')}" alt="${escapeHtml(m.title || '')}">
       <h3>${escapeHtml(m.title || '')}</h3>
-      <button class="more-info">اطلاعات بیشتر</button>
-    `;
+      <div class="button-wrap">
+  <button class="more-info">
+    <span>More Info</span>
+    </button>
+</div>`;
     item.querySelector('.more-info').addEventListener('click', (e) => {
       e.stopPropagation();
       openMovieModal(m);
@@ -2508,7 +2521,10 @@ function openMovieModal(m) {
           <span class="field-label">Synopsis:</span>
           <div class="field-quote synopsis-quote">
             <div class="quote-text">${synopsis}</div>
-            <button class="quote-toggle-btn">More</button>
+            <div class="button-wrap">
+            <button class="quote-toggle-btn"><span>More</span></button>
+            </div>
+
           </div>
 
           <span class="field-label">Director:</span>
@@ -2532,9 +2548,11 @@ function openMovieModal(m) {
           <div class="episodes-container" data-movie-id="${data.id}">
             <div class="episodes-list"></div>
           </div>
-
-          <button class="go-btn" data-link="${escapeHtml(data.link || '#')}">Go to file</button>
-          <button class="close-btn">بستن</button>
+          <div class="button-wrap"><button class="go-btn" data-link="${escapeHtml(data.link || '#')}"><span>Go to file</span></button>
+          <div class="button-shadow"></div></div>
+          
+          <div class="button-wrap"><button class="close-btn"><span>Close</span></button>
+          <div class button-shadow"></div></div>
         </div>
       </div>
     `;
@@ -4946,8 +4964,16 @@ if (goTopBtn) {
     }, 1000);
   });
 }
+
+
+/*document.querySelectorAll('.glass-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.add('active');
+    setTimeout(() => btn.classList.remove('active'), 800);
+  });
+});*/
+
 // -------------------- Initial load --------------------
-// اینجا باید فراخوانی بشه
 if (document.querySelector('.admin-tabs .tab-btn')) {
   initAdminTabs();
 }
