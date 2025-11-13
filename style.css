@@ -485,19 +485,13 @@ Body.dark .movie-item,body.dark .message-item{background:var(--post-night)}
   Flex-direction: column;
   Gap:8px}
 .movie-actions .btn-edit,.message-actions .btn-edit{
-  border:0;
   color: #228302;
   font-weight: bold;
-  padding:6px 10px;
-  border-radius:6px;
   cursor:pointer;
 }
 .movie-actions .btn-delete,.message-actions .btn-delete{
-  border:0;
   color:red;
   font-weight: bold;
-  padding:6px 10px;
-  border-radius:6px;
   cursor:pointer}
 
 /* =========================
