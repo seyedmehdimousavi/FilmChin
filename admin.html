@@ -34,7 +34,7 @@
   <!-- 🔹 هدر -->
   <div class="header">
     <div class="search-bar">
-      <!-- دکمه برگشت به سایت -->
+      
       <a href="index.html" id="backToSiteBtn" class="menu-btn" aria-label="back">
         <img width="32" height="32" src="images/icons8-back-to-50.png" alt="back"/>
       </a>
@@ -50,7 +50,7 @@
           </div>
           <hr class="profile-divider"/>
           <div class="button-wrap">
-              <button id="logoutBtn" class="profile-logout">logout</button>
+              <button id="logoutBtn" class="profile-logout"><span>logout</span></button>
               <div class="button-shadow"></div>
           </div>
         </div>
@@ -60,50 +60,60 @@
       <div class="admin-title">Admin Panel</div>
 
       <!-- دکمه پروفایل -->
+      <div class="button-wrap">
       <button id="profileBtn" class="icon-inside" aria-label="profile">
         <img src="images/icons8-user-96.png" alt="user"/>
-      </button>
+      </button><div class="button-shadow"></div></div>
     </div>
 
     <!-- دکمه تغییر تم -->
+    <div class="button-wrap">
     <button id="themeToggle" class="icon-btn" aria-label="toggle theme">
       <img src="images/icons8-moon.apng" alt="dark-mode"/>
     </button>
+    <div class="button-shadow"></div></div>
   </div>
 </header>
 <main>
   <div class="admin-tabs">
+    <div class="button-wrap">
   <button class="tab-btn active" data-target="posts" type="button">
     <div class="tab-circle">
       <img src="images/icons8-share.apng" alt="posts">
     </div>
-  </button>
+  </button><div class="button-shadow"></div></div>
+  <div class="button-wrap">
   <button class="tab-btn" data-target="messages" type="button">
   <div class="tab-circle">
     <img src="images/icons8-message.apng" alt="messages">
     <span id="adminMessagesBadge" class="badge" style="display:none;">!</span>
   </div>
 </button>
+<div class="button-shadow"></div></div>
+<div class="button-wrap">
   <button class="tab-btn" data-target="comments" type="button">
     <div class="tab-circle">
       <img src="images/icons8-comment.apng" alt="comments">
     </div>
-  </button>
+  </button><div class="button-shadow"></div></div>
+  <div class="button-wrap">
   <button class="tab-btn" data-target="links" type="button">
     <div class="tab-circle">
       <img src="images/icons8-link.apng" alt="links">
     </div>
-  </button>
+  </button><div class="button-shadow"></div></div>
+  <div class="button-wrap">
   <button class="tab-btn" data-target="analytics" type="button">
   <div class="tab-circle">
     <img src="images/icons8-combo-chart.apng" alt="analytics">
   </div>
-</button>
+</button><div class="button-shadow"></div></div>
+<div class="button-wrap">
 <button class="tab-btn" data-target="users" type="button">
   <div class="tab-circle">
     <img src="/images/icons8-users-48.png" alt="users">
   </div>
-</button>
+</button><div class="button-shadow"></div></div>
 </div>
   <section id="adminProfile" class="admin-section">
     
@@ -129,8 +139,12 @@
 <input type="hidden" id="mode" name="mode" value="single">
   <!-- دکمه‌های Collection / Serial -->
   <div id="bundle-toggle" class="admin-form">
-    <button type="button" id="btn-collection" class="admin-submit">Collection</button>
-    <button type="button" id="btn-serial" class="admin-submit">Serial</button>
+    <div class="button-wrap">
+    <button type="button" id="btn-collection" class="admin-submit"><span>Collection </span></button>
+    <div class="button-shadow"></div></div>
+    <div class="button-wrap">
+    <button type="button" id="btn-collection" class="admin-submit">Serial</button>
+    <div class="button-shadow"></div></div>
   </div>
 
   <!-- کانتینر فرم‌های پویا -->
@@ -138,14 +152,17 @@
 
   <!-- دکمه‌های افزودن/حذف -->
   <div id="bundle-actions" class="admin-form" hidden>
-    <button type="button" id="btn-add-item" class="admin-submit"></button>
-    <button type="button" id="btn-remove-last" class="admin-submit danger"></button>
+    <div class="button-wrap">
+    <button type="button" id="btn-add-item" class="admin-submit"></button><div class="button-shadow"></div></div>
+    <div class="button-wrap">
+    <button type="button" id="btn-remove-last" class="admin-submit danger"></button><div class="button-shadow"></div></div>
   </div>
 
   <!-- دکمه ارسال -->
-  <button type="submit" class="admin-submit">
-    Submit and Send <i class="bi bi-cloud-upload"></i>
-  </button>
+  <div class="button-wrap">
+  <button type="submit" class="admin-submit"><span>
+    Submit and Send <i class="bi bi-cloud-upload"></i></span>
+  </button><div class="button-shadow"></div></div>
 </form>
     </section>
     
@@ -156,7 +173,8 @@
       <h2>Admin Messages</h2>
       <form id="addMessageForm" class="admin-form">
         <textarea id="messageText" placeholder="Write a message..."></textarea>
-        <button type="submit" class="admin-submit">Submit message <i class="bi bi-chat-dots"></i></button>
+        <div class="button-wrap">
+        <button type="submit" class="admin-submit">Submit message <i class="bi bi-chat-dots"></i></button><div class="button-shadow"></div></div>
       </form>
       <div id="messageList" class="message-list" aria-live="polite"></div>
 
@@ -175,7 +193,8 @@
   <!-- اوورلی نمایش گفت‌وگو -->
   <div id="adminThreadOverlay" class="chat-overlay" aria-hidden="true">
     <div class="chat-overlay-header">
-      <button id="adminThreadBackBtn" class="chat-back-btn" aria-label="back">&larr;</button>
+      <div class="button-wrap">
+      <button id="adminThreadBackBtn" class="chat-back-btn" aria-label="back">&larr;</button><div class="button-shadow"></div></div>
       <img id="adminThreadAvatar" class="chat-admin-avatar" src="images/icons8-user-96.png" alt="user" />
       <div id="adminThreadTitle" class="chat-overlay-title">گفت‌وگو</div>
     </div>
@@ -183,14 +202,16 @@
     <div id="adminThreadMessages" class="chat-messages-list"></div>
 
     <div class="chat-composer">
+      <div class="button-wrap">
       <button id="adminThreadAttachBtn" class="chat-icon-btn" aria-label="attach">
         <img src="images/icons8-attach-60.png" alt="attach" />
-      </button>
+      </button><div class="button-shadow"></div></div>
       <input id="adminThreadAttachFile" type="file" accept="image/*" hidden />
       <input id="adminThreadInput" type="text" placeholder="پاسخ بنویسید..." />
+      <div class="button-wrap">
       <button id="adminThreadSendBtn" class="chat-icon-btn disabled" aria-label="send">
         <img src="images/icons8-send-90.png" alt="send" />
-      </button>
+      </button><div class="button-shadow"></div></div>
     </div>
   </div>
 </section>
@@ -207,7 +228,8 @@
            <input id="socialTitle" type="text" placeholder="Title" required />
            <input id="socialIcon" type="file" accept="image/*" />
            <input id="socialUrl" type="text" placeholder="Link" required />
-           <button type="submit" class="admin-submit">Add link</button>
+           <div class="button-wrap">
+           <button type="submit" class="admin-submit"><span>Add link</span></button><div class="button-shadow"></div></div>
         </form>
         <div id="socialList" class="message-list"></div>
         
@@ -215,7 +237,8 @@
         <div class="admin-section">
   <h3>App Version</h3>
   <input type="text" id="versionInput" placeholder="مثلاً 1.3.3">
-  <button id="saveVersionBtn">Save</button>
+  <div class="button-wrap">
+  <button id="saveVersionBtn">Save</button><div class="button-shadow"></div></div>
 </div>
     </section>
     
@@ -265,7 +288,8 @@
     <h3>Users List</h3>
     <div class="search-bar" style="display:flex;align-items:center;gap:8px;">
       <input type="text" id="userSearch" placeholder="Search..." style="flex:1;padding:6px;">
-      <button id="clearSearch">✕</button>
+      <div class="button-wrap">
+      <button id="clearSearch"><span>✕</span></button><div class="button-shadow"></div></div>
     </div>
     <div id="usersContainer" class="white-box" style="background:#fff;padding:10px;border-radius:6px;margin-top:10px;"></div>
     <div id="usersPagination" class="pagination-users"></div>

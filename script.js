@@ -1120,7 +1120,8 @@ async function fetchEpisodes() {
         </div>
       </div>
       <div class="msg-body">${escapeHtml(m.text)}</div>
-      <button class="msg-close" aria-label="close message">Mark as Read</button>
+      <div class="button-wrap">
+      <button class="msg-close" aria-label="close message"><span>Mark as Read</span></button><div class="button-shadow"></div></div>
     `;
     div.querySelector('.msg-close').addEventListener('click', () => {
       markMessageAsRead(m.id); // 👈 ذخیره در localStorage
@@ -2155,8 +2156,10 @@ function renderAdminMovieList(list = []) {
           <div class="toggle-comments" data-id="${m.id}">Comments <i class="bi bi-chevron-down"></i></div>
         </div>
         <div class="movie-actions">
-          <button class="btn-edit"><i class="bi bi-pencil"></i> Edit</button>
-          <button class="btn-delete"><i class="bi bi-trash"></i> Delete</button>
+        <div class="button-wrap">
+          <button class="btn-edit"><span><i class="bi bi-pencil"></i> Edit</span></button><div class="button-shadow"></div></div>
+          <div class="button-wrap">
+          <button class="btn-delete"><span><i class="bi bi-trash"></i> Delete</span></button><div class="button-shadow"></div></div>
         </div>
       </div>
       <div class="admin-comments-panel" id="comments-${m.id}" style="display:none;"></div>
@@ -2278,7 +2281,8 @@ function renderAdminMovieList(list = []) {
                 <div class="admin-comment-meta"><strong>${escapeHtml(c.name)}</strong> · ${new Date(c.created_at).toLocaleString()}</div>
                 <div class="admin-comment-text">${escapeHtml(c.text)}</div>
               </div>
-              <button class="admin-comment-delete" data-id="${c.id}">Delete</button>
+              <div class="button-wrap">
+              <button class="admin-comment-delete" data-id="${c.id}">span>Delete</span></button><div class="button-shadow"></div></div>
             </div>
           `).join('');
           panel.querySelectorAll('.admin-comment-delete').forEach(btn => {
@@ -2421,7 +2425,7 @@ function renderPopularCarousel(list = []) {
       <div class="button-wrap">
   <button class="more-info">
     <span>More Info</span>
-    </button>
+    </button><div class="button-shadow"></div>
 </div>`;
     item.querySelector('.more-info').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -2919,8 +2923,15 @@ function renderEpisodeForms(eps = []) {
         el.innerHTML = `
           <span class="message-text">${escapeHtml(m.text)}</span>
           <div class="message-actions">
-            <button class="btn-edit" data-id="${m.id}"><i class="bi bi-pencil"></i> Edit</button>
-            <button class="btn-delete" data-id="${m.id}"><i class="bi bi-trash"></i> Delete</button>
+          <div class="button-wrap">
+            <button class="btn-edit" data-id="${m.id}"><span><i class="bi bi-pencil"></i> Edit</span></button>
+            <div class="button-shadow"></div>
+            </div>
+            <div class="button-wrap">
+            <button class="btn-delete" data-id="${m.id}"><span><i class="bi bi-trash"></i> Delete</span></button>
+            <div class="button-shadow"></div>
+            </div>
+            
           </div>
         `;
         messageList.appendChild(el);
@@ -3124,8 +3135,8 @@ async function loadUsers(search = '') {
       <td>
         ${
           currentUser.role === 'owner'
-            ? `<button class="btn-danger" onclick="blockUser('${u.id}','${u.email}','${u.username}')">Block</button>
-               <button class="btn-primary" onclick="promoteToAdmin('${u.id}')">Promote</button>`
+            ? `<div class="button-wrap"><button class="btn-danger" onclick="blockUser('${u.id}','${u.email}','${u.username}')"><span>Block</span></button><div class="button-shadow"></div></div>
+               <div class="button-wrap"><button class="btn-primary" onclick="promoteToAdmin('${u.id}')"><span>Promote</span></button><div class="button-shadow"></div></div>`
             : ''
         }
       </td>
@@ -3202,8 +3213,8 @@ async function loadAdmins() {
       <td>
         ${
           currentUser.role === 'owner' && u.role !== 'owner'
-            ? `<button class="btn-danger" onclick="demoteToUser('${u.id}')">Demote</button>
-               <button class="btn-danger" onclick="blockUser('${u.id}','${u.email}','${u.username}')">Block</button>`
+            ? `<div class="button-wrap"><button class="btn-danger" onclick="demoteToUser('${u.id}')"><span>Demote</span></button><div class="button-shadow"></div></div>
+               <div class="button-wrap"><button class="btn-danger" onclick="blockUser('${u.id}','${u.email}','${u.username}')"><span>Block</span></button><div class="button-shadow"></div></div>`
             : ''
         }
       </td>
@@ -3242,8 +3253,8 @@ async function confirmDialog(message, { title = "Confirm", confirmText = "Confir
         <h3 class="modal-title">${title}</h3>
         <p class="modal-message">${message}</p>
         <div class="modal-actions">
-          <button class="btn btn-subtle" data-role="cancel">${cancelText}</button>
-          <button class="btn btn-danger" data-role="ok">${confirmText}</button>
+          <div class="button-wrap"><button class="btn btn-subtle" data-role="cancel"><span>${cancelText}</span></button><div class="button-shadow"></div></div>
+          <div class="button-wrap"><button class="btn btn-danger" data-role="ok"><span>${confirmText}</span></button><div class="button-shadow"></div></div>
         </div>
       </div>`;
     document.body.appendChild(overlay);
@@ -3267,8 +3278,8 @@ async function passwordDialog({ title = "Owner confirmation", placeholder = "Own
         <h3 class="modal-title">${title}</h3>
         <input type="password" class="modal-input" id="ownerConfirmInput" placeholder="${placeholder}" />
         <div class="modal-actions">
-          <button class="btn btn-subtle" data-role="cancel">${cancelText}</button>
-          <button class="btn btn-primary" data-role="ok">${confirmText}</button>
+          <div class="button-wrap"><button class="btn btn-subtle" data-role="cancel"><span>${cancelText}</span></button><div class="button-shadow"></div></div>
+          <div class="button-wrap"><button class="btn btn-primary" data-role="ok"><span>${confirmText}</span></button><div class="button-shadow"></div></div>
         </div>
       </div>`;
     document.body.appendChild(overlay);
@@ -3852,8 +3863,8 @@ async function fetchAdminSocialLinks() {
     <div class="message-item">
       <span class="message-text">${escapeHtml(s.title)}</span>
       <div class="message-actions">
-        <button class="btn-edit" data-id="${s.id}"><i class="bi bi-pencil"></i> Edit</button>
-        <button class="btn-delete" data-id="${s.id}"><i class="bi bi-trash"></i> Delete</button>
+        <div class="button-wrap"><button class="btn-edit" data-id="${s.id}"><span><i class="bi bi-pencil"></i> Edit</span></button><div class="button-shadow"></div></div>
+        <div class="button-wrap"><button class="btn-delete" data-id="${s.id}"><span><i class="bi bi-trash"></i> Delete</span></button><div class="button-shadow"></div></div>
       </div>
     </div>
   `).join('');
@@ -4361,7 +4372,7 @@ if (applyRatingFilterBtn) {
   activeFiltersContainer.innerHTML = `
     <div class="filter-badge">
       امتیاز ≥ ${imdbMinRating.toFixed(1)}
-      <button id="btnClearRatingFilter" aria-label="Remove rating filter">×</button>
+      <div class="button-wrap"><button id="btnClearRatingFilter" aria-label="Remove rating filter"><span>×</span></button><div class="button-shadow"></div></div>
     </div>
   `;
   document.getElementById("btnClearRatingFilter")
@@ -5010,7 +5021,8 @@ if (document.getElementById('unapprovedComments')) {
             <div class="bubble-time">${c.created_at ? new Date(c.created_at).toLocaleString() : ''}</div>
           </div>
           <div class="bubble-right">
-            <button class="btn-approve" data-id="${c.id}"><i class="bi bi-check2-circle"></i> Approve</button>
+          <div class="button-wrap">
+            <button class="btn-approve" data-id="${c.id}"><i class="bi bi-check2-circle"><span></i> Approve</span></button><div class="button-shadow"></div></div>
             <button class="btn-delete" data-id="${c.id}"><i class="bi bi-trash"></i> Delete</button>
           </div>
         </div>
