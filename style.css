@@ -2067,8 +2067,15 @@ body.dark .genre-chip.active {
   gap: 8px;
   padding: 14px 18px;
   border-radius: 18px;
+.message-bubble button{
+  display: flex;
+justify-content: end;
 
-  /* شیشه‌ای */
+
+
+
+
+}
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
