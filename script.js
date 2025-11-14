@@ -985,51 +985,36 @@ if (searchInput) {
 
 
 
-  // Theme toggle
-  // ===== Theme switch (Uiverse) integration =====
-// پیدا کردن چک‌باکس جدید
+// کش کردن عناصر
 const themeSwitchCheckbox = document.getElementById('themeSwitchCheckbox');
-const themeSwitchLabel = document.getElementById('themeSwitchLabel');
 
-// تابع اعمال تم (همان‌طور که قبلاً بود، فقط بدون تغییر آیکون درون دکمه)
-function applyTheme(dark) {
-  if (dark) {
-    document.body.classList.add('dark');
-    localStorage.setItem('theme', 'dark');
-    if (themeSwitchCheckbox) themeSwitchCheckbox.checked = true;
-  } else {
-    document.body.classList.remove('dark');
-    localStorage.setItem('theme', 'light');
-    if (themeSwitchCheckbox) themeSwitchCheckbox.checked = false;
-  }
+// تغییر تم با تأخیر کوتاه (برای جلوگیری از لگ انیمیشن)
+function applyThemeSmooth(dark) {
+  // تم را 70ms دیرتر تغییر بده تا انیمیشن سوییچر روان اجرا شود
+  setTimeout(() => {
+    if (dark) {
+      document.body.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, 70); // مقدار طلایی
 }
 
-// listener برای تغییر چک‌باکس
+// تغییر با سوییچ
 if (themeSwitchCheckbox) {
   themeSwitchCheckbox.addEventListener('change', (e) => {
-    applyTheme(e.target.checked);
+    applyThemeSmooth(e.target.checked);
   });
 }
 
-// اگر لازم است، اجازه بده label هم کلیک‌پذیر باشه (پیش‌فرض هست ولی اگر رفتار خاصی لازم باشه)
-if (themeSwitchLabel) {
-  themeSwitchLabel.addEventListener('click', (e) => {
-    // اجازه میدیم رفتار پیش‌فرض input اعمال شود؛ این فقط برای اطمینان است
-    // هیچ کار اضافه‌ای لازم نیست بذاری مگر بخواهی انیمیشن یا کلاس اضافی تغییر کند
-  });
-}
-
-// مقدار اولیه از localStorage بخوان و اعمال کن
+// اعمال مقدار ذخیره‌شده
 const savedTheme = localStorage.getItem('theme');
-if (savedTheme === 'dark') {
-  applyTheme(true);
-} else if (savedTheme === 'light') {
-  applyTheme(false);
-} else {
-  // اگر ذخیره‌ای نبود، می‌تونی سیستم عامل کاربر را چک کنی (اختیاری)
-  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  applyTheme(prefersDark);
-}
+if (savedTheme === 'dark') themeSwitchCheckbox.checked = true;
+
+// بارگذاری تم بدون انیمیشن اولیه
+applyThemeSmooth(savedTheme === 'dark');
 
   // Side menu
   if (menuBtn && sideMenu && menuOverlay) {
