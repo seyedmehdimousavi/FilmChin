@@ -3511,7 +3511,7 @@ position: fixed;
   top: 65px;
 }
 #chatOverlay {
-  display: none; /* پیش‌فرض مخفی */
+  display: none;
 }
 #chatOverlay[aria-hidden="false"] {
   display: grid !important; /* وقتی باز شد */
