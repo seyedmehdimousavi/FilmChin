@@ -986,20 +986,50 @@ if (searchInput) {
 
 
   // Theme toggle
-  function applyTheme(dark) {
-    if (dark) {
-      document.body.classList.add('dark');
-      if (themeToggle && themeToggle.querySelector('i')) themeToggle.querySelector('i').className = 'bi bi-sun';
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.body.classList.remove('dark');
-      if (themeToggle && themeToggle.querySelector('i')) themeToggle.querySelector('i').className = 'bi bi-moon';
-      localStorage.setItem('theme', 'light');
-    }
-  }
-  if (themeToggle) themeToggle.addEventListener('click', () => applyTheme(!document.body.classList.contains('dark')));
-  if (localStorage.getItem('theme') === 'dark') applyTheme(true);
+  // ===== Theme switch (Uiverse) integration =====
+// پیدا کردن چک‌باکس جدید
+const themeSwitchCheckbox = document.getElementById('themeSwitchCheckbox');
+const themeSwitchLabel = document.getElementById('themeSwitchLabel');
 
+// تابع اعمال تم (همان‌طور که قبلاً بود، فقط بدون تغییر آیکون درون دکمه)
+function applyTheme(dark) {
+  if (dark) {
+    document.body.classList.add('dark');
+    localStorage.setItem('theme', 'dark');
+    if (themeSwitchCheckbox) themeSwitchCheckbox.checked = true;
+  } else {
+    document.body.classList.remove('dark');
+    localStorage.setItem('theme', 'light');
+    if (themeSwitchCheckbox) themeSwitchCheckbox.checked = false;
+  }
+}
+
+// listener برای تغییر چک‌باکس
+if (themeSwitchCheckbox) {
+  themeSwitchCheckbox.addEventListener('change', (e) => {
+    applyTheme(e.target.checked);
+  });
+}
+
+// اگر لازم است، اجازه بده label هم کلیک‌پذیر باشه (پیش‌فرض هست ولی اگر رفتار خاصی لازم باشه)
+if (themeSwitchLabel) {
+  themeSwitchLabel.addEventListener('click', (e) => {
+    // اجازه میدیم رفتار پیش‌فرض input اعمال شود؛ این فقط برای اطمینان است
+    // هیچ کار اضافه‌ای لازم نیست بذاری مگر بخواهی انیمیشن یا کلاس اضافی تغییر کند
+  });
+}
+
+// مقدار اولیه از localStorage بخوان و اعمال کن
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+  applyTheme(true);
+} else if (savedTheme === 'light') {
+  applyTheme(false);
+} else {
+  // اگر ذخیره‌ای نبود، می‌تونی سیستم عامل کاربر را چک کنی (اختیاری)
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(prefersDark);
+}
 
   // Side menu
   if (menuBtn && sideMenu && menuOverlay) {
