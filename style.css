@@ -459,7 +459,6 @@ Body.dark #adminProfile textarea{
   Color: #e6eef6;
 }
 
-Body.dark .admin-submit{background:var(--btn-night)}
 .movie-list,.message-list{margin-top:12px;display:flex;flex-direction:column;gap:10px}
 .movie-item,.message-item{
   Display:flex;
@@ -1078,7 +1077,7 @@ Body.dark .admin-comment-text {
   Align-items: center;
   Font-weight: bold;
 }
-.menu-toggle span{
+.menu-toggle span, .links-toggle span {
   width: 100%;
   text-align: left;
 }
@@ -1278,13 +1277,7 @@ Body.admin-body.dark .admin-form textarea::placeholder {
 /* دکمه‌ها */
 Body.admin-body.dark .admin-submit,
 Body.admin-body.dark .logout-btn {
-  Background: var(--btn-night);
   Color: #fff;
-  Border: none;
-}
-Body.admin-body.dark .admin-submit:hover,
-Body.admin-body.dark .logout-btn:hover {
-  Background: #006bb3;
 }
 /* Pagination – هماهنگ با ایندکس */
 .pagination {
@@ -3904,7 +3897,7 @@ body.dark .user-thread-snippet { color: #bbb; }
 }
 .go-top-button span{
   text-align: center;
-  padding-left: px;
+  padding-left: 19px;
 
 }
 
