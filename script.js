@@ -699,10 +699,9 @@ function showDialog({ message = '', type = 'alert', defaultValue = '' } = {}) {
         btn.style.flex = opts.full ? '1' : '1';
         btn.style.padding = '10px';
         btn.style.fontSize = '15px';
-        btn.style.border = 'none';
-        btn.style.borderRadius = '6px';
         btn.style.cursor = 'pointer';
         btn.style.minWidth = '88px';
+        btn.style.textAlign = 'center';
         btn.style.background = opts.primary ? '#0d6efd' : '#e0e0e0';
         btn.style.color = opts.primary ? '#fff' : '#111';
         return btn;
@@ -1743,12 +1742,10 @@ if (imdbMinRating !== null) {
             </div>
           </div>
           <textarea class="comment-text" placeholder="Write a comment..." rows="2"></textarea>
-          
           <div class="button-wrap">
           <button class="comment-send"><span>Send</span></button>
-          <div class="button-shadow"></div>
+          <div class="button-shaddow"></div>
           </div>
-          
         </div>
       </div>
     </div>
@@ -5022,8 +5019,11 @@ if (document.getElementById('unapprovedComments')) {
           </div>
           <div class="bubble-right">
           <div class="button-wrap">
-            <button class="btn-approve" data-id="${c.id}"><i class="bi bi-check2-circle"><span></i> Approve</span></button><div class="button-shadow"></div></div>
-            <button class="btn-delete" data-id="${c.id}"><i class="bi bi-trash"></i> Delete</button>
+            <button class="btn-approve" data-id="${c.id}"><span><i class="bi bi-check2-circle"></i> Approve</span></button>
+            <div class="button-shadow"></div></div>
+            <div class="button-wrap">
+            <button class="btn-delete" data-id="${c.id}"><span><i class="bi bi-trash"></i> Delete</span></button>
+            <div class="button-shadow"></div></div>
           </div>
         </div>
       `;

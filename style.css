@@ -457,10 +457,7 @@ Body.dark #adminProfile textarea{
   Background: rgba(255, 255, 255, 0.08);
   Color: #e6eef6;
 }
-.admin-submit{
-  Background:var(--btn-day);
-  Color:#fff;
-  Cursor:pointer}
+
 Body.dark .admin-submit{background:var(--btn-night)}
 .movie-list,.message-list{margin-top:12px;display:flex;flex-direction:column;gap:10px}
 .movie-item,.message-item{
@@ -474,6 +471,7 @@ Body.dark .admin-submit{background:var(--btn-night)}
 Body.dark .movie-item,body.dark .message-item{background:var(--post-night)}
 .movie-cover{
   width:60px;
+  border-radius: 6px;
   height:80px;
   object-fit:cover;
   
@@ -485,16 +483,22 @@ Body.dark .movie-item,body.dark .message-item{background:var(--post-night)}
   Display:flex;
   Flex-direction: column;
   Gap:8px}
-.movie-actions .btn-edit,.message-actions .btn-edit{
+  .movie-actions .btn-edit,.message-actions .btn-edit{
+  width: 100%;
+}
+.movie-actions .btn-edit span,.message-actions .btn-edit span{
   color: #228302;
   font-weight: bold;
-  cursor:pointer;
+  width: 100%;
 }
-.movie-actions .btn-delete,.message-actions .btn-delete{
+.movie-actions .btn-delete span , .message-actions .btn-delete span{
   color:red;
   font-weight: bold;
-  cursor:pointer}
-
+  cursor:pointer;
+width: 100%;}
+.movie-actions .btn-delete span, .movie-actions .btn-edit span , .message-actions .btn-delete span, .message-actions .btn-edit span , .btn-edit span , .btn-approve span{
+  padding: 8px;
+}
 /* =========================
   Pagination (bubbles)
   ========================= */
@@ -721,15 +725,16 @@ Body.dark #loginModal .close-btn:hover {
 
 /* دکمه ثبت و ارسال */
 .admin-submit {
-  Background: #2185D5;
-  Color: #fff;
+  text-align: center;
   Font-size: 14px;
+   flex: 1;
+   width: 100%;
   Cursor: pointer;
-  Width: 100%;
   Transition: background 0.2s;
 }
-.admin-submit:hover {
-  Background: #1769a8;
+.admin-submit>span , #btn-add-item , #btn-remove-last{
+  color: #1769a8;
+  padding: 10px;
 }
 
 /* لیست پیام‌ها */
@@ -788,13 +793,8 @@ Body.dark #loginModal .close-btn:hover {
 .comment-actions button {
   Margin-left: 5px;
 }
-.btn-approve{
-  Background:var(--btn-day);
-  Border:0;
-  Color:#fff;
-  Padding:6px 10px;
-  Border-radius:6px;
-  Cursor:pointer;
+.btn-approve span{
+  Color: #228302;
   }
   
 .admin-section {
@@ -874,10 +874,10 @@ Body.dark .unapproved-bubble {
 }
 
 .bubble-cover {
-  Width: 80px;
-  Height: 100px;
-  Object-fit: cover;
-  Border-radius: 8px;
+      Width: 70px;
+    /* Height: 100px; */
+    Object-fit: cover;
+    Border-radius: 8px;
 }
 
 .bubble-center {
@@ -922,28 +922,16 @@ Body.dark .bubble-text {
   Gap: 6px;
 }
 
-.bubble-right .btn-approve {
-  Background: var(--green);
-  Border: 0;
-  Color: #fff;
-  Padding: 6px 10px;
-  Border-radius: 6px;
-  Cursor: pointer;
-}
 
-.bubble-right .btn-approve:hover {
-  Background: var(--green-hover);
+.bubble-right .btn-delete span{
+  color: red;
 }
-
-.bubble-right .btn-delete {
-  Background: var(--red);
-  Border: 0;
-  Color: #fff;
-  Padding: 6px 10px;
-  Border-radius: 6px;
-  Cursor: pointer;
+.bubble-right .button-wrap{
+  display: flex;
 }
-
+#saveVersionBtn{
+  width: 100%;
+}
 .movie-info-admin {
   Flex: 1;
   Display: flex;
@@ -971,6 +959,7 @@ Body.dark .bubble-text {
   Border-radius: 8px;
   Background: rgba(227,242,253,0.6);
   Display: none;
+  width: 100%;
   Flex-direction: column;
   Gap: 8px;
 }
@@ -1340,9 +1329,11 @@ Body.admin-body.dark h2 {
   flex-direction: row;
   justify-content: space-between;
   gap: 2%;
+ 
   margin: 12px 0;
 }
 #bundle-toggle .button-wrap{
+  display: flex;
   flex: 1;
 }
 #bundle-toggle .admin-submit {
@@ -1362,7 +1353,14 @@ Body.admin-body.dark h2 {
   gap: 10px;
 }
 #bundle-actions.show {
-  display: flex; /* فقط وقتی کلاس show اضافه بشه */
+  display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+#bundle-actions > .button-wrap{
+  display: flex;
+  flex: 1;
 }
 #bundle-actions .admin-submit {
   flex: 1;
@@ -1483,7 +1481,7 @@ body.dark .episode-card{
       background: #e0e9fa;
     color: #003170;
   border-radius: 6px;
-  padding: 3px;
+  padding: 5px;
   justify-content: space-between;
   align-items: center;
 }
@@ -1738,7 +1736,9 @@ body.dark .genre-chip.active {
   border-radius: 3px;
   overflow: hidden;
 }
-
+.message-text{
+  width: 70%;
+}
 .progress-fill {
   height: 100%;
   width: 0%;
@@ -3119,6 +3119,18 @@ body.dark .profile-logout:hover {
     border-radius: 9px;
     gap: 5px;
 }
+.pagination-users{
+      display: flex;
+    justify-content: center;
+    margin: 10px 0;
+    align-items: center;
+    background: #fff;
+    border-radius: 6px;
+    padding: 8px;
+}
+body.dark .pagination-users{
+  Background: rgba(255, 255, 255, 0.08);
+}
 #users h3{
       padding: 10px;
     text-align: center;
@@ -3579,6 +3591,11 @@ body.dark .msg-meta { color: #bbb; }
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 10px;
+}
+.user-thread-name{
+      width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
 }
 .user-thread-card {
   background: var(--post-day);
@@ -4052,7 +4069,9 @@ button span {
   padding-inline: 1.5em;
   padding-block: 0.875em;
 }
-
+body.dark button span{
+  color: #fff;
+}
 button:hover span {
   text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.12);
 }
