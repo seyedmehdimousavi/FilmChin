@@ -1188,6 +1188,7 @@ body.dark .movie-title{
 .message-item,
 .movie-item,
 .admin-comment-row {
+  Border-left: 4px solid rgba(33, 133, 213, 0.7);
   Background: #fff; /* داخل سفید بمونه برای خوانایی */
   Border-radius: 6px;
   Padding: 12px;
@@ -3902,7 +3903,7 @@ body.dark .user-thread-snippet { color: #bbb; }
 }
 .go-top-button span{
   text-align: center;
-  margin-right: 8px;
+  padding-left: px;
 
 }
 
