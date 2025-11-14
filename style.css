@@ -117,16 +117,17 @@ Body.dark{
 Body.dark .main-header{
   background:rgba(30,36,40,0.6)}
 .search-bar{
-  Display: flex;
+    Display: flex;
     Justify-content: space-between;
     Align-items: center;
     Padding: 6px;
     Flex: 1;
     Width: 50%;
     Border-radius: 28px;
-    Background: rgba(255, 255, 255,0.1);
+    Background: rgba(255, 255, 255, 0.1);
     Min-height: 54px;
-    box-shadow:  rgba(0,0,0,0.2);
+    box-shadow: rgba(0,0,0,0.2);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.09);
     Backdrop-filter: blur(6px);
 }
 .themetogglle{
@@ -499,14 +500,25 @@ Body.dark .movie-item,body.dark .message-item{background:var(--post-night)}
   ========================= */
 .pagination-container{
   Display:flex;
-  Gap:8px;
+  Gap: 5px;
   Justify-content:center;
   Align-items:center;
   Padding:18px 8px;
   Margin-top:18px;
   Flex-wrap:wrap;
 }
-.page-bubble{min-width:40px;height:40px;border-radius:999px;background:rgba(255,255,255,0.9);border:1px solid rgba(0,0,0,0.06);display:inline-grid;place-items:center;cursor:pointer;font-weight:600;padding:0 10px}
+.page-bubble{
+      min-width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    display: inline-grid;
+    place-items: center;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 2px;
+}
 .page-bubble.active{background:var(--btn-day);color:#fff;box-shadow:0 6px 20px rgba(0,74,124,0.18)}
 Body.dark .page-bubble{background:rgba(48,56,65,0.9);color:#e6eef6;border:1px solid rgba(255,255,255,0.04)}
 Body.dark .page-bubble.active{background:var(--btn-night)}
@@ -1330,6 +1342,9 @@ Body.admin-body.dark h2 {
   gap: 2%;
   margin: 12px 0;
 }
+#bundle-toggle .button-wrap{
+  flex: 1;
+}
 #bundle-toggle .admin-submit {
   font-size: 15px;
   text-align: center;
@@ -1919,6 +1934,7 @@ body.dark .genre-chip.active {
   position: fixed;
   bottom: 100px;
   right: 20px;
+  padding: 10px;
   width: 90%;
   max-width: 360px;
   border-radius: 20px;
@@ -1937,64 +1953,27 @@ body.dark .genre-chip.active {
   display: flex;
   scrollbar-width: none;
   overflow-x: auto;
-  padding: 12px;
-  gap: 12px;
+  padding: 5px;
+  gap: 5px;
 }
 .story {
-  flex: 0 0 auto;
-  text-align: center;
-}
-
-/* ساختار صحیح: تصویر + فاصله شفاف (padding) + حلقه گرادیانت در border */
-.story-circle {
-  position: relative;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden; /* برای اینکه چیزی بیرون نزنه */
-}
-
-.story-circle::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  padding: 2px; /* ضخامت حلقه */
-  background: linear-gradient(135deg, #4ce964, #48cad8);
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box, 
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-}
-
-.story-circle img {
-  position: relative;
-  width: 85%;
-  height: 85%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.story-title {
-  display: block;
-  margin-top: 4px;
-  font-size: 12px;
-  line-height: 1.2;
-  width: 72px;          /* عرض ثابت */
-  text-align: center;
-  white-space: nowrap;  /* فقط یک خط */
-  overflow: hidden;     /* مخفی کردن اضافه‌ها */
-  text-overflow: clip;  /* بدون سه‌نقطه */
+     flex: 0 0 auto;
+     border-radius: 6px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
 }
 
 .go-pagination {
   width: 100%;
   cursor: pointer;
   text-align: center;
+}
+.go-pagination span{
+  padding: 7px;
 }
 .story-title {
   display: block;
@@ -2012,7 +1991,7 @@ body.dark .genre-chip.active {
 .story-title.scrolling span {
   display: inline-block;
   padding-left: 100%;
-  animation: scroll-text 6s linear infinite;
+  animation: scroll-text 15s linear infinite;
   font-size: inherit;     /* سایز فونت مثل والد */
   line-height: inherit;   /* ارتفاع خط مثل والد */
   font-weight: inherit;   /* وزن فونت مثل والد */
@@ -2024,21 +2003,22 @@ body.dark .genre-chip.active {
 }
 .story-circle {
   position: relative;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  transition: all 0.4s ease;
+    width: 60px;
+    aspect-ratio: 9 / 15;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: all 0.4s 
+ease;
 }
 
 .story-circle::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 50%;
+  border-radius: 6px;
   padding: 2px;
   background: linear-gradient(135deg, #4ce964, #48cad8);
   -webkit-mask: 
@@ -2053,7 +2033,7 @@ body.dark .genre-chip.active {
   position: relative;
   width: 85%;
   height: 85%;
-  border-radius: 50%;
+  border-radius: 6px;
   object-fit: cover;
   transition: all 0.4s ease;
 }
@@ -2513,10 +2493,13 @@ body.dark .active-filters-toast .filter-badge {
   gap: 10px;
   margin-bottom: 12px;
 }
+.auth-tabs>div{
+  display: flex;
+  flex: 1;
+}
 
 .auth-tabs .tab-btn {
-
-
+flex: 1;
   background: rgba(0,74,124,0.08);
   font-size: 14px;
   transition: background 0.2s ease;
@@ -2586,11 +2569,8 @@ body.dark .active-filters-toast .filter-badge {
 
 .profile-menu button {
   background: transparent;
-  border: none;
-  cursor: pointer;
   font-size: 14px;
-  padding: 6px 12px;
-  border-radius: 6px;
+  flex: 1;
   transition: background 0.2s ease;
 }
 
@@ -2604,9 +2584,12 @@ body.dark .active-filters-toast .filter-badge {
   transform: translateY(10px);
 }
 .fade-step.active-step {
-  display: block !important;
-  opacity: 1;
-  transform: translateY(0);
+      display: flex !important
+;
+    flex-direction: column;
+    opacity: 1;
+    gap: 10px;
+    transform: translateY(0);
 }
 .signup-next-btn {
   display: flex;
@@ -2657,6 +2640,12 @@ body.dark .active-filters-toast .filter-badge {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+.profile-bubble>div{
+  display: flex;
+}
+.profile-bubble span{
+  padding: 5px;
 }
 
 /* هماهنگی با حالت شب/روز */
@@ -3576,16 +3565,6 @@ body.dark .msg-bubble.admin {
 body.dark .msg-meta { color: #bbb; }
 .msg-meta img { width: 14px; height: 14px; }
 
-/* کامپوزر پایین اوورلی */
-.chat-composer {
-  display: flex;
-   align-items: center;
-   padding: 8px;
-  background: rgba(255,255,255,0.85);
-}
-body.dark .chat-composer { background: rgba(30,36,40,0.85); }
-body.dark .chat-composer input { background: #202020; color: #f1f1f1; border-color: #444; }
-
 /* بدج روی دکمه منو */
 #menuBtn .chat-menu-badge {
   position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
@@ -3700,6 +3679,7 @@ body.dark .msg-meta { color: #bbb; }
   display: flex;
    align-items: center;
    padding: 8px;
+  gap: 5px;
   background: rgba(255,255,255,0.85);
 }
 body.dark .chat-composer { background: rgba(30,36,40,0.85); }
@@ -4269,4 +4249,8 @@ button:active::after {
   background: #fff;
     color: #111;
   }
+.userChatBackBtnspan{
+  padding: 5px 10px;
+  }
+
 body.dark .chat-back-btn { background: #333; color: #fff; }
