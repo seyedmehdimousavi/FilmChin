@@ -3509,7 +3509,7 @@ position: fixed;
   backdrop-filter: blur(12px); background: rgba(0,0,0,0.45);
   grid-template-rows: auto 1fr auto;
 }
-.index-body .chat-overlay{
+.chat-overlay{
   top: 65px;
 }
 #chatOverlay {
