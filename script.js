@@ -985,12 +985,23 @@ if (searchInput) {
 
 
 
-// کش کردن عناصر
+// ===== Theme switch + Background Blur =====
+
 const themeSwitchCheckbox = document.getElementById('themeSwitchCheckbox');
 
-// تغییر تم با تأخیر کوتاه (برای جلوگیری از لگ انیمیشن)
 function applyThemeSmooth(dark) {
-  // تم را 70ms دیرتر تغییر بده تا انیمیشن سوییچر روان اجرا شود
+
+  // اول بک‌گراند عوض می‌شود (بدون لگ)
+  const bg = document.getElementById('siteBgBlur');
+  if (bg) {
+    bg.style.opacity = 0; // برای تقویت ترنزیشن
+    setTimeout(() => {
+      // فقط کافی است کلاس body عوض شود → CSS خودش تصویر را ست می‌کند
+      bg.style.opacity = 1;
+    }, 10);
+  }
+
+  // کلاس dark با تاخیر کوچک از بین بردن لگ
   setTimeout(() => {
     if (dark) {
       document.body.classList.add('dark');
@@ -999,23 +1010,22 @@ function applyThemeSmooth(dark) {
       document.body.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
-  }, 70); // مقدار طلایی
+  }, 70);
 }
 
-// تغییر با سوییچ
+// تغییر با سوییچر
 if (themeSwitchCheckbox) {
   themeSwitchCheckbox.addEventListener('change', (e) => {
     applyThemeSmooth(e.target.checked);
   });
 }
 
-// اعمال مقدار ذخیره‌شده
+// مقدار ذخیره‌شده
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme === 'dark') themeSwitchCheckbox.checked = true;
 
-// بارگذاری تم بدون انیمیشن اولیه
+// اعمال اولیه بدون لگ
 applyThemeSmooth(savedTheme === 'dark');
-
   // Side menu
   if (menuBtn && sideMenu && menuOverlay) {
     const openMenu = () => {
