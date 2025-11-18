@@ -4999,12 +4999,176 @@ if (goTopBtn) {
 }
 
 
-/*document.querySelectorAll('.glass-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    btn.classList.add('active');
-    setTimeout(() => btn.classList.remove('active'), 800);
+// =====================
+// HOMEPAGE MANAGER LOGIC
+// =====================
+(function () {
+  const homepageManagerToggle = document.getElementById("homepageManagerToggle");
+  const homepageManagerSubmenu = document.getElementById("homepageManagerSubmenu");
+
+  if (!homepageManagerToggle || !homepageManagerSubmenu) return; // فقط روی index.html
+
+  // open/close the section
+  homepageManagerToggle.addEventListener("click", () => {
+    homepageManagerSubmenu.style.display =
+      homepageManagerSubmenu.style.display === "none" ? "block" : "none";
   });
-});*/
+
+  // Toggle elements
+  const toggleTabs            = document.getElementById("toggleTabs");
+  const toggleSubTabGenres    = document.getElementById("toggleSubTabGenres");
+  const togglePopularMovies   = document.getElementById("togglePopularMovies");
+  const toggleBackToTop       = document.getElementById("toggleBackToTop");
+  const toggleFloatingPanel   = document.getElementById("toggleFloatingPanel");
+
+  function hideOrShow(el, show) {
+    if (!el) return;
+    el.style.display = show ? "" : "none";
+  }
+
+  // Index elements (واقعی صفحه توی index.html)
+  const elTabs                 = document.querySelector(".movie-type-tabs");
+  const elSubTabGenresWrapper  = document.querySelector(".tab-genres-wrapper");
+  const elPopularMovies        = document.querySelector("#popular-carousel");
+  const elBackToTopContainer   = document.querySelector(".go-top-container");
+  const elFloatingWrapper      = document.querySelector(".floating-wrapper");
+  const elFloatingBtnContainer = document.querySelector(".floating-btn-container");
+
+  // LocalStorage keys (مثل theme)
+  const HOMEPAGE_PREF_KEYS = {
+    tabs:        "homepage_tabs",
+    subTabGenres:"homepage_subtab_genres",
+    popular:     "homepage_popular_movies",
+    backToTop:   "homepage_back_to_top",
+    floating:    "homepage_floating_panel"
+  };
+
+  // ---- Apply functions ----
+  function applyTabsSetting() {
+    if (!toggleTabs) return;
+    const enabled = !!toggleTabs.checked;
+
+    // اگر روی تب دیگه‌ای بود برگرده روی All Movies
+    if (!enabled) {
+      const activeBtn = document.querySelector(".movie-type-tabs button.active");
+      const allBtn = document.querySelector('.movie-type-tabs button[data-type="all"]');
+      if (activeBtn && allBtn && activeBtn !== allBtn) {
+        allBtn.click();
+      }
+    }
+
+    hideOrShow(elTabs, enabled);
+
+    // اگر تب‌ها خاموش باشند، ژانر زیر تب‌ها هم قطع
+    if (!enabled) {
+      hideOrShow(elSubTabGenresWrapper, false);
+    }
+
+    localStorage.setItem(HOMEPAGE_PREF_KEYS.tabs, enabled ? "1" : "0");
+  }
+
+  function applySubTabGenresSetting() {
+    if (!toggleSubTabGenres) return;
+    const enabled = !!toggleSubTabGenres.checked;
+
+    // فقط وقتی تب‌ها روشن‌اند ژانرها نمایش داده شوند
+    const shouldShow = enabled && (!!toggleTabs && toggleTabs.checked);
+    hideOrShow(elSubTabGenresWrapper, shouldShow);
+
+    localStorage.setItem(HOMEPAGE_PREF_KEYS.subTabGenres, enabled ? "1" : "0");
+  }
+
+  function applyPopularMoviesSetting() {
+    if (!togglePopularMovies) return;
+    const enabled = !!togglePopularMovies.checked;
+
+    hideOrShow(elPopularMovies, enabled);
+
+    localStorage.setItem(HOMEPAGE_PREF_KEYS.popular, enabled ? "1" : "0");
+  }
+
+  function applyBackToTopSetting() {
+    if (!toggleBackToTop) return;
+    const enabled = !!toggleBackToTop.checked;
+
+    hideOrShow(elBackToTopContainer, enabled);
+
+    localStorage.setItem(HOMEPAGE_PREF_KEYS.backToTop, enabled ? "1" : "0");
+  }
+
+  function applyFloatingSetting() {
+    if (!toggleFloatingPanel) return;
+    const enabled = !!toggleFloatingPanel.checked;
+
+    hideOrShow(elFloatingWrapper, enabled);
+    hideOrShow(elFloatingBtnContainer, enabled);
+
+    localStorage.setItem(HOMEPAGE_PREF_KEYS.floating, enabled ? "1" : "0");
+  }
+
+  // ---- Restore from localStorage on load ----
+  function restoreHomepagePrefs() {
+    if (toggleTabs) {
+      const v = localStorage.getItem(HOMEPAGE_PREF_KEYS.tabs);
+      if (v === "0") toggleTabs.checked = false;
+    }
+
+    if (toggleSubTabGenres) {
+      const v = localStorage.getItem(HOMEPAGE_PREF_KEYS.subTabGenres);
+      if (v === "0") toggleSubTabGenres.checked = false;
+    }
+
+    if (togglePopularMovies) {
+      const v = localStorage.getItem(HOMEPAGE_PREF_KEYS.popular);
+      if (v === "0") togglePopularMovies.checked = false;
+    }
+
+    if (toggleBackToTop) {
+      const v = localStorage.getItem(HOMEPAGE_PREF_KEYS.backToTop);
+      if (v === "0") toggleBackToTop.checked = false;
+    }
+
+    if (toggleFloatingPanel) {
+      const v = localStorage.getItem(HOMEPAGE_PREF_KEYS.floating);
+      if (v === "0") toggleFloatingPanel.checked = false;
+    }
+
+    // اعمال اولیه بر اساس مقدارهای فعلی چک‌باکس‌ها
+    applyTabsSetting();
+    applySubTabGenresSetting();
+    applyPopularMoviesSetting();
+    applyBackToTopSetting();
+    applyFloatingSetting();
+  }
+
+  // ---- Event listeners ----
+  if (toggleTabs) {
+    toggleTabs.addEventListener("change", () => {
+      applyTabsSetting();
+      // وقتی تب‌ها خاموش/روشن می‌شوند، وضعیت ژانر زیر تب‌ها هم دوباره محاسبه شود
+      applySubTabGenresSetting();
+    });
+  }
+
+  if (toggleSubTabGenres) {
+    toggleSubTabGenres.addEventListener("change", applySubTabGenresSetting);
+  }
+
+  if (togglePopularMovies) {
+    togglePopularMovies.addEventListener("change", applyPopularMoviesSetting);
+  }
+
+  if (toggleBackToTop) {
+    toggleBackToTop.addEventListener("change", applyBackToTopSetting);
+  }
+
+  if (toggleFloatingPanel) {
+    toggleFloatingPanel.addEventListener("change", applyFloatingSetting);
+  }
+
+  // اجرا در بار اول (restore)
+  restoreHomepagePrefs();
+})();
 
 // -------------------- Initial load --------------------
 if (document.querySelector('.admin-tabs .tab-btn')) {

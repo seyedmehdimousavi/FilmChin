@@ -4821,3 +4821,93 @@ body.dark .chat-back-btn { background: #333; color: #fff; }
     transform: translateY(-100%) translateX(50%);
   }
 }
+/* =========================
+   HOMEPAGE MANAGER STYLES
+========================= */
+
+.homepage-manager-submenu {
+  padding: 10px 8px;
+  border-radius: 12px;
+  margin: 10px 0;
+  background: rgba(0, 74, 124, 0.05);  /* شبیه rating-filter، بدون گلس */
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+body.dark .homepage-manager-submenu {
+  background: rgba(15, 23, 42, 0.9);   /* کارت تیره تمیز در دارک مود */
+  border-color: rgba(148, 163, 184, 0.35);
+}
+
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 4px;
+  font-size: 14px;
+  color: #111827;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.toggle-row:last-child {
+  border-bottom: none;
+}
+
+body.dark .toggle-row {
+  color: #e5e7eb;
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+/* TOGGLE SWITCH */
+.switch {
+  position: relative;
+  width: 46px;
+  height: 24px;
+  display: inline-block;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  border-radius: 34px;
+  background: #9ca3af;
+  transition: .25s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: #f9fafb;
+  border-radius: 50%;
+  transition: .25s;
+}
+
+/* active */
+input:checked + .slider {
+  background: #0ea5e9;
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+/* dark mode tweaks */
+body.dark .slider {
+  background: #4b5563;
+}
+
+body.dark input:checked + .slider {
+  background: #38bdf8;
+}
+
+body.dark .slider:before {
+  background: #e5e7eb;
+}
