@@ -4926,3 +4926,33 @@ body.dark input:checked + .slider {
 body.dark .slider:before {
   background: #e5e7eb;
 }
+body.dark .toggle-row span {
+  color: #fff;
+}
+/* وقتی کاربر Animations را خاموش می‌کند */
+body.reduce-animations .movie-card,
+body.reduce-animations .anim-horizontal,
+body.reduce-animations .anim-vertical,
+body.reduce-animations .anim-left-right {
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+/* وقتی انیمیشن خاموش است */
+body.reduce-animations .movie-card,
+body.reduce-animations .anim-horizontal,
+body.reduce-animations .anim-vertical,
+body.reduce-animations .anim-left-right {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+}
+
+/* همه اکتیوها را بی‌اثر کن */
+body.reduce-animations .active-down,
+body.reduce-animations .active-up {
+    opacity: 1 !important;
+    transform: none !important;
+}
