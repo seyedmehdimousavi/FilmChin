@@ -4956,3 +4956,27 @@ body.reduce-animations .active-up {
     opacity: 1 !important;
     transform: none !important;
 }
+/* ============================
+   HARD DISABLE ANIMATIONS MODE
+   ============================ */
+
+body.reduce-animations * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* کارت‌ها در حالت بدون انیمیشن */
+body.reduce-animations .movie-card,
+body.reduce-animations .movie-card * {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* المان‌های anim-horizontal, anim-vertical */
+body.reduce-animations .anim-horizontal,
+body.reduce-animations .anim-vertical,
+body.reduce-animations .anim-left-right {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
