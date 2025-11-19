@@ -3205,8 +3205,12 @@ body.dark .pagination-users{
 body.dark .carousel-item button.more-info {
   color: #fff;
 }
-.carousel-item.active button.more-info {
-  display: block;
+.carousel-item .button-wrap {
+  display: none;
+}
+
+.carousel-item.active .button-wrap {
+  display: flex;       /* یا block — هر کدام طرح تو اجازه می‌دهد */
 }
 .carousel-bg {
   position: absolute;
@@ -4929,54 +4933,25 @@ body.dark .slider:before {
 body.dark .toggle-row span {
   color: #fff;
 }
-/* وقتی کاربر Animations را خاموش می‌کند */
-body.reduce-animations .movie-card,
-body.reduce-animations .anim-horizontal,
-body.reduce-animations .anim-vertical,
-body.reduce-animations .anim-left-right {
-  opacity: 1 !important;
-  transform: none !important;
-  animation: none !important;
-  transition: none !important;
-}
-/* وقتی انیمیشن خاموش است */
-body.reduce-animations .movie-card,
-body.reduce-animations .anim-horizontal,
-body.reduce-animations .anim-vertical,
-body.reduce-animations .anim-left-right {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-    animation: none !important;
-}
-
-/* همه اکتیوها را بی‌اثر کن */
-body.reduce-animations .active-down,
-body.reduce-animations .active-up {
-    opacity: 1 !important;
-    transform: none !important;
-}
 /* ============================
-   HARD DISABLE ANIMATIONS MODE
+   REDUCE ANIMATIONS — FIXED
    ============================ */
 
-body.reduce-animations * {
+/* فقط کارت‌های اصلی صفحات (غیر کاروسل) */
+body.reduce-animations .movie-card:not(.carousel-item),
+body.reduce-animations .movie-card:not(.carousel-item) * {
+  opacity: 1 !important;
+  transform: none !important;
   transition: none !important;
   animation: none !important;
 }
 
-/* کارت‌ها در حالت بدون انیمیشن */
-body.reduce-animations .movie-card,
-body.reduce-animations .movie-card * {
-  opacity: 1 !important;
-  transform: none !important;
-}
-
-/* المان‌های anim-horizontal, anim-vertical */
-body.reduce-animations .anim-horizontal,
-body.reduce-animations .anim-vertical,
-body.reduce-animations .anim-left-right {
+/* فقط المان‌های انیمیشن اسکرول */
+body.reduce-animations .movie-card:not(.carousel-item) .anim-horizontal,
+body.reduce-animations .movie-card:not(.carousel-item) .anim-vertical,
+body.reduce-animations .movie-card:not(.carousel-item) .anim-left-right {
   opacity: 1 !important;
   transform: none !important;
   transition: none !important;
+  animation: none !important;
 }

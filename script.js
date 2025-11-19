@@ -5058,62 +5058,68 @@ if (goTopBtn) {
     localStorage.getItem(PREF.animations) === "0";
 
   // ==================================================
-  // ANIMATIONS — ENABLE / DISABLE
-  // ==================================================
-  function applyAnimationSetting() {
-    const animationsEnabled = !!toggleReduceAnimations.checked;
-    window.filmchiReduceAnimations = !animationsEnabled;
+// ANIMATIONS — ENABLE / DISABLE  (FINAL FIXED VERSION)
+// ==================================================
+function applyAnimationSetting() {
+  const animationsEnabled = !!toggleReduceAnimations.checked;
+  window.filmchiReduceAnimations = !animationsEnabled;
 
-    const cards = document.querySelectorAll(".movie-card");
-    const animatedEls = document.querySelectorAll(
-      ".anim-horizontal, .anim-vertical, .anim-left-right"
-    );
+  // فقط کارت‌ها و اجزای داخل کارت
+  const cards = document.querySelectorAll(".movie-card");
+  const animatedEls = document.querySelectorAll(
+    ".movie-card .anim-horizontal, .movie-card .anim-vertical, .movie-card .anim-left-right"
+  );
 
-    if (animationsEnabled) {
-      // ---------------- ENABLE ANIMATIONS ----------------
-      document.body.classList.remove("reduce-animations");
+  // -----------------------------------
+  //   ENABLE ANIMATIONS
+  // -----------------------------------
+  if (animationsEnabled) {
+    document.body.classList.remove("reduce-animations");
 
-      cards.forEach(card =>
-        card.classList.remove("active-down", "active-up")
-      );
-      animatedEls.forEach(el =>
-        el.classList.remove("active-down", "active-up")
-      );
+    // کلاس‌های فعال قبلی حذف می‌شوند تا دوباره با اسکرول فعال شوند
+    cards.forEach(card => {
+      card.classList.remove("active-down", "active-up", "no-reveal");
+    });
+    animatedEls.forEach(el => {
+      el.classList.remove("active-down", "active-up", "no-reveal");
+    });
 
-      try {
-        if (typeof cardObserver !== "undefined") cardObserver.disconnect();
-        if (typeof animObserver !== "undefined") animObserver.disconnect();
-      } catch {}
+    // بازنشانی Observerها
+    try { if (typeof cardObserver !== "undefined") cardObserver.disconnect(); } catch {}
+    try { if (typeof animObserver !== "undefined") animObserver.disconnect(); } catch {}
 
-      // Restore scroll animations
-      cards.forEach(card => {
-        try { cardObserver.observe(card); } catch {}
-      });
+    // فعال کردن دوباره مشاهده برای کارت‌ها
+    cards.forEach(card => {
+      try { cardObserver.observe(card); } catch {}
+    });
 
-      animatedEls.forEach(el => {
-        try { animObserver.observe(el); } catch {}
-      });
+    animatedEls.forEach(el => {
+      try { animObserver.observe(el); } catch {}
+    });
 
-    } else {
-      // ---------------- DISABLE ANIMATIONS ----------------
-      document.body.classList.add("reduce-animations");
+  // -----------------------------------
+  //   DISABLE ANIMATIONS
+  // -----------------------------------
+  } else {
+    document.body.classList.add("reduce-animations");
 
-      try {
-        if (typeof cardObserver !== "undefined") cardObserver.disconnect();
-        if (typeof animObserver !== "undefined") animObserver.disconnect();
-      } catch {}
+    // توقف کامل observer ها
+    try { if (typeof cardObserver !== "undefined") cardObserver.disconnect(); } catch {}
+    try { if (typeof animObserver !== "undefined") animObserver.disconnect(); } catch {}
 
-      // Force all cards to appear instantly
-      cards.forEach(card => {
-        card.classList.add("active-down", "active-up");
-      });
-      animatedEls.forEach(el => {
-        el.classList.add("active-down", "active-up");
-      });
-    }
+    // کارت‌ها از همان اول ظاهر شوند؛ و دکمه More Info هم کار کند
+    cards.forEach(card => {
+      card.classList.add("active-down", "active-up", "no-reveal");
+    });
 
-    localStorage.setItem(PREF.animations, animationsEnabled ? "1" : "0");
+    animatedEls.forEach(el => {
+      el.classList.add("active-down", "active-up", "no-reveal");
+    });
   }
+
+  // ذخیره انتخاب
+  localStorage.setItem(PREF.animations, animationsEnabled ? "1" : "0");
+}
 
   // ==================================================
   // APPLY FUNCTIONS
@@ -5172,7 +5178,70 @@ if (goTopBtn) {
     if (localStorage.getItem(PREF.popular) === "0") togglePopularMovies.checked = false;
     if (localStorage.getItem(PREF.backToTop) === "0") toggleBackToTop.checked = false;
     if (localStorage.getItem(PREF.floating) === "0") toggleFloatingPanel.checked = false;
+// ==================================================
+// ANIMATIONS —  / DISABLE (FINAL FIXED VERSION)
+// ==================================================
+function applyAnimationSetting() {
+  const animationsEnabled = !!toggleReduceAnimations.checked;
+  window.filmchiReduceAnimations = !animationsEnabled;
 
+  // ❗ فقط کارت‌های اصلی صفحه
+  const mainCards = document.querySelectorAll(
+    ".movie-card:not(.expanded)" // کارت‌های صفحه index، نه داخل مودال و نه carousel
+  );
+
+  // فقط المنت‌های انیمیشنی داخل کارت‌های اصلی
+  const animatedEls = document.querySelectorAll(
+    ".movie-card .anim-horizontal, .movie-card .anim-vertical, .movie-card .anim-left-right"
+  );
+
+  if (animationsEnabled) {
+    // ---------------- ENABLE ANIMATIONS ----------------
+    document.body.classList.remove("reduce-animations");
+
+    mainCards.forEach(card =>
+      card.classList.remove("active-down", "active-up", "no-reveal")
+    );
+
+    animatedEls.forEach(el =>
+      el.classList.remove("active-down", "active-up")
+    );
+
+    // فعال کردن دوباره آبزرورها
+    try {
+      if (typeof cardObserver !== "undefined") {
+        cardObserver.disconnect();
+        mainCards.forEach(card => cardObserver.observe(card));
+      }
+
+      if (typeof animObserver !== "undefined") {
+        animObserver.disconnect();
+        animatedEls.forEach(el => animObserver.observe(el));
+      }
+    } catch {}
+
+  } else {
+    // ---------------- DISABLE ANIMATIONS ----------------
+    document.body.classList.add("reduce-animations");
+
+    // قطع آبزرورها
+    try {
+      if (typeof cardObserver !== "undefined") cardObserver.disconnect();
+      if (typeof animObserver !== "undefined") animObserver.disconnect();
+    } catch {}
+
+    // کارت‌های اصلی → کاملاً نمایش داده شوند
+    mainCards.forEach(card => {
+      card.classList.add("active-down", "active-up", "no-reveal");
+    });
+
+    animatedEls.forEach(el => {
+      el.classList.add("active-down", "active-up");
+    });
+  }
+
+  localStorage.setItem(PREF.animations, animationsEnabled ? "1" : "0");
+}
     if (localStorage.getItem(PREF.animations) === "0") {
       toggleReduceAnimations.checked = false;
       window.filmchiReduceAnimations = true;
