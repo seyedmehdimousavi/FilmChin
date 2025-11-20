@@ -1533,8 +1533,11 @@ Backdrop-filter: blur(var(--blur));
   mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
   mask-repeat: no-repeat;
   mask-size: 100% 100%;
-  position: sticky;
-  top: 120px;
+  position: fixed; /* به جای sticky */
+  top: 120px;       /* زیر هدر */
+  left: 0;
+  right: 0;
+  transition: transform 0.3s ease;
 }
 
 .movie-type-tabs::-webkit-scrollbar {
@@ -3802,29 +3805,6 @@ body.dark .user-thread-snippet { color: #bbb; }
   transform: translateY(-100%);
 }
 
-.movie-type-tabs {
-  z-index: 900;
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  white-space: nowrap;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  padding: 8px 16px;
-  backdrop-filter: blur(var(--blur));
-  width: 100%;
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
-  mask-repeat: no-repeat;
-  mask-size: 100% 100%;
-  position: fixed; /* به جای sticky */
-  top: 120px;       /* زیر هدر */
-  left: 0;
-  right: 0;
-  transition: transform 0.3s ease;
-}
 
 .movie-type-tabs.hide {
   transform: translateY(-100%);
