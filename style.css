@@ -283,11 +283,11 @@ Body.dark .field-label{color:#ddd}
   Background: linear-gradient(90deg, hsla(204, 77%, 44%, 0.1) 0%, hsla(204, 100%, 24%, 0.06)  100%);
   border: 1px solid rgba(0,74,124,0.05);
   Border-left:4px solid rgba(33,133,213,0.9);
-  Padding:8px;
   Border-radius:6px;
   Margin-bottom:6px;
   Color:#263345;
   box-shadow:0 6px 16px rgba(0,0,0,0.09);
+  Padding: 6px 3px;
 }
 Body.dark .field-quote{
   Background: rgba(255,255,255,0.08);
@@ -1094,15 +1094,23 @@ Body.dark .admin-comment-text {
 }
 .menu-toggle span, .links-toggle span {
   width: 100%;
-  text-align: left;
+    text-align: left;
+    display: flex;
+    align-items: center;
+}
+.menu-toggle span i, .links-toggle span i{
+  font-size: 20px;
+    padding-right: 5px;
 }
 Body.dark .menu-toggle {
   Background: rgba(255,255,255,0.08);
 }
 .submenu {
-  Margin-top: 6px;
-  Padding-left: 10px;
-  Border-left: 2px solid rgba(0,0,0,0.1);
+    Padding: 10px;
+    Margin-top: 6px;
+    border-radius: 12px;
+    background: rgba(0, 74, 124, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 Body.dark .submenu {
@@ -1660,16 +1668,21 @@ body.dark .genre-chip-mini{
 }
 .genre-chip {
   display: inline-flex;
-  align-items: center;
-  transition: all 0.2s ease;
-  padding: 4px 10px;
-  border-radius: 16px;
-  background: #eee;
-  cursor: pointer;
+    align-items: center;
+    transition: all 0.2s ease;
+    border-radius: 16px;
+    background: rgba(0, 123, 255, 0.15);
+    color: #007bff;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
 }
 Body.dark .genre-chip{
-  background: #eef3f7;
-  color: #0b3d5c;
+     background: rgba(0, 123, 255, 0.35);
+    color: #FFFFFFE3;
 }
 .genre-chip:hover {
   background: #ddd;
@@ -2235,13 +2248,14 @@ body.dark .admin-tabs .tab-btn.active .tab-circle {
 }
 
 .menu-section {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin-top: 65px;
-  gap: 10px;
-  justify-content: space-between;
-  align-items: center;
+ display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    margin: 10px 0;
+    margin-top: 65px;
+    justify-content: space-between;
+    align-items: center;
 }
 .menu-section >div{
   width: 100%;
@@ -3155,9 +3169,6 @@ body.dark .pagination-users{
     color: #005d79;
     border-radius: 10px;
 }
-#genreSubmenu .genre-chip{
-  font-size: 12px;
-}
 .movie-top {
   position: relative;
 }
@@ -3279,12 +3290,12 @@ body.dark .carousel-item button.more-info {
 }
 
 .movie-modal-content {
-    width: 85%;
+        width: 85%;
     max-width: 700px;
     max-height: 90vh;
     overflow-y: auto;
     scrollbar-width: none;
-    border-radius: 6px;
+    border-radius: 16px;
     position: relative;
 }
 
