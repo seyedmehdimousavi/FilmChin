@@ -4933,20 +4933,25 @@ body.dark .slider:before {
 body.dark .toggle-row span {
   color: #fff;
 }
-/* ============================
-   REDUCE ANIMATIONS — FIXED
-   ============================ */
+/* =========================================
+   REDUCE ANIMATIONS — ONLY MAIN MOVIE CARDS
+   ========================================= */
 
-/* فقط کارت‌های اصلی صفحات (غیر کاروسل) */
-body.reduce-animations .movie-card:not(.carousel-item),
-body.reduce-animations .movie-card:not(.carousel-item) * {
+/* فقط کارت‌های اصلی فیلم‌ها (نه کاروسل) */
+body.reduce-animations .movie-card:not(.carousel-item) {
   opacity: 1 !important;
   transform: none !important;
   transition: none !important;
   animation: none !important;
 }
 
-/* فقط المان‌های انیمیشن اسکرول */
+/* فقط wrapper کارت — نه عناصر داخلی کارت */
+body.reduce-animations .movie-card:not(.carousel-item) > * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* فقط انیمیشن‌های اسکرول ورودی کارت‌ها */
 body.reduce-animations .movie-card:not(.carousel-item) .anim-horizontal,
 body.reduce-animations .movie-card:not(.carousel-item) .anim-vertical,
 body.reduce-animations .movie-card:not(.carousel-item) .anim-left-right {
@@ -4954,4 +4959,17 @@ body.reduce-animations .movie-card:not(.carousel-item) .anim-left-right {
   transform: none !important;
   transition: none !important;
   animation: none !important;
+}
+
+/* =========================================
+   DO NOT TOUCH episode-title scrolling
+   ========================================= */
+
+/* اپیزودها مثل قبل حرکت کنند */
+body.reduce-animations .episode-title,
+body.reduce-animations .episode-title.scrolling {
+  animation: inherit !important;
+  transition: inherit !important;
+  transform: inherit !important;
+  opacity: inherit !important;
 }
