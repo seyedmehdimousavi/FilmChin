@@ -1,494 +1,619 @@
 <!DOCTYPE html>
 <html lang="fa" dir="ltr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FilmChiin</title>
-  <!-- Bootstrap icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <!-- main stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FilmChiin</title>
+    <!-- Bootstrap icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- main stylesheet -->
+    <link rel="stylesheet" href="style.css" />
 
-  <!-- supabase client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body class="index-body">
-<!-- Toast Container -->
-<div id="toast-container"></div>
-<!-- Active Filters Toast -->
-<div id="activeFilters" class="active-filters-toast"></div>
-<!-- Header (sticky with blur) -->
-<header class="main-header">
-  <!-- 🔹 بنر بالای سایت -->
-<div id="site-banner"class="site-banner">
-  <div class="banner-content split-text-container">
-    <span class="banner-logo text-part left">
-      <img src="/images/banner-icon.png" alt="banner-logo" />
-    </span>
-    <span class="banner-text text-part right">filmchiin.ir</span>
-  </div>
-</div>
-<div class="header">
-<div class="search-bar">
-  <div class="button-wrap">
-    <button id="menuBtn" class="menu-btn" aria-label="menu">
-    
-      <img width="96" height="96" src="images/icons8-menu-64.png" alt="menu--v2" style="display:flex;align-items:center;"/>
-  </button>
-  <div class="button-shadow"></div>
-  </div>
-<div id="profileMenu" class="profile-menu hidden">
-  <div class="profile-bubble">
-    <div class="profile-username" id="profileUsername">UserName</div>
-    <div class="button-wrap">
-      <button class="profile-edit"><span>Edit Profile</span></button>
-      <div class="button-shadow"></div>
-    </div>
-    
-    <hr class="profile-divider"/>
-    <div class="button-wrap">
-      <button id="logoutBtn" class="profile-logout"><span>Logout</span></button>
-      <div class="button-shadow">
-      </div>
-    </div>
-    
-  </div>
-</div>
-  <input id="search" type="text" placeholder="Search..." dir="auto"/>
-
-  <div class="button-wrap">
-    <button id="profileBtn" class="icon-inside" style="display:flex;align-items:center;" aria-label="profile">
-        <img src="images/icons8-user-96.png" alt="user"/>
-    <span id="commentBadge" class="badge" style="display:none;">!</span>
-  </button>
-  <div class="button-shadow">
-  </div>
-  </div>
-  
-  
-
-  <button id="searchCloseBtn" class="close-btn" style="display:none;" aria-label="close">✕</button>
-</div>
-
-<label class="theme-switch" id="themeSwitchLabel">
-  <input class="theme-switch__checkbox" type="checkbox" id="themeSwitchCheckbox" />
-  <div class="theme-switch__container">
-    <div class="theme-switch__clouds"></div>
-    <div class="theme-switch__stars-container">
-      <svg fill="none" viewBox="0 0 144 55" xmlns="http://www.w3.org/2000/svg">
-        <path
-          fill="currentColor"
-          d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z"
-          clip-rule="evenodd"
-          fill-rule="evenodd"
-        ></path>
-      </svg>
-    </div>
-    <div class="theme-switch__circle-container">
-      <div class="theme-switch__sun-moon-container">
-        <div class="theme-switch__moon">
-          <div class="theme-switch__spot"></div>
-          <div class="theme-switch__spot"></div>
-          <div class="theme-switch__spot"></div>
+    <!-- supabase client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body class="index-body">
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+    <!-- Active Filters Toast -->
+    <div id="activeFilters" class="active-filters-toast"></div>
+    <!-- Header (sticky with blur) -->
+    <header class="main-header">
+      <!-- 🔹 بنر بالای سایت -->
+      <div id="site-banner" class="site-banner">
+        <div class="banner-content split-text-container">
+          <span class="banner-logo text-part left">
+            <img src="/images/banner-icon.png" alt="banner-logo" />
+          </span>
+          <span class="banner-text text-part right">filmchiin.ir</span>
         </div>
       </div>
-    </div>
-    <div class="theme-switch__shooting-star"></div>
-    <div class="theme-switch__shooting-star-2"></div>
-    <div class="theme-switch__meteor"></div>
-    <div class="theme-switch__stars-cluster">
-      <div class="star"></div>
-      <div class="star"></div>
-      <div class="star"></div>
-      <div class="star"></div>
-      <div class="star"></div>
-    </div>
-    <div class="theme-switch__aurora"></div>
-    <div class="theme-switch__comets">
-      <div class="comet"></div>
-      <div class="comet"></div>
-    </div>
-  </div>
-</label>
-</div>
-    
-</header>
-
-<!-- side menu and overlay -->
-<div id="menuOverlay" class="menu-overlay"></div>
-
-
-<nav id="sideMenu" class="side-menu" aria-hidden="true">
-  
-  <div class="menu-section">
-    <div class="homepage-manager-section">
-
-  <div class="button-wrap homepage-manager-btn">
-    <button id="homepageManagerToggle" class="menu-toggle">
-      <span><i class="bi bi-gear"></i> Homepage Manager</span>
-    </button>
-    <div class="button-shadow"></div>
-  </div>
-
-  <div id="homepageManagerSubmenu" class="submenu homepage-manager-submenu" style="display:none;">
-    
-    <div class="toggle-row">
-  <span>Animations</span>
-  <label class="switch">
-    <input type="checkbox" id="toggleReduceAnimations" checked>
-    <span class="slider"></span>
-  </label>
-</div>
-
-    <div class="toggle-row">
-      <span>Tabs</span>
-      <label class="switch">
-        <input type="checkbox" id="toggleTabs" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="toggle-row">
-      <span>Sub-tab genres</span>
-      <label class="switch">
-        <input type="checkbox" id="toggleSubTabGenres" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="toggle-row">
-      <span>Popular movies</span>
-      <label class="switch">
-        <input type="checkbox" id="togglePopularMovies" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="toggle-row">
-      <span>Back to Top Button</span>
-      <label class="switch">
-        <input type="checkbox" id="toggleBackToTop" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="toggle-row">
-      <span>Floating Summary Panel</span>
-      <label class="switch">
-        <input type="checkbox" id="toggleFloatingPanel" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-
-  </div>
-</div>
-     <div class="gs">
-       <div class="button-wrap">
-             <button id="genreToggle" class="menu-toggle">
-               <span><i class="bi bi-list"></i> Genres</span>
+      <div class="header">
+        <div class="search-bar">
+          <div class="button-wrap">
+            <button id="menuBtn" class="menu-btn" aria-label="menu">
+              <img
+                width="96"
+                height="96"
+                src="images/icons8-menu-64.png"
+                alt="menu--v2"
+                style="display: flex; align-items: center"
+              />
             </button>
-        <div class="button-shadow"></div>
-        </div>
-                <div id="genreSubmenu" class="submenu" style="display:none;">
-           <div id="genreGrid" class="genre-grid"></div>
-         </div>
+            <div class="button-shadow"></div>
+          </div>
+          <div id="profileMenu" class="profile-menu hidden">
+            <div class="profile-bubble">
+              <div class="profile-username" id="profileUsername">UserName</div>
+              <div class="button-wrap">
+                <button class="profile-edit"><span>Edit Profile</span></button>
+                <div class="button-shadow"></div>
+              </div>
 
-      </div>
-     <div class="sl">
-           <div id="linksHeader">
-             <div class="button-wrap">
-               <button class="links-toggle" style="display: flex;align-items: center;">
-               <span>               <i class="bi bi-link-45deg"></i> Links
-               </span>
-             </button>
-             <div class="button-shadow"></div>
-             </div>
-             
-         </div>
-           <div id="socialGrid" class="social-grid hidden"></div>
-     </div>
-     
-     <div id="ratingFilter" class="rating-filter">
-       <h4 class="rating-filter-title">Sort by imdb rating</h4>
-
-       <div class="rating-process-wrapper">
-         <div class="rating-min">0</div>
-        <div class="rating-track" id="ratingTrack" aria-hidden="false">
-         <div class="rating-track-fill" id="ratingFill"></div>
-         <div class="rating-knob" id="ratingKnob" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0">
-        <div class="rating-bubble" id="ratingBubble" aria-hidden="true">
-          Rating &gt; <span id="ratingBubbleValue">0.0</span>
-        </div>
-      </div>
-    </div>
-    <div class="rating-max">10</div>
-  </div>
-
-  <div class="rating-controls button-wrap">
-    <button id="applyRatingFilter" class="apply-imdb small">
-      <span>Apply</span>
-      </button>
-      <div class="button-shadow"></div>
-  </div>
-  
-</div>
-
-
-
-     </div>
-  
-  
-  
-<section class="side-menu-bottom">
-  <!--  to admin bubble -->
-<div id="chatBubble" class="chat-bubble">
-  <div class="chat-bubble-header">
-    <span class="chat-bubble-title">پیام به ادمین</span>
-    <span id="chatBubbleBadge" class="badge" style="display:none;">!</span>
-  </div>
-
-  <!-- ردیف جمع‌شده (کالپس) -->
-  <div class="chat-input-row" id="chatInputRow">
-    <input id="chatInput" type="text" placeholder="پیام به ادمین" />
-    <div class="chat-actions">
-      <div class="button-wrap">
-        <button id="chatAttachBtn" class="chat-icon-btn" aria-label="attach">
-  <img src="images/icons8-attach-60.png" alt="attach" />
-</button>
-<div class="button-shadow">
-</div>
-      </div>
-      <input id="chatAttachFile" type="file" accept="image/*" hidden />
-      <div class="button-wrap">
-              <button id="chatSendBtn" class="chat-icon-btn disabled" aria-label="send">
-                <img src="images/icons8-send-90.png" alt="send" />
-      </button>
-      <div class="button-shadow"></div>
-      </div>
-      
-    </div>
-  </div>
-
-  <!-- نمای تمام‌صفحه در سایدمنو -->
-  <div id="chatOverlay" class="chat-overlay" aria-hidden="true">
-    <div class="chat-overlay-header">
-      <div class="button-wrap">
-              <button id="userChatBackBtn" class="chat-back-btn" aria-label="back">
-                <span>close</span> </button>
-              <div class="button-shadow"></div>
-      </div>
-      
-      <img id="chatAdminAvatar" class="chat-admin-avatar" src="images/Admin-logo.png" alt="admin" />
-      <div class="chat-overlay-title">پیام به ادمین</div>
-    </div>
-
-        <div id="chatMessagesList" class="chat-messages-list"></div>
-
-    <!-- کامپوزر پایین -->
-    <div class="chat-composer">
-            <input id="overlayInput" type="text" placeholder="بنویس..." />
-            <div class="button-wrap">
-              <button id="overlayAttachBtn" class="chat-icon-btn" aria-label="attach">
-  <img src="images/icons8-attach-60.png" alt="attach" />
-</button>
-<div class="button-shadow">
-</div>
+              <hr class="profile-divider" />
+              <div class="button-wrap">
+                <button id="logoutBtn" class="profile-logout">
+                  <span>Logout</span>
+                </button>
+                <div class="button-shadow"></div>
+              </div>
             </div>
-      <input id="overlayAttachFile" type="file" accept="image/*" hidden />
-      <div class="button-wrap">
-        <button id="overlaySendBtn" class="chat-icon-btn disabled" aria-label="send">
-  <img src="images/icons8-send-90.png" alt="send" />
-</button>
-<div class="button-shadow"></div>
+          </div>
+          <input id="search" type="text" placeholder="Search..." dir="auto" />
+
+          <div class="button-wrap">
+            <button
+              id="profileBtn"
+              class="icon-inside"
+              style="display: flex; align-items: center"
+              aria-label="profile"
+            >
+              <img src="images/icons8-user-96.png" alt="user" />
+              <span id="commentBadge" class="badge" style="display: none"
+                >!</span
+              >
+            </button>
+            <div class="button-shadow"></div>
+          </div>
+
+          <button
+            id="searchCloseBtn"
+            class="close-btn"
+            style="display: none"
+            aria-label="close"
+          >
+            ✕
+          </button>
+        </div>
+
+        <label class="theme-switch" id="themeSwitchLabel">
+          <input
+            class="theme-switch__checkbox"
+            type="checkbox"
+            id="themeSwitchCheckbox"
+          />
+          <div class="theme-switch__container">
+            <div class="theme-switch__clouds"></div>
+            <div class="theme-switch__stars-container">
+              <svg
+                fill="none"
+                viewBox="0 0 144 55"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill="currentColor"
+                  d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z"
+                  clip-rule="evenodd"
+                  fill-rule="evenodd"
+                ></path>
+              </svg>
+            </div>
+            <div class="theme-switch__circle-container">
+              <div class="theme-switch__sun-moon-container">
+                <div class="theme-switch__moon">
+                  <div class="theme-switch__spot"></div>
+                  <div class="theme-switch__spot"></div>
+                  <div class="theme-switch__spot"></div>
+                </div>
+              </div>
+            </div>
+            <div class="theme-switch__shooting-star"></div>
+            <div class="theme-switch__shooting-star-2"></div>
+            <div class="theme-switch__meteor"></div>
+            <div class="theme-switch__stars-cluster">
+              <div class="star"></div>
+              <div class="star"></div>
+              <div class="star"></div>
+              <div class="star"></div>
+              <div class="star"></div>
+            </div>
+            <div class="theme-switch__aurora"></div>
+            <div class="theme-switch__comets">
+              <div class="comet"></div>
+              <div class="comet"></div>
+            </div>
+          </div>
+        </label>
       </div>
-    </div>
-  </div>
-</div>
+    </header>
 
-<div class="designer-credit">
-  Design :
-  <div style="display: flex;align-items: center; justify-content: space-between; gap: 4px;">
-    <a href="tg://resolve?domain=SeyedMahdiMousavi" target="_blank" class="designer-bubble">Mehdi</a>
-  <div id="appVersion" class="genre-chip version-chip">v1.0.0</div>
-  </div>
-</div>
-</section>
+    <!-- side menu and overlay -->
+    <div id="menuOverlay" class="menu-overlay"></div>
 
-</nav>
+    <nav id="sideMenu" class="side-menu" aria-hidden="true">
+      <div class="menu-section">
+        <div class="homepage-manager-section">
+          <div class="button-wrap homepage-manager-btn">
+            <button id="homepageManagerToggle" class="menu-toggle">
+              <span><i class="bi bi-gear"></i> Homepage Manager</span>
+            </button>
+            <div class="button-shadow"></div>
+          </div>
 
+          <div
+            id="homepageManagerSubmenu"
+            class="submenu homepage-manager-submenu"
+            style="display: none"
+          >
+            <div class="toggle-row">
+              <span>Animations</span>
+              <label class="switch">
+                <input type="checkbox" id="toggleReduceAnimations" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
 
-<section class="movie-type-tabs">
-  <div class="button-wrap">
-    <button data-type="all" class="active">
-      All Movies <span class="count">0</span>
-    </button>
-    <div class="button-shadow"></div>
-  </div>
-  
+            <div class="toggle-row">
+              <span>Tabs</span>
+              <label class="switch">
+                <input type="checkbox" id="toggleTabs" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
 
-  <div class="button-wrap">
-    <button data-type="collection" class="">
-      Collections <span class="count btn-text">0</span>
-    </button>
-    <div class="button-shadow"></div>
-  </div>
-  
-  <div class="button-wrap">
-    <button data-type="series" class="">
-      Series<span class="count">0</span>
-    </button>
-    <div class="button-shadow"></div>
-  </div>
-  
-  <div class="button-wrap">
-    <button data-type="single" class="">
-      Single Films<span class="count">0</span>
-    </button>
-    <div class="button-shadow"></div>
-  </div>
-</section>
-<div class="tab-genres-wrapper">
-  <div class="tab-genres-list"></div>
-</div>
+            <div class="toggle-row">
+              <span>Sub-tab genres</span>
+              <label class="switch">
+                <input type="checkbox" id="toggleSubTabGenres" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
 
-<!-- main container -->
-<div class="container">
-  <!-- admin s (bubbles above movies) -->
-  <div id="admins" class="s-container" aria-live="polite"></div>
- 
-  
-  <section id="popular-carousel" class="popular-section">
-    <div class="popular-title">
-      <div class="button-wrap">
-  <button>
-    <span>فیلم‌های پرطرفدار</span>
-  </button>
-  <div class="button-shadow">
-  </div>
-</div>
-    </div>
-  <div class="carousel-container">
-    <button class="carousel-btn prev"><img src="images/icons8-back-to-64.png" alt="prev button" /></button>
-    <div class="carousel-window">
-      <div class="carousel-track"></div>
-    </div>
-    <button class="carousel-btn next"><img src="images/icons8-next-page-64.png" alt="next button" /></button>
-  </div>
-  <div class="carousel-bg"></div>
-</section>
+            <div class="toggle-row">
+              <span>Popular movies</span>
+              <label class="switch">
+                <input type="checkbox" id="togglePopularMovies" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
 
-<!-- مودال اطلاعات بیشتر -->
-<div id="movie-modal" class="movie-modal">
-  <div class="movie-modal-content"></div>
-</div>
+            <div class="toggle-row">
+              <span>Back to Top Button</span>
+              <label class="switch">
+                <input type="checkbox" id="toggleBackToTop" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
 
-  <!-- movies count -->
-  <div id="movieCount" class="movie-count">Number of movies: 0</div>
-  
-  <!-- movies grid -->
-  <div id="moviesGrid" class="movies-grid" role="list"></div>
+            <div class="toggle-row">
+              <span>Floating Summary Panel</span>
+              <label class="switch">
+                <input type="checkbox" id="toggleFloatingPanel" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="gs">
+          <div class="button-wrap">
+            <button id="genreToggle" class="menu-toggle">
+              <span><i class="bi bi-list"></i> Genres</span>
+            </button>
+            <div class="button-shadow"></div>
+          </div>
+          <div id="genreSubmenu" class="submenu" style="display: none">
+            <div id="genreGrid" class="genre-grid"></div>
+          </div>
+        </div>
+        <div class="sl">
+          <div id="linksHeader">
+            <div class="button-wrap">
+              <button
+                class="links-toggle"
+                style="display: flex; align-items: center"
+              >
+                <span> <i class="bi bi-link-45deg"></i> Links </span>
+              </button>
+              <div class="button-shadow"></div>
+            </div>
+          </div>
+          <div id="socialGrid" class="social-grid hidden"></div>
+        </div>
 
-  <!-- pagination -->
-  <div id="pagination" class="pagination-container" aria-label="pagination"></div>
-</div>
+        <div id="ratingFilter" class="rating-filter">
+          <h4 class="rating-filter-title">Sort by imdb rating</h4>
 
-<!-- Auth Modal -->
-<div id="authModal" class="login-modal" aria-hidden="true">
-  <div class="login-box">
-    <!-- تب‌ها -->
-    <div class="auth-tabs">
-      <div class="button-wrap">
-        <button class="tab-btn active" data-tab="login"><span>Login</span></button>
-        <div class="button-shadow"></div>
-      </div>
-      
-      <div class="button-wrap">
-        <button class="tab-btn" data-tab="signup"><span>Sign Up</span></button><div class="button-shadow">
+          <div class="rating-process-wrapper">
+            <div class="rating-min">0</div>
+            <div class="rating-track" id="ratingTrack" aria-hidden="false">
+              <div class="rating-track-fill" id="ratingFill"></div>
+              <div
+                class="rating-knob"
+                id="ratingKnob"
+                role="slider"
+                tabindex="0"
+                aria-valuemin="0"
+                aria-valuemax="10"
+                aria-valuenow="0"
+              >
+                <div class="rating-bubble" id="ratingBubble" aria-hidden="true">
+                  Rating &gt; <span id="ratingBubbleValue">0.0</span>
+                </div>
+              </div>
+            </div>
+            <div class="rating-max">10</div>
+          </div>
+
+          <div class="rating-controls button-wrap">
+            <button id="applyRatingFilter" class="apply-imdb small">
+              <span>Apply</span>
+            </button>
+            <div class="button-shadow"></div>
+          </div>
         </div>
       </div>
-      
-      
-    </div>
 
-    <!-- فرم لاگین -->
-    <form id="loginForm" class="tab-content active" data-tab="login">
-      <input type="text" id="loginUsername" placeholder="Gmail or Username" required />
-      <input type="password" id="loginPassword" placeholder="Password" required />
+      <section class="side-menu-bottom">
+        <!--  to admin bubble -->
+        <div id="chatBubble" class="chat-bubble">
+          <div class="chat-bubble-header">
+            <span class="chat-bubble-title">پیام به ادمین</span>
+            <span id="chatBubbleBadge" class="badge" style="display: none"
+              >!</span
+            >
+          </div>
+
+          <!-- ردیف جمع‌شده (کالپس) -->
+          <div class="chat-input-row" id="chatInputRow">
+            <input id="chatInput" type="text" placeholder="پیام به ادمین" />
+            <div class="chat-actions">
+              <div class="button-wrap">
+                <button
+                  id="chatAttachBtn"
+                  class="chat-icon-btn"
+                  aria-label="attach"
+                >
+                  <img src="images/icons8-attach-60.png" alt="attach" />
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+              <input id="chatAttachFile" type="file" accept="image/*" hidden />
+              <div class="button-wrap">
+                <button
+                  id="chatSendBtn"
+                  class="chat-icon-btn disabled"
+                  aria-label="send"
+                >
+                  <img src="images/icons8-send-90.png" alt="send" />
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- نمای تمام‌صفحه در سایدمنو -->
+          <div id="chatOverlay" class="chat-overlay" aria-hidden="true">
+            <div class="chat-overlay-header">
+              <div class="button-wrap">
+                <button
+                  id="userChatBackBtn"
+                  class="chat-back-btn"
+                  aria-label="back"
+                >
+                  <span>close</span>
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+
+              <img
+                id="chatAdminAvatar"
+                class="chat-admin-avatar"
+                src="images/Admin-logo.png"
+                alt="admin"
+              />
+              <div class="chat-overlay-title">پیام به ادمین</div>
+            </div>
+
+            <div id="chatMessagesList" class="chat-messages-list"></div>
+
+            <!-- کامپوزر پایین -->
+            <div class="chat-composer">
+              <input id="overlayInput" type="text" placeholder="بنویس..." />
+              <div class="button-wrap">
+                <button
+                  id="overlayAttachBtn"
+                  class="chat-icon-btn"
+                  aria-label="attach"
+                >
+                  <img src="images/icons8-attach-60.png" alt="attach" />
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+              <input
+                id="overlayAttachFile"
+                type="file"
+                accept="image/*"
+                hidden
+              />
+              <div class="button-wrap">
+                <button
+                  id="overlaySendBtn"
+                  class="chat-icon-btn disabled"
+                  aria-label="send"
+                >
+                  <img src="images/icons8-send-90.png" alt="send" />
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="designer-credit">
+          Design :
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 4px;
+            "
+          >
+            <a
+              href="tg://resolve?domain=SeyedMahdiMousavi"
+              target="_blank"
+              class="designer-bubble"
+              >Mehdi</a
+            >
+            <div id="appVersion" class="genre-chip version-chip">v1.0.0</div>
+          </div>
+        </div>
+      </section>
+    </nav>
+
+    <section class="movie-type-tabs">
       <div class="button-wrap">
-        <button type="submit" class="login-btn"><span>Login</span></button>
+        <button data-type="all" class="active">
+          All Movies <span class="count">0</span>
+        </button>
         <div class="button-shadow"></div>
       </div>
-    </form>
 
-    <!-- فرم ثبت‌نام دو مرحله‌ای -->
-    <form id="signupForm" class="tab-content" data-tab="signup" enctype="multipart/form-data">
-      <!-- مرحله ۱ -->
-      <div id="signupStep1" class="fade-step active-step">
-        <input type="email" id="signupEmail" placeholder="Gmail" required />
-        <input type="text" id="signupUsername" placeholder="Username" required />
-        <input type="password" id="signupPassword" placeholder="Password" required />
-      </div>
-
-      <!-- مرحله ۲ -->
-      <div id="signupStep2" class="fade-step" style="display:none;">
-        <input type="file" id="signupAvatar" accept="image/*" required />
-        <small style="font-size:12px;color:#888;">حداکثر حجم عکس: 500KB</small>
-      </div>
       <div class="button-wrap">
-        <button type="button" id="signupNextBtn" class="login-btn signup-next-btn">
-          <span>  <img src="/images/icons8-next.apng" alt="next" id="signupNextIcon" style="height:22px;vertical-align:middle;">
-</span>
-  <span id="signupBtnText"></span>
-</button>
-<div class="button-shadow"></div>
+        <button data-type="collection" class="">
+          Collections <span class="count btn-text">0</span>
+        </button>
+        <div class="button-shadow"></div>
       </div>
-      
-    </form>
-  </div>
-</div>
 
+      <div class="button-wrap">
+        <button data-type="series" class="">
+          Series<span class="count">0</span>
+        </button>
+        <div class="button-shadow"></div>
+      </div>
 
-<!-- کانتینر شناور -->
-<div class="floating-wrapper">
-  <!-- پنل استوری‌ها -->
-  <div id="storyPanel" class="story-panel" aria-hidden="true">
-    <div class="stories" role="list"></div>
-    <div class="button-wrap">
-          <button class="go-pagination" type="button">
-            <span>go to pagination<img src="images/icons8-double-down.apng" alt="down" style="width:16px;height:16px;vertical-align:middle;"/>
-</span>
-    </button>
-    <div class="button-shadow"></div>
+      <div class="button-wrap">
+        <button data-type="single" class="">
+          Single Films<span class="count">0</span>
+        </button>
+        <div class="button-shadow"></div>
+      </div>
+    </section>
+    <div class="tab-genres-wrapper">
+      <div class="tab-genres-list"></div>
     </div>
-  </div>
-  </div>
 
-  <!-- دکمه شناور -->
-  <div class="floating-btn-container">
-     <div class="button-wrap">
-   <button id="storyToggle" class="floating-btn" aria-label="toggle stories">
-    <img id="storyToggleIcon" src="images/icons8-double-left.apng" alt="toggle" />
-   </button>
-   <div class="button-shadow"></div>
- </div>
-  </div>
-  
-<div class="go-top-container">
-  <div class="button-wrap">
-  <button class="go-top-button " id="goTopBtn">
-    <span>
-      <svg viewBox="0 0 384 512" class="svgIcon">
-    <path
-      d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"
-    ></path>
-  </svg>
-    </span>
-</button>
-<div class="button-shadow"></div>
-</div>
+    <!-- main container -->
+    <div class="container">
+      <!-- admin s (bubbles above movies) -->
+      <div id="admins" class="s-container" aria-live="polite"></div>
 
-</div>
-<!-- script (app logic) -->
-<script src="script.js"></script>
-</body>
+      <section id="popular-carousel" class="popular-section">
+        <div class="popular-title">
+          <div class="button-wrap">
+            <button>
+              <span>Popular Movies</span>
+            </button>
+            <div class="button-shadow"></div>
+          </div>
+        </div>
+        <div class="carousel-container">
+          <button class="carousel-btn prev">
+            <img src="images/icons8-back-to-64.png" alt="prev button" />
+          </button>
+          <div class="carousel-window">
+            <div class="carousel-track"></div>
+          </div>
+          <button class="carousel-btn next">
+            <img src="images/icons8-next-page-64.png" alt="next button" />
+          </button>
+        </div>
+        <div class="carousel-bg"></div>
+      </section>
+
+      <!-- مودال اطلاعات بیشتر -->
+      <div id="movie-modal" class="movie-modal">
+        <div class="movie-modal-content"></div>
+      </div>
+
+      <!-- movies count -->
+      <div id="movieCount" class="movie-count">Number of movies: 0</div>
+
+      <!-- movies grid -->
+      <div id="moviesGrid" class="movies-grid" role="list"></div>
+
+      <!-- pagination -->
+      <div
+        id="pagination"
+        class="pagination-container"
+        aria-label="pagination"
+      ></div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="login-modal" aria-hidden="true">
+      <div class="login-box">
+        <!-- تب‌ها -->
+        <div class="auth-tabs">
+          <div class="button-wrap">
+            <button class="tab-btn active" data-tab="login">
+              <span>Login</span>
+            </button>
+            <div class="button-shadow"></div>
+          </div>
+
+          <div class="button-wrap">
+            <button class="tab-btn" data-tab="signup">
+              <span>Sign Up</span>
+            </button>
+            <div class="button-shadow"></div>
+          </div>
+        </div>
+
+        <!-- فرم لاگین -->
+        <form id="loginForm" class="tab-content active" data-tab="login">
+          <input
+            type="text"
+            id="loginUsername"
+            placeholder="Gmail or Username"
+            required
+          />
+          <input
+            type="password"
+            id="loginPassword"
+            placeholder="Password"
+            required
+          />
+          <div class="button-wrap">
+            <button type="submit" class="login-btn"><span>Login</span></button>
+            <div class="button-shadow"></div>
+          </div>
+        </form>
+
+        <!-- فرم ثبت‌نام دو مرحله‌ای -->
+        <form
+          id="signupForm"
+          class="tab-content"
+          data-tab="signup"
+          enctype="multipart/form-data"
+        >
+          <!-- مرحله ۱ -->
+          <div id="signupStep1" class="fade-step active-step">
+            <input type="email" id="signupEmail" placeholder="Gmail" required />
+            <input
+              type="text"
+              id="signupUsername"
+              placeholder="Username"
+              required
+            />
+            <input
+              type="password"
+              id="signupPassword"
+              placeholder="Password"
+              required
+            />
+          </div>
+
+          <!-- مرحله ۲ -->
+          <div id="signupStep2" class="fade-step" style="display: none">
+            <input type="file" id="signupAvatar" accept="image/*" required />
+            <small style="font-size: 12px; color: #888"
+              >حداکثر حجم عکس: 500KB</small
+            >
+          </div>
+          <div class="button-wrap">
+            <button
+              type="button"
+              id="signupNextBtn"
+              class="login-btn signup-next-btn"
+            >
+              <span>
+                <img
+                  src="/images/icons8-next.apng"
+                  alt="next"
+                  id="signupNextIcon"
+                  style="height: 22px; vertical-align: middle"
+                />
+              </span>
+              <span id="signupBtnText"></span>
+            </button>
+            <div class="button-shadow"></div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- کانتینر شناور -->
+    <div class="floating-wrapper">
+      <!-- پنل استوری‌ها -->
+      <div id="storyPanel" class="story-panel" aria-hidden="true">
+        <div class="stories" role="list"></div>
+        <div class="button-wrap">
+          <button class="go-pagination" type="button">
+            <span
+              >go to pagination<img
+                src="images/icons8-double-down.apng"
+                alt="down"
+                style="width: 16px; height: 16px; vertical-align: middle"
+              />
+            </span>
+          </button>
+          <div class="button-shadow"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- دکمه شناور -->
+    <div class="floating-btn-container">
+      <div class="button-wrap">
+        <button
+          id="storyToggle"
+          class="floating-btn"
+          aria-label="toggle stories"
+        >
+          <img
+            id="storyToggleIcon"
+            src="images/icons8-double-left.apng"
+            alt="toggle"
+          />
+        </button>
+        <div class="button-shadow"></div>
+      </div>
+    </div>
+
+    <div class="go-top-container">
+      <div class="button-wrap">
+        <button class="go-top-button" id="goTopBtn">
+          <span>
+            <svg viewBox="0 0 384 512" class="svgIcon">
+              <path
+                d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"
+              ></path>
+            </svg>
+          </span>
+        </button>
+        <div class="button-shadow"></div>
+      </div>
+    </div>
+    <!-- script (app logic) -->
+    <script src="script.js"></script>
+  </body>
+</html>

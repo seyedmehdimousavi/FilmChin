@@ -1,358 +1,514 @@
 <!DOCTYPE html>
 <html lang="fa" dir="ltr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Panel</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin Panel</title>
 
-  <!-- IRANSans -->
-  <link href="https://cdn.fontcdn.ir/Font/Persian/IRANSans/IRANSans.css" rel="stylesheet" type="text/css" />
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <!-- icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- IRANSans -->
+    <link
+      href="https://cdn.fontcdn.ir/Font/Persian/IRANSans/IRANSans.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
 
-  <!-- styles -->
-  <link rel="stylesheet" href="style.css">
+    <!-- styles -->
+    <link rel="stylesheet" href="style.css" />
 
-  <!-- supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body class="admin-body">
-<!-- Toast Container -->
-<div id="toast-container"></div>
-<header class="main-header">
-  <!-- 🔹 بنر بالای سایت -->
-  <div class="site-banner">
-    <a href="filmchiin.ir">
-      <div class="banner-content">
-      <span class="banner-logo">
-        <img src="/images/banner-icon.png" alt="banner-logo" />
-      </span>
-      <span class="banner-text">filmchiin.ir</span>
-    </div>
-    </a>
-  </div>
-
-  <!-- 🔹 هدر -->
-  <div class="header">
-    <div class="search-bar">
-      
-      <a href="index.html" id="backToSiteBtn" class="menu-btn" aria-label="back">
-        <img width="32" height="32" src="images/icons8-back-to-50.png" alt="back"/>
-      </a>
-
-      <!-- منوی پروفایل (مثل index) -->
-      <div id="profileMenu" class="profile-menu hidden">
-        <div class="profile-bubble">
-          <div class="profile-username" id="profileUsername">Admin</div>
-          <div class="button-wrap">
-               <button class="profile-edit"><span>Edit profile</span></button>
-               <div class="button-shadow">
-               </div>
+    <!-- supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body class="admin-body">
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+    <header class="main-header">
+      <!-- 🔹 بنر بالای سایت -->
+      <div class="site-banner">
+        <a href="filmchiin.ir">
+          <div class="banner-content">
+            <span class="banner-logo">
+              <img src="/images/banner-icon.png" alt="banner-logo" />
+            </span>
+            <span class="banner-text">filmchiin.ir</span>
           </div>
-          <hr class="profile-divider"/>
-          <div class="button-wrap">
-              <button id="logoutBtn" class="profile-logout"><span>logout</span></button>
-              <div class="button-shadow"></div>
-          </div>
-        </div>
+        </a>
       </div>
 
-      <!-- متن ثابت Admin Panel به جای سرچ -->
-      <div class="admin-title">Admin Panel</div>
+      <!-- 🔹 هدر -->
+      <div class="header">
+        <div class="search-bar">
+          <a
+            href="index.html"
+            id="backToSiteBtn"
+            class="menu-btn"
+            aria-label="back"
+          >
+            <img
+              width="32"
+              height="32"
+              src="images/icons8-back-to-50.png"
+              alt="back"
+            />
+          </a>
 
-      <!-- دکمه پروفایل -->
-      <div class="button-wrap">
-      <button id="profileBtn" class="icon-inside" aria-label="profile">
-        <img src="images/icons8-user-96.png" alt="user"/>
-      </button><div class="button-shadow"></div></div>
-    </div>
+          <!-- منوی پروفایل (مثل index) -->
+          <div id="profileMenu" class="profile-menu hidden">
+            <div class="profile-bubble">
+              <div class="profile-username" id="profileUsername">Admin</div>
+              <div class="button-wrap">
+                <button class="profile-edit"><span>Edit profile</span></button>
+                <div class="button-shadow"></div>
+              </div>
+              <hr class="profile-divider" />
+              <div class="button-wrap">
+                <button id="logoutBtn" class="profile-logout">
+                  <span>logout</span>
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+            </div>
+          </div>
 
-    <!-- دکمه تغییر تم -->
-    <div class="button-wrap">
-      <label class="theme-switch" id="themeSwitchLabel">
-  <input class="theme-switch__checkbox" type="checkbox" id="themeSwitchCheckbox" />
-  <div class="theme-switch__container">
-    <div class="theme-switch__clouds"></div>
-    <div class="theme-switch__stars-container">
-      <svg fill="none" viewBox="0 0 144 55" xmlns="http://www.w3.org/2000/svg">
-        <path
-          fill="currentColor"
-          d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z"
-          clip-rule="evenodd"
-          fill-rule="evenodd"
-        ></path>
-      </svg>
-    </div>
-    <div class="theme-switch__circle-container">
-      <div class="theme-switch__sun-moon-container">
-        <div class="theme-switch__moon">
-          <div class="theme-switch__spot"></div>
-          <div class="theme-switch__spot"></div>
-          <div class="theme-switch__spot"></div>
+          <!-- متن ثابت Admin Panel به جای سرچ -->
+          <div class="admin-title">Admin Panel</div>
+
+          <!-- دکمه پروفایل -->
+          <div class="button-wrap">
+            <button id="profileBtn" class="icon-inside" aria-label="profile">
+              <img src="images/icons8-user-96.png" alt="user" />
+            </button>
+            <div class="button-shadow"></div>
+          </div>
         </div>
-      </div>
-    </div>
-    <div class="theme-switch__shooting-star"></div>
-    <div class="theme-switch__shooting-star-2"></div>
-    <div class="theme-switch__meteor"></div>
-    <div class="theme-switch__stars-cluster">
-      <div class="star"></div>
-      <div class="star"></div>
-      <div class="star"></div>
-      <div class="star"></div>
-      <div class="star"></div>
-    </div>
-    <div class="theme-switch__aurora"></div>
-    <div class="theme-switch__comets">
-      <div class="comet"></div>
-      <div class="comet"></div>
-    </div>
-  </div>
-</label>
-    <div class="button-shadow"></div></div>
-  </div>
-</header>
-<main>
-  <div class="admin-tabs">
-    <div class="button-wrap">
-  <button class="tab-btn active" data-target="posts" type="button">
-    <div class="tab-circle">
-      <img src="images/icons8-share.apng" alt="posts">
-    </div>
-  </button><div class="button-shadow"></div></div>
-  <div class="button-wrap">
-  <button class="tab-btn" data-target="messages" type="button">
-  <div class="tab-circle">
-    <img src="images/icons8-message.apng" alt="messages">
-    <span id="adminMessagesBadge" class="badge" style="display:none;">!</span>
-  </div>
-</button>
-<div class="button-shadow"></div></div>
-<div class="button-wrap">
-  <button class="tab-btn" data-target="comments" type="button">
-    <div class="tab-circle">
-      <img src="images/icons8-comment.apng" alt="comments">
-    </div>
-  </button><div class="button-shadow"></div></div>
-  <div class="button-wrap">
-  <button class="tab-btn" data-target="links" type="button">
-    <div class="tab-circle">
-      <img src="images/icons8-link.apng" alt="links">
-    </div>
-  </button><div class="button-shadow"></div></div>
-  <div class="button-wrap">
-  <button class="tab-btn" data-target="analytics" type="button">
-  <div class="tab-circle">
-    <img src="images/icons8-combo-chart.apng" alt="analytics">
-  </div>
-</button><div class="button-shadow"></div></div>
-<div class="button-wrap">
-<button class="tab-btn" data-target="users" type="button">
-  <div class="tab-circle">
-    <img src="/images/icons8-users-48.png" alt="users">
-  </div>
-</button><div class="button-shadow"></div></div>
-</div>
-  <section id="adminProfile" class="admin-section">
-    
 
-    
-    
-    <section class="send_post admin-section-item-1 admin-section-item">
-      <h2>Post Management</h2>
-
-    <!-- add / edit movie form -->
-    <form id="addMovieForm" class="admin-form" enctype="multipart/form-data">
-  <!-- فرم اصلی فیلم تکی -->
-  <input id="title" type="text" placeholder="Title" />
-  <input id="coverFile" type="file" accept="image/*" />
-  <input id="link" type="text" placeholder="File Link" />
-  <textarea id="synopsis" placeholder="Synopsis"></textarea>
-  <input id="director" type="text" placeholder="Director" />
-  <input id="product" type="text" placeholder="Product" />
-  <input id="stars" type="text" placeholder="Stars" />
-  <input id="imdb" type="text" placeholder="IMDB" />
-  <input id="release_info" type="text" placeholder="Release Info" />
-  <input id="genre" type="text" placeholder="Genre (space-separated)" />
-<input type="hidden" id="mode" name="mode" value="single">
-  <!-- دکمه‌های Collection / Serial -->
-  <div id="bundle-toggle" class="admin-form">
-    <div class="button-wrap">
-    <button type="button" id="btn-collection" class="admin-submit"><span>Collection</span></button>
-    <div class="button-shadow"></div>
-    </div>
-    <div class="button-wrap">
-    <button type="button" id="btn-serial" class="admin-submit"><span>Serial</span></button>
-    <div class="button-shadow"></div>
-    </div>
-  </div>
-
-  <!-- کانتینر فرم‌های پویا -->
-  <div id="bundle-forms"></div>
-
-  <!-- دکمه‌های افزودن/حذف -->
-  <div id="bundle-actions" class="admin-form" hidden>
-    <div class="button-wrap">
-          <button type="button" id="btn-add-item" class="admin-submit"></button>
-          <div class="button-shadow"></div>
-    </div>
-    <div class="button-wrap">
-    <button type="button" id="btn-remove-last" class="admin-submit danger"></button>
-    <div class="button-shadow"></div>
-    </div>
-  </div>
-
-  <!-- دکمه ارسال -->
-   <div class="button-wrap">
-    <button type="submit" class="admin-submit">
-      <span>Submit and Send <i class="bi bi-cloud-upload"></i></span>
-  </button>
-  <div class="button-shadow"></div>
-   </div>
-  
-</form>
-    </section>
-    
-    
-    
-    <section class="admin_messages admin-section-item-2 admin-section-item">
-      <!-- admin messages section -->
-      <h2>Admin Messages</h2>
-      <form id="addMessageForm" class="admin-form">
-        <textarea id="messageText" placeholder="Write a message..."></textarea>
+        <!-- دکمه تغییر تم -->
         <div class="button-wrap">
-        <button type="submit" class="admin-submit">
-          <span>
-            Submit message <i class="bi bi-chat-dots"></i>
-          </span>
-        </button>
-        <div class="button-shadow"></div></div>
-      </form>
-      <div id="messageList" class="message-list" aria-live="polite"></div>
-
-    </section>
-    
-    <!-- پیام‌های کاربران -->
-<section id="usersMessages" class="admin-section-item admin_messages_users">
-  <h2>پیام‌های کاربران</h2>
-
-  <!-- گرید پروفایل‌ها -->
-  <div id="userThreadsGrid" class="user-threads-grid"></div>
-
-  <!-- پیجینیشن اختصاصی -->
-  <div id="userThreadsPagination" class="pagination-users"></div>
-
-  <!-- اوورلی نمایش گفت‌وگو -->
-  <div id="adminThreadOverlay" class="chat-overlay" aria-hidden="true">
-    <div class="chat-overlay-header">
-      <div class="button-wrap">
-      <button id="adminThreadBackBtn" class="chat-back-btn" aria-label="back">&larr;</button><div class="button-shadow"></div></div>
-      <img id="adminThreadAvatar" class="chat-admin-avatar" src="images/icons8-user-96.png" alt="user" />
-      <div id="adminThreadTitle" class="chat-overlay-title">گفت‌وگو</div>
-    </div>
-
-    <div id="adminThreadMessages" class="chat-messages-list"></div>
-
-    <div class="chat-composer">
-      <div class="button-wrap">
-      <button id="adminThreadAttachBtn" class="chat-icon-btn" aria-label="attach">
-        <img src="images/icons8-attach-60.png" alt="attach" />
-      </button><div class="button-shadow"></div></div>
-      <input id="adminThreadAttachFile" type="file" accept="image/*" hidden />
-      <input id="adminThreadInput" type="text" placeholder="پاسخ بنویسید..." />
-      <div class="button-wrap">
-      <button id="adminThreadSendBtn" class="chat-icon-btn disabled" aria-label="send">
-        <img src="images/icons8-send-90.png" alt="send" />
-      </button><div class="button-shadow"></div></div>
-    </div>
-  </div>
-</section>
-
-    <section id="unapproved-comments-section" class="admin-section-item-3 admin-section-item">
-      <h2>Unpublished Comments</h2>
-      <div id="unapprovedComments"></div>
-    </section>
-
-
-    <section id="social-links-section" class="admin-section-item-4 admin-section-item">
-        <h2>Links in sidemenu</h2>
-        <form id="addSocialForm" class="admin-form">
-           <input id="socialTitle" type="text" placeholder="Title" required />
-           <input id="socialIcon" type="file" accept="image/*" />
-           <input id="socialUrl" type="text" placeholder="Link" required />
-           <div class="button-wrap">
-           <button type="submit" class="admin-submit"><span>Add link</span></button><div class="button-shadow"></div></div>
-        </form>
-        <div id="socialList" class="message-list"></div>
-        
-        
-        <div class="admin-section">
-  <h3>App Version</h3>
-  <input type="text" id="versionInput" placeholder="مثلاً 1.3.3">
-  <div class="button-wrap">
-  <button id="saveVersionBtn">
-    <span>Save</span></button>
-  <div class="button-shadow"></div></div>
-</div>
-    </section>
-    
-    <section class="released_movies admin-section-item-5 admin-section-item">
-       <!-- admin search (after messages, before movie list) -->
-      <div class="admin-search-wrapper">
-        <h2>Search in released movies</h2>
-        <input id="adminSearch" class="admin-search-input" type="text" placeholder="Search movies..." />
+          <label class="theme-switch" id="themeSwitchLabel">
+            <input
+              class="theme-switch__checkbox"
+              type="checkbox"
+              id="themeSwitchCheckbox"
+            />
+            <div class="theme-switch__container">
+              <div class="theme-switch__clouds"></div>
+              <div class="theme-switch__stars-container">
+                <svg
+                  fill="none"
+                  viewBox="0 0 144 55"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z"
+                    clip-rule="evenodd"
+                    fill-rule="evenodd"
+                  ></path>
+                </svg>
+              </div>
+              <div class="theme-switch__circle-container">
+                <div class="theme-switch__sun-moon-container">
+                  <div class="theme-switch__moon">
+                    <div class="theme-switch__spot"></div>
+                    <div class="theme-switch__spot"></div>
+                    <div class="theme-switch__spot"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="theme-switch__shooting-star"></div>
+              <div class="theme-switch__shooting-star-2"></div>
+              <div class="theme-switch__meteor"></div>
+              <div class="theme-switch__stars-cluster">
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+              </div>
+              <div class="theme-switch__aurora"></div>
+              <div class="theme-switch__comets">
+                <div class="comet"></div>
+                <div class="comet"></div>
+              </div>
+            </div>
+          </label>
+          <div class="button-shadow"></div>
+        </div>
       </div>
-      <div>
-        <h2>Released Movies</h2>
-        <!-- movie list -->
-        <div id="movieList" class="movie-list"></div>
-        <div id="admin-pagination" class="pagination-container"></div>
+    </header>
+    <main>
+      <div class="admin-tabs">
+        <div class="button-wrap">
+          <button class="tab-btn active" data-target="posts" type="button">
+            <div class="tab-circle">
+              <img src="images/icons8-share.apng" alt="posts" />
+            </div>
+          </button>
+          <div class="button-shadow"></div>
+        </div>
+        <div class="button-wrap">
+          <button class="tab-btn" data-target="messages" type="button">
+            <div class="tab-circle">
+              <img src="images/icons8-message.apng" alt="messages" />
+              <span id="adminMessagesBadge" class="badge" style="display: none"
+                >!</span
+              >
+            </div>
+          </button>
+          <div class="button-shadow"></div>
+        </div>
+        <div class="button-wrap">
+          <button class="tab-btn" data-target="comments" type="button">
+            <div class="tab-circle">
+              <img src="images/icons8-comment.apng" alt="comments" />
+            </div>
+          </button>
+          <div class="button-shadow"></div>
+        </div>
+        <div class="button-wrap">
+          <button class="tab-btn" data-target="links" type="button">
+            <div class="tab-circle">
+              <img src="images/icons8-link.apng" alt="links" />
+            </div>
+          </button>
+          <div class="button-shadow"></div>
+        </div>
+        <div class="button-wrap">
+          <button class="tab-btn" data-target="analytics" type="button">
+            <div class="tab-circle">
+              <img src="images/icons8-combo-chart.apng" alt="analytics" />
+            </div>
+          </button>
+          <div class="button-shadow"></div>
+        </div>
+        <div class="button-wrap">
+          <button class="tab-btn" data-target="users" type="button">
+            <div class="tab-circle">
+              <img src="/images/icons8-users-48.png" alt="users" />
+            </div>
+          </button>
+          <div class="button-shadow"></div>
+        </div>
       </div>
-    </section>
-    
-  <section id="popular-movies-section" class="admin-section-item">
-  <h2>فیلم‌های پرطرفدار</h2>
-  <div id="popularMoviesList" class="movie-list"></div>
-</section>
-    
-  <section id="analytics" class="admin-section-item-6 admin-section-item" style="display:none;">
-  <h2>Analytics</h2>
+      <section id="adminProfile" class="admin-section">
+        <section class="send_post admin-section-item-1 admin-section-item">
+          <h2>Post Management</h2>
 
-  <h3>Daily visits</h3>
-  <canvas id="visitsChart" height="120"></canvas>
+          <!-- add / edit movie form -->
+          <form
+            id="addMovieForm"
+            class="admin-form"
+            enctype="multipart/form-data"
+          >
+            <!-- فرم اصلی فیلم تکی -->
+            <input id="title" type="text" placeholder="Title" />
+            <input id="coverFile" type="file" accept="image/*" />
+            <input id="link" type="text" placeholder="File Link" />
+            <textarea id="synopsis" placeholder="Synopsis"></textarea>
+            <input id="director" type="text" placeholder="Director" />
+            <input id="product" type="text" placeholder="Product" />
+            <input id="stars" type="text" placeholder="Stars" />
+            <input id="imdb" type="text" placeholder="IMDB" />
+            <input id="release_info" type="text" placeholder="Release Info" />
+            <input
+              id="genre"
+              type="text"
+              placeholder="Genre (space-separated)"
+            />
+            <input type="hidden" id="mode" name="mode" value="single" />
+            <!-- دکمه‌های Collection / Serial -->
+            <div id="bundle-toggle" class="admin-form">
+              <div class="button-wrap">
+                <button type="button" id="btn-collection" class="admin-submit">
+                  <span>Collection</span>
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+              <div class="button-wrap">
+                <button type="button" id="btn-serial" class="admin-submit">
+                  <span>Serial</span>
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+            </div>
 
-  <h3>Top searches</h3>
-  <div id="topSearches"></div>
+            <!-- کانتینر فرم‌های پویا -->
+            <div id="bundle-forms"></div>
 
-  <h3>Top clicks</h3>
-  <div id="topClicks"></div>
-</section>
+            <!-- دکمه‌های افزودن/حذف -->
+            <div id="bundle-actions" class="admin-form" hidden>
+              <div class="button-wrap">
+                <button
+                  type="button"
+                  id="btn-add-item"
+                  class="admin-submit"
+                ></button>
+                <div class="button-shadow"></div>
+              </div>
+              <div class="button-wrap">
+                <button
+                  type="button"
+                  id="btn-remove-last"
+                  class="admin-submit danger"
+                ></button>
+                <div class="button-shadow"></div>
+              </div>
+            </div>
 
-<section id="users" class="admin-section-item-7 admin-section-item" style="display:none;">
-  <h2>Users & Admins</h2>
+            <!-- دکمه ارسال -->
+            <div class="button-wrap">
+              <button type="submit" class="admin-submit">
+                <span>Submit and Send <i class="bi bi-cloud-upload"></i></span>
+              </button>
+              <div class="button-shadow"></div>
+            </div>
+          </form>
+        </section>
 
-  <!-- Admins list -->
-  <div class="card grey-box" style="margin-bottom:20px;padding:10px;border-radius:8px;background:#f0f0f0;">
-    <h3>Admins List</h3>
-    <div id="adminsContainer" class="white-box" style="background:#fff;padding:10px;border-radius:6px;"></div>
-  </div>
+        <section class="admin_messages admin-section-item-2 admin-section-item">
+          <!-- admin messages section -->
+          <h2>Admin Messages</h2>
+          <form id="addMessageForm" class="admin-form">
+            <textarea
+              id="messageText"
+              placeholder="Write a message..."
+            ></textarea>
+            <div class="button-wrap">
+              <button type="submit" class="admin-submit">
+                <span> Submit message <i class="bi bi-chat-dots"></i> </span>
+              </button>
+              <div class="button-shadow"></div>
+            </div>
+          </form>
+          <div id="messageList" class="message-list" aria-live="polite"></div>
+        </section>
 
-  <!-- Users list -->
-  <div class="card grey-box" style="padding:10px;border-radius:8px;background:#f0f0f0;">
-    <h3>Users List</h3>
-    <div class="search-bar" style="display:flex;align-items:center;gap:8px;">
-      <input type="text" id="userSearch" placeholder="Search..." style="flex:1;padding:6px;">
-      <div class="button-wrap">
-      <button id="clearSearch"><span>✕</span></button><div class="button-shadow"></div></div>
-    </div>
-    <div id="usersContainer" class="white-box" style="background:#fff;padding:10px;border-radius:6px;margin-top:10px;"></div>
-    <div id="usersPagination" class="pagination-users"></div>
-  </div>
-</section>
-  </section>
-</main>
-<script src="script.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</body>
+        <!-- پیام‌های کاربران -->
+        <section
+          id="usersMessages"
+          class="admin-section-item admin_messages_users"
+        >
+          <h2>پیام‌های کاربران</h2>
+
+          <!-- گرید پروفایل‌ها -->
+          <div id="userThreadsGrid" class="user-threads-grid"></div>
+
+          <!-- پیجینیشن اختصاصی -->
+          <div id="userThreadsPagination" class="pagination-users"></div>
+
+          <!-- اوورلی نمایش گفت‌وگو -->
+          <div id="adminThreadOverlay" class="chat-overlay" aria-hidden="true">
+            <div class="chat-overlay-header">
+              <div class="button-wrap">
+                <button
+                  id="adminThreadBackBtn"
+                  class="chat-back-btn"
+                  aria-label="back"
+                >
+                  &larr;
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+              <img
+                id="adminThreadAvatar"
+                class="chat-admin-avatar"
+                src="images/icons8-user-96.png"
+                alt="user"
+              />
+              <div id="adminThreadTitle" class="chat-overlay-title">
+                گفت‌وگو
+              </div>
+            </div>
+
+            <div id="adminThreadMessages" class="chat-messages-list"></div>
+
+            <div class="chat-composer">
+              <div class="button-wrap">
+                <button
+                  id="adminThreadAttachBtn"
+                  class="chat-icon-btn"
+                  aria-label="attach"
+                >
+                  <img src="images/icons8-attach-60.png" alt="attach" />
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+              <input
+                id="adminThreadAttachFile"
+                type="file"
+                accept="image/*"
+                hidden
+              />
+              <input
+                id="adminThreadInput"
+                type="text"
+                placeholder="پاسخ بنویسید..."
+              />
+              <div class="button-wrap">
+                <button
+                  id="adminThreadSendBtn"
+                  class="chat-icon-btn disabled"
+                  aria-label="send"
+                >
+                  <img src="images/icons8-send-90.png" alt="send" />
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="unapproved-comments-section"
+          class="admin-section-item-3 admin-section-item"
+        >
+          <h2>Unpublished Comments</h2>
+          <div id="unapprovedComments"></div>
+        </section>
+
+        <section
+          id="social-links-section"
+          class="admin-section-item-4 admin-section-item"
+        >
+          <h2>Links in sidemenu</h2>
+          <form id="addSocialForm" class="admin-form">
+            <input id="socialTitle" type="text" placeholder="Title" required />
+            <input id="socialIcon" type="file" accept="image/*" />
+            <input id="socialUrl" type="text" placeholder="Link" required />
+            <div class="button-wrap">
+              <button type="submit" class="admin-submit">
+                <span>Add link</span>
+              </button>
+              <div class="button-shadow"></div>
+            </div>
+          </form>
+          <div id="socialList" class="message-list"></div>
+
+          <div class="admin-section">
+            <h3>App Version</h3>
+            <input type="text" id="versionInput" placeholder="مثلاً 1.3.3" />
+            <div class="button-wrap">
+              <button id="saveVersionBtn">
+                <span>Save</span>
+              </button>
+              <div class="button-shadow"></div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="released_movies admin-section-item-5 admin-section-item"
+        >
+          <!-- admin search (after messages, before movie list) -->
+          <div class="admin-search-wrapper">
+            <h2>Search in released movies</h2>
+            <input
+              id="adminSearch"
+              class="admin-search-input"
+              type="text"
+              placeholder="Search movies..."
+            />
+          </div>
+          <div>
+            <h2>Released Movies</h2>
+            <!-- movie list -->
+            <div id="movieList" class="movie-list"></div>
+            <div id="admin-pagination" class="pagination-container"></div>
+          </div>
+        </section>
+
+        <section id="popular-movies-section" class="admin-section-item">
+          <h2>فیلم‌های پرطرفدار</h2>
+          <div id="popularMoviesList" class="movie-list"></div>
+        </section>
+
+        <section
+          id="analytics"
+          class="admin-section-item-6 admin-section-item"
+          style="display: none"
+        >
+          <h2>Analytics</h2>
+
+          <h3>Daily visits</h3>
+          <canvas id="visitsChart" height="120"></canvas>
+
+          <h3>Top searches</h3>
+          <div id="topSearches"></div>
+
+          <h3>Top clicks</h3>
+          <div id="topClicks"></div>
+        </section>
+
+        <section
+          id="users"
+          class="admin-section-item-7 admin-section-item"
+          style="display: none"
+        >
+          <h2>Users & Admins</h2>
+
+          <!-- Admins list -->
+          <div
+            class="card grey-box"
+            style="
+              margin-bottom: 20px;
+              padding: 10px;
+              border-radius: 8px;
+              background: #f0f0f0;
+            "
+          >
+            <h3>Admins List</h3>
+            <div
+              id="adminsContainer"
+              class="white-box"
+              style="background: #fff; padding: 10px; border-radius: 6px"
+            ></div>
+          </div>
+
+          <!-- Users list -->
+          <div
+            class="card grey-box"
+            style="padding: 10px; border-radius: 8px; background: #f0f0f0"
+          >
+            <h3>Users List</h3>
+            <div
+              class="search-bar"
+              style="display: flex; align-items: center; gap: 8px"
+            >
+              <input
+                type="text"
+                id="userSearch"
+                placeholder="Search..."
+                style="flex: 1; padding: 6px"
+              />
+              <div class="button-wrap">
+                <button id="clearSearch"><span>✕</span></button>
+                <div class="button-shadow"></div>
+              </div>
+            </div>
+            <div
+              id="usersContainer"
+              class="white-box"
+              style="
+                background: #fff;
+                padding: 10px;
+                border-radius: 6px;
+                margin-top: 10px;
+              "
+            ></div>
+            <div id="usersPagination" class="pagination-users"></div>
+          </div>
+        </section>
+      </section>
+    </main>
+    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </body>
 </html>
