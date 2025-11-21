@@ -5457,3 +5457,49 @@ body.reduce-animations .episode-title.scrolling {
   transform: inherit !important;
   opacity: inherit !important;
 }
+/* ================================
+   TELEGRAM PROMO BOX
+================================ */
+
+.telegram-box {
+  width: 100%;
+  background: linear-gradient(135deg, #4cc7ff, #0090e6);
+  border-radius: 18px;
+  padding: 16px;
+  margin: 20px auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-decoration: none;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  transition: transform .15s;
+}
+
+.telegram-box:hover {
+  transform: translateY(-3px);
+}
+
+.telegram-box-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.telegram-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.telegram-id {
+  font-size: 15px;
+  background: rgba(255,255,255,0.25);
+  padding: 4px 10px;
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.telegram-icon img {
+  width: 48px;
+  height: 48px;
+}
