@@ -169,6 +169,8 @@ Body.dark .main-header {
   box-shadow: rgba(0, 0, 0, 0.2);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.09);
   backdrop-filter: blur(6px);
+  height: 50px;
+  position: relative;
 }
 .themetogglle {
   width: 44px;
@@ -565,6 +567,7 @@ Body.dark .comment-input-row {
   padding: 8px;
   border-radius: 8px;
   border: 1px solid #ccc;
+  width: 80%;
 }
 .comment-input-row .comment-text {
   flex: 1;
@@ -576,6 +579,7 @@ Body.dark .comment-input-row {
 .comment-input-row .comment-send {
   background: var(--btn-day);
   color: #fff;
+  width: 100%;
 }
 
 .button-wrap span {
@@ -739,6 +743,9 @@ body.dark .message-item {
   font-weight: 600;
   padding: 2px;
 }
+.page-bubble:hover {
+  transform: scale(1.1);
+}
 .page-bubble.active {
   background: var(--btn-day);
   color: #fff;
@@ -783,19 +790,12 @@ Body.dark .page-bubble.active {
   align-items: center;
 }
 .comments-close {
+  margin-left: 5px;
   line-height: 0;
   padding: 2px 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.comments-close span {
-}
-.comment-input-row .comment-name {
-  width: 80%;
-}
-.comment-input-row .comment-send {
-  width: 100%;
 }
 /* Ensure login modal is hidden by default (defensive) */
 /* پس‌زمینه مدال با بلر */
@@ -2504,7 +2504,7 @@ body.dark .message-bubble {
   display: flex;
   align-items: center;
   justify-content: center;
-
+  position: relative;
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
@@ -2944,10 +2944,6 @@ body.dark .active-filters-toast .filter-badge {
   width: 40px !important;
   height: 40px !important;
 }
-.search-bar {
-  height: 50px;
-  position: relative;
-}
 
 #profileMenu {
   position: absolute;
@@ -3090,10 +3086,9 @@ body.dark .role-badge.user {
 .admin-row,
 .user-row {
   display: grid;
-  grid-template-columns: minmax(220px, 1.2fr) minmax(100px, 0.5fr) minmax(
-      140px,
-      0.6fr
-    ) minmax(110px, 0.4fr);
+  grid-template-columns:
+    minmax(220px, 1.2fr) minmax(100px, 0.5fr) minmax(140px, 0.6fr)
+    minmax(110px, 0.4fr);
   gap: 12px;
   align-items: center;
   padding: 10px 12px;
@@ -4038,6 +4033,7 @@ body.dark .msg-meta {
   width: 100%;
   white-space: normal;
   overflow-wrap: break-word;
+  font-weight: bold;
 }
 .user-thread-card {
   background: var(--post-day);
@@ -4061,9 +4057,6 @@ body.dark .user-thread-card {
   border-radius: 50%;
   object-fit: cover;
 }
-.user-thread-name {
-  font-weight: bold;
-}
 .user-thread-snippet {
   font-size: 12px;
   color: #666;
@@ -4075,9 +4068,6 @@ body.dark .user-thread-card {
 }
 body.dark .user-thread-snippet {
   color: #bbb;
-}
-.admin-tabs .tab-circle {
-  position: relative;
 }
 .admin-tabs .tab-circle .badge {
   position: absolute;
@@ -4262,9 +4252,6 @@ body.dark .user-thread-card {
   border-radius: 50%;
   object-fit: cover;
 }
-.user-thread-name {
-  font-weight: bold;
-}
 .user-thread-snippet {
   font-size: 12px;
   color: #666;
@@ -4277,10 +4264,7 @@ body.dark .user-thread-card {
 body.dark .user-thread-snippet {
   color: #bbb;
 }
-.admin-tabs .tab-circle {
-  position: relative;
-}
-.admin-tabs .tab-circle .badge {
+min-tabs .tab-circle .badge {
   position: absolute;
   top: -4px;
   right: -4px;
@@ -5462,22 +5446,22 @@ body.reduce-animations .episode-title.scrolling {
 ================================ */
 
 .telegram-box {
-  width: 100%;
+  width: 75%;
   background: linear-gradient(135deg, #4cc7ff, #0090e6);
   border-radius: 18px;
   padding: 16px;
-  margin: 20px auto;
+  margin: 20px 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   text-decoration: none;
   color: #fff;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-  transition: transform .15s;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s;
 }
 
 .telegram-box:hover {
-  transform: translateY(-3px);
+  transform: scale(1.02);
 }
 
 .telegram-box-left {
@@ -5489,14 +5473,6 @@ body.reduce-animations .episode-title.scrolling {
 .telegram-title {
   font-size: 18px;
   font-weight: 600;
-}
-
-.telegram-id {
-  font-size: 15px;
-  background: rgba(255,255,255,0.25);
-  padding: 4px 10px;
-  border-radius: 12px;
-  width: fit-content;
 }
 
 .telegram-icon img {
