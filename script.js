@@ -41,6 +41,37 @@ let currentPage = 1;
 let episodesByMovie = new Map();
 let imdbMinRating = null;
 
+/* ======================
+   PAGE URL HELPERS
+   ====================== */
+function getPageFromUrl() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("page");
+    const p = parseInt(raw || "1", 10);
+    if (!Number.isFinite(p) || p < 1) return 1;
+    return p;
+  } catch (e) {
+    console.warn("getPageFromUrl error:", e);
+    return 1;
+  }
+}
+
+function setPageInUrl(page) {
+  try {
+    const url = new URL(window.location.href);
+    if (!Number.isFinite(page) || page <= 1) {
+      // صفحه ۱ → پارامتر رو حذف کنیم تا URL تمیز بمونه
+      url.searchParams.delete("page");
+    } else {
+      url.searchParams.set("page", String(page));
+    }
+    window.history.replaceState({}, "", url);
+  } catch (e) {
+    console.warn("setPageInUrl error:", e);
+  }
+}
+
 // ---- Central auth state loader (fixed) ----
 async function loadAuthState() {
   try {
@@ -1166,7 +1197,7 @@ document.addEventListener("DOMContentLoaded", () => {
         movies = data || [];
       }
       await fetchEpisodes();
-      currentPage = 1;
+      currentPage = getPageFromUrl();
       await renderPagedMovies(); // note: await for inner supabase calls in bundles
       buildGenreGrid();
       if (document.getElementById("movieList"))
@@ -1324,22 +1355,39 @@ document.addEventListener("DOMContentLoaded", () => {
     const total = computeTotalPages(filteredLength);
     if (total <= 1) return;
     const createBubble = (label, page, isActive = false) => {
-      const btn = document.createElement("button");
-      btn.className = "page-bubble" + (isActive ? " active" : "");
-      btn.textContent = label;
-      btn.dataset.page = page;
-      btn.addEventListener("click", () => {
-        if (page === "dots") return;
-        currentPage = Number(page);
-        renderPagedMovies(true);
-        const cont = document.querySelector(".container");
-        window.scrollTo({
-          top: (cont?.offsetTop || 0) - 8,
-          behavior: "smooth",
-        });
-      });
-      return btn;
-    };
+  if (page === "dots") {
+    const span = document.createElement("span");
+    span.className = "page-bubble dots";
+    span.textContent = "...";
+    return span;
+  }
+
+  const a = document.createElement("a");
+  a.className = "page-bubble" + (isActive ? " active" : "");
+  a.textContent = label;
+  a.href = `?page=${page}`;
+
+  // اگر کاربر وسط-کلیک یا ctrl+click نکرده → رفتار JS اجرا شود
+  a.addEventListener("click", (e) => {
+    // اگر لینک را در تب جدید باز می‌کند → JS دخالت نکند
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) {
+      return; // اجازه بده لینک واقعی باز شود
+    }
+
+    e.preventDefault(); // رفتار معمولی وب‌سایت
+    currentPage = Number(page);
+    renderPagedMovies(true);
+
+    const cont = document.querySelector(".container");
+    window.scrollTo({
+      top: (cont?.offsetTop || 0) - 8,
+      behavior: "smooth",
+    });
+  });
+
+  return a;
+};
+
     if (total <= 9) {
       for (let i = 1; i <= total; i++)
         paginationContainer.appendChild(createBubble(i, i, i === currentPage));
@@ -1778,10 +1826,16 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    if (typeof updateTypeCounts === "function") updateTypeCounts();
+   if (typeof updateTypeCounts === "function") updateTypeCounts();
 
     const totalPages = computeTotalPages(filtered.length);
+
+    // صفحه در محدوده معتبر
     if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    // ✅ آدرس صفحه در URL
+    setPageInUrl(currentPage);
 
     const start = (currentPage - 1) * PAGE_SIZE;
     const pageItems = filtered.slice(start, start + PAGE_SIZE);
