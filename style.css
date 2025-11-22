@@ -1758,17 +1758,12 @@ body.dark .episode-card {
 }
 
 .movie-type-tabs {
-  z-index: 900;
-  display: flex;
   gap: 8px;
   overflow-x: auto;
   white-space: nowrap;
   -ms-overflow-style: none;
   scrollbar-width: none;
-  padding: 8px 16px;
   backdrop-filter: blur(var(--blur));
-  width: 100%;
-  /* ماسک برای محو شدن پایین */
   -webkit-mask-image: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 1) 80%,
@@ -1783,11 +1778,15 @@ body.dark .episode-card {
   );
   mask-repeat: no-repeat;
   mask-size: 100% 100%;
-  position: fixed; /* به جای sticky */
-  top: 120px; /* زیر هدر */
+  position: fixed;
+  top: 120px;
   left: 0;
   right: 0;
   transition: transform 0.3s ease;
+  z-index: 900;
+  transition: transform 0.6s ease;
+  width: 100%;
+  display: flex;
 }
 
 .movie-type-tabs::-webkit-scrollbar {
@@ -1797,50 +1796,6 @@ body.dark .episode-card {
 .movie-type-tabs::-webkit-scrollbar-thumb {
   background: #ccc;
   border-radius: 3px;
-}
-
-.movie-type-tabs button {
-  flex: 0 0 auto;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  padding: 6px 14px;
-  font-size: 14px;
-  font-weight: 700;
-  color: #333;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-}
-
-body.dark .movie-type-tabs button {
-  color: #fff;
-}
-
-.movie-type-tabs button .count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 22px;
-  height: 22px;
-  padding: 6px;
-  border-radius: 50%;
-  background: #fff;
-  color: #512bd4;
-  border: 1px solid #512bd4;
-  font-size: 12px;
-  font-weight: bold;
-  line-height: 1;
-  box-sizing: border-box;
-}
-.movie-type-tabs button.active {
-  color: #512bd4;
-}
-
-.movie-type-tabs button.active .count {
-  background: var(--primary-bg);
-  color: #fff;
 }
 
 .genre-chip-mini {
@@ -4319,19 +4274,6 @@ min-tabs .tab-circle .badge {
 .main-header.hide {
   transform: translateY(-100%);
 }
-
-.movie-type-tabs {
-  position: fixed; /* به جای sticky */
-  top: 120px; /* دقیقا زیر هدر */
-  left: 0;
-  right: 0;
-  z-index: 900;
-  transition: transform 0.3s ease;
-}
-
-.movie-type-tabs.hide {
-  transform: translateY(-220px); /* هدر (120px) + تب‌ها (حدود 100px ارتفاع) */
-}
 .main-header {
   transition: transform 0.3s ease; /* سرعت کمتر */
 }
@@ -4339,9 +4281,6 @@ min-tabs .tab-circle .badge {
   transform: translateY(-100%);
 }
 
-.movie-type-tabs {
-  transition: transform 0.6s ease; /* سرعت بیشتر */
-}
 .movie-type-tabs.hide {
   transform: translateY(-220px);
 }
@@ -5483,43 +5422,51 @@ body.reduce-animations .episode-title.scrolling {
    TABS WITH SLIDING BUBBLE INDICATOR
    ========================================== */
 
-.movie-type-tabs {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin: 12px 0 18px;
-}
-
 .tabs-container {
   position: relative;
   display: flex;
-  background: rgba(255,255,255,0.06);
   padding: 6px;
   border-radius: 18px;
-  backdrop-filter: blur(10px);
   gap: 4px;
 }
 
 .tabs-container .tab-link {
   position: relative;
   z-index: 5;
-  padding: 8px 18px;
-  border-radius: 12px;
-
-  font-size: 14px;
-  color: #fff;
   text-decoration: none;
-  font-weight: 500;
-
-  display: flex;
-  gap: 6px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  cursor: pointer;
+  display: inline-flex;
   align-items: center;
-  transition: color 0.25s ease;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+.tabs-container .tab-link.active {
+  color: #fff;
 }
 
 .tabs-container .tab-link .count {
   font-size: 12px;
   opacity: 0.7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 6px;
+  border-radius: 50%;
+  background: #fff;
+  color: #512bd4;
+  border: 1px solid #512bd4;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  box-sizing: border-box;
 }
 
 /* حباب شناور */
@@ -5528,15 +5475,14 @@ body.reduce-animations .episode-title.scrolling {
   top: 6px;
   bottom: 6px;
   width: 0;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #007cff, #00d0ff);
-  transition: all 0.30s cubic-bezier(0.25, 1, 0.30, 1);
+  border-radius: 20px;
+  background: var(--primary-bg);
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.3, 1);
   z-index: 1;
   opacity: 0.9;
 }
 
-/* وقتی تب فعال شد فقط رنگ نوشته تغییر می‌کند */
-.tabs-container .tab-link.active {
-  color: #000;
-  font-weight: 600;
+.tabs-container .tab-link.active.count {
+  background: var(--primary-bg);
+  color: #fff;
 }
