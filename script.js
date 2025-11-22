@@ -1478,64 +1478,138 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --------------------
-  // Type filter tabs
-  // --------------------
-  let currentTypeFilter = "all";
+// --------------------
+// Type filter tabs (FINAL VERSION FOR <a class="tab-link">)
+// --------------------
 
-  // شمارنده‌ها
+let currentTypeFilter = "all";
 
-  function updateTypeCounts() {
-    if (!Array.isArray(movies)) return;
-    const all = movies.length;
-    const collections = movies.filter(
-      (m) => (m.type || "").toLowerCase() === "collection"
-    ).length;
-    const serials = movies.filter(
-      (m) => (m.type || "").toLowerCase() === "serial"
-    ).length;
-    const singles = movies.filter(
-      (m) => (m.type || "").toLowerCase() === "single"
-    ).length;
+/* =============== GET TAB FROM URL =============== */
+function getTabFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const tab = params.get("tab");
 
-    document.querySelector('[data-type="all"] .count').textContent = all;
-    document.querySelector('[data-type="collection"] .count').textContent =
-      collections;
-    document.querySelector('[data-type="series"] .count').textContent = serials; // چون دکمه‌ات هنوز data-type="series" هست
-    document.querySelector('[data-type="single"] .count').textContent = singles;
-  }
-  // فیلتر نوع
-  function filterByType(type) {
-    currentTypeFilter = type;
-    currentPage = 1;
-    renderPagedMovies();
+  const valid = ["all", "collection", "series", "single"];
+  return valid.includes(tab) ? tab : "all";
+}
+
+/* =============== SET TAB IN URL =============== */
+function setTabInUrl(type) {
+  const url = new URL(location.href);
+
+  if (type === "all") {
+    url.searchParams.delete("tab");
+  } else {
+    url.searchParams.set("tab", type);
   }
 
-  // وصل کردن کلیک روی تب‌ها
-  document.querySelectorAll(".movie-type-tabs button").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      // دکمه فعال
-      document
-        .querySelectorAll(".movie-type-tabs button")
-        .forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
+  history.replaceState({}, "", url);
+}
 
-      // ریست کردن سرچ
-      if (searchInput) {
-        searchInput.value = "";
-      }
+/* =============== UPDATE COUNTS (NO CHANGE) =============== */
+function updateTypeCounts() {
+  if (!Array.isArray(movies)) return;
 
-      // ریست کردن ژانر انتخاب‌شده (زیر تب‌ها)
-      currentTabGenre = null; // متغیر سراسری ژانر
-      const genreChips = document.querySelectorAll(
-        ".tab-genres-list .genre-chip.active"
-      );
-      genreChips.forEach((chip) => chip.classList.remove("active"));
+  const all = movies.length;
+  const collections = movies.filter(m => (m.type || "").toLowerCase() === "collection").length;
+  const serials = movies.filter(m => (m.type || "").toLowerCase() === "serial").length;
+  const singles = movies.filter(m => (m.type || "").toLowerCase() === "single").length;
 
-      // اعمال فیلتر نوع
-      filterByType(btn.dataset.type);
-    });
+  document.querySelector('[data-type="all"] .count').textContent = all;
+  document.querySelector('[data-type="collection"] .count').textContent = collections;
+  document.querySelector('[data-type="series"] .count').textContent = serials;
+  document.querySelector('[data-type="single"] .count').textContent = singles;
+}
+
+/* =============== FILTER MOVIES BY TYPE =============== */
+function filterByType(type) {
+  currentTypeFilter = type;
+  currentPage = 1;
+  renderPagedMovies();
+
+  // بعد از رندر تعداد کارت‌ها → جای‌نمایی جدید
+  setTimeout(moveTabIndicator, 50);
+}
+
+/* =============== ACTIVATE TAB IN UI =============== */
+function applyActiveTab(type) {
+  document.querySelectorAll(".tab-link").forEach(link => {
+    link.classList.remove("active");
   });
+
+  const activeLink = document.querySelector(`.tab-link[data-type="${type}"]`);
+  if (activeLink) activeLink.classList.add("active");
+
+  // حرکت حباب شناور
+  moveTabIndicator();
+}
+
+/* =============== SLIDING BUBBLE INDICATOR =============== */
+function moveTabIndicator() {
+  const active = document.querySelector(".tab-link.active");
+  const indicator = document.querySelector(".tab-indicator");
+  if (!active || !indicator) return;
+
+  const rect = active.getBoundingClientRect();
+  const parentRect = active.parentElement.getBoundingClientRect();
+
+  indicator.style.width = rect.width + "px";
+  indicator.style.transform =
+    `translateX(${rect.left - parentRect.left}px)`;
+}
+
+/* =============== CLICK HANDLER =============== */
+document.querySelectorAll(".tab-link").forEach(link => {
+  link.addEventListener("click", (e) => {
+    const type = link.dataset.type;
+
+    // اگر Ctrl یا Middle click → اجازه بده در تب جدید باز شود
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) {
+      return;
+    }
+
+    e.preventDefault();
+
+    // ریست سرچ
+    if (typeof searchInput !== "undefined" && searchInput) {
+      searchInput.value = "";
+    }
+
+    // ریست ژانر
+    currentTabGenre = null;
+    document.querySelectorAll(".tab-genres-list .genre-chip.active")
+      .forEach(ch => ch.classList.remove("active"));
+
+    // فعال‌سازی تب
+    applyActiveTab(type);
+
+    // ست در URL
+    setTabInUrl(type);
+
+    // اعمال فیلتر
+    filterByType(type);
+  });
+});
+
+/* =============== INITIAL LOAD =============== */
+(function initTabs() {
+  const type = getTabFromUrl();
+  currentTypeFilter = type;
+
+  applyActiveTab(type);
+})();
+window.addEventListener("load", () => {
+  moveTabIndicator();
+});
+
+/* =============== HANDLE BACK/FORWARD =============== */
+window.addEventListener("popstate", () => {
+  const type = getTabFromUrl();
+  currentTypeFilter = type;
+  applyActiveTab(type);
+  filterByType(type);
+});
+
 
   // -------------------- تشخیص جهت اسکرول --------------------
 

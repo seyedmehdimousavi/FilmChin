@@ -389,34 +389,27 @@
     </nav>
 
     <section class="movie-type-tabs">
-      <div class="button-wrap">
-        <button data-type="all" class="active">
-          All Movies <span class="count">0</span>
-        </button>
-        <div class="button-shadow"></div>
-      </div>
+  <div class="tabs-container">
+    <div class="tab-indicator"></div>
 
-      <div class="button-wrap">
-        <button data-type="collection" class="">
-          Collections <span class="count btn-text">0</span>
-        </button>
-        <div class="button-shadow"></div>
-      </div>
+    <a href="?tab=all" data-type="all" class="tab-link active">
+      <span>All</span><span class="count">0</span>
+    </a>
 
-      <div class="button-wrap">
-        <button data-type="series" class="">
-          Series<span class="count">0</span>
-        </button>
-        <div class="button-shadow"></div>
-      </div>
+    <a href="?tab=collection" data-type="collection" class="tab-link">
+      <span>Collections</span><span class="count">0</span>
+    </a>
 
-      <div class="button-wrap">
-        <button data-type="single" class="">
-          Single Films<span class="count">0</span>
-        </button>
-        <div class="button-shadow"></div>
-      </div>
-    </section>
+    <a href="?tab=series" data-type="series" class="tab-link">
+      <span>Series</span><span class="count">0</span>
+    </a>
+
+    <a href="?tab=single" data-type="single" class="tab-link">
+      <span>Single Movies</span><span class="count">0</span>
+    </a>
+  </div>
+</section>
+
     <div class="tab-genres-wrapper">
       <div class="tab-genres-list"></div>
     </div>
