@@ -1013,29 +1013,35 @@ function attachCommentsHandlers(card, movieId) {
       }, 60);
     }
   }
-  async function refresh() {
+async function refresh() {
     try {
       renderComments(await loadComments(movieId));
     } catch {
       renderComments([]);
     }
   }
+
   function openComments() {
     refresh();
-    if (panel) {
+    if (panel && !panel.classList.contains("open")) {
+      // یک استیت برای بک‌باتن ثبت کن
+      history.pushState({ overlay: "comments", movieId }, "");
       panel.classList.add("open");
       panel.setAttribute("aria-hidden", "false");
     }
   }
+
   function closeComments() {
     if (panel) {
       panel.classList.remove("open");
       panel.setAttribute("aria-hidden", "true");
     }
   }
+
   enterBtn?.addEventListener("click", openComments);
   summaryRow?.addEventListener("click", openComments);
   closeBtn?.addEventListener("click", closeComments);
+  
 
   sendBtn?.addEventListener("click", async () => {
     let name = (nameInput?.value || "Guest").trim() || "Guest";
@@ -1088,6 +1094,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const menuBtn = document.getElementById("menuBtn");
   const sideMenu = document.getElementById("sideMenu");
   const menuOverlay = document.getElementById("menuOverlay");
+
+// وقتی سایدمنو باز می‌شود، یک استیت در history اضافه کن
+  if (menuBtn && sideMenu && menuOverlay) {
+    menuBtn.addEventListener("click", () => {
+      // اگر هنوز باز نیست → یعنی این کلیک باعث باز شدن می‌شود
+      if (!sideMenu.classList.contains("active")) {
+        history.pushState({ overlay: "sideMenu" }, "");
+      }
+    });
+  }
+  
 
   const profileBtn = document.getElementById("profileBtn");
 
@@ -1505,6 +1522,13 @@ function getTabFromUrl() {
   return valid.includes(tab) ? tab : "all";
 }
 
+/* =============== GET PAGE FROM URL =============== */
+function getPageFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const p = parseInt(params.get("page") || "1", 10);
+  return isNaN(p) || p < 1 ? 1 : p;
+}
+
 /* =============== SET TAB IN URL =============== */
 function setTabInUrl(type) {
   const url = new URL(location.href);
@@ -1515,23 +1539,17 @@ function setTabInUrl(type) {
     url.searchParams.set("tab", type);
   }
 
-  history.replaceState({}, "", url);
+  history.pushState({}, "", url);
 }
 
-/* =============== UPDATE COUNTS + AUTO FIX INDICATOR =============== */
+/* =============== UPDATE COUNTS =============== */
 function updateTypeCounts() {
   if (!Array.isArray(movies)) return;
 
   const all = movies.length;
-  const collections = movies.filter(
-    m => (m.type || "").toLowerCase() === "collection"
-  ).length;
-  const serials = movies.filter(
-    m => (m.type || "").toLowerCase() === "serial"
-  ).length;
-  const singles = movies.filter(
-    m => (m.type || "").toLowerCase() === "single"
-  ).length;
+  const collections = movies.filter(m => (m.type || "").toLowerCase() === "collection").length;
+  const serials = movies.filter(m => (m.type || "").toLowerCase() === "serial").length;
+  const singles = movies.filter(m => (m.type || "").toLowerCase() === "single").length;
 
   const allEl        = document.querySelector('[data-type="all"] .count');
   const collectionEl = document.querySelector('[data-type="collection"] .count');
@@ -1543,7 +1561,6 @@ function updateTypeCounts() {
   if (seriesEl)     seriesEl.textContent     = serials;
   if (singleEl)     singleEl.textContent     = singles;
 
-  // بعد از رندر شدن شمارنده‌ها → اندیکاتور را درست کن
   setTimeout(moveTabIndicator, 50);
 }
 
@@ -1552,7 +1569,6 @@ function filterByType(type) {
   currentTypeFilter = type;
   currentPage = 1;
   renderPagedMovies();
-
   setTimeout(moveTabIndicator, 60);
 }
 
@@ -1568,7 +1584,7 @@ function applyActiveTab(type) {
   moveTabIndicator();
 }
 
-/* =============== SLIDING BUBBLE INDICATOR — FINAL FIXED VERSION =============== */
+/* =============== INDICATOR SLIDE FIXED VERSION =============== */
 function moveTabIndicator() {
   const active = document.querySelector(".tab-link.active");
   const indicator = document.querySelector(".tab-indicator");
@@ -1576,7 +1592,6 @@ function moveTabIndicator() {
 
   if (!active || !indicator || !wrapper) return;
 
-  // فاصله جزئی برای جلوگیری از خطای میلی‌متری
   const FIX = 4;
 
   const width = active.offsetWidth - FIX;
@@ -1592,30 +1607,24 @@ document.querySelectorAll(".tab-link").forEach(link => {
   link.addEventListener("click", (e) => {
     const type = link.dataset.type;
 
-    // اجازه باز شدن در تب جدید
     if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) {
       return;
     }
 
     e.preventDefault();
 
-    // ریست سرچ
     if (typeof searchInput !== "undefined" && searchInput) {
       searchInput.value = "";
     }
 
-    // ریست ژانرهای زیرتب
     currentTabGenre = null;
     document.querySelectorAll(".tab-genres-list .genre-chip.active")
       .forEach(ch => ch.classList.remove("active"));
 
-    // فعال سازی تب
     applyActiveTab(type);
 
-    // ذخیره در URL
     setTabInUrl(type);
 
-    // فیلتر
     filterByType(type);
   });
 });
@@ -1631,17 +1640,14 @@ window.addEventListener("load", () => {
   setTimeout(moveTabIndicator, 80);
 });
 
-/* =============== BACK/FORWARD SUPPORT (TABS + PAGES) =============== */
+/* =============== BACK/FORWARD SUPPORT =============== */
 window.addEventListener("popstate", () => {
-  // 1) تب را از URL بخوان
   const typeFromUrl = getTabFromUrl();
   currentTypeFilter = typeFromUrl;
   applyActiveTab(typeFromUrl);
 
-  // 2) صفحه را از URL بخوان
   currentPage = getPageFromUrl();
 
-  // 3) دوباره رندر با وضعیت فعلی (تب + صفحه + سرچ + ژانر)
   renderPagedMovies(true);
 });
 
@@ -2914,9 +2920,14 @@ window.addEventListener("popstate", () => {
   }
   // مودال
 
-  function openMovieModal(m) {
+function openMovieModal(m) {
     const modal = document.getElementById("movie-modal");
     const content = modal.querySelector(".movie-modal-content");
+
+    // اگر مودال قبلاً باز نیست → state اضافه کن (برای پشتیبانی دکمه Back)
+    if (modal.style.display !== "flex") {
+        history.pushState({ overlay: "modal", movieId: m.id }, "");
+    }
 
     // 🔹 رندر اولیه کارت
     function renderCard(data, allEpisodes = []) {
@@ -2957,9 +2968,8 @@ window.addEventListener("popstate", () => {
           <div class="field-quote synopsis-quote">
             <div class="quote-text">${synopsis}</div>
             <div class="button-wrap">
-            <button class="quote-toggle-btn"><span>More</span></button>
+              <button class="quote-toggle-btn"><span>More</span></button>
             </div>
-
           </div>
 
           <span class="field-label">Director:</span>
@@ -2987,13 +2997,18 @@ window.addEventListener("popstate", () => {
           <div class="episodes-container" data-movie-id="${data.id}">
             <div class="episodes-list"></div>
           </div>
-          <div class="button-wrap"><button class="go-btn" data-link="${escapeHtml(
-            data.link || "#"
-          )}"><span>Go to file</span></button>
-          <div class="button-shadow"></div></div>
+
+          <div class="button-wrap">
+            <button class="go-btn" data-link="${escapeHtml(
+              data.link || "#"
+            )}"><span>Go to file</span></button>
+            <div class="button-shadow"></div>
+          </div>
           
-          <div class="button-wrap"><button class="close-btn"><span>Close</span></button>
-          <div class button-shadow"></div></div>
+          <div class="button-wrap">
+            <button class="close-btn"><span>Close</span></button>
+            <div class="button-shadow"></div>
+          </div>
         </div>
       </div>
     `;
@@ -3003,21 +3018,15 @@ window.addEventListener("popstate", () => {
     function updateInfo(ep) {
       content.querySelector(".movie-name").textContent = ep.title || "-";
       content.querySelector(".cover-image").src = ep.cover || m.cover;
-      content.querySelector(".cover-blur").style.backgroundImage = `url('${
-        ep.cover || m.cover
-      }')`;
+      content.querySelector(".cover-blur").style.backgroundImage = `url('${ep.cover || m.cover}')`;
       content.querySelector(".quote-text").textContent = ep.synopsis || "-";
       content.querySelector(".director-field").textContent = ep.director || "-";
-      content.querySelector(".product-field").innerHTML = renderChips(
-        ep.product || "-"
-      );
+      content.querySelector(".product-field").innerHTML = renderChips(ep.product || "-");
       content.querySelector(".stars-field").textContent = ep.stars || "-";
       content.querySelector(".imdb-chip").textContent = ep.imdb || "-";
-      content.querySelector(".release-field").textContent =
-        ep.release_info || "-";
-      content.querySelector(".genre-grid").innerHTML = renderChips(
-        ep.genre || "-"
-      );
+      content.querySelector(".release-field").textContent = ep.release_info || "-";
+      content.querySelector(".genre-grid").innerHTML = renderChips(ep.genre || "-");
+
       content.querySelector(".go-btn").dataset.link = ep.link || "#";
 
       initModalSynopsisToggle(content);
@@ -3026,10 +3035,15 @@ window.addEventListener("popstate", () => {
     // رندر اولیه
     content.innerHTML = renderCard(m);
     modal.style.display = "flex";
+
     content.addEventListener("click", (e) => e.stopPropagation());
+
+    // دکمه Close (بدون pushState اضافی)
     content.querySelector(".close-btn").onclick = () => {
       modal.style.display = "none";
     };
+
+    // کلیک روی بک‌گراند → بستن
     modal.onclick = (e) => {
       if (e.target === modal) modal.style.display = "none";
     };
@@ -3059,15 +3073,12 @@ window.addEventListener("popstate", () => {
 
         const allEpisodes = [{ ...m }, ...(eps || [])];
         const listEl = content.querySelector(".episodes-list");
+
         listEl.innerHTML = allEpisodes
           .map(
             (ep, idx) => `
-        <div class="episode-card ${
-          idx === 0 ? "active" : ""
-        }" data-idx="${idx}">
-          <img src="${escapeHtml(ep.cover || m.cover)}" alt="${escapeHtml(
-              ep.title
-            )}">
+        <div class="episode-card ${idx === 0 ? "active" : ""}" data-idx="${idx}">
+          <img src="${escapeHtml(ep.cover || m.cover)}" alt="${escapeHtml(ep.title)}">
           <div class="episode-title">${escapeHtml(ep.title)}</div>
         </div>
       `
@@ -3075,21 +3086,17 @@ window.addEventListener("popstate", () => {
           .join("");
 
         // آپدیت badge-count
-        const badgeCount = content.querySelector(
-          ".collection-badge .badge-count"
-        );
+        const badgeCount = content.querySelector(".collection-badge .badge-count");
         if (badgeCount) {
           badgeCount.textContent =
             allEpisodes.length +
             (allEpisodes.length > 1 ? " episodes" : " episode");
         }
 
-        // هندل کلیک روی اپیزودها
+        // کلیک روی اپیزودها
         listEl.querySelectorAll(".episode-card").forEach((cardEl, idx) => {
           cardEl.addEventListener("click", () => {
-            listEl
-              .querySelectorAll(".episode-card")
-              .forEach((c) => c.classList.remove("active"));
+            listEl.querySelectorAll(".episode-card").forEach(c => c.classList.remove("active"));
             cardEl.classList.add("active");
             updateInfo(allEpisodes[idx]);
             bindGoBtn(allEpisodes[idx]);
@@ -3097,7 +3104,8 @@ window.addEventListener("popstate", () => {
         });
       })();
     }
-  }
+}
+
 
   function initModalSynopsisToggle(rootEl) {
     const quote = rootEl.querySelector(".synopsis-quote");
@@ -5062,34 +5070,57 @@ window.addEventListener("popstate", () => {
 
   const userChatBackBtn = document.getElementById("userChatBackBtn");
 
-  function openChatOverlay() {
-    if (!currentUser) {
-      showToast("برای ارسال پیام ابتدا لاگین کنید");
-      return;
-    }
-
-    // پاک کردن بدج‌ها
-    chatBubbleBadge?.style && (chatBubbleBadge.style.display = "none");
-    if (typeof chatMenuBadgeEl !== "undefined" && chatMenuBadgeEl) {
-      chatMenuBadgeEl.remove();
-    }
-
-    // اوورلی باز شود
-    chatOverlay?.setAttribute("aria-hidden", "false");
-
-    // کلاس وضعیت روی والد برای مخفی کردن ردیف ورودی
-    chatBubble?.classList.add("chat-open");
-
-    loadOrCreateThreadAndMessages();
+ function openChatOverlay() {
+  if (!currentUser) {
+    showToast('برای ارسال پیام ابتدا لاگین کنید');
+    return;
   }
 
-  function closeChatOverlay() {
-    // اوورلی بسته شود
-    chatOverlay?.setAttribute("aria-hidden", "true");
-
-    // حذف کلاس وضعیت از والد برای نمایش دوباره ردیف ورودی
-    chatBubble?.classList.remove("chat-open");
+  // پاک کردن بدج‌ها
+  chatBubbleBadge?.style && (chatBubbleBadge.style.display = 'none');
+  if (typeof chatMenuBadgeEl !== 'undefined' && chatMenuBadgeEl) {
+    chatMenuBadgeEl.remove();
   }
+
+  // اگر بسته بود → یک استیت برای بک‌باتن بساز
+  if (chatOverlay && chatOverlay.getAttribute('aria-hidden') !== 'false') {
+    history.pushState({ overlay: 'chat' }, '');
+  }
+
+  // اوورلی باز شود
+  chatOverlay?.setAttribute('aria-hidden', 'false');
+
+  // کلاس وضعیت روی والد برای مخفی کردن ردیف ورودی
+  chatBubble?.classList.add('chat-open');
+
+  loadOrCreateThreadAndMessages();
+}
+
+function closeChatOverlay() {
+  // اوورلی بسته شود
+  chatOverlay?.setAttribute('aria-hidden', 'true');
+
+  // حذف کلاس وضعیت از والد برای نمایش دوباره ردیف ورودی
+  chatBubble?.classList.remove('chat-open');
+}
+
+// اتصال‌ها
+chatInput?.addEventListener('focus', (e) => {
+  e.stopPropagation();
+  openChatOverlay();
+});
+
+chatBubble?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  openChatOverlay();
+});
+
+// دکمه Back داخل اوورلی
+userChatBackBtn?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  // بستن با دکمه داخلی → مستقیم ببند، history را دست نمی‌زنیم
+  closeChatOverlay();
+});
 
   // اتصال‌ها
   chatInput?.addEventListener("focus", (e) => {
@@ -5982,6 +6013,45 @@ window.addEventListener("popstate", () => {
         });
     });
   }
+
+// -------------------- Back/Forward handler for UI overlays --------------------
+window.addEventListener("popstate", () => {
+  // 1) Comments panel on a movie card
+  const openCommentsPanel = document.querySelector(".comments-panel.open");
+if (openCommentsPanel) {
+  openCommentsPanel.classList.remove("open");
+  openCommentsPanel.setAttribute("aria-hidden", "true");
+  return;
+}
+
+  // 2) Chat overlay (پیام به ادمین)
+  if (typeof closeChatOverlay === "function" && window.chatOverlay) {
+    if (chatOverlay.getAttribute("aria-hidden") === "false") {
+      closeChatOverlay();
+      return;
+    }
+  }
+
+  // 3) Movie modal (Popular + cards)
+  const modal = document.getElementById("movie-modal");
+if (modal && modal.style.display === "flex") {
+  modal.style.display = "none";
+  return;
+}
+
+  // 4) Side menu
+  const sideMenu = document.getElementById("sideMenu");
+  const menuOverlay = document.getElementById("menuOverlay");
+  if (sideMenu && sideMenu.classList.contains("active")) {
+    sideMenu.classList.remove("active");
+    menuOverlay && menuOverlay.classList.remove("active");
+    document.body.classList.remove("no-scroll", "menu-open");
+    return;
+  }
+
+  // اگر هیچ لایه‌ای باز نیست، این هندلر کاری نمی‌کند
+  // و popstateهای قبلی (مثلاً تب‌ها / پیجینیشن) کار خودشان را انجام می‌دهند.
+});
 
   // -------------------- Initial load --------------------
   if (document.querySelector(".admin-tabs .tab-btn")) {
