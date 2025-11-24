@@ -1758,12 +1758,15 @@ body.dark .episode-card {
 }
 
 .movie-type-tabs {
+  z-index: 900;
+  display: flex;
   gap: 8px;
   overflow-x: auto;
   white-space: nowrap;
   -ms-overflow-style: none;
   scrollbar-width: none;
   backdrop-filter: blur(var(--blur));
+  width: 100%;
   -webkit-mask-image: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 1) 80%,
@@ -1778,15 +1781,11 @@ body.dark .episode-card {
   );
   mask-repeat: no-repeat;
   mask-size: 100% 100%;
-  position: fixed;
-  top: 120px;
+  position: fixed; /* به جای sticky */
+  top: 120px; /* زیر هدر */
   left: 0;
   right: 0;
   transition: transform 0.3s ease;
-  z-index: 900;
-  transition: transform 0.6s ease;
-  width: 100%;
-  display: flex;
 }
 
 .movie-type-tabs::-webkit-scrollbar {
@@ -1844,9 +1843,6 @@ body.dark .genre-chip-mini {
   white-space: nowrap;
   transition: background 0.2s;
 }
-.tab-genres-list .genre-chip:hover {
-  background: #dce9f2;
-}
 .close-btn {
   font-size: 1.2rem;
   font-weight: bold;
@@ -1880,10 +1876,6 @@ Body.dark .genre-chip {
   background: rgba(0, 123, 255, 0.35);
   color: #ffffffe3;
 }
-.genre-chip:hover {
-  background: #ddd;
-}
-
 .genre-chip.active {
   background: #007bff;
   color: #fff;
@@ -5260,7 +5252,7 @@ body.dark .chat-back-btn {
 }
 
 body.dark .homepage-manager-submenu {
-  background: rgba(15, 23, 42, 0.9); /* کارت تیره تمیز در دارک مود */
+  background: rgba(255, 255, 255, 0.08);
   border-color: rgba(148, 163, 184, 0.35);
 }
 
@@ -5434,39 +5426,45 @@ body.reduce-animations .episode-title.scrolling {
   position: relative;
   z-index: 5;
   text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  flex: 0 0 auto;
+  background: var(--promo-accent-color);
   border: 1px solid #ddd;
   border-radius: 20px;
   padding: 6px 14px;
   font-size: 14px;
   font-weight: 700;
   color: #333;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
 }
 .tabs-container .tab-link.active {
+  background: var(--primary-bg);
   color: #fff;
+  border-color: var(--promo-accent-color);
 }
 
 .tabs-container .tab-link .count {
-  font-size: 12px;
-  opacity: 0.7;
+  border: 1px solid #512bd4;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 22px;
-  height: 22px;
-  padding: 6px;
+  min-width: 22px; /* حداقل عرض */
+  height: 22px; /* ارتفاع ثابت */
+  padding: 0 6px; /* کمی فاصله برای اعداد دو یا سه رقمی */
   border-radius: 50%;
-  background: #fff;
-  color: #512bd4;
-  border: 1px solid #512bd4;
+  background: var(--primary-bg);
+  color: #fff;
   font-size: 12px;
   font-weight: bold;
   line-height: 1;
   box-sizing: border-box;
+}
+.tabs-container .tab-link.active .count {
+  background: white;
+  color: #512bd4;
 }
 
 /* حباب شناور */
