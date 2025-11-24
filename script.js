@@ -95,7 +95,6 @@ async function loadAuthState() {
       return null;
     }
 
-    // گرفتن اطلاعات کاربر از users
     const { data: dbUser, error: dbErr } = await supabase
       .from("users")
       .select("*")
@@ -627,7 +626,6 @@ function finishPostProgress(success = true) {
 async function uploadWithProgress(file, path) {
   return new Promise(async (resolve, reject) => {
     try {
-      // گرفتن توکن کاربر لاگین‌شده
       const {
         data: { session },
         error,
@@ -899,7 +897,6 @@ function renderStoriesForPage(pageItems) {
       const title = escapeHtml(rawTitle);
       const cover = escapeHtml(m.cover || "https://via.placeholder.com/80");
 
-      // شرط: اگر طول عنوان بیشتر از 14 کاراکتر بود → انیمیشن بخوره
       const isLong = rawTitle.length > 14;
       const titleHtml = isLong
         ? `<span>${title}</span>` // داخل span برای انیمیشن
@@ -935,7 +932,7 @@ goPaginationBtn?.addEventListener("click", () => {
   // 2️⃣ بستن پنل در صورت باز بودن
   if (storyPanel.classList.contains("open")) {
     storyPanel.classList.remove("open");
-    storyToggle.classList.remove("open"); // هماهنگی با دکمه شناور
+    storyToggle.classList.remove("open");
   }
 });
 
@@ -1125,7 +1122,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeSwitchCheckbox = document.getElementById("themeSwitchCheckbox");
 
   function applyThemeSmooth(dark) {
-    // اول بک‌گراند عوض می‌شود (بدون لگ)
     const bg = document.getElementById("siteBgBlur");
     if (bg) {
       bg.style.opacity = 0; // برای تقویت ترنزیشن
@@ -1134,8 +1130,6 @@ document.addEventListener("DOMContentLoaded", () => {
         bg.style.opacity = 1;
       }, 10);
     }
-
-    // کلاس dark با تاخیر کوچک از بین بردن لگ
     setTimeout(() => {
       if (dark) {
         document.body.classList.add("dark");
@@ -1158,7 +1152,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const savedTheme = localStorage.getItem("theme");
   if (savedTheme === "dark") themeSwitchCheckbox.checked = true;
 
-  // اعمال اولیه بدون لگ
   applyThemeSmooth(savedTheme === "dark");
   // Side menu
   if (menuBtn && sideMenu && menuOverlay) {
@@ -1270,7 +1263,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!adminMessagesContainer) return;
     adminMessagesContainer.innerHTML = "";
     (messages || []).forEach((m) => {
-      // 👇 اگر قبلاً خوانده شده، نمایش نده
       if (isMessageRead(m.id)) return;
 
       const div = document.createElement("div");
@@ -1366,15 +1358,11 @@ document.addEventListener("DOMContentLoaded", () => {
   a.className = "page-bubble" + (isActive ? " active" : "");
   a.textContent = label;
   a.href = `?page=${page}`;
-
-  // اگر کاربر وسط-کلیک یا ctrl+click نکرده → رفتار JS اجرا شود
   a.addEventListener("click", (e) => {
-    // اگر لینک را در تب جدید باز می‌کند → JS دخالت نکند
     if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) {
-      return; // اجازه بده لینک واقعی باز شود
+      return;
     }
-
-    e.preventDefault(); // رفتار معمولی وب‌سایت
+    e.preventDefault();
     currentPage = Number(page);
     renderPagedMovies(true);
 
@@ -1479,7 +1467,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 // --------------------
-// Type filter tabs (FINAL VERSION FOR <a class="tab-link">)
+// Type filter tabs (FINAL — FIXED VERSION)
 // --------------------
 
 let currentTypeFilter = "all";
@@ -1506,19 +1494,33 @@ function setTabInUrl(type) {
   history.replaceState({}, "", url);
 }
 
-/* =============== UPDATE COUNTS (NO CHANGE) =============== */
+/* =============== UPDATE COUNTS + AUTO FIX INDICATOR =============== */
 function updateTypeCounts() {
   if (!Array.isArray(movies)) return;
 
   const all = movies.length;
-  const collections = movies.filter(m => (m.type || "").toLowerCase() === "collection").length;
-  const serials = movies.filter(m => (m.type || "").toLowerCase() === "serial").length;
-  const singles = movies.filter(m => (m.type || "").toLowerCase() === "single").length;
+  const collections = movies.filter(
+    m => (m.type || "").toLowerCase() === "collection"
+  ).length;
+  const serials = movies.filter(
+    m => (m.type || "").toLowerCase() === "serial"
+  ).length;
+  const singles = movies.filter(
+    m => (m.type || "").toLowerCase() === "single"
+  ).length;
 
-  document.querySelector('[data-type="all"] .count').textContent = all;
-  document.querySelector('[data-type="collection"] .count').textContent = collections;
-  document.querySelector('[data-type="series"] .count').textContent = serials;
-  document.querySelector('[data-type="single"] .count').textContent = singles;
+  const allEl        = document.querySelector('[data-type="all"] .count');
+  const collectionEl = document.querySelector('[data-type="collection"] .count');
+  const seriesEl     = document.querySelector('[data-type="series"] .count');
+  const singleEl     = document.querySelector('[data-type="single"] .count');
+
+  if (allEl)        allEl.textContent        = all;
+  if (collectionEl) collectionEl.textContent = collections;
+  if (seriesEl)     seriesEl.textContent     = serials;
+  if (singleEl)     singleEl.textContent     = singles;
+
+  // بعد از رندر شدن شمارنده‌ها → اندیکاتور را درست کن
+  setTimeout(moveTabIndicator, 50);
 }
 
 /* =============== FILTER MOVIES BY TYPE =============== */
@@ -1527,35 +1529,38 @@ function filterByType(type) {
   currentPage = 1;
   renderPagedMovies();
 
-  // بعد از رندر تعداد کارت‌ها → جای‌نمایی جدید
-  setTimeout(moveTabIndicator, 50);
+  setTimeout(moveTabIndicator, 60);
 }
 
 /* =============== ACTIVATE TAB IN UI =============== */
 function applyActiveTab(type) {
-  document.querySelectorAll(".tab-link").forEach(link => {
-    link.classList.remove("active");
-  });
+  document.querySelectorAll(".tab-link").forEach(link =>
+    link.classList.remove("active")
+  );
 
   const activeLink = document.querySelector(`.tab-link[data-type="${type}"]`);
   if (activeLink) activeLink.classList.add("active");
 
-  // حرکت حباب شناور
   moveTabIndicator();
 }
 
-/* =============== SLIDING BUBBLE INDICATOR =============== */
+/* =============== SLIDING BUBBLE INDICATOR — FINAL FIXED VERSION =============== */
 function moveTabIndicator() {
   const active = document.querySelector(".tab-link.active");
   const indicator = document.querySelector(".tab-indicator");
-  if (!active || !indicator) return;
+  const wrapper = document.querySelector(".tabs-container");
 
-  const rect = active.getBoundingClientRect();
-  const parentRect = active.parentElement.getBoundingClientRect();
+  if (!active || !indicator || !wrapper) return;
 
-  indicator.style.width = rect.width + "px";
-  indicator.style.transform =
-    `translateX(${rect.left - parentRect.left}px)`;
+  // فاصله جزئی برای جلوگیری از خطای میلی‌متری
+  const FIX = 4;
+
+  const width = active.offsetWidth - FIX;
+  const left = active.offsetLeft + FIX / 2;
+
+  indicator.style.width = width + "px";
+  indicator.style.left = left + "px";
+  indicator.style.transform = "translateX(0)";
 }
 
 /* =============== CLICK HANDLER =============== */
@@ -1563,7 +1568,7 @@ document.querySelectorAll(".tab-link").forEach(link => {
   link.addEventListener("click", (e) => {
     const type = link.dataset.type;
 
-    // اگر Ctrl یا Middle click → اجازه بده در تب جدید باز شود
+    // اجازه باز شدن در تب جدید
     if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) {
       return;
     }
@@ -1575,18 +1580,18 @@ document.querySelectorAll(".tab-link").forEach(link => {
       searchInput.value = "";
     }
 
-    // ریست ژانر
+    // ریست ژانرهای زیرتب
     currentTabGenre = null;
     document.querySelectorAll(".tab-genres-list .genre-chip.active")
       .forEach(ch => ch.classList.remove("active"));
 
-    // فعال‌سازی تب
+    // فعال سازی تب
     applyActiveTab(type);
 
-    // ست در URL
+    // ذخیره در URL
     setTabInUrl(type);
 
-    // اعمال فیلتر
+    // فیلتر
     filterByType(type);
   });
 });
@@ -1595,20 +1600,22 @@ document.querySelectorAll(".tab-link").forEach(link => {
 (function initTabs() {
   const type = getTabFromUrl();
   currentTypeFilter = type;
-
   applyActiveTab(type);
 })();
+
 window.addEventListener("load", () => {
-  moveTabIndicator();
+  setTimeout(moveTabIndicator, 80);
 });
 
-/* =============== HANDLE BACK/FORWARD =============== */
+/* =============== BACK/FORWARD SUPPORT =============== */
 window.addEventListener("popstate", () => {
   const type = getTabFromUrl();
   currentTypeFilter = type;
+
   applyActiveTab(type);
   filterByType(type);
 });
+
 
 
   // -------------------- تشخیص جهت اسکرول --------------------
@@ -1703,8 +1710,6 @@ window.addEventListener("popstate", () => {
     if (!container) return;
 
     let baseMovies;
-
-    // اگر سرچ فعال بود → از filteredMovies استفاده کن
     if (
       searchInput &&
       searchInput.value.trim() !== "" &&
@@ -1753,7 +1758,6 @@ window.addEventListener("popstate", () => {
     // تبدیل به آرایه
     const genres = Object.entries(genreCounts);
 
-    // جدا کردن انگلیسی و فارسی (بعد از حذف #)
     const englishGenres = genres.filter(([g]) => {
       const clean = g.startsWith("#") ? g.slice(1) : g;
       return /^[A-Za-z]/.test(clean);
@@ -1763,11 +1767,9 @@ window.addEventListener("popstate", () => {
       return !/^[A-Za-z]/.test(clean);
     });
 
-    // مرتب‌سازی هر گروه بر اساس تعداد
     englishGenres.sort((a, b) => b[1] - a[1]);
     persianGenres.sort((a, b) => b[1] - a[1]);
 
-    // ترکیب: اول انگلیسی‌ها بعد فارسی‌ها
     const finalGenres = [...englishGenres, ...persianGenres];
 
     // ساخت ژانرها
@@ -2062,7 +2064,6 @@ window.addEventListener("popstate", () => {
       goBtn?.addEventListener("click", async () => {
         const link = goBtn.dataset.link || "#";
 
-        // 🔹 ثبت لاگ کلیک در Supabase
         try {
           const movieId = m.id; // چون m در اسکوپ حلقه هست
           const epActiveEl = card.querySelector(
@@ -2073,7 +2074,6 @@ window.addEventListener("popstate", () => {
             : null;
 
           const activeTitle = (() => {
-            // اگر اپیزود فعال هست
             if (epActiveEl) {
               const titleEl = epActiveEl.querySelector(".episode-title span");
               return titleEl ? titleEl.textContent : m.title;
@@ -2136,7 +2136,6 @@ window.addEventListener("popstate", () => {
 
           const listEl = card.querySelector(".episodes-list");
 
-          // اگر اپیزود match شده بود، همون index فعال میشه
           const activeIndex = episodeMatches.get(m.id) ?? 0;
 
           listEl.innerHTML = allEpisodes
@@ -2175,7 +2174,6 @@ window.addEventListener("popstate", () => {
               totalEpisodes + (totalEpisodes > 1 ? " episodes" : " episode");
           }
 
-          // اگر اپیزود match شده بود
           if (activeIndex > 0) {
             const ep = allEpisodes[activeIndex];
 
@@ -2223,7 +2221,6 @@ window.addEventListener("popstate", () => {
             }
           }
 
-          // 👇 اسکرول خودکار فقط اگر سرچ باعث match شده باشه
           setTimeout(() => {
             const activeEpEl = listEl.querySelector(".episode-card.active");
             if (
@@ -2307,7 +2304,6 @@ window.addEventListener("popstate", () => {
             });
           });
 
-          // اگر badge نبود، با شمارش اضافه شود
           const titleEl = card.querySelector(".movie-title");
           if (
             titleEl &&
@@ -2393,7 +2389,6 @@ window.addEventListener("popstate", () => {
   // -------------------- Admin guard --------------------
   async function enforceAdminGuard() {
     try {
-      // اگر وضعیت کاربر هنوز مقداردهی نشده، یک‌بار لود کن
       if (!currentUser) {
         await loadAuthState();
       }
@@ -2402,7 +2397,6 @@ window.addEventListener("popstate", () => {
         currentUser && ["owner", "admin"].includes(currentUser.role)
       );
 
-      // اگر در صفحه ادمین هستیم و ادمین نیست → برگرد به index
       if (!isAdmin && window.location.pathname.endsWith("admin.html")) {
         window.location.href = "index.html";
         return false;
@@ -2523,7 +2517,7 @@ window.addEventListener("popstate", () => {
             .from("movies")
             .update({ is_popular: isNowPopular })
             .eq("id", id)
-            .returns("minimal"); // 👈 هیچ داده‌ای برنمی‌گردونه
+            .returns("minimal");
 
           if (error) {
             console.error("popular toggle error:", error);
@@ -3026,7 +3020,6 @@ window.addEventListener("popstate", () => {
     bindGoBtn(m);
     initModalSynopsisToggle(content);
 
-    // 🔹 اگر سریال یا کالکشن بود
     if (m.type === "collection" || m.type === "serial") {
       (async () => {
         const { data: eps } = await supabase
@@ -3118,7 +3111,6 @@ window.addEventListener("popstate", () => {
       });
 
       quote.addEventListener("click", (e) => {
-        // اگر روی لینک/چیب/دکمه کلیک شد، toggle نشه
         if (
           e.target.closest("a") ||
           e.target.closest("button") ||
@@ -3131,7 +3123,6 @@ window.addEventListener("popstate", () => {
         toggleQuote();
       });
     } else {
-      // اگر کوتاهه، دکمه رو حذف کن
       if (btn) btn.remove();
     }
   }
@@ -3153,9 +3144,6 @@ window.addEventListener("popstate", () => {
     formsWrap.innerHTML = "";
     if (!items || !items.length) return;
 
-    // تعیین اینکه آیا items[0] اپیزود اصلی (فرم main) است یا نه
-    // در حالت edit اگر عنوان فرم main با عنوان items[0] همخوانی داشت،
-    // فرض می‌کنیم items شامل اپیزود اول هم هست و باید از آیتم دوم شروع کنیم.
     let startIdx = 0;
     if (mode === "edit") {
       try {
@@ -3264,7 +3252,6 @@ window.addEventListener("popstate", () => {
     if (ep.cover) {
       formEl.dataset.existingCover = ep.cover;
 
-      // اگر preview از قبل وجود دارد، آن را بردار و دوباره اضافه کن تا تکراری نشود
       const existingPreview = formEl.querySelector(".bundle-cover-preview");
       if (existingPreview) existingPreview.remove();
 
@@ -3323,7 +3310,7 @@ window.addEventListener("popstate", () => {
       )}" />
 
 
-      <label>بازیگران</label>
+      <label>actors</label>
       <input type="text" name="ep_stars_${ep.id}" value="${escapeHtml(
         ep.stars || ""
       )}" />
@@ -3485,7 +3472,6 @@ window.addEventListener("popstate", () => {
   }
 
   async function loadAnalytics() {
-    // فقط اگر ادمین لاگین است
     const ok = await enforceAdminGuard();
     if (!ok) return;
 
@@ -3666,7 +3652,7 @@ window.addEventListener("popstate", () => {
   // هندلر سرچ
   document.getElementById("userSearch")?.addEventListener("input", (e) => {
     const value = e.target.value.trim();
-    usersPage = 1; // برگرده به صفحه اول
+    usersPage = 1;
     loadUsers(value);
   });
 
@@ -4349,7 +4335,6 @@ window.addEventListener("popstate", () => {
     try {
       const badge = document.getElementById("commentBadge");
 
-      // فقط اگر نقش کاربر owner یا admin باشه
       if (!currentUser || !["owner", "admin"].includes(currentUser.role)) {
         if (badge) badge.style.display = "none";
         return;
@@ -4675,7 +4660,6 @@ window.addEventListener("popstate", () => {
       const q = adminSearchInput.value.trim().toLowerCase();
 
       if (!q) {
-        // اگه سرچ خالی بود، لیست کامل رو بیار
         loadAdminMovies(1);
         return;
       }
@@ -4902,9 +4886,8 @@ window.addEventListener("popstate", () => {
   const applyRatingFilterBtn = document.getElementById("applyRatingFilter");
   const activeFiltersContainer = document.getElementById("activeFilters");
 
-  let imdbMinRating = null; // اگر null باشه یعنی فیلتری فعال نیست
+  let imdbMinRating = null;
 
-  // Helper: به‌روزرسانی UI اسلایدر بر اساس درصد
   function setSliderPercent(pct) {
     const clamped = Math.max(0, Math.min(100, pct));
     ratingFill.style.width = clamped + "%";
@@ -5117,8 +5100,6 @@ window.addEventListener("popstate", () => {
     const { data: pub } = supabase.storage.from("chat").getPublicUrl(data.path);
     return pub?.publicUrl || null;
   }
-
-  // ساخت یا گرفتن نخ
   async function ensureThread() {
     if (!currentUser) return null;
     if (chatThreadId) return chatThreadId;
@@ -5439,7 +5420,6 @@ window.addEventListener("popstate", () => {
     }
   }
 
-  // ===== اوورلی گفت‌وگو با کاربر =====
   const adminThreadOverlay = document.getElementById("adminThreadOverlay");
   const adminThreadBackBtn = document.getElementById("adminThreadBackBtn");
   const adminThreadMessages = document.getElementById("adminThreadMessages");
@@ -5605,8 +5585,7 @@ window.addEventListener("popstate", () => {
   const adminMessagesBadge = document.getElementById("adminMessagesBadge");
 
   async function pollAdminUnread() {
-    if (!adminMessagesBadge) return; // 🔹 اگر در این صفحه نبود، کاری نکن
-
+    if (!adminMessagesBadge) return;
     const { data, error } = await supabase
       .from("user_admin_threads")
       .select("id")
