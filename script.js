@@ -1358,14 +1358,37 @@ document.addEventListener("DOMContentLoaded", () => {
   a.className = "page-bubble" + (isActive ? " active" : "");
   a.textContent = label;
   a.href = `?page=${page}`;
+
   a.addEventListener("click", (e) => {
+    // اجازه بده تب جدید / میان‌کلیک رفتار خودش رو داشته باشه
     if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) {
       return;
     }
+
     e.preventDefault();
-    currentPage = Number(page);
+
+    const targetPage = Number(page);
+    if (!Number.isFinite(targetPage)) return;
+
+    // 🔹 ساختن یک history state جدید برای این صفحه
+    try {
+      const url = new URL(window.location.href);
+      if (targetPage <= 1) {
+        // صفحه ۱ → پارامتر page پاک شود تا URL تمیز بماند
+        url.searchParams.delete("page");
+      } else {
+        url.searchParams.set("page", String(targetPage));
+      }
+      window.history.pushState({}, "", url);
+    } catch (err) {
+      console.warn("pagination pushState error:", err);
+    }
+
+    // ست کردن صفحه فعلی و رندر
+    currentPage = targetPage;
     renderPagedMovies(true);
 
+    // اسکرول نرم به بالای لیست
     const cont = document.querySelector(".container");
     window.scrollTo({
       top: (cont?.offsetTop || 0) - 8,
@@ -1375,6 +1398,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   return a;
 };
+
 
     if (total <= 9) {
       for (let i = 1; i <= total; i++)
@@ -1607,13 +1631,18 @@ window.addEventListener("load", () => {
   setTimeout(moveTabIndicator, 80);
 });
 
-/* =============== BACK/FORWARD SUPPORT =============== */
+/* =============== BACK/FORWARD SUPPORT (TABS + PAGES) =============== */
 window.addEventListener("popstate", () => {
-  const type = getTabFromUrl();
-  currentTypeFilter = type;
+  // 1) تب را از URL بخوان
+  const typeFromUrl = getTabFromUrl();
+  currentTypeFilter = typeFromUrl;
+  applyActiveTab(typeFromUrl);
 
-  applyActiveTab(type);
-  filterByType(type);
+  // 2) صفحه را از URL بخوان
+  currentPage = getPageFromUrl();
+
+  // 3) دوباره رندر با وضعیت فعلی (تب + صفحه + سرچ + ژانر)
+  renderPagedMovies(true);
 });
 
 
