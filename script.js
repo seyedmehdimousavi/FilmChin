@@ -1622,7 +1622,7 @@ document.querySelectorAll(".tab-link").forEach(link => {
       .forEach(ch => ch.classList.remove("active"));
 
     applyActiveTab(type);
-
+updateDynamicTitle();
     setTabInUrl(type);
 
     filterByType(type);
@@ -6049,8 +6049,22 @@ if (modal && modal.style.display === "flex") {
     return;
   }
 
-  // اگر هیچ لایه‌ای باز نیست، این هندلر کاری نمی‌کند
-  // و popstateهای قبلی (مثلاً تب‌ها / پیجینیشن) کار خودشان را انجام می‌دهند.
+});
+
+function updateDynamicTitle() {
+  let title = "FilmChiin";
+
+  if (currentTypeFilter === "all") title = "All Movies | FilmChiin";
+  if (currentTypeFilter === "collection") title = "Collections | FilmChiin";
+  if (currentTypeFilter === "series") title = "Series | FilmChiin";
+  if (currentTypeFilter === "single") title = "Single Movies | FilmChiin";
+
+  document.title = title;
+}
+
+
+document.querySelectorAll("img").forEach(img => {
+  if (!img.loading) img.loading = "lazy";
 });
 
   // -------------------- Initial load --------------------
