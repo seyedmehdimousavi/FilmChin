@@ -40,6 +40,16 @@ const PAGE_SIZE = 10;
 let currentPage = 1;
 let episodesByMovie = new Map();
 let imdbMinRating = null;
+// ======= Deep link for single movie (/movie/slug) =======
+let deepLinkSlug = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const path = window.location.pathname || "";
+  if (path.startsWith("/movie/")) {
+    // "/movie/xxx" → فقط بخش بعد از /movie/
+    deepLinkSlug = decodeURIComponent(path.replace("/movie/", "").replace(/\/+$/, ""));
+  }
+});
 
 /* ======================
    PAGE URL HELPERS
@@ -549,6 +559,22 @@ function escapeHtml(str) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
 }
+// ساخت slug از عنوان فیلم برای تطبیق با آدرس /movie/slug
+function makeMovieSlug(title) {
+  if (!title) return "";
+  return String(title)
+    .toLowerCase()
+    .trim()
+    // حذف پرانتز و براکت
+    .replace(/[\(\)\[\]\{\}]/g, "")
+    // تبدیل هر چیز غیر حرف/عدد به -
+    .replace(/[^a-z0-9ا-ی]+/gi, "-")
+    // حذف - های تکراری
+    .replace(/-+/g, "-")
+    // حذف - از ابتدا و انتها
+    .replace(/^-|-$/g, "");
+}
+
 function initials(name) {
   if (!name) return "U";
   const parts = name.trim().split(/\s+/);
@@ -1194,29 +1220,50 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Fetch data
+  
   async function fetchMovies() {
-    try {
-      const { data, error } = await supabase
-        .from("movies")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) {
-        console.error("fetch movies error", error);
-        movies = [];
-      } else {
-        movies = data || [];
-      }
-      await fetchEpisodes();
-      currentPage = getPageFromUrl();
-      await renderPagedMovies(); // note: await for inner supabase calls in bundles
-      buildGenreGrid();
-      if (document.getElementById("movieList"))
-        renderAdminMovieList(movies.slice(0, 10));
-    } catch (err) {
-      console.error("fetchMovies catch", err);
+  try {
+    const { data, error } = await supabase
+      .from("movies")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("fetch movies error", error);
       movies = [];
+    } else {
+      movies = data || [];
     }
+
+    // دریافت اپیزودها
+    await fetchEpisodes();
+
+    // صفحه فعلی را از URL بخوان
+    currentPage = getPageFromUrl();
+
+    // رندر فیلم‌ها در صفحه
+    await renderPagedMovies(); // note: await for inner supabase calls in bundles
+
+    // 🔹 مهم‌ترین بخش: اگر لینک مستقیم فیلم باشد، مودال را باز کن
+    if (typeof handleDeepLinkMovieOpen === "function") {
+      handleDeepLinkMovieOpen();
+    }
+
+    // ساخت گرید ژانر
+    buildGenreGrid();
+
+    // اگر در صفحه ادمین هستیم، لیست محدود رندر کن
+    if (document.getElementById("movieList")) {
+      renderAdminMovieList(movies.slice(0, 10));
+    }
+
+  } catch (err) {
+    console.error("fetchMovies catch", err);
+    movies = [];
   }
+}
+
+  
   async function fetchMessages() {
     try {
       const { data, error } = await supabase
@@ -2421,6 +2468,52 @@ window.addEventListener("popstate", () => {
     // -------------------- آپدیت استوری‌ها --------------------
     renderStoriesForPage(pageItems);
   }
+  // بعد از لود شدن movies، اگر روی /movie/slug هستیم مودال همان فیلم باز شود
+function handleDeepLinkMovieOpen() {
+  if (!deepLinkSlug || !Array.isArray(movies) || !movies.length) return;
+
+  const slug = deepLinkSlug;
+  deepLinkSlug = null; // فقط یکبار استفاده شود
+
+  // پیدا کردن فیلم بر اساس عنوان
+  const targetMovie = movies.find(m => {
+    const t = (m.title || m.name || "").trim();
+    if (!t) return false;
+    return makeMovieSlug(t) === slug;
+  });
+
+  if (!targetMovie) {
+    console.warn("Deep link movie not found for slug:", slug);
+    return;
+  }
+
+  // اگر نوع فیلم مشخص است، می‌توانیم تب درست را هم فعال کنیم (اختیاری)
+  try {
+    if (targetMovie.type && typeof applyActiveTab === "function") {
+      const type = (targetMovie.type || "").toLowerCase();
+      const valid = ["all", "collection", "series", "single"];
+      if (valid.includes(type)) {
+        applyActiveTab(type);
+        // اگر filterByType داری، آن را هم صدا بزن
+        if (typeof filterByType === "function") {
+          filterByType(type);
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("applyActiveTab error:", e);
+  }
+
+  // کمی صبر می‌کنیم تا گرید رندر شود، بعد مودال را باز می‌کنیم
+  setTimeout(() => {
+    try {
+      openMovieModal(targetMovie);
+    } catch (e) {
+      console.error("openMovieModal error:", e);
+    }
+  }, 300);
+}
+
   // -------------------- Admin guard --------------------
   async function enforceAdminGuard() {
     try {
