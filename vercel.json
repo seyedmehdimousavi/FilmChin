@@ -1,8 +1,8 @@
 {
+  "cleanUrls": true,
   "rewrites": [
-    {
-      "source": "/movie/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/movie/:slug", "destination": "/index.html" },
+    { "source": "/movie/:slug/", "destination": "/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
