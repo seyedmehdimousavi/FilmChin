@@ -393,7 +393,7 @@ signupNextBtn?.addEventListener("click", async (e) => {
         signupStep2.style.display = "none";
         signupStep1.classList.add("active-step");
         signupStep2.classList.remove("active-step");
-        signupNextBtn.innerHTML = `<img src="images/nextsignup.png" alt="Next" style="height:22px;vertical-align:middle;">`;
+        signupNextBtn.innerHTML = `<img src="/images/nextsignup.png" alt="Next" style="height:22px;vertical-align:middle;">`;
       });
     }
   }
@@ -482,7 +482,7 @@ function setUserProfile(avatarUrl) {
   if (avatarUrl) {
     profileBtnEl.innerHTML = `<img src="${avatarUrl}" style="width:44px;height:44px;border-radius:50%;">`;
   } else {
-    profileBtnEl.innerHTML = `<img src="images/icons8-user-96.png" alt="user"/>`;
+    profileBtnEl.innerHTML = `<img src="/images/icons8-user-96.png" alt="user"/>`;
   }
 }
 
@@ -1334,8 +1334,8 @@ document.addEventListener("DOMContentLoaded", () => {
       div.innerHTML = `
       <div class="msg-header">
         <div class="msg-avatar-wrapper">
-          <img class="msg-avatar" src="images/Admin-logo.png" alt="admin">
-          <img class="msg-icon" src="images/icons8-message.apng" alt="msg-icon">
+          <img class="msg-avatar" src="/images/Admin-logo.png" alt="admin">
+          <img class="msg-icon" src="/images/icons8-message.apng" alt="msg-icon">
         </div>
         <div class="msg-meta">
           <span class="msg-title">Admin</span>
@@ -2046,7 +2046,7 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
 
 
-    <span class="field-label anim-vertical"><img src="images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
+    <span class="field-label anim-vertical"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
     <div class="field-quote anim-left-right synopsis-quote">
       <div class="quote-text anim-horizontal">${synopsis}</div>
       <div class="button-wrap">
@@ -2056,22 +2056,22 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
 
 
-    <span class="field-label anim-vertical"><img src="images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span>
+    <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span>
     <div class="field-quote anim-left-right">${director}</div>
 
 
-    <span class="field-label anim-vertical"><img src="images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
+    <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
     <div class="field-quote anim-horizontal">
       ${renderChips(m.product || "-")}
     </div>
 
 
-    <span class="field-label anim-vertical"><img src="images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
+    <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
     <div class="field-quote anim-left-right">${stars}</div>
 
 
     <span class="field-label anim-vertical">
-      <img src="images/icons8-imdb-48.png" class="imdb-bell" style="width:20px;height:20px;">
+      <img src="/images/icons8-imdb-48.png" class="imdb-bell" style="width:20px;height:20px;">
       IMDB:
     </span>
     <div class="field-quote anim-left-right">
@@ -2079,11 +2079,11 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
 
 
-    <span class="field-label anim-vertical"><img src="images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span>
+    <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span>
     <div class="field-quote anim-left-right">${release_info}</div>
 
 
-    <span class="field-label anim-vertical"><img src="images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span>
+    <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span>
     <div class="field-quote genre-grid anim-horizontal">${renderChips(
       m.genre || "-"
     )}</div>
@@ -2104,7 +2104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <div class="comment-summary anim-horizontal">
       <div class="avatars"></div>
       <div class="comments-count">0 comments</div>
-      <div class="enter-comments"><img src="images/icons8-comment.apng" style="width:22px;height:22px;"></div>
+      <div class="enter-comments"><img src="/images/icons8-comment.apng" style="width:22px;height:22px;"></div>
     </div>
 
 
@@ -2596,7 +2596,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="popular-toggle" data-id="${
           m.id
         }" aria-label="toggle popular">
-          <img src="images/${
+          <img src="/images/${
             m.is_popular ? "icons8-heart-50-fill.png" : "icons8-heart-50.png"
           }" 
                alt="heart" class="heart-icon"/>
@@ -2830,7 +2830,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="popular-toggle" data-id="${
           m.id
         }" aria-label="toggle popular">
-          <img src="images/${
+          <img src="/images/${
             m.is_popular ? "icons8-heart-50-fill.png" : "icons8-heart-50.png"
           }" 
                alt="heart" class="heart-icon"/>
@@ -3774,7 +3774,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const avatar = u.avatar_url
         ? supabase.storage.from("avatars").getPublicUrl(u.avatar_url).data
             .publicUrl
-        : "images/icons8-user-96.png";
+        : "/images/icons8-user-96.png";
 
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -3853,7 +3853,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const avatar = u.avatar_url
         ? supabase.storage.from("avatars").getPublicUrl(u.avatar_url).data
             .publicUrl
-        : "images/icons8-user-96.png";
+        : "/images/icons8-user-96.png";
 
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -5354,8 +5354,8 @@ document.addEventListener("DOMContentLoaded", () => {
         let tickIcon = "";
         if (m.role === "user") {
           tickIcon = m.seen_by_admin
-            ? `<img src="images/icons8-double-tick-50.png" alt="seen">`
-            : `<img src="images/icons8-tick-96.png" alt="sent">`;
+            ? `<img src="/images/icons8-double-tick-50.png" alt="seen">`
+            : `<img src="/images/icons8-tick-96.png" alt="sent">`;
         } else {
           tickIcon = ""; // پیام‌های ورودی (ادمین) بدون تیک
         }
@@ -5548,7 +5548,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const avatar = user?.avatar_url
         ? supabase.storage.from("avatars").getPublicUrl(user.avatar_url).data
             .publicUrl
-        : "images/icons8-user-96.png";
+        : "/images/icons8-user-96.png";
 
       const { data: lastMsg } = await supabase
         .from("user_admin_messages")
@@ -5676,8 +5676,8 @@ document.addEventListener("DOMContentLoaded", () => {
         let tickIcon = "";
         if (m.role === "admin") {
           tickIcon = m.seen_by_user
-            ? `<img src="images/icons8-double-tick-50.png" alt="seen">`
-            : `<img src="images/icons8-tick-96.png" alt="sent">`;
+            ? `<img src="/images/icons8-double-tick-50.png" alt="seen">`
+            : `<img src="/images/icons8-tick-96.png" alt="sent">`;
         } else {
           tickIcon = ""; // پیام‌های ورودی از کاربر بدون تیک
         }
