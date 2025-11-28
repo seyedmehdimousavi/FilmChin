@@ -2,9 +2,9 @@
   Base variables & reset
   ========================= */
 :root {
-  --bg-day: #f7f7f7;
+  --bg-day: #f1f4f9;
   --bg-night: #1a2026;
-  --post-day: #fafafa;
+  --post-day: #ffffff;
   --post-night: #212a33;
   --btn-day: linear-gradient(
     90deg,
@@ -86,7 +86,7 @@
 }
 * {
   font-family: "IRANSans", "ProductSans", sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 400;
   /* Letter-spacing: -0.2px;s */
   text-rendering: optimizeLegibility;
@@ -1801,7 +1801,7 @@ body.dark .episode-card {
   display: inline-block;
   border-radius: 12px;
   background: rgba(0, 123, 255, 0.15);
-  color: #007bff;
+  color: #1767bd;
   line-height: 1;
   cursor: pointer;
   user-select: none;
@@ -3124,6 +3124,7 @@ body.dark .role-badge.user {
 .btn-subtle {
   background: #eceff1;
   color: #37474f;
+  padding: 10px 15px;
 }
 .btn-subtle:hover {
   background: #e0e5e8;
