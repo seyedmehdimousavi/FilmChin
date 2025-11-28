@@ -1864,7 +1864,8 @@ body.dark .genre-chip-mini {
   transition: all 0.2s ease;
   border-radius: 16px;
   background: rgba(0, 123, 255, 0.15);
-  color: #007bff;
+  color: #1767bd;
+
   line-height: 1;
   cursor: pointer;
   user-select: none;
@@ -1882,7 +1883,7 @@ Body.dark .genre-chip {
   font-weight: bold;
 }
 body.dark .genre-chip.active {
-  background: #007bff;
+  background: #017ada;
   color: #fff;
   font-weight: bold;
 }
@@ -1906,12 +1907,6 @@ body.dark .genre-chip.active {
   font-size: 10px;
   padding: 2px 6px;
   border-radius: 10px;
-}
-
-/* وقتی ژانر اکتیو شد */
-.genre-chip.active {
-  background: #0d6efd; /* کل چیپ آبی */
-  color: #fff; /* متن ژانر سفید */
 }
 
 .genre-chip.active .count {
@@ -5433,30 +5428,28 @@ body.reduce-animations .episode-title.scrolling {
   gap: 6px;
   transition: all 0.2s ease;
   flex: 0 0 auto;
-  background: var(--promo-accent-color);
+  background: #eef3f7;
+  color: #0b3d5c;
   border: 1px solid #ddd;
   border-radius: 20px;
   padding: 6px 14px;
   font-size: 14px;
   font-weight: 700;
-  color: #333;
 }
 .tabs-container .tab-link.active {
-  background: var(--primary-bg);
+  background: #017ada;
   color: #fff;
-  border-color: var(--promo-accent-color);
 }
 
 .tabs-container .tab-link .count {
-  border: 1px solid #512bd4;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 22px; /* حداقل عرض */
-  height: 22px; /* ارتفاع ثابت */
-  padding: 0 6px; /* کمی فاصله برای اعداد دو یا سه رقمی */
+  width: 25px;
+  height: 25px;
+  padding: 0 6px;
   border-radius: 50%;
-  background: var(--primary-bg);
+  background: #017ada;
   color: #fff;
   font-size: 12px;
   font-weight: bold;
@@ -5465,7 +5458,7 @@ body.reduce-animations .episode-title.scrolling {
 }
 .tabs-container .tab-link.active .count {
   background: white;
-  color: #512bd4;
+  color: #017ada;
 }
 
 /* حباب شناور */
@@ -5475,7 +5468,7 @@ body.reduce-animations .episode-title.scrolling {
   bottom: 6px;
   width: 0;
   border-radius: 20px;
-  background: var(--primary-bg);
+  background: #017ada;
   transition: all 0.3s cubic-bezier(0.25, 1, 0.3, 1);
   z-index: 1;
   opacity: 0.9;
@@ -5483,5 +5476,5 @@ body.reduce-animations .episode-title.scrolling {
 
 .tabs-container .tab-link.active.count {
   background: var(--primary-bg);
-  color: #fff;
+  color: #017ada;
 }
