@@ -1,8 +1,13 @@
 {
-  "cleanUrls": true,
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
-    { "source": "/movie/:slug", "destination": "/index.html" },
-    { "source": "/movie/:slug/", "destination": "/index.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/movie/:slug",
+      "destination": "/"
+    },
+    {
+      "source": "/movie/:slug/",
+      "destination": "/"
+    }
   ]
 }
