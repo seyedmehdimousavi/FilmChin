@@ -1426,9 +1426,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="favorite-item">
             <img src="${cover}" alt="${title}" class="favorite-cover" loading="lazy" />
             <div class="favorite-title" dir="auto">${title}</div>
-            <div class="favorite-meta">
-              ${imdb ? `IMDB: ${imdb}` : ""} ${release ? ` • ${release}` : ""}
-            </div>
+            <div class="favorite-meta"></div>
             <div class="favorite-actions">
               <div class="button-wrap">
                 <button
@@ -1487,8 +1485,9 @@ document.addEventListener("DOMContentLoaded", () => {
     renderFavoritesGrid();
 
     if (!favoritesOverlay) return;
+    
     favoritesOverlay.setAttribute("aria-hidden", "false");
-    document.body.classList.add("no-scroll", "favorites-open");
+document.body.classList.add("no-scroll");
 
     // برای Back button
     history.pushState({ overlay: "favorites" }, "");
@@ -1497,7 +1496,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function closeFavoritesOverlay() {
     if (!favoritesOverlay) return;
     favoritesOverlay.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("no-scroll", "favorites-open");
+document.body.classList.remove("no-scroll");
   }
 
   // ناوبری از Favorite به کارت پست
@@ -6634,7 +6633,7 @@ window.addEventListener("popstate", () => {
     favoritesOverlay.getAttribute("aria-hidden") === "false"
   ) {
     favoritesOverlay.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("no-scroll", "favorites-open");
+document.body.classList.remove("no-scroll");
     return;
   }
 
