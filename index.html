@@ -106,22 +106,33 @@
             <div class="button-shadow"></div>
           </div>
           <div id="profileMenu" class="profile-menu hidden">
-            <div class="profile-bubble">
-              <div class="profile-username" id="profileUsername">UserName</div>
-              <div class="button-wrap">
-                <button class="profile-edit"><span>Edit Profile</span></button>
-                <div class="button-shadow"></div>
-              </div>
+  <div class="profile-bubble">
+    <div class="profile-username" id="profileUsername">UserName</div>
 
-              <hr class="profile-divider" />
-              <div class="button-wrap">
-                <button id="logoutBtn" class="profile-logout">
-                  <span>Logout</span>
-                </button>
-                <div class="button-shadow"></div>
-              </div>
-            </div>
-          </div>
+    <div class="button-wrap">
+      <button class="profile-edit"><span>Edit Profile</span></button>
+      <div class="button-shadow"></div>
+    </div>
+
+    <!-- ✅ NEW: Favorite movies button -->
+    <div class="button-wrap">
+      <button id="favoriteMoviesBtn" class="profile-favorites">
+        <span>Favorite movies</span>
+      </button>
+      <div class="button-shadow"></div>
+    </div>
+
+    <hr class="profile-divider" />
+
+    <div class="button-wrap">
+      <button id="logoutBtn" class="profile-logout">
+        <span>Logout</span>
+      </button>
+      <div class="button-shadow"></div>
+    </div>
+  </div>
+</div>
+
           <input id="search" type="text" placeholder="Search..." dir="auto" />
 
           <div class="button-wrap">
@@ -510,6 +521,106 @@
       <div id="movie-modal" class="movie-modal">
         <div class="movie-modal-content"></div>
       </div>
+
+<!-- ✅ NEW: Post options overlay -->
+<div
+  id="postOptionsOverlay"
+  class="post-options-overlay"
+  aria-hidden="true"
+>
+  <div class="post-options-backdrop"></div>
+  <div class="post-options-modal" id="postOptionsModal">
+    <div class="post-options-header">
+      <span id="postOptionsTitle" class="post-options-title">
+        Post options
+      </span>
+      <button
+        id="postOptionsCloseBtn"
+        class="post-options-close-btn"
+        aria-label="Close"
+      >
+        &times;
+      </button>
+    </div>
+
+    <div class="post-options-list">
+      <!-- Option 1: Add to favorites -->
+      <button
+        id="postOptionFavorite"
+        class="post-option-item post-option-favorite"
+        type="button"
+      >
+        <div class="post-option-main">
+          <span class="post-option-title">Add to favorites</span>
+          <span class="post-option-subtitle">
+            Save this movie in your favorite list
+          </span>
+        </div>
+        <span class="post-option-status"> </span>
+      </button>
+
+      <!-- Option 2: Copy link -->
+      <button
+        id="postOptionCopyLink"
+        class="post-option-item"
+        type="button"
+      >
+        <div class="post-option-main">
+          <span class="post-option-title">Copy link</span>
+          <span class="post-option-subtitle">
+            Copy movie link ( /movie/slug )
+          </span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ✅ NEW: Favorites overlay -->
+<div id="favoritesOverlay" class="favorites-overlay" aria-hidden="true">
+  <div class="favorites-overlay-inner">
+    <div class="favorites-overlay-header">
+      <div class="button-wrap">
+        <button
+          id="favoritesCloseBtn"
+          class="favorites-close-btn"
+          aria-label="Close"
+        >
+          <!-- ساده: یک علامت × -->
+          <span>&times;</span>
+        </button>
+        <div class="button-shadow"></div>
+      </div>
+      <span class="favorites-title">Favorite movies</span>
+    </div>
+
+    <div class="favorites-overlay-body">
+      <div id="favoritesGrid" class="favorites-grid"></div>
+
+      <div class="favorites-pagination">
+        <button
+          id="favoritesPrev"
+          class="favorites-page-btn"
+          type="button"
+        >
+          <span>Prev</span>
+        </button>
+        <span id="favoritesPageInfo" class="favorites-page-info">
+          1 / 1
+        </span>
+        <button
+          id="favoritesNext"
+          class="favorites-page-btn"
+          type="button"
+        >
+          <span>Next</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
       <!-- movies count -->
       <div id="movieCount" class="movie-count">Number of movies: 0</div>

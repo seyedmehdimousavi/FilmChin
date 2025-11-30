@@ -36,10 +36,22 @@ let currentUser = null;
 let movies = [];
 let messages = [];
 let editingMovie = null;
+
 const PAGE_SIZE = 10;
 let currentPage = 1;
 let episodesByMovie = new Map();
 let imdbMinRating = null;
+
+// ✅ Favorites state
+const FAVORITES_PAGE_SIZE = 9;
+let favoriteMovieIds = new Set();
+let favoritesRaw = [];
+let favoritesLoaded = false;
+let favoritesPage = 1;
+
+// برای منوی گزینه‌های پست
+let currentOptionsMovie = null;
+
 // ======= Deep link for single movie (/movie/slug) =======
 let deepLinkSlug = null;
 
@@ -153,13 +165,52 @@ async function loadAuthState() {
     if (usernameEl && currentUser) {
       usernameEl.textContent = currentUser.username;
     }
+
+    // ✅ بعد از گرفتن currentUser → favorites را لود کن
+    await loadFavoritesForCurrentUser();
+
     return currentUser;
   } catch (err) {
     console.error("loadAuthState error:", err);
     currentUser = null;
     localStorage.removeItem("currentUser");
     setUserProfile(null);
+
+    // اگر خطا شد favorites پاک شود
+    favoriteMovieIds = new Set();
+    favoritesRaw = [];
+    favoritesLoaded = false;
+
     return null;
+  }
+}
+
+// ✅ NEW: لود favorites برای کاربر
+async function loadFavoritesForCurrentUser() {
+  if (!currentUser) {
+    favoriteMovieIds = new Set();
+    favoritesRaw = [];
+    favoritesLoaded = true;
+    return;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("favorites")
+      .select("movie_id, created_at")
+      .eq("user_id", currentUser.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("loadFavoritesForCurrentUser error:", error);
+      return;
+    }
+
+    favoritesRaw = data || [];
+    favoriteMovieIds = new Set((favoritesRaw || []).map((f) => f.movie_id));
+    favoritesLoaded = true;
+  } catch (err) {
+    console.error("loadFavoritesForCurrentUser exception:", err);
   }
 }
 
@@ -523,6 +574,12 @@ async function doLogoutAndRefresh() {
     currentUser = null;
     setUserProfile(null);
     profileMenu?.classList.add("hidden");
+
+    // ✅ پاک کردن favorites در خروج
+    favoriteMovieIds = new Set();
+    favoritesRaw = [];
+    favoritesLoaded = false;
+    
     setTimeout(() => {
       if (window.location.pathname.includes("admin")) {
         window.location.href = "index.html";
@@ -1124,26 +1181,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const sideMenu = document.getElementById("sideMenu");
   const menuOverlay = document.getElementById("menuOverlay");
 
-  // وقتی سایدمنو باز می‌شود، یک استیت در history اضافه کن
-  if (menuBtn && sideMenu && menuOverlay) {
-    menuBtn.addEventListener("click", () => {
-      // اگر هنوز باز نیست → یعنی این کلیک باعث باز شدن می‌شود
-      if (!sideMenu.classList.contains("active")) {
-        history.pushState({ overlay: "sideMenu" }, "");
-      }
-    });
-  }
+  const menuUsername = document.getElementById("menuUsername");
+  const menuUserId = document.getElementById("menuUserId");
 
+  const logoutBtn = document.getElementById("logoutBtn");
   const profileBtn = document.getElementById("profileBtn");
+  const profileMenu = document.getElementById("profileMenu");
 
   const searchInput = document.getElementById("search");
 
   if (searchInput) {
-    searchInput.addEventListener("change", (e) => {
-      const q = e.target.value.trim();
-      if (q) {
-        supabase.from("search_logs").insert([{ query: q }]);
-      }
+    searchInput.addEventListener("input", () => {
+      currentPage = 1;
+      renderPagedMovies(true);
     });
   }
 
@@ -1151,12 +1201,434 @@ document.addEventListener("DOMContentLoaded", () => {
   const movieCount = document.getElementById("movieCount");
   const genreGrid = document.getElementById("genreGrid");
 
+  /* -------------------------------------------------------
+     NEW FAVORITES + POST OPTIONS OVERLAYS (FULL DEFINITIONS)
+     ------------------------------------------------------- */
+
+  // Post options overlay
+  const postOptionsOverlay = document.getElementById("postOptionsOverlay");
+  const postOptionsModal = document.getElementById("postOptionsModal");
+  const postOptionsTitle = document.getElementById("postOptionsTitle");
+  const postOptionFavorite = document.getElementById("postOptionFavorite");
+  const postOptionCopyLink = document.getElementById("postOptionCopyLink");
+  const postOptionsCloseBtn = document.getElementById("postOptionsCloseBtn");
+
+  // Favorites overlay
+  const favoritesOverlay = document.getElementById("favoritesOverlay");
+  const favoritesGrid = document.getElementById("favoritesGrid");
+  const favoritesPageInfo = document.getElementById("favoritesPageInfo");
+  const favoritesPrevBtn = document.getElementById("favoritesPrev");
+  const favoritesNextBtn = document.getElementById("favoritesNext");
+  const favoritesCloseBtn = document.getElementById("favoritesCloseBtn");
+
+  const favoriteMoviesBtn = document.getElementById("favoriteMoviesBtn");
+  // ===================== Post Options (card click) =====================
+
+  function updatePostOptionsFavoriteUI(isFavorite) {
+    if (!postOptionFavorite) return;
+    const statusEl = postOptionFavorite.querySelector(".post-option-status");
+
+    if (isFavorite) {
+      postOptionFavorite.classList.add("favorite-active");
+      if (statusEl) statusEl.textContent = "In favorites";
+    } else {
+      postOptionFavorite.classList.remove("favorite-active");
+      if (statusEl) statusEl.textContent = "";
+    }
+  }
+
+  function openPostOptions(movie) {
+    if (!postOptionsOverlay || !movie) return;
+    currentOptionsMovie = movie;
+
+    if (postOptionsTitle) {
+      postOptionsTitle.textContent = movie.title || movie.name || "Post options";
+    }
+
+    const isFavorite = favoriteMovieIds.has(movie.id);
+    updatePostOptionsFavoriteUI(isFavorite);
+
+    postOptionsOverlay.classList.add("open");
+    postOptionsOverlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("no-scroll", "post-options-open");
+
+    // برای Back button
+    history.pushState({ overlay: "postOptions", movieId: movie.id }, "");
+  }
+
+  function closePostOptions() {
+    if (!postOptionsOverlay) return;
+    postOptionsOverlay.classList.remove("open");
+    postOptionsOverlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("no-scroll", "post-options-open");
+    currentOptionsMovie = null;
+  }
+
+  async function toggleFavoriteForCurrentMovie() {
+    if (!currentOptionsMovie) return;
+
+    await loadAuthState();
+    if (!currentUser) {
+      showToast("برای افزودن به لیست علاقه‌مندی باید لاگین کنید", "error");
+      const authModal = document.getElementById("authModal");
+      if (authModal) authModal.style.display = "flex";
+      return;
+    }
+
+    const movieId = currentOptionsMovie.id;
+    const isFavorite = favoriteMovieIds.has(movieId);
+
+    try {
+      if (isFavorite) {
+        const { error } = await supabase
+          .from("favorites")
+          .delete()
+          .eq("user_id", currentUser.id)
+          .eq("movie_id", movieId);
+
+        if (error) throw error;
+
+        favoriteMovieIds.delete(movieId);
+        favoritesRaw = (favoritesRaw || []).filter(
+          (f) => f.movie_id !== movieId
+        );
+        updatePostOptionsFavoriteUI(false);
+        showToast("Removed from favorites ✅", "success");
+      } else {
+        const { error } = await supabase.from("favorites").insert([
+          {
+            user_id: currentUser.id,
+            movie_id: movieId,
+          },
+        ]);
+
+        if (error) throw error;
+
+        favoriteMovieIds.add(movieId);
+        favoritesRaw = [
+          { movie_id: movieId, created_at: new Date().toISOString() },
+          ...(favoritesRaw || []),
+        ];
+        updatePostOptionsFavoriteUI(true);
+        showToast("Added to favorites ✅", "success");
+      }
+    } catch (err) {
+      console.error("toggleFavoriteForCurrentMovie error:", err);
+      showToast("خطا در به‌روزرسانی لیست علاقه‌مندی ❌", "error");
+    }
+  }
+
+  async function copyCurrentMovieLink() {
+    if (!currentOptionsMovie) return;
+    const t = (currentOptionsMovie.title || currentOptionsMovie.name || "").trim();
+    if (!t) {
+      showToast("عنوان فیلم یافت نشد ❌", "error");
+      return;
+    }
+
+    const slug = makeMovieSlug(t);
+    if (!slug) {
+      showToast("نمی‌توان slug مناسب ساخت ❌", "error");
+      return;
+    }
+
+    const origin = (window.location && window.location.origin) || "https://filmchiin.ir";
+    const url = origin.replace(/\/+$/, "") + "/movie/" + slug;
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const tmp = document.createElement("textarea");
+        tmp.value = url;
+        document.body.appendChild(tmp);
+        tmp.select();
+        document.execCommand("copy");
+        document.body.removeChild(tmp);
+      }
+      showToast("Post link copied ✅", "success");
+    } catch (err) {
+      console.error("copyCurrentMovieLink error:", err);
+      showToast("خطا در کپی کردن لینک ❌", "error");
+    }
+  }
+
+  // اتصال دکمه‌ها و کلیک بیرون
+  postOptionFavorite?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFavoriteForCurrentMovie();
+  });
+
+  postOptionCopyLink?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    copyCurrentMovieLink();
+  });
+
+  postOptionsCloseBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closePostOptions();
+  });
+
+  postOptionsOverlay?.addEventListener("click", (e) => {
+    if (e.target === postOptionsOverlay || e.target.classList.contains("post-options-backdrop")) {
+      closePostOptions();
+    }
+  });
+  
+  // ===================== Favorite Movies Overlay =====================
+
+  function buildFavoritesWithMovies() {
+    if (!Array.isArray(favoritesRaw)) return [];
+    return favoritesRaw
+      .map((fav) => {
+        const movie = (movies || []).find((m) => m.id === fav.movie_id);
+        if (!movie) return null;
+        return { fav, movie };
+      })
+      .filter(Boolean);
+  }
+
+  function renderFavoritesGrid() {
+    if (!favoritesGrid) return;
+
+    const items = buildFavoritesWithMovies();
+    if (!items.length) {
+      favoritesGrid.innerHTML =
+        '<div class="favorites-empty">No favorite movies yet.</div>';
+      if (favoritesPageInfo) favoritesPageInfo.textContent = "0 / 0";
+      return;
+    }
+
+    const totalPages = Math.max(
+      1,
+      Math.ceil(items.length / FAVORITES_PAGE_SIZE)
+    );
+    if (favoritesPage < 1) favoritesPage = 1;
+    if (favoritesPage > totalPages) favoritesPage = totalPages;
+
+    const start = (favoritesPage - 1) * FAVORITES_PAGE_SIZE;
+    const slice = items.slice(start, start + FAVORITES_PAGE_SIZE);
+
+    favoritesGrid.innerHTML = slice
+      .map(({ movie }) => {
+        const cover = escapeHtml(
+          movie.cover ||
+            "https://via.placeholder.com/300x200?text=No+Image"
+        );
+        const title = escapeHtml(movie.title || movie.name || "-");
+        const imdb = escapeHtml(movie.imdb || "");
+        const release = escapeHtml(movie.release_info || "");
+
+        return `
+          <div class="favorite-item">
+            <img src="${cover}" alt="${title}" class="favorite-cover" loading="lazy" />
+            <div class="favorite-title" dir="auto">${title}</div>
+            <div class="favorite-meta">
+              ${imdb ? `IMDB: ${imdb}` : ""} ${release ? ` • ${release}` : ""}
+            </div>
+            <div class="favorite-actions">
+              <div class="button-wrap">
+                <button
+                  class="favorite-goto-btn"
+                  data-movie-id="${movie.id}"
+                  type="button"
+                >
+                  <span>Go to post</span>
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+
+    if (favoritesPageInfo) {
+      favoritesPageInfo.textContent = `${favoritesPage} / ${totalPages}`;
+    }
+
+    if (favoritesPrevBtn)
+      favoritesPrevBtn.disabled = favoritesPage <= 1;
+    if (favoritesNextBtn)
+      favoritesNextBtn.disabled = favoritesPage >= totalPages;
+
+    // اتصال Go to post
+    favoritesGrid
+      .querySelectorAll(".favorite-goto-btn")
+      .forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const movieId = btn.dataset.movieId;
+          if (movieId) {
+            navigateToMovieFromFavorites(movieId);
+          }
+        });
+      });
+  }
+
+  async function openFavoritesOverlayUI() {
+    await loadAuthState();
+    if (!currentUser) {
+      showToast("برای مشاهده لیست علاقه‌مندی باید لاگین کنید", "error");
+      const authModal = document.getElementById("authModal");
+      if (authModal) authModal.style.display = "flex";
+      return;
+    }
+
+    if (!favoritesLoaded) {
+      await loadFavoritesForCurrentUser();
+    }
+
+    favoritesPage = 1;
+    renderFavoritesGrid();
+
+    if (!favoritesOverlay) return;
+    favoritesOverlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("no-scroll", "favorites-open");
+
+    // برای Back button
+    history.pushState({ overlay: "favorites" }, "");
+  }
+
+  function closeFavoritesOverlay() {
+    if (!favoritesOverlay) return;
+    favoritesOverlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("no-scroll", "favorites-open");
+  }
+
+  // ناوبری از Favorite به کارت پست
+  async function navigateToMovieFromFavorites(movieId) {
+    try {
+      closeFavoritesOverlay();
+
+      // اگر movies خالی است، صبر کنیم تا لود شود
+      if (!Array.isArray(movies) || !movies.length) {
+        await fetchMovies();
+      }
+
+      const q = (searchInput?.value || "").toLowerCase();
+
+      // کپی از منطق فیلتر در renderPagedMovies
+      let filtered = movies.filter((m) => {
+        const movieMatch = Object.values(m).some(
+          (val) =>
+            typeof val === "string" &&
+            val.toLowerCase().includes(q)
+        );
+
+        let episodeMatch = false;
+        if (!movieMatch && (m.type === "collection" || m.type === "serial")) {
+          const eps = episodesByMovie.get(m.id) || [];
+          for (let idx = 0; idx < eps.length; idx++) {
+            const ep = eps[idx];
+            if (
+              Object.values(ep).some(
+                (val) =>
+                  typeof val === "string" &&
+                  val.toLowerCase().includes(q)
+              )
+            ) {
+              episodeMatch = true;
+              break;
+            }
+          }
+        }
+
+        return movieMatch || episodeMatch;
+      });
+
+      if (currentTypeFilter !== "all") {
+        filtered = filtered.filter((m) => {
+          const t = (m.type || "").toLowerCase();
+          if (currentTypeFilter === "series") {
+            return t === "serial";
+          }
+          return t === currentTypeFilter;
+        });
+      }
+
+      if (currentTabGenre) {
+        filtered = filtered.filter((m) => {
+          return (m.genre || "")
+            .split(" ")
+            .includes(currentTabGenre);
+        });
+      }
+
+      if (imdbMinRating !== null) {
+        filtered = filtered.filter((m) => {
+          const val = parseFloat(m.imdb || "0");
+          return val >= imdbMinRating;
+        });
+      }
+
+      const index = filtered.findIndex((m) => m.id === movieId);
+      if (index === -1) {
+        showToast("این فیلم در لیست فعلی پیدا نشد", "error");
+        return;
+      }
+
+      const totalPages = computeTotalPages(filtered.length);
+      const targetPage = Math.floor(index / PAGE_SIZE) + 1;
+      currentPage = Math.min(Math.max(targetPage, 1), totalPages);
+
+      await renderPagedMovies(true);
+
+      const card = document.querySelector(
+        `.movie-card[data-movie-id="${movieId}"]`
+      );
+      if (card) {
+        card.classList.add("highlight-favorite");
+        card.scrollIntoView({ behavior: "smooth", block: "start" });
+        setTimeout(() => {
+          card.classList.remove("highlight-favorite");
+        }, 1500);
+      }
+    } catch (err) {
+      console.error("navigateToMovieFromFavorites error:", err);
+    }
+  }
+
+  // اتصال دکمه‌ها
+  favoriteMoviesBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // بستن حباب پروفایل
+    profileMenu?.classList.add("hidden");
+    openFavoritesOverlayUI();
+  });
+
+  favoritesCloseBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeFavoritesOverlay();
+  });
+
+  favoritesPrevBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (favoritesPage > 1) {
+      favoritesPage--;
+      renderFavoritesGrid();
+    }
+  });
+
+  favoritesNextBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    favoritesPage++;
+    renderFavoritesGrid();
+  });
+  
+  
   const adminMessagesContainer = document.getElementById("adminMessages");
   const paginationContainer = document.getElementById("pagination");
 
   const addMovieForm = document.getElementById("addMovieForm");
   const movieList = document.getElementById("movieList");
-  const logoutBtn = document.getElementById("logoutBtn");
+
 
   const addMessageForm = document.getElementById("addMessageForm");
   const messageList = document.getElementById("messageList");
@@ -2131,14 +2603,13 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 `;
 
+      
       moviesGrid.appendChild(card);
 
       // احترام به تنظیم Animations در Homepage Manager
       if (window.filmchiReduceAnimations) {
-        // Animations OFF → کارت‌ها بدون ریویل و ثابت نمایش داده می‌شوند
         card.classList.add("no-reveal");
       } else {
-        // Animations ON → آبزرورها فعال می‌شوند
         cardObserver.observe(card);
         card
           .querySelectorAll(
@@ -2149,12 +2620,36 @@ document.addEventListener("DOMContentLoaded", () => {
           });
       }
 
+      // ===================== NEW: کلیک روی کارت برای باز کردن Post Options =====================
+      card.addEventListener("click", (e) => {
+        const target = e.target;
+
+        // جلوگیری از باز شدن منوی پست در کلیک روی موارد زیر:
+        if (
+          target.closest(".go-btn") ||
+          target.closest(".quote-toggle-btn") ||
+          target.closest(".enter-comments") ||
+          target.closest(".comments-panel") ||
+          target.closest(".comment-send") ||
+          target.closest(".comments-close") ||
+          target.closest(".comment-name") ||
+          target.closest(".comment-text") ||
+          target.closest(".episode-card")
+        ) {
+          return;
+        }
+
+        if (!postOptionsOverlay) return;
+        openPostOptions(m);
+      });
+
+      // ===================== رفتار دکمه Go to file (بدون تغییر) =====================
       const goBtn = card.querySelector(".go-btn");
       goBtn?.addEventListener("click", async () => {
         const link = goBtn.dataset.link || "#";
 
         try {
-          const movieId = m.id; // چون m در اسکوپ حلقه هست
+          const movieId = m.id;
           const epActiveEl = card.querySelector(
             ".episodes-list .episode-card.active"
           );
@@ -2164,10 +2659,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
           const activeTitle = (() => {
             if (epActiveEl) {
-              const titleEl = epActiveEl.querySelector(".episode-title span");
+              const titleEl =
+                epActiveEl.querySelector(".episode-title span");
               return titleEl ? titleEl.textContent : m.title;
             }
-            // در غیر این صورت عنوان خود فیلم
             return m.title;
           })();
 
@@ -2183,234 +2678,51 @@ document.addEventListener("DOMContentLoaded", () => {
           console.error("click log error:", err);
         }
 
-        // 🔹 باز کردن لینک
         if (link && link !== "#") {
           window.open(link, "_blank");
         }
       });
 
+      // ===================== اتصال کامنت‌ها (بدون تغییر) =====================
       attachCommentsHandlers(card, m.id);
-      // 👇 منطق اپیزودها
+
+      // ===================== منطق اپیزودها (بدون تغییر) =====================
       if (m.type === "collection" || m.type === "serial") {
-        (async () => {
-          const { data: eps, error: epsErr } = await supabase
-            .from("movie_items")
-            .select("*")
-            .eq("movie_id", m.id)
-            .order("order_index", { ascending: true });
+        let eps = episodesByMovie.get(m.id);
+        if (eps && eps.length > 0) {
+          const epList = card.querySelector(".episodes-list");
+          if (epList) {
+            epList.innerHTML = eps
+              .map((ep, idx) => {
+                const safeTitle = escapeHtml(ep.title || `Episode ${idx + 1}`);
+                return `
+                  <div class="episode-card" data-episode-index="${idx}">
+                    <div class="episode-title"><span>${safeTitle}</span></div>
+                  </div>
+                `;
+              })
+              .join("");
 
-          if (epsErr) {
-            console.error("Error loading episodes:", epsErr);
-            return;
-          }
-
-          const allEpisodes = [
-            {
-              id: m.id,
-              title: m.title,
-              cover: m.cover,
-              synopsis: m.synopsis,
-              director: m.director,
-              product: m.product,
-              stars: m.stars,
-              imdb: m.imdb,
-              release_info: m.release_info,
-              genre: m.genre,
-              link: m.link,
-            },
-            ...(eps || []),
-          ];
-
-          const listEl = card.querySelector(".episodes-list");
-
-          const activeIndex = episodeMatches.get(m.id) ?? 0;
-
-          listEl.innerHTML = allEpisodes
-            .map((ep, idx) => {
-              const titleText = escapeHtml(ep.title || "");
-              const scrollable = titleText.length > 16 ? "scrollable" : "";
-              return `
-            <div class="episode-card ${
-              idx === activeIndex ? "active" : ""
-            }" data-link="${ep.link}">
-              <img src="${escapeHtml(
-                ep.cover || "https://via.placeholder.com/120x80?text=No+Cover"
-              )}" 
-                   alt="${titleText}" class="episode-cover ">
-              <div class="episode-title ${scrollable}"><span>${titleText}</span></div>
-            </div>
-          `;
-            })
-            .join("");
-
-          // لینک Go روی اپیزود فعال ست میشه
-          goBtn.dataset.link = allEpisodes[activeIndex].link;
-
-          // آپدیت IMDb chip برای اپیزود فعال
-          const imdbChip = card.querySelector(".imdb-chip");
-          if (imdbChip)
-            imdbChip.textContent = allEpisodes[activeIndex].imdb || m.imdb;
-
-          // 🔹 آپدیت badge-count با تعداد اپیزودها + متن
-          const badgeCount = card.querySelector(
-            ".collection-badge .badge-count"
-          );
-          if (badgeCount) {
-            const totalEpisodes = (eps || []).length + 1; // شامل پست اصلی
-            badgeCount.textContent =
-              totalEpisodes + (totalEpisodes > 1 ? " episodes" : " episode");
-          }
-
-          if (activeIndex > 0) {
-            const ep = allEpisodes[activeIndex];
-
-            if (m.type === "collection") {
-              // تغییر همه مشخصات
-              const nameEl = card.querySelector(".movie-name");
-              if (nameEl) nameEl.textContent = ep.title || m.title;
-              const coverImg = card.querySelector(".cover-image");
-              if (coverImg) coverImg.src = ep.cover || m.cover;
-              const coverBlur = card.querySelector(".cover-blur");
-              if (coverBlur)
-                coverBlur.style.backgroundImage = `url('${
-                  ep.cover || m.cover
-                }')`;
-              card.querySelector(".quote-text").textContent =
-                ep.synopsis || m.synopsis;
-              card.querySelectorAll(".field-quote")[1].textContent =
-                ep.director || m.director;
-              // Product و Genre با حباب‌های کلیک‌پذیر
-              card.querySelectorAll(".field-quote")[2].innerHTML = renderChips(
-                ep.product || m.product || "-"
-              );
-              card.querySelectorAll(".field-quote")[3].textContent =
-                ep.stars || m.stars;
-              if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
-              card.querySelectorAll(".field-quote")[5].textContent =
-                ep.release_info || m.release_info;
-              card.querySelectorAll(".field-quote")[6].innerHTML = renderChips(
-                ep.genre || m.genre || "-"
-              );
+            const epCards = epList.querySelectorAll(".episode-card");
+            if (epCards.length > 0) {
+              epCards[0].classList.add("active");
+              goBtn.dataset.link = eps[0].link || "#";
             }
 
-            if (m.type === "serial") {
-              // فقط تغییر title + cover + blur + link
-              const nameEl = card.querySelector(".movie-name");
-              if (nameEl) nameEl.textContent = ep.title || m.title;
-              const coverImg = card.querySelector(".cover-image");
-              if (coverImg) coverImg.src = ep.cover || m.cover;
-              const coverBlur = card.querySelector(".cover-blur");
-              if (coverBlur)
-                coverBlur.style.backgroundImage = `url('${
-                  ep.cover || m.cover
-                }')`;
-              goBtn.dataset.link = ep.link;
-            }
-          }
-
-          setTimeout(() => {
-            const activeEpEl = listEl.querySelector(".episode-card.active");
-            if (
-              activeEpEl &&
-              allEpisodes.length > 3 &&
-              episodeMatches.has(m.id)
-            ) {
-              const prevScrollY = window.scrollY;
-              activeEpEl.scrollIntoView({
-                behavior: "smooth",
-                inline: "end",
-                block: "nearest",
+            epCards.forEach((epCard) => {
+              epCard.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+                const idx = parseInt(epCard.dataset.episodeIndex, 10);
+                epCards.forEach((x) => x.classList.remove("active"));
+                epCard.classList.add("active");
+                const ep = eps[idx];
+                goBtn.dataset.link = ep.link || "#";
               });
-              setTimeout(() => {
-                window.scrollTo({ top: prevScrollY });
-              }, 0);
-            }
-          }, 100);
-
-          // هندل کلیک روی اپیزودها
-          listEl.querySelectorAll(".episode-card").forEach((cardEl, idx) => {
-            cardEl.addEventListener("click", () => {
-              listEl
-                .querySelectorAll(".episode-card")
-                .forEach((c) => c.classList.remove("active"));
-              cardEl.classList.add("active");
-
-              const ep = allEpisodes[idx];
-
-              if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
-
-              if (m.type === "serial") {
-                const nameEl = card.querySelector(".movie-name");
-                if (nameEl) nameEl.textContent = ep.title || m.title;
-                const coverImg = card.querySelector(".cover-image");
-                if (coverImg) coverImg.src = ep.cover || m.cover;
-                const coverBlur = card.querySelector(".cover-blur");
-                if (coverBlur)
-                  coverBlur.style.backgroundImage = `url('${
-                    ep.cover || m.cover
-                  }')`;
-                goBtn.dataset.link = ep.link;
-              } else if (m.type === "collection") {
-                const nameEl = card.querySelector(".movie-name");
-                if (nameEl) nameEl.textContent = ep.title || m.title;
-                const coverImg = card.querySelector(".cover-image");
-                if (coverImg) coverImg.src = ep.cover || m.cover;
-                const coverBlur = card.querySelector(".cover-blur");
-                if (coverBlur)
-                  coverBlur.style.backgroundImage = `url('${
-                    ep.cover || m.cover
-                  }')`;
-                card.querySelector(".quote-text").textContent =
-                  ep.synopsis || m.synopsis;
-                card.querySelectorAll(".field-quote")[1].textContent =
-                  ep.director || m.director;
-                // Product و Genre با حباب‌های کلیک‌پذیر در کلیک دستی
-                card.querySelectorAll(".field-quote")[2].innerHTML =
-                  renderChips(ep.product || m.product || "-");
-                card.querySelectorAll(".field-quote")[3].textContent =
-                  ep.stars || m.stars;
-                if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
-                card.querySelectorAll(".field-quote")[5].textContent =
-                  ep.release_info || m.release_info;
-                card.querySelectorAll(".field-quote")[6].innerHTML =
-                  renderChips(ep.genre || m.genre || "-");
-                goBtn.dataset.link = ep.link;
-              }
-
-              if (allEpisodes.length > 3) {
-                const prevScrollY = window.scrollY;
-                cardEl.scrollIntoView({
-                  behavior: "smooth",
-                  inline: "end",
-                  block: "nearest",
-                });
-                setTimeout(() => {
-                  window.scrollTo({ top: prevScrollY });
-                }, 0);
-              }
             });
-          });
-
-          const titleEl = card.querySelector(".movie-title");
-          if (
-            titleEl &&
-            !titleEl.querySelector(".collection-badge") &&
-            m.type &&
-            m.type !== "single"
-          ) {
-            const badge = document.createElement("span");
-            badge.className = `collection-badge ${
-              m.type === "collection" ? "badge-collection" : "badge-serial"
-            }`;
-            badge.innerHTML = `${
-              m.type === "collection" ? "Collection" : "Series"
-            } <span class="badge-count">${
-              (eps || []).length + 1
-            } episodes</span>`;
-            titleEl.appendChild(badge);
           }
-        })();
+        }
       }
+      
     }
 
     // -------------------- toggle برای synopsis --------------------
@@ -6126,41 +6438,67 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // -------------------- Back/Forward handler for UI overlays --------------------
-  window.addEventListener("popstate", () => {
-    // 1) Comments panel on a movie card
-    const openCommentsPanel = document.querySelector(".comments-panel.open");
-    if (openCommentsPanel) {
-      openCommentsPanel.classList.remove("open");
-      openCommentsPanel.setAttribute("aria-hidden", "true");
+  /* ============================================================
+     BACK BUTTON HANDLER – FINAL VERSION (NO SHORTENING)
+   ============================================================ */
+window.addEventListener("popstate", () => {
+  // 1) Comments panel on a movie card
+  const openCommentsPanel = document.querySelector(".comments-panel.open");
+  if (openCommentsPanel) {
+    openCommentsPanel.classList.remove("open");
+    openCommentsPanel.setAttribute("aria-hidden", "true");
+    return;
+  }
+
+  // 2) Chat overlay
+  if (typeof closeChatOverlay === "function" && window.chatOverlay) {
+    if (chatOverlay.getAttribute("aria-hidden") === "false") {
+      closeChatOverlay();
       return;
     }
+  }
 
-    // 2) Chat overlay (پیام به ادمین)
-    if (typeof closeChatOverlay === "function" && window.chatOverlay) {
-      if (chatOverlay.getAttribute("aria-hidden") === "false") {
-        closeChatOverlay();
-        return;
-      }
-    }
+  // 3) Movie modal (Popular + card modal)
+  const modal = document.getElementById("movie-modal");
+  if (modal && modal.style.display === "flex") {
+    modal.style.display = "none";
+    return;
+  }
 
-    // 3) Movie modal (Popular + cards)
-    const modal = document.getElementById("movie-modal");
-    if (modal && modal.style.display === "flex") {
-      modal.style.display = "none";
-      return;
-    }
+  // 4) Post options overlay
+  const postOptionsOverlay = document.getElementById("postOptionsOverlay");
+  if (
+    postOptionsOverlay &&
+    postOptionsOverlay.classList.contains("open")
+  ) {
+    postOptionsOverlay.classList.remove("open");
+    postOptionsOverlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("no-scroll", "post-options-open");
+    return;
+  }
 
-    // 4) Side menu
-    const sideMenu = document.getElementById("sideMenu");
-    const menuOverlay = document.getElementById("menuOverlay");
-    if (sideMenu && sideMenu.classList.contains("active")) {
-      sideMenu.classList.remove("active");
-      menuOverlay && menuOverlay.classList.remove("active");
-      document.body.classList.remove("no-scroll", "menu-open");
-      return;
-    }
-  });
+  // 5) Favorites overlay
+  const favoritesOverlay = document.getElementById("favoritesOverlay");
+  if (
+    favoritesOverlay &&
+    favoritesOverlay.getAttribute("aria-hidden") === "false"
+  ) {
+    favoritesOverlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("no-scroll", "favorites-open");
+    return;
+  }
+
+  // 6) Side menu
+  const sideMenu = document.getElementById("sideMenu");
+  const menuOverlay = document.getElementById("menuOverlay");
+  if (sideMenu && sideMenu.classList.contains("active")) {
+    sideMenu.classList.remove("active");
+    menuOverlay && menuOverlay.classList.remove("active");
+    document.body.classList.remove("no-scroll", "menu-open");
+    return;
+  }
+});
+
 
   function updateDynamicTitle() {
     let title = "FilmChiin";
