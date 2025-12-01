@@ -43,7 +43,7 @@ let episodesByMovie = new Map();
 let imdbMinRating = null;
 
 // ✅ Favorites state
-const FAVORITES_PAGE_SIZE = 9;
+const FAVORITES_PAGE_SIZE = 6;
 let favoriteMovieIds = new Set();
 let favoritesRaw = [];
 let favoritesLoaded = false;
