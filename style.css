@@ -5717,6 +5717,7 @@ body.dark .post-option-item:hover {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  padding: 5px;
 }
 
 .post-option-title {
