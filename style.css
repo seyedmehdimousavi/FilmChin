@@ -5539,7 +5539,6 @@ body.dark .favorites-overlay-header {
   padding-right: 4px;
 }
 
-
 .favorite-item {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 12px;
@@ -5661,8 +5660,7 @@ body.dark .favorites-page-btn {
 .post-options-modal {
   position: relative;
   z-index: 1;
-  width: min(420px, 90vw);
-  background: #ffffff;
+  background: #ffffff7d;
   border-radius: 16px;
   padding: 14px 16px 10px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
@@ -5685,14 +5683,17 @@ body.dark .post-options-modal {
   font-size: 16px;
 }
 
-.post-options-close-btn {
+.post-options-close-btn span {
   border: none;
   background: transparent;
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
+  padding: 3px 12px;
 }
-
+.favorite-goto-btn {
+  padding: 2px 7px;
+}
 .post-options-list {
   display: flex;
   flex-direction: column;
@@ -5700,15 +5701,10 @@ body.dark .post-options-modal {
 }
 
 .post-option-item {
-  width: 100%;
-  border: none;
-  border-radius: 12px;
-  padding: 10px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   text-align: left;
-  cursor: pointer;
   background: #f5f5f5;
 }
 
@@ -5733,11 +5729,15 @@ body.dark .post-option-item:hover {
 .post-option-title {
   font-size: 14px;
   font-weight: 600;
+  padding: 0;
+  margin-left: 15px;
 }
 
 .post-option-subtitle {
   font-size: 12px;
   opacity: 0.7;
+  padding: 0;
+  margin-left: 15px;
 }
 
 /* حالت favorite فعال → سبز ملایم */
@@ -5802,7 +5802,7 @@ body.dark .post-option-favorite.favorite-active {
 }
 .favorite-cover {
   width: 100%;
-  height: 150px;   /* ارتفاع ثابت */
+  height: 150px; /* ارتفاع ثابت */
   object-fit: cover;
   border-radius: 10px;
 }
