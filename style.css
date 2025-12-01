@@ -5534,7 +5534,7 @@ body.dark .favorites-overlay-header {
 .favorites-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 5px;
   overflow-y: auto;
   padding-right: 4px;
 }
@@ -5562,12 +5562,6 @@ body.dark .favorite-item {
   max-height: 180px;
 }
 
-.favorite-title {
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.3;
-}
-
 .favorite-meta {
   font-size: 12px;
   opacity: 0.7;
@@ -5591,7 +5585,7 @@ body.dark .favorite-item {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   margin-top: 8px;
 }
 
@@ -5599,7 +5593,6 @@ body.dark .favorite-item {
   border: none;
   background: #f0f0f0;
   border-radius: 20px;
-  padding: 6px 14px;
   font-size: 13px;
   cursor: pointer;
 }
@@ -5691,8 +5684,8 @@ body.dark .post-options-modal {
   cursor: pointer;
   padding: 3px 12px;
 }
-.favorite-goto-btn {
-  padding: 2px 7px;
+.favorite-goto-btn span{
+  padding: 3px 5px;
 }
 .post-options-list {
   display: flex;
@@ -5772,37 +5765,24 @@ body.dark .post-option-favorite.favorite-active {
   flex-direction: column;
   align-items: center;
   text-align: center;
-
-  /* ارتفاع ثابت کارت */
-  height: 260px;
-
-  /* جلوگیری از تغییر ارتفاع */
+  height: 180px;
   overflow: hidden;
-
-  background: var(--surface);
   border-radius: 14px;
-
-  padding: 10px;
+  padding: 5px;
 }
 .favorite-title {
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 600;
-  margin-top: 8px;
-
-  /* محدودیت نمایش */
-  max-height: 40px;
+  margin-top: 3px;
   overflow: hidden;
-
-  /* سه نقطه */
   display: -webkit-box;
-  -webkit-line-clamp: 2; /* دو خط */
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-
   text-overflow: ellipsis;
 }
 .favorite-cover {
   width: 100%;
-  height: 150px; /* ارتفاع ثابت */
+  height: 100px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 6px;
 }
