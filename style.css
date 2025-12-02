@@ -1832,8 +1832,7 @@ body.dark .genre-chip-mini {
 
 .tab-genres-list .genre-chip {
   flex: 0 0 auto;
-  padding: 5px 10px;
-  border-radius: 999px;
+  padding: 5px;
   background: #eef3f7;
   color: #0b3d5c;
   margin: 0 4px;
@@ -1902,11 +1901,17 @@ body.dark .genre-chip.active {
   font-weight: 600;
 }
 .genre-chip .count {
-  background: #0d6efd; /* آبی */
-  color: #fff; /* متن سفید */
+  background: #0d6efd;
+  color: #fff;
+  width: 20px;
+  height: 20px;
   font-size: 10px;
-  padding: 2px 6px;
+  padding-top: 2px;
+  display: flex;
+  text-align: center;
   border-radius: 10px;
+  align-items: center;
+  justify-content: center;
 }
 
 .genre-chip.active .count {
@@ -5432,7 +5437,7 @@ body.reduce-animations .episode-title.scrolling {
   color: #0b3d5c;
   border: 1px solid #ddd;
   border-radius: 20px;
-  padding: 6px 14px;
+  padding: 3px 10px;
   font-size: 14px;
   font-weight: 700;
 }
@@ -5445,13 +5450,12 @@ body.reduce-animations .episode-title.scrolling {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 25px;
-  height: 25px;
-  padding: 0 6px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: #017ada;
   color: #fff;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: bold;
   line-height: 1;
   box-sizing: border-box;
@@ -5684,7 +5688,7 @@ body.dark .post-options-modal {
   cursor: pointer;
   padding: 3px 12px;
 }
-.favorite-goto-btn span{
+.favorite-goto-btn span {
   padding: 3px 5px;
 }
 .post-options-list {

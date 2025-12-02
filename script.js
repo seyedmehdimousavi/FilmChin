@@ -579,7 +579,7 @@ async function doLogoutAndRefresh() {
     favoriteMovieIds = new Set();
     favoritesRaw = [];
     favoritesLoaded = false;
-    
+
     setTimeout(() => {
       if (window.location.pathname.includes("admin")) {
         window.location.href = "index.html";
@@ -1243,7 +1243,8 @@ document.addEventListener("DOMContentLoaded", () => {
     currentOptionsMovie = movie;
 
     if (postOptionsTitle) {
-      postOptionsTitle.textContent = movie.title || movie.name || "Post options";
+      postOptionsTitle.textContent =
+        movie.title || movie.name || "Post options";
     }
 
     const isFavorite = favoriteMovieIds.has(movie.id);
@@ -1321,7 +1322,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function copyCurrentMovieLink() {
     if (!currentOptionsMovie) return;
-    const t = (currentOptionsMovie.title || currentOptionsMovie.name || "").trim();
+    const t = (
+      currentOptionsMovie.title ||
+      currentOptionsMovie.name ||
+      ""
+    ).trim();
     if (!t) {
       showToast("عنوان فیلم یافت نشد ❌", "error");
       return;
@@ -1333,7 +1338,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const origin = (window.location && window.location.origin) || "https://filmchiin.ir";
+    const origin =
+      (window.location && window.location.origin) || "https://filmchiin.ir";
     const url = origin.replace(/\/+$/, "") + "/movie/" + slug;
 
     try {
@@ -1353,12 +1359,15 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("خطا در کپی کردن لینک ❌", "error");
     }
   }
-  
-  
+
   async function shareCurrentMovieLink() {
     if (!currentOptionsMovie) return;
 
-    const t = (currentOptionsMovie.title || currentOptionsMovie.name || "").trim();
+    const t = (
+      currentOptionsMovie.title ||
+      currentOptionsMovie.name ||
+      ""
+    ).trim();
     if (!t) {
       showToast("عنوان فیلم یافت نشد ❌", "error");
       return;
@@ -1410,7 +1419,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   }
-  
+
   // اتصال دکمه‌ها و کلیک بیرون
   postOptionFavorite?.addEventListener("click", (e) => {
     e.preventDefault();
@@ -1423,13 +1432,13 @@ document.addEventListener("DOMContentLoaded", () => {
     e.stopPropagation();
     copyCurrentMovieLink();
   });
-  
+
   postOptionShareLink?.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
     shareCurrentMovieLink();
   });
-  
+
   postOptionsCloseBtn?.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -1437,11 +1446,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   postOptionsOverlay?.addEventListener("click", (e) => {
-    if (e.target === postOptionsOverlay || e.target.classList.contains("post-options-backdrop")) {
+    if (
+      e.target === postOptionsOverlay ||
+      e.target.classList.contains("post-options-backdrop")
+    ) {
       closePostOptions();
     }
   });
-  
+
   // ===================== Favorite Movies Overlay =====================
 
   function buildFavoritesWithMovies() {
@@ -1479,8 +1491,7 @@ document.addEventListener("DOMContentLoaded", () => {
     favoritesGrid.innerHTML = slice
       .map(({ movie }) => {
         const cover = escapeHtml(
-          movie.cover ||
-            "https://via.placeholder.com/300x200?text=No+Image"
+          movie.cover || "https://via.placeholder.com/300x200?text=No+Image"
         );
         const title = escapeHtml(movie.title || movie.name || "-");
         const imdb = escapeHtml(movie.imdb || "");
@@ -1512,24 +1523,21 @@ document.addEventListener("DOMContentLoaded", () => {
       favoritesPageInfo.textContent = `${favoritesPage} / ${totalPages}`;
     }
 
-    if (favoritesPrevBtn)
-      favoritesPrevBtn.disabled = favoritesPage <= 1;
+    if (favoritesPrevBtn) favoritesPrevBtn.disabled = favoritesPage <= 1;
     if (favoritesNextBtn)
       favoritesNextBtn.disabled = favoritesPage >= totalPages;
 
     // اتصال Go to post
-    favoritesGrid
-      .querySelectorAll(".favorite-goto-btn")
-      .forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const movieId = btn.dataset.movieId;
-          if (movieId) {
-            navigateToMovieFromFavorites(movieId);
-          }
-        });
+    favoritesGrid.querySelectorAll(".favorite-goto-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const movieId = btn.dataset.movieId;
+        if (movieId) {
+          navigateToMovieFromFavorites(movieId);
+        }
       });
+    });
   }
 
   async function openFavoritesOverlayUI() {
@@ -1549,9 +1557,9 @@ document.addEventListener("DOMContentLoaded", () => {
     renderFavoritesGrid();
 
     if (!favoritesOverlay) return;
-    
+
     favoritesOverlay.setAttribute("aria-hidden", "false");
-document.body.classList.add("no-scroll");
+    document.body.classList.add("no-scroll");
 
     // برای Back button
     history.pushState({ overlay: "favorites" }, "");
@@ -1560,7 +1568,7 @@ document.body.classList.add("no-scroll");
   function closeFavoritesOverlay() {
     if (!favoritesOverlay) return;
     favoritesOverlay.setAttribute("aria-hidden", "true");
-document.body.classList.remove("no-scroll");
+    document.body.classList.remove("no-scroll");
   }
 
   // ناوبری از Favorite به کارت پست
@@ -1578,9 +1586,7 @@ document.body.classList.remove("no-scroll");
       // کپی از منطق فیلتر در renderPagedMovies
       let filtered = movies.filter((m) => {
         const movieMatch = Object.values(m).some(
-          (val) =>
-            typeof val === "string" &&
-            val.toLowerCase().includes(q)
+          (val) => typeof val === "string" && val.toLowerCase().includes(q)
         );
 
         let episodeMatch = false;
@@ -1591,8 +1597,7 @@ document.body.classList.remove("no-scroll");
             if (
               Object.values(ep).some(
                 (val) =>
-                  typeof val === "string" &&
-                  val.toLowerCase().includes(q)
+                  typeof val === "string" && val.toLowerCase().includes(q)
               )
             ) {
               episodeMatch = true;
@@ -1616,9 +1621,7 @@ document.body.classList.remove("no-scroll");
 
       if (currentTabGenre) {
         filtered = filtered.filter((m) => {
-          return (m.genre || "")
-            .split(" ")
-            .includes(currentTabGenre);
+          return (m.genre || "").split(" ").includes(currentTabGenre);
         });
       }
 
@@ -1684,14 +1687,12 @@ document.body.classList.remove("no-scroll");
     favoritesPage++;
     renderFavoritesGrid();
   });
-  
-  
+
   const adminMessagesContainer = document.getElementById("adminMessages");
   const paginationContainer = document.getElementById("pagination");
 
   const addMovieForm = document.getElementById("addMovieForm");
   const movieList = document.getElementById("movieList");
-
 
   const addMessageForm = document.getElementById("addMessageForm");
   const messageList = document.getElementById("messageList");
@@ -2458,116 +2459,116 @@ document.body.classList.remove("no-scroll");
       .join(" ");
   }
   async function renderPagedMovies(skipScroll) {
-  if (!moviesGrid || !movieCount) return;
-  const q = (searchInput?.value || "").toLowerCase();
+    if (!moviesGrid || !movieCount) return;
+    const q = (searchInput?.value || "").toLowerCase();
 
-  // هر بار سرچ جدید انجام میشه، مقادیر قبلی پاک بشن
-  episodeMatches.clear();
+    // هر بار سرچ جدید انجام میشه، مقادیر قبلی پاک بشن
+    episodeMatches.clear();
 
-  // 1. فیلتر سرچ
-  let filtered = movies.filter((m) => {
-    const movieMatch = Object.values(m).some(
-      (val) => typeof val === "string" && val.toLowerCase().includes(q)
-    );
+    // 1. فیلتر سرچ
+    let filtered = movies.filter((m) => {
+      const movieMatch = Object.values(m).some(
+        (val) => typeof val === "string" && val.toLowerCase().includes(q)
+      );
 
-    let episodeMatch = false;
-    if (!movieMatch && (m.type === "collection" || m.type === "serial")) {
-      const eps = episodesByMovie.get(m.id) || [];
-      for (let idx = 0; idx < eps.length; idx++) {
-        const ep = eps[idx];
-        if (
-          Object.values(ep).some(
-            (val) => typeof val === "string" && val.toLowerCase().includes(q)
-          )
-        ) {
-          episodeMatches.set(m.id, idx + 1);
-          episodeMatch = true;
-          break;
+      let episodeMatch = false;
+      if (!movieMatch && (m.type === "collection" || m.type === "serial")) {
+        const eps = episodesByMovie.get(m.id) || [];
+        for (let idx = 0; idx < eps.length; idx++) {
+          const ep = eps[idx];
+          if (
+            Object.values(ep).some(
+              (val) => typeof val === "string" && val.toLowerCase().includes(q)
+            )
+          ) {
+            episodeMatches.set(m.id, idx + 1);
+            episodeMatch = true;
+            break;
+          }
         }
+      } else if (movieMatch) {
+        episodeMatches.delete(m.id);
       }
-    } else if (movieMatch) {
-      episodeMatches.delete(m.id);
+
+      return movieMatch || episodeMatch;
+    });
+
+    // 2. فیلتر نوع
+    if (currentTypeFilter !== "all") {
+      filtered = filtered.filter((m) => {
+        const t = (m.type || "").toLowerCase();
+        if (currentTypeFilter === "series") {
+          return t === "serial";
+        }
+        return t === currentTypeFilter;
+      });
     }
 
-    return movieMatch || episodeMatch;
-  });
+    // 3. فیلتر ژانر
+    if (currentTabGenre) {
+      filtered = filtered.filter((m) => {
+        return (m.genre || "").split(" ").includes(currentTabGenre);
+      });
+    }
 
-  // 2. فیلتر نوع
-  if (currentTypeFilter !== "all") {
-    filtered = filtered.filter((m) => {
-      const t = (m.type || "").toLowerCase();
-      if (currentTypeFilter === "series") {
-        return t === "serial";
-      }
-      return t === currentTypeFilter;
-    });
-  }
+    // فیلتر IMDb
+    if (imdbMinRating !== null) {
+      filtered = filtered.filter((m) => {
+        const val = parseFloat(m.imdb || "0");
+        return val >= imdbMinRating;
+      });
+    }
 
-  // 3. فیلتر ژانر
-  if (currentTabGenre) {
-    filtered = filtered.filter((m) => {
-      return (m.genre || "").split(" ").includes(currentTabGenre);
-    });
-  }
+    if (imdbMinRating !== null) {
+      filtered = filtered.filter((m) => {
+        const val = parseFloat(m.imdb || "0");
+        return val >= imdbMinRating;
+      });
+    }
 
-  // فیلتر IMDb
-  if (imdbMinRating !== null) {
-    filtered = filtered.filter((m) => {
-      const val = parseFloat(m.imdb || "0");
-      return val >= imdbMinRating;
-    });
-  }
+    if (typeof updateTypeCounts === "function") updateTypeCounts();
 
-  if (imdbMinRating !== null) {
-    filtered = filtered.filter((m) => {
-      const val = parseFloat(m.imdb || "0");
-      return val >= imdbMinRating;
-    });
-  }
+    const totalPages = computeTotalPages(filtered.length);
 
-  if (typeof updateTypeCounts === "function") updateTypeCounts();
+    // صفحه در محدوده معتبر
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
 
-  const totalPages = computeTotalPages(filtered.length);
+    // آدرس صفحه در URL
+    setPageInUrl(currentPage);
 
-  // صفحه در محدوده معتبر
-  if (currentPage > totalPages) currentPage = totalPages;
-  if (currentPage < 1) currentPage = 1;
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const pageItems = filtered.slice(start, start + PAGE_SIZE);
 
-  // آدرس صفحه در URL
-  setPageInUrl(currentPage);
+    moviesGrid.innerHTML = "";
+    movieCount.innerText = `Number of movies: ${filtered.length}`;
 
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = filtered.slice(start, start + PAGE_SIZE);
+    for (const m of pageItems) {
+      const cover = escapeHtml(
+        m.cover || "https://via.placeholder.com/300x200?text=No+Image"
+      );
+      const title = escapeHtml(m.title || "-");
+      const synopsis = escapeHtml((m.synopsis || "-").trim());
+      const director = escapeHtml(m.director || "-");
+      const stars = escapeHtml(m.stars || "-");
+      const imdb = escapeHtml(m.imdb || "-");
+      const release_info = escapeHtml(m.release_info || "-");
 
-  moviesGrid.innerHTML = "";
-  movieCount.innerText = `Number of movies: ${filtered.length}`;
+      const card = document.createElement("div");
+      card.classList.add("movie-card", "reveal");
+      card.dataset.movieId = m.id;
 
-  for (const m of pageItems) {
-    const cover = escapeHtml(
-      m.cover || "https://via.placeholder.com/300x200?text=No+Image"
-    );
-    const title = escapeHtml(m.title || "-");
-    const synopsis = escapeHtml((m.synopsis || "-").trim());
-    const director = escapeHtml(m.director || "-");
-    const stars = escapeHtml(m.stars || "-");
-    const imdb = escapeHtml(m.imdb || "-");
-    const release_info = escapeHtml(m.release_info || "-");
-
-    const card = document.createElement("div");
-    card.classList.add("movie-card", "reveal");
-    card.dataset.movieId = m.id;
-
-    const badgeHtml =
-      m.type && m.type !== "single"
-        ? `<span class="collection-badge ${
-            m.type === "collection" ? "badge-collection" : "badge-serial"
-          }">
+      const badgeHtml =
+        m.type && m.type !== "single"
+          ? `<span class="collection-badge ${
+              m.type === "collection" ? "badge-collection" : "badge-serial"
+            }">
          ${m.type === "collection" ? "Collection" : "Series"}
          <span class="badge-count anim-left-right">0</span>
        </span>`
-        : "";
+          : "";
 
-    card.innerHTML = `
+      card.innerHTML = `
 <div class="cover-container anim-vertical">
   <div class="cover-blur anim-vertical" style="background-image: url('${cover}');"></div>
   <img class="cover-image anim-vertical" src="${cover}" alt="${title}">
@@ -2655,251 +2656,184 @@ document.body.classList.remove("no-scroll");
 </div>
 `;
 
-    
-    moviesGrid.appendChild(card);
+      moviesGrid.appendChild(card);
 
-    // احترام به تنظیم Animations
-    if (window.filmchiReduceAnimations) {
-      card.classList.add("no-reveal");
-    } else {
-      cardObserver.observe(card);
-      card
-        .querySelectorAll(
-          ".anim-horizontal, .anim-vertical, .anim-left-right"
-        )
-        .forEach((el) => {
-          animObserver.observe(el);
-        });
-    }
-
-    // ===================== CLICK HANDLER — جلوگیری از باز شدن اشتباه منو =====================
-    card.addEventListener("click", (e) => {
-      const target = e.target;
-
-      // بخش کامنت‌ها
-      if (
-        target.closest(".enter-comments") ||
-        target.closest(".comments-panel") ||
-        target.closest(".comment-send") ||
-        target.closest(".comments-close") ||
-        target.closest(".comment-name") ||
-        target.closest(".comment-text") ||
-        target.closest(".comment-summary")
-      ) {
-        return;
+      // احترام به تنظیم Animations
+      if (window.filmchiReduceAnimations) {
+        card.classList.add("no-reveal");
+      } else {
+        cardObserver.observe(card);
+        card
+          .querySelectorAll(
+            ".anim-horizontal, .anim-vertical, .anim-left-right"
+          )
+          .forEach((el) => {
+            animObserver.observe(el);
+          });
       }
 
-      // دکمه Go to file
-      if (target.closest(".go-btn")) {
-        return;
-      }
+      // ===================== CLICK HANDLER — جلوگیری از باز شدن اشتباه منو =====================
+      card.addEventListener("click", (e) => {
+        const target = e.target;
 
-      // دکمه toggle synopsis
-      if (target.closest(".quote-toggle-btn")) return;
-
-      // متن سینوپسیس
-      if (target.closest(".quote-text")) return;
-
-      // اپیزودها
-      if (target.closest(".episode-card")) return;
-
-      // ژانر
-      if (target.closest(".genre-chip")) return;
-
-      // Product → کشور سازنده
-      if (target.closest(".country-chip")) return;
-
-      // فقط در صورتی که هیچ مورد بالا نبود:
-      openPostOptions(m);
-    });
-
-    // ===================== رفتار دکمه Go to file =====================
-    const goBtn = card.querySelector(".go-btn");
-    goBtn?.addEventListener("click", async () => {
-      const link = goBtn.dataset.link || "#";
-
-      try {
-        const movieId = m.id;
-        const epActiveEl = card.querySelector(
-          ".episodes-list .episode-card.active"
-        );
-        const epIndex = epActiveEl
-          ? Array.from(epActiveEl.parentElement.children).indexOf(epActiveEl)
-          : null;
-
-        const activeTitle = (() => {
-          if (epActiveEl) {
-            const titleEl =
-              epActiveEl.querySelector(".episode-title span");
-            return titleEl ? titleEl.textContent : m.title;
-          }
-          return m.title;
-        })();
-
-        await supabase.from("click_logs").insert([
-          {
-            movie_id: movieId,
-            episode_index: epIndex,
-            link,
-            title: activeTitle,
-          },
-        ]);
-      } catch (err) {
-        console.error("click log error:", err);
-      }
-
-      if (link && link !== "#") {
-        window.open(link, "_blank");
-      }
-    });
-
-    // ===================== اتصال کامنت‌ها =====================
-    attachCommentsHandlers(card, m.id);
-
-    // ===================== نسخه سالم و کامل اپیزودها — بازگردانی =====================
-    if (m.type === "collection" || m.type === "serial") {
-      (async () => {
-        const { data: eps, error: epsErr } = await supabase
-          .from("movie_items")
-          .select("*")
-          .eq("movie_id", m.id)
-          .order("order_index", { ascending: true });
-
-        if (epsErr) {
-          console.error("Error loading episodes:", epsErr);
+        // بخش کامنت‌ها
+        if (
+          target.closest(".enter-comments") ||
+          target.closest(".comments-panel") ||
+          target.closest(".comment-send") ||
+          target.closest(".comments-close") ||
+          target.closest(".comment-name") ||
+          target.closest(".comment-text") ||
+          target.closest(".comment-summary")
+        ) {
           return;
         }
 
-        const allEpisodes = [
-          {
-            id: m.id,
-            title: m.title,
-            cover: m.cover,
-            synopsis: m.synopsis,
-            director: m.director,
-            product: m.product,
-            stars: m.stars,
-            imdb: m.imdb,
-            release_info: m.release_info,
-            genre: m.genre,
-            link: m.link,
-          },
-          ...(eps || []),
-        ];
+        // دکمه Go to file
+        if (target.closest(".go-btn")) {
+          return;
+        }
 
-        const listEl = card.querySelector(".episodes-list");
-        const activeIndex = episodeMatches.get(m.id) ?? 0;
+        // دکمه toggle synopsis
+        if (target.closest(".quote-toggle-btn")) return;
 
-        listEl.innerHTML = allEpisodes
-          .map((ep, idx) => {
-            const titleText = escapeHtml(ep.title || "");
-            const scrollable = titleText.length > 16 ? "scrollable" : "";
-            return `
-          <div class="episode-card ${idx === activeIndex ? "active" : ""}" data-link="${ep.link}">
+        // متن سینوپسیس
+        if (target.closest(".quote-text")) return;
+
+        // اپیزودها
+        if (target.closest(".episode-card")) return;
+
+        // ژانر
+        if (target.closest(".genre-chip-mini")) return;
+
+        // Product → کشور سازنده
+        if (target.closest(".country-chip")) return;
+
+        // فقط در صورتی که هیچ مورد بالا نبود:
+        openPostOptions(m);
+      });
+
+      // ===================== رفتار دکمه Go to file =====================
+      const goBtn = card.querySelector(".go-btn");
+      goBtn?.addEventListener("click", async () => {
+        const link = goBtn.dataset.link || "#";
+
+        try {
+          const movieId = m.id;
+          const epActiveEl = card.querySelector(
+            ".episodes-list .episode-card.active"
+          );
+          const epIndex = epActiveEl
+            ? Array.from(epActiveEl.parentElement.children).indexOf(epActiveEl)
+            : null;
+
+          const activeTitle = (() => {
+            if (epActiveEl) {
+              const titleEl = epActiveEl.querySelector(".episode-title span");
+              return titleEl ? titleEl.textContent : m.title;
+            }
+            return m.title;
+          })();
+
+          await supabase.from("click_logs").insert([
+            {
+              movie_id: movieId,
+              episode_index: epIndex,
+              link,
+              title: activeTitle,
+            },
+          ]);
+        } catch (err) {
+          console.error("click log error:", err);
+        }
+
+        if (link && link !== "#") {
+          window.open(link, "_blank");
+        }
+      });
+
+      // ===================== اتصال کامنت‌ها =====================
+      attachCommentsHandlers(card, m.id);
+
+      // ===================== نسخه سالم و کامل اپیزودها — بازگردانی =====================
+      if (m.type === "collection" || m.type === "serial") {
+        (async () => {
+          const { data: eps, error: epsErr } = await supabase
+            .from("movie_items")
+            .select("*")
+            .eq("movie_id", m.id)
+            .order("order_index", { ascending: true });
+
+          if (epsErr) {
+            console.error("Error loading episodes:", epsErr);
+            return;
+          }
+
+          const allEpisodes = [
+            {
+              id: m.id,
+              title: m.title,
+              cover: m.cover,
+              synopsis: m.synopsis,
+              director: m.director,
+              product: m.product,
+              stars: m.stars,
+              imdb: m.imdb,
+              release_info: m.release_info,
+              genre: m.genre,
+              link: m.link,
+            },
+            ...(eps || []),
+          ];
+
+          const listEl = card.querySelector(".episodes-list");
+          const activeIndex = episodeMatches.get(m.id) ?? 0;
+
+          listEl.innerHTML = allEpisodes
+            .map((ep, idx) => {
+              const titleText = escapeHtml(ep.title || "");
+              const scrollable = titleText.length > 16 ? "scrollable" : "";
+              return `
+          <div class="episode-card ${
+            idx === activeIndex ? "active" : ""
+          }" data-link="${ep.link}">
             <img src="${escapeHtml(
               ep.cover || "https://via.placeholder.com/120x80?text=No+Cover"
             )}" alt="${titleText}" class="episode-cover">
             <div class="episode-title ${scrollable}"><span>${titleText}</span></div>
           </div>
         `;
-          })
-          .join("");
+            })
+            .join("");
 
-        goBtn.dataset.link = allEpisodes[activeIndex].link;
+          goBtn.dataset.link = allEpisodes[activeIndex].link;
 
-        const imdbChip = card.querySelector(".imdb-chip");
-        if (imdbChip) imdbChip.textContent = allEpisodes[activeIndex].imdb || m.imdb;
+          const imdbChip = card.querySelector(".imdb-chip");
+          if (imdbChip)
+            imdbChip.textContent = allEpisodes[activeIndex].imdb || m.imdb;
 
-        const badgeCount = card.querySelector(".collection-badge .badge-count");
-        if (badgeCount) {
-          const totalEpisodes = (eps || []).length + 1;
-          badgeCount.textContent =
-            totalEpisodes + (totalEpisodes > 1 ? " episodes" : " episode");
-        }
-
-        if (activeIndex > 0) {
-          const ep = allEpisodes[activeIndex];
-
-          if (m.type === "collection") {
-            const nameEl = card.querySelector(".movie-name");
-            if (nameEl) nameEl.textContent = ep.title || m.title;
-            const coverImg = card.querySelector(".cover-image");
-            if (coverImg) coverImg.src = ep.cover || m.cover;
-            const coverBlur = card.querySelector(".cover-blur");
-            if (coverBlur)
-              coverBlur.style.backgroundImage = `url('${ep.cover || m.cover}')`;
-            card.querySelector(".quote-text").textContent =
-              ep.synopsis || m.synopsis;
-            card.querySelectorAll(".field-quote")[1].textContent =
-              ep.director || m.director;
-            card.querySelectorAll(".field-quote")[2].innerHTML = renderChips(
-              ep.product || m.product || "-"
-            );
-            card.querySelectorAll(".field-quote")[3].textContent =
-              ep.stars || m.stars;
-            if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
-            card.querySelectorAll(".field-quote")[5].textContent =
-              ep.release_info || m.release_info;
-            card.querySelectorAll(".field-quote")[6].innerHTML = renderChips(
-              ep.genre || m.genre || "-"
-            );
+          const badgeCount = card.querySelector(
+            ".collection-badge .badge-count"
+          );
+          if (badgeCount) {
+            const totalEpisodes = (eps || []).length + 1;
+            badgeCount.textContent =
+              totalEpisodes + (totalEpisodes > 1 ? " episodes" : " episode");
           }
 
-          if (m.type === "serial") {
-            const nameEl = card.querySelector(".movie-name");
-            if (nameEl) nameEl.textContent = ep.title || m.title;
-            const coverImg = card.querySelector(".cover-image");
-            if (coverImg) coverImg.src = ep.cover || m.cover;
-            const coverBlur = card.querySelector(".cover-blur");
-            if (coverBlur)
-              coverBlur.style.backgroundImage = `url('${ep.cover || m.cover}')`;
-            goBtn.dataset.link = ep.link;
-          }
-        }
+          if (activeIndex > 0) {
+            const ep = allEpisodes[activeIndex];
 
-        setTimeout(() => {
-          const activeEpEl = listEl.querySelector(".episode-card.active");
-          if (activeEpEl && allEpisodes.length > 3 && episodeMatches.has(m.id)) {
-            const prevScrollY = window.scrollY;
-            activeEpEl.scrollIntoView({
-              behavior: "smooth",
-              inline: "end",
-              block: "nearest",
-            });
-            setTimeout(() => {
-              window.scrollTo({ top: prevScrollY });
-            }, 0);
-          }
-        }, 100);
-
-        listEl.querySelectorAll(".episode-card").forEach((cardEl, idx) => {
-          cardEl.addEventListener("click", () => {
-            listEl.querySelectorAll(".episode-card").forEach((c) =>
-              c.classList.remove("active")
-            );
-            cardEl.classList.add("active");
-
-            const ep = allEpisodes[idx];
-
-            if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
-
-            if (m.type === "serial") {
+            if (m.type === "collection") {
               const nameEl = card.querySelector(".movie-name");
               if (nameEl) nameEl.textContent = ep.title || m.title;
               const coverImg = card.querySelector(".cover-image");
               if (coverImg) coverImg.src = ep.cover || m.cover;
               const coverBlur = card.querySelector(".cover-blur");
               if (coverBlur)
-                coverBlur.style.backgroundImage = `url('${ep.cover || m.cover}')`;
-              goBtn.dataset.link = ep.link;
-            } else if (m.type === "collection") {
-              const nameEl = card.querySelector(".movie-name");
-              if (nameEl) nameEl.textContent = ep.title || m.title;
-              const coverImg = card.querySelector(".cover-image");
-              if (coverImg) coverImg.src = ep.cover || m.cover;
-              const coverBlur = card.querySelector(".cover-blur");
-              if (coverBlur)
-                coverBlur.style.backgroundImage = `url('${ep.cover || m.cover}')`;
+                coverBlur.style.backgroundImage = `url('${
+                  ep.cover || m.cover
+                }')`;
               card.querySelector(".quote-text").textContent =
                 ep.synopsis || m.synopsis;
               card.querySelectorAll(".field-quote")[1].textContent =
@@ -2915,12 +2849,31 @@ document.body.classList.remove("no-scroll");
               card.querySelectorAll(".field-quote")[6].innerHTML = renderChips(
                 ep.genre || m.genre || "-"
               );
-              goBtn.dataset.link = ep.link;
             }
 
-            if (allEpisodes.length > 3) {
+            if (m.type === "serial") {
+              const nameEl = card.querySelector(".movie-name");
+              if (nameEl) nameEl.textContent = ep.title || m.title;
+              const coverImg = card.querySelector(".cover-image");
+              if (coverImg) coverImg.src = ep.cover || m.cover;
+              const coverBlur = card.querySelector(".cover-blur");
+              if (coverBlur)
+                coverBlur.style.backgroundImage = `url('${
+                  ep.cover || m.cover
+                }')`;
+              goBtn.dataset.link = ep.link;
+            }
+          }
+
+          setTimeout(() => {
+            const activeEpEl = listEl.querySelector(".episode-card.active");
+            if (
+              activeEpEl &&
+              allEpisodes.length > 3 &&
+              episodeMatches.has(m.id)
+            ) {
               const prevScrollY = window.scrollY;
-              cardEl.scrollIntoView({
+              activeEpEl.scrollIntoView({
                 behavior: "smooth",
                 inline: "end",
                 block: "nearest",
@@ -2929,74 +2882,135 @@ document.body.classList.remove("no-scroll");
                 window.scrollTo({ top: prevScrollY });
               }, 0);
             }
+          }, 100);
+
+          listEl.querySelectorAll(".episode-card").forEach((cardEl, idx) => {
+            cardEl.addEventListener("click", () => {
+              listEl
+                .querySelectorAll(".episode-card")
+                .forEach((c) => c.classList.remove("active"));
+              cardEl.classList.add("active");
+
+              const ep = allEpisodes[idx];
+
+              if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
+
+              if (m.type === "serial") {
+                const nameEl = card.querySelector(".movie-name");
+                if (nameEl) nameEl.textContent = ep.title || m.title;
+                const coverImg = card.querySelector(".cover-image");
+                if (coverImg) coverImg.src = ep.cover || m.cover;
+                const coverBlur = card.querySelector(".cover-blur");
+                if (coverBlur)
+                  coverBlur.style.backgroundImage = `url('${
+                    ep.cover || m.cover
+                  }')`;
+                goBtn.dataset.link = ep.link;
+              } else if (m.type === "collection") {
+                const nameEl = card.querySelector(".movie-name");
+                if (nameEl) nameEl.textContent = ep.title || m.title;
+                const coverImg = card.querySelector(".cover-image");
+                if (coverImg) coverImg.src = ep.cover || m.cover;
+                const coverBlur = card.querySelector(".cover-blur");
+                if (coverBlur)
+                  coverBlur.style.backgroundImage = `url('${
+                    ep.cover || m.cover
+                  }')`;
+                card.querySelector(".quote-text").textContent =
+                  ep.synopsis || m.synopsis;
+                card.querySelectorAll(".field-quote")[1].textContent =
+                  ep.director || m.director;
+                card.querySelectorAll(".field-quote")[2].innerHTML =
+                  renderChips(ep.product || m.product || "-");
+                card.querySelectorAll(".field-quote")[3].textContent =
+                  ep.stars || m.stars;
+                if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
+                card.querySelectorAll(".field-quote")[5].textContent =
+                  ep.release_info || m.release_info;
+                card.querySelectorAll(".field-quote")[6].innerHTML =
+                  renderChips(ep.genre || m.genre || "-");
+                goBtn.dataset.link = ep.link;
+              }
+
+              if (allEpisodes.length > 3) {
+                const prevScrollY = window.scrollY;
+                cardEl.scrollIntoView({
+                  behavior: "smooth",
+                  inline: "end",
+                  block: "nearest",
+                });
+                setTimeout(() => {
+                  window.scrollTo({ top: prevScrollY });
+                }, 0);
+              }
+            });
           });
-        });
-      })();
+        })();
+      }
     }
-  }
 
-  // toggle synopsis
-  document.querySelectorAll(".synopsis-quote").forEach((quote) => {
-    const textEl = quote.querySelector(".quote-text");
-    const btn = quote.querySelector(".quote-toggle-btn");
-    if (!textEl || !btn) return;
+    // toggle synopsis
+    document.querySelectorAll(".synopsis-quote").forEach((quote) => {
+      const textEl = quote.querySelector(".quote-text");
+      const btn = quote.querySelector(".quote-toggle-btn");
+      if (!textEl || !btn) return;
 
-    const fullText = textEl.textContent.trim();
-    if (fullText.length > 200) {
-      const shortText = fullText.substring(0, 200) + "…";
-      let collapsed = true;
+      const fullText = textEl.textContent.trim();
+      if (fullText.length > 200) {
+        const shortText = fullText.substring(0, 200) + "…";
+        let collapsed = true;
 
-      function applyState() {
-        if (collapsed) {
-          textEl.textContent = shortText;
-          quote.style.overflow = "hidden";
-          quote.style.maxHeight = "120px";
-          quote.classList.add("collapsed");
-          btn.textContent = "More";
-        } else {
-          textEl.textContent = fullText;
-          quote.style.maxHeight = "1000px";
-          quote.classList.remove("collapsed");
-          btn.textContent = "Less";
+        function applyState() {
+          if (collapsed) {
+            textEl.textContent = shortText;
+            quote.style.overflow = "hidden";
+            quote.style.maxHeight = "120px";
+            quote.classList.add("collapsed");
+            btn.textContent = "More";
+          } else {
+            textEl.textContent = fullText;
+            quote.style.maxHeight = "1000px";
+            quote.classList.remove("collapsed");
+            btn.textContent = "Less";
+          }
         }
-      }
 
-      function toggleQuote() {
-        collapsed = !collapsed;
+        function toggleQuote() {
+          collapsed = !collapsed;
+          applyState();
+        }
+
         applyState();
+
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          toggleQuote();
+        });
+
+        quote.addEventListener("click", (e) => {
+          if (e.target.closest("a")) return;
+          if (e.target === btn) return;
+          toggleQuote();
+        });
+      } else {
+        if (btn) btn.remove();
       }
+    });
 
-      applyState();
+    // صفحه‌بندی
+    renderPagination(filtered.length);
 
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        toggleQuote();
-      });
+    // ژانرهای بالای صفحه
+    buildTabGenres(filtered);
 
-      quote.addEventListener("click", (e) => {
-        if (e.target.closest("a")) return;
-        if (e.target === btn) return;
-        toggleQuote();
-      });
-    } else {
-      if (btn) btn.remove();
+    // اسکرول به بالا
+    if (!skipScroll) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  });
 
-  // صفحه‌بندی
-  renderPagination(filtered.length);
-
-  // ژانرهای بالای صفحه
-  buildTabGenres(filtered);
-
-  // اسکرول به بالا
-  if (!skipScroll) {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // آپدیت استوری‌ها
+    renderStoriesForPage(pageItems);
   }
-
-  // آپدیت استوری‌ها
-  renderStoriesForPage(pageItems);
-}
 
   // بعد از لود شدن movies، اگر روی /movie/slug هستیم مودال همان فیلم باز شود
   function handleDeepLinkMovieOpen() {
@@ -6654,64 +6668,60 @@ document.body.classList.remove("no-scroll");
   /* ============================================================
      BACK BUTTON HANDLER – FINAL VERSION (NO SHORTENING)
    ============================================================ */
-window.addEventListener("popstate", () => {
-  // 1) Comments panel on a movie card
-  const openCommentsPanel = document.querySelector(".comments-panel.open");
-  if (openCommentsPanel) {
-    openCommentsPanel.classList.remove("open");
-    openCommentsPanel.setAttribute("aria-hidden", "true");
-    return;
-  }
-
-  // 2) Chat overlay
-  if (typeof closeChatOverlay === "function" && window.chatOverlay) {
-    if (chatOverlay.getAttribute("aria-hidden") === "false") {
-      closeChatOverlay();
+  window.addEventListener("popstate", () => {
+    // 1) Comments panel on a movie card
+    const openCommentsPanel = document.querySelector(".comments-panel.open");
+    if (openCommentsPanel) {
+      openCommentsPanel.classList.remove("open");
+      openCommentsPanel.setAttribute("aria-hidden", "true");
       return;
     }
-  }
 
-  // 3) Movie modal (Popular + card modal)
-  const modal = document.getElementById("movie-modal");
-  if (modal && modal.style.display === "flex") {
-    modal.style.display = "none";
-    return;
-  }
+    // 2) Chat overlay
+    if (typeof closeChatOverlay === "function" && window.chatOverlay) {
+      if (chatOverlay.getAttribute("aria-hidden") === "false") {
+        closeChatOverlay();
+        return;
+      }
+    }
 
-  // 4) Post options overlay
-  const postOptionsOverlay = document.getElementById("postOptionsOverlay");
-  if (
-    postOptionsOverlay &&
-    postOptionsOverlay.classList.contains("open")
-  ) {
-    postOptionsOverlay.classList.remove("open");
-    postOptionsOverlay.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("no-scroll", "post-options-open");
-    return;
-  }
+    // 3) Movie modal (Popular + card modal)
+    const modal = document.getElementById("movie-modal");
+    if (modal && modal.style.display === "flex") {
+      modal.style.display = "none";
+      return;
+    }
 
-  // 5) Favorites overlay
-  const favoritesOverlay = document.getElementById("favoritesOverlay");
-  if (
-    favoritesOverlay &&
-    favoritesOverlay.getAttribute("aria-hidden") === "false"
-  ) {
-    favoritesOverlay.setAttribute("aria-hidden", "true");
-document.body.classList.remove("no-scroll");
-    return;
-  }
+    // 4) Post options overlay
+    const postOptionsOverlay = document.getElementById("postOptionsOverlay");
+    if (postOptionsOverlay && postOptionsOverlay.classList.contains("open")) {
+      postOptionsOverlay.classList.remove("open");
+      postOptionsOverlay.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("no-scroll", "post-options-open");
+      return;
+    }
 
-  // 6) Side menu
-  const sideMenu = document.getElementById("sideMenu");
-  const menuOverlay = document.getElementById("menuOverlay");
-  if (sideMenu && sideMenu.classList.contains("active")) {
-    sideMenu.classList.remove("active");
-    menuOverlay && menuOverlay.classList.remove("active");
-    document.body.classList.remove("no-scroll", "menu-open");
-    return;
-  }
-});
+    // 5) Favorites overlay
+    const favoritesOverlay = document.getElementById("favoritesOverlay");
+    if (
+      favoritesOverlay &&
+      favoritesOverlay.getAttribute("aria-hidden") === "false"
+    ) {
+      favoritesOverlay.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("no-scroll");
+      return;
+    }
 
+    // 6) Side menu
+    const sideMenu = document.getElementById("sideMenu");
+    const menuOverlay = document.getElementById("menuOverlay");
+    if (sideMenu && sideMenu.classList.contains("active")) {
+      sideMenu.classList.remove("active");
+      menuOverlay && menuOverlay.classList.remove("active");
+      document.body.classList.remove("no-scroll", "menu-open");
+      return;
+    }
+  });
 
   function updateDynamicTitle() {
     let title = "FilmChiin";
