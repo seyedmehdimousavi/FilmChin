@@ -1211,6 +1211,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const postOptionsTitle = document.getElementById("postOptionsTitle");
   const postOptionFavorite = document.getElementById("postOptionFavorite");
   const postOptionCopyLink = document.getElementById("postOptionCopyLink");
+  const postOptionShareLink = document.getElementById("postOptionShareLink");
   const postOptionsCloseBtn = document.getElementById("postOptionsCloseBtn");
 
   // Favorites overlay
@@ -1352,7 +1353,64 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("خطا در کپی کردن لینک ❌", "error");
     }
   }
+  
+  
+  async function shareCurrentMovieLink() {
+    if (!currentOptionsMovie) return;
 
+    const t = (currentOptionsMovie.title || currentOptionsMovie.name || "").trim();
+    if (!t) {
+      showToast("عنوان فیلم یافت نشد ❌", "error");
+      return;
+    }
+
+    const slug = makeMovieSlug(t);
+    if (!slug) {
+      showToast("نمی‌توان slug مناسب ساخت ❌", "error");
+      return;
+    }
+
+    const origin =
+      (window.location && window.location.origin) || "https://filmchiin.ir";
+    const url = origin.replace(/\/+$/, "") + "/movie/" + slug;
+
+    // Web Share API (مخصوص موبایل/مرورگرهایی که پشتیبانی می‌کنند)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: t,
+          text: t,
+          url,
+        });
+        showToast("Link shared ✅", "success");
+      } catch (err) {
+        // اگر کاربر خودِ share را کنسل کرد، خطا مهم نیست
+        if (!err || err.name !== "AbortError") {
+          console.error("shareCurrentMovieLink error:", err);
+          showToast("خطا در اشتراک‌گذاری لینک ❌", "error");
+        }
+      }
+    } else {
+      // fallback: فقط لینک را کپی می‌کنیم
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url);
+        } else {
+          const tmp = document.createElement("textarea");
+          tmp.value = url;
+          document.body.appendChild(tmp);
+          tmp.select();
+          document.execCommand("copy");
+          document.body.removeChild(tmp);
+        }
+        showToast("Post link copied ✅", "success");
+      } catch (err) {
+        console.error("shareCurrentMovieLink fallback error:", err);
+        showToast("خطا در کپی کردن لینک ❌", "error");
+      }
+    }
+  }
+  
   // اتصال دکمه‌ها و کلیک بیرون
   postOptionFavorite?.addEventListener("click", (e) => {
     e.preventDefault();
@@ -1365,7 +1423,13 @@ document.addEventListener("DOMContentLoaded", () => {
     e.stopPropagation();
     copyCurrentMovieLink();
   });
-
+  
+  postOptionShareLink?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    shareCurrentMovieLink();
+  });
+  
   postOptionsCloseBtn?.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();

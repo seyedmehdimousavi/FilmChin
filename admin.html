@@ -54,21 +54,32 @@
 
           <!-- منوی پروفایل (مثل index) -->
           <div id="profileMenu" class="profile-menu hidden">
-            <div class="profile-bubble">
-              <div class="profile-username" id="profileUsername">Admin</div>
-              <div class="button-wrap">
-                <button class="profile-edit"><span>Edit profile</span></button>
-                <div class="button-shadow"></div>
-              </div>
-              <hr class="profile-divider" />
-              <div class="button-wrap">
-                <button id="logoutBtn" class="profile-logout">
-                  <span>logout</span>
-                </button>
-                <div class="button-shadow"></div>
-              </div>
-            </div>
-          </div>
+  <div class="profile-bubble">
+    <div class="profile-username" id="profileUsername">Admin</div>
+
+    <div class="button-wrap">
+      <button class="profile-edit"><span>Edit profile</span></button>
+      <div class="button-shadow"></div>
+    </div>
+
+    <!-- ✅ NEW: Favorite movies (همان طراحی نسخه اصلی سایت) -->
+    <div class="button-wrap">
+      <button id="favoriteMoviesBtn" class="profile-favorites">
+        <span>Favorite movies</span>
+      </button>
+      <div class="button-shadow"></div>
+    </div>
+
+    <hr class="profile-divider" />
+
+    <div class="button-wrap">
+      <button id="logoutBtn" class="profile-logout">
+        <span>logout</span>
+      </button>
+      <div class="button-shadow"></div>
+    </div>
+  </div>
+</div>
 
           <!-- متن ثابت Admin Panel به جای سرچ -->
           <div class="admin-title">Admin Panel</div>
@@ -499,6 +510,50 @@
           </div>
         </section>
       </section>
+            <!-- ✅ NEW: Favorites overlay -->
+      <div id="favoritesOverlay" class="favorites-overlay" aria-hidden="true">
+        <div class="favorites-overlay-inner">
+          <div class="favorites-overlay-header">
+            <div class="button-wrap">
+              <button
+                id="favoritesCloseBtn"
+                class="favorites-close-btn"
+                aria-label="Close"
+              >
+                <!-- ساده: یک علامت × -->
+                <span>&times;</span>
+              </button>
+              <div class="button-shadow"></div>
+            </div>
+            <span class="favorites-title">Favorite movies</span>
+          </div>
+
+          <div class="favorites-overlay-body">
+            <div id="favoritesGrid" class="favorites-grid"></div>
+
+            <div class="favorites-pagination">
+              <button
+                id="favoritesPrev"
+                class="favorites-page-btn"
+                type="button"
+              >
+                <span>Prev</span>
+              </button>
+              <span id="favoritesPageInfo" class="favorites-page-info">
+                1 / 1
+              </span>
+              <button
+                id="favoritesNext"
+                class="favorites-page-btn"
+                type="button"
+              >
+                <span>Next</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
     </main>
     <script src="script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
