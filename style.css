@@ -5790,3 +5790,15 @@ body.dark .post-option-favorite.favorite-active {
   object-fit: cover;
   border-radius: 14px;
 }
+.search-highlight {
+  background-color: rgba(255, 230, 0, 0.6);
+  padding: 2px 3px;
+  border-radius: 6px;     /* گوشه گرد دقیق */
+  display: inline;        /* مهم */
+  line-height: 1.6;       /* برای هماهنگی با متن */
+}
+
+/* Dark mode */
+body.dark .search-highlight {
+  background-color: rgba(255, 255, 0, 0.35);
+}
