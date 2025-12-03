@@ -135,13 +135,15 @@ Body.dark {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 60px;
   backdrop-filter: blur(var(--blur));
   background: rgba(255, 255, 255, 0.55);
-  position: sticky;
-  top: 0;
-  z-index: 12000;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 12000;
+  transition: transform 0.3s ease;
 }
 .header {
   display: flex;
@@ -1764,7 +1766,6 @@ body.dark .episode-card {
   white-space: nowrap;
   -ms-overflow-style: none;
   scrollbar-width: none;
-  backdrop-filter: blur(var(--blur));
   width: 100%;
   -webkit-mask-image: linear-gradient(
     to bottom,
@@ -1780,8 +1781,7 @@ body.dark .episode-card {
   );
   mask-repeat: no-repeat;
   mask-size: 100% 100%;
-  position: fixed; /* به جای sticky */
-  top: 120px; /* زیر هدر */
+  top: 120px;
   left: 0;
   right: 0;
   transition: transform 0.3s ease;
@@ -4230,45 +4230,7 @@ min-tabs .tab-circle .badge {
   flex-direction: column;
   gap: 9px;
 }
-.main-header {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 120px;
-  backdrop-filter: blur(var(--blur));
-  background: rgba(255, 255, 255, 0.55);
-  position: fixed; /* به جای sticky */
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 12000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-}
 
-.main-header.hide {
-  transform: translateY(-100%);
-}
-
-.movie-type-tabs.hide {
-  transform: translateY(-100%);
-}
-.main-header {
-  position: fixed; /* به جای sticky */
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 120px;
-  z-index: 12000;
-  transition: transform 0.3s ease;
-}
-
-.main-header.hide {
-  transform: translateY(-100%);
-}
-.main-header {
-  transition: transform 0.3s ease; /* سرعت کمتر */
-}
 .main-header.hide {
   transform: translateY(-100%);
 }
@@ -5418,6 +5380,8 @@ body.reduce-animations .episode-title.scrolling {
   position: relative;
   display: flex;
   padding: 6px;
+  width: 100%;
+  justify-content: space-around;
   border-radius: 18px;
   gap: 4px;
 }
@@ -5433,14 +5397,17 @@ body.reduce-animations .episode-title.scrolling {
   transition: all 0.2s ease;
   flex: 0 0 auto;
   color: #0b3d5c;
-  border: 1px solid #ddd;
+  border: 1px solid #6e6e6e;
   border-radius: 20px;
   padding: 3px 5px;
   font-size: 14px;
   font-weight: 700;
 }
+body.dark .tabs-container .tab-link {
+  color: #ffffff;
+  border: 1px solid #ffffff;
+}
 .tabs-container .tab-link.active {
-  background: #017ada;
   color: #fff;
 }
 
