@@ -141,7 +141,6 @@ Body.dark {
   position: sticky;
   top: 0;
   z-index: 12000;
-  height: 120px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 .header {
@@ -5433,11 +5432,10 @@ body.reduce-animations .episode-title.scrolling {
   gap: 6px;
   transition: all 0.2s ease;
   flex: 0 0 auto;
-  background: #eef3f7;
   color: #0b3d5c;
   border: 1px solid #ddd;
   border-radius: 20px;
-  padding: 3px 10px;
+  padding: 3px 5px;
   font-size: 14px;
   font-weight: 700;
 }
@@ -5792,10 +5790,9 @@ body.dark .post-option-favorite.favorite-active {
 }
 .search-highlight {
   background-color: rgba(255, 230, 0, 0.6);
-  padding: 2px 3px;
-  border-radius: 6px;     /* گوشه گرد دقیق */
-  display: inline;        /* مهم */
-  line-height: 1.6;       /* برای هماهنگی با متن */
+  border-radius: 6px;
+  display: inline;
+  line-height: 1;
 }
 
 /* Dark mode */

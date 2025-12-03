@@ -1258,40 +1258,39 @@ document.addEventListener("DOMContentLoaded", () => {
    * - query: متن جست‌وجو (همان چیزی که کاربر تایپ کرده یا با کلیک روی ژانر/پروداکت ست شده)
    */
   function applySearchHighlightsInGrid(query) {
-    if (!moviesGrid) return;
-    const root = moviesGrid;
+  if (!moviesGrid) return;
+  const root = moviesGrid;
 
-    // 1) حذف هایلایت‌های قبلی (mark.search-highlight → متن ساده)
-    const oldMarks = root.querySelectorAll("mark.search-highlight");
-    oldMarks.forEach((markEl) => {
-      const textNode = document.createTextNode(markEl.textContent || "");
-      const parent = markEl.parentNode;
-      if (!parent) return;
-      parent.replaceChild(textNode, markEl);
-      parent.normalize();
+  // 1) پاک کردن هایلایت‌های قبلی
+  const oldMarks = root.querySelectorAll("mark.search-highlight");
+  oldMarks.forEach((markEl) => {
+    const textNode = document.createTextNode(markEl.textContent || "");
+    const parent = markEl.parentNode;
+    if (!parent) return;
+    parent.replaceChild(textNode, markEl);
+    parent.normalize();
+  });
+
+  const q = (query || "").trim();
+  if (!q) return;
+
+  const selectors = [
+    ".movie-name",       // عنوان
+    ".quote-text",       // synopsis
+    ".genre-chip-mini",  // ژانر
+    ".country-chip"      // Product / کشور
+  ];
+
+  selectors.forEach((sel) => {
+    root.querySelectorAll(sel).forEach((el) => {
+      const raw = el.textContent;
+      if (!raw) return;
+      const html = makeHighlightHtml(raw, q);
+      el.innerHTML = html;
     });
+  });
+}
 
-    const q = (query || "").trim();
-    if (!q) return;
-
-    // 2) اعمال هایلایت روی بخش‌های مهم کارت
-    const selectors = [
-      ".movie-name",   // عنوان فیلم
-      ".quote-text",   // متن synopsis
-      ".genre-chip",   // چیپ ژانر
-      ".country-chip"  // چیپ Product / کشور
-    ];
-
-    selectors.forEach((sel) => {
-      root.querySelectorAll(sel).forEach((el) => {
-        const raw = el.textContent;
-        if (!raw) return;
-        const html = makeHighlightHtml(raw, q);
-        el.innerHTML = html;
-      });
-    });
-  }
-  
   /* -------------------------------------------------------
      NEW FAVORITES + POST OPTIONS OVERLAYS (FULL DEFINITIONS)
      ------------------------------------------------------- */
@@ -2551,7 +2550,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   async function renderPagedMovies(skipScroll) {
   if (!moviesGrid || !movieCount) return;
+
+  // مقدار خام برای جست‌وجو (برای هایلایت)
   const searchTerm = (searchInput?.value || "").trim();
+  // مقدار lowercase برای فیلتر کردن
   const q = searchTerm.toLowerCase();
 
   // هر بار سرچ جدید انجام میشه، مقادیر قبلی پاک بشن
@@ -2639,16 +2641,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const cover = escapeHtml(
       m.cover || "https://via.placeholder.com/300x200?text=No+Image"
     );
-
-    const titleRaw = m.title || "-";
-    const synopsisRaw = (m.synopsis || "-").trim();
-
-    const directorRaw = m.director || "-";
-    const starsRaw = m.stars || "-";
-    const imdbRaw = m.imdb || "-";
-    const releaseInfoRaw = m.release_info || "-";
-
-    const titleAlt = escapeHtml(titleRaw);
+    const title = escapeHtml(m.title || "-");
+    const synopsis = escapeHtml((m.synopsis || "-").trim());
+    const director = escapeHtml(m.director || "-");
+    const stars = escapeHtml(m.stars || "-");
+    const imdb = escapeHtml(m.imdb || "-");
+    const release_info = escapeHtml(m.release_info || "-");
 
     const card = document.createElement("div");
     card.classList.add("movie-card", "reveal");
@@ -2667,24 +2665,18 @@ document.addEventListener("DOMContentLoaded", () => {
     card.innerHTML = `
 <div class="cover-container anim-vertical">
   <div class="cover-blur anim-vertical" style="background-image: url('${cover}');"></div>
-  <img class="cover-image anim-vertical" src="${cover}" alt="${titleAlt}">
+  <img class="cover-image anim-vertical" src="${cover}" alt="${title}">
 </div>
 
 <div class="movie-info anim-vertical">
   <div class="movie-title anim-left-right">
-    <span class="movie-name anim-horizontal">${makeHighlightHtml(
-      titleRaw,
-      searchTerm
-    )}</span>
+    <span class="movie-name anim-horizontal">${title}</span>
     ${badgeHtml}
   </div>
 
   <span class="field-label anim-vertical"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
   <div class="field-quote anim-left-right synopsis-quote">
-    <div class="quote-text anim-horizontal">${makeHighlightHtml(
-      synopsisRaw,
-      searchTerm
-    )}</div>
+    <div class="quote-text anim-horizontal">${synopsis}</div>
     <div class="button-wrap">
           <button class="quote-toggle-btn"><span>More</span></button>
           <div class="button-shadow"></div>
@@ -2692,10 +2684,7 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 
   <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span>
-  <div class="field-quote anim-left-right">${makeHighlightHtml(
-    directorRaw,
-    searchTerm
-  )}</div>
+  <div class="field-quote anim-left-right">${director}</div>
 
   <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
   <div class="field-quote anim-horizontal">
@@ -2703,27 +2692,18 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 
   <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
-  <div class="field-quote anim-left-right">${makeHighlightHtml(
-    starsRaw,
-    searchTerm
-  )}</div>
+  <div class="field-quote anim-left-right">${stars}</div>
 
   <span class="field-label anim-vertical">
     <img src="/images/icons8-imdb-48.png" class="imdb-bell" style="width:20px;height:20px;">
     IMDB:
   </span>
   <div class="field-quote anim-left-right">
-    <span class="chip imdb-chip anim-horizontal">${makeHighlightHtml(
-      imdbRaw,
-      searchTerm
-    )}</span>
+    <span class="chip imdb-chip anim-horizontal">${imdb}</span>
   </div>
 
   <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span>
-  <div class="field-quote anim-left-right">${makeHighlightHtml(
-    releaseInfoRaw,
-    searchTerm
-  )}</div>
+  <div class="field-quote anim-left-right">${release_info}</div>
 
   <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span>
   <div class="field-quote genre-grid anim-horizontal">${renderChips(
@@ -2786,7 +2766,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // CLICK → Post Options
+    // ===================== CLICK HANDLER — جلوگیری از باز شدن اشتباه منو =====================
     card.addEventListener("click", (e) => {
       const target = e.target;
 
@@ -2797,7 +2777,8 @@ document.addEventListener("DOMContentLoaded", () => {
         target.closest(".comment-send") ||
         target.closest(".comments-close") ||
         target.closest(".comment-name") ||
-        target.closest(".comment-text")
+        target.closest(".comment-text") ||
+        target.closest(".comment-summary")
       ) {
         return;
       }
@@ -2816,8 +2797,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // اپیزودها
       if (target.closest(".episode-card")) return;
 
-      // ژانر
-      if (target.closest(".genre-chip")) return;
+      // ژانر (mini chip)
+      if (target.closest(".genre-chip-mini")) return;
 
       // Product → کشور سازنده
       if (target.closest(".country-chip")) return;
@@ -2826,7 +2807,7 @@ document.addEventListener("DOMContentLoaded", () => {
       openPostOptions(m);
     });
 
-    // Go to file
+    // ===================== رفتار دکمه Go to file =====================
     const goBtn = card.querySelector(".go-btn");
     goBtn?.addEventListener("click", async () => {
       const link = goBtn.dataset.link || "#";
@@ -2842,8 +2823,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const activeTitle = (() => {
           if (epActiveEl) {
-            const titleEl =
-              epActiveEl.querySelector(".episode-title span");
+            const titleEl = epActiveEl.querySelector(".episode-title span");
             return titleEl ? titleEl.textContent : m.title;
           }
           return m.title;
@@ -2866,9 +2846,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
+    // ===================== اتصال کامنت‌ها =====================
     attachCommentsHandlers(card, m.id);
 
-    // اپیزودها (نسخه سالم قبلی)
+    // ===================== نسخه سالم و کامل اپیزودها — بازگردانی =====================
     if (m.type === "collection" || m.type === "serial") {
       (async () => {
         const { data: eps, error: epsErr } = await supabase
@@ -2902,14 +2883,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const listEl = card.querySelector(".episodes-list");
         const activeIndex = episodeMatches.get(m.id) ?? 0;
 
-        const imdbChip = card.querySelector(".imdb-chip");
-
         listEl.innerHTML = allEpisodes
           .map((ep, idx) => {
             const titleText = escapeHtml(ep.title || "");
             const scrollable = titleText.length > 16 ? "scrollable" : "";
             return `
-          <div class="episode-card ${idx === activeIndex ? "active" : ""}" data-link="${ep.link}">
+          <div class="episode-card ${
+            idx === activeIndex ? "active" : ""
+          }" data-link="${ep.link}">
             <img src="${escapeHtml(
               ep.cover || "https://via.placeholder.com/120x80?text=No+Cover"
             )}" alt="${titleText}" class="episode-cover">
@@ -2921,9 +2902,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         goBtn.dataset.link = allEpisodes[activeIndex].link;
 
-        if (imdbChip) imdbChip.textContent = allEpisodes[activeIndex].imdb || m.imdb;
+        const imdbChip = card.querySelector(".imdb-chip");
+        if (imdbChip)
+          imdbChip.textContent = allEpisodes[activeIndex].imdb || m.imdb;
 
-        const badgeCount = card.querySelector(".collection-badge .badge-count");
+        const badgeCount = card.querySelector(
+          ".collection-badge .badge-count"
+        );
         if (badgeCount) {
           const totalEpisodes = (eps || []).length + 1;
           badgeCount.textContent =
@@ -2940,7 +2925,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (coverImg) coverImg.src = ep.cover || m.cover;
             const coverBlur = card.querySelector(".cover-blur");
             if (coverBlur)
-              coverBlur.style.backgroundImage = `url('${ep.cover || m.cover}')`;
+              coverBlur.style.backgroundImage = `url('${
+                ep.cover || m.cover
+              }')`;
             card.querySelector(".quote-text").textContent =
               ep.synopsis || m.synopsis;
             card.querySelectorAll(".field-quote")[1].textContent =
@@ -2965,14 +2952,20 @@ document.addEventListener("DOMContentLoaded", () => {
             if (coverImg) coverImg.src = ep.cover || m.cover;
             const coverBlur = card.querySelector(".cover-blur");
             if (coverBlur)
-              coverBlur.style.backgroundImage = `url('${ep.cover || m.cover}')`;
+              coverBlur.style.backgroundImage = `url('${
+                ep.cover || m.cover
+              }')`;
             goBtn.dataset.link = ep.link;
           }
         }
 
         setTimeout(() => {
           const activeEpEl = listEl.querySelector(".episode-card.active");
-          if (activeEpEl && allEpisodes.length > 3 && episodeMatches.has(m.id)) {
+          if (
+            activeEpEl &&
+            allEpisodes.length > 3 &&
+            episodeMatches.has(m.id)
+          ) {
             const prevScrollY = window.scrollY;
             activeEpEl.scrollIntoView({
               behavior: "smooth",
@@ -2987,9 +2980,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         listEl.querySelectorAll(".episode-card").forEach((cardEl, idx) => {
           cardEl.addEventListener("click", () => {
-            listEl.querySelectorAll(".episode-card").forEach((c) =>
-              c.classList.remove("active")
-            );
+            listEl
+              .querySelectorAll(".episode-card")
+              .forEach((c) => c.classList.remove("active"));
             cardEl.classList.add("active");
 
             const ep = allEpisodes[idx];
@@ -3003,7 +2996,9 @@ document.addEventListener("DOMContentLoaded", () => {
               if (coverImg) coverImg.src = ep.cover || m.cover;
               const coverBlur = card.querySelector(".cover-blur");
               if (coverBlur)
-                coverBlur.style.backgroundImage = `url('${ep.cover || m.cover}')`;
+                coverBlur.style.backgroundImage = `url('${
+                  ep.cover || m.cover
+                }')`;
               goBtn.dataset.link = ep.link;
             } else if (m.type === "collection") {
               const nameEl = card.querySelector(".movie-name");
@@ -3012,22 +3007,22 @@ document.addEventListener("DOMContentLoaded", () => {
               if (coverImg) coverImg.src = ep.cover || m.cover;
               const coverBlur = card.querySelector(".cover-blur");
               if (coverBlur)
-                coverBlur.style.backgroundImage = `url('${ep.cover || m.cover}')`;
+                coverBlur.style.backgroundImage = `url('${
+                  ep.cover || m.cover
+                }')`;
               card.querySelector(".quote-text").textContent =
                 ep.synopsis || m.synopsis;
               card.querySelectorAll(".field-quote")[1].textContent =
                 ep.director || m.director;
-              card.querySelectorAll(".field-quote")[2].innerHTML = renderChips(
-                ep.product || m.product || "-"
-              );
+              card.querySelectorAll(".field-quote")[2].innerHTML =
+                renderChips(ep.product || m.product || "-");
               card.querySelectorAll(".field-quote")[3].textContent =
                 ep.stars || m.stars;
               if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
               card.querySelectorAll(".field-quote")[5].textContent =
                 ep.release_info || m.release_info;
-              card.querySelectorAll(".field-quote")[6].innerHTML = renderChips(
-                ep.genre || m.genre || "-"
-              );
+              card.querySelectorAll(".field-quote")[6].innerHTML =
+                renderChips(ep.genre || m.genre || "-");
               goBtn.dataset.link = ep.link;
             }
 
@@ -3099,16 +3094,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------- هایلایت نتایج جست‌وجو --------------------
   applySearchHighlightsInGrid(searchTerm);
 
-  // -------------------- صفحه‌بندی و ژانر --------------------
+  // صفحه‌بندی
   renderPagination(filtered.length);
+
+  // ژانرهای بالای صفحه
   buildTabGenres(filtered);
 
-  // -------------------- اسکرول به بالا --------------------
+  // اسکرول به بالا
   if (!skipScroll) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  // -------------------- آپدیت استوری‌ها --------------------
+  // آپدیت استوری‌ها
   renderStoriesForPage(pageItems);
 }
 
