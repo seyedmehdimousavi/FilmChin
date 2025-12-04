@@ -689,6 +689,58 @@ function makeMovieSlug(title) {
   );
 }
 
+function buildTelegramBotUrlFromChannelLink(rawLink) {
+  const trimmed = (rawLink || "").trim();
+  if (!trimmed || trimmed === "#") return trimmed;
+
+  // اگر لینک همین حالا لینک بات است
+  if (/^https?:\/\/t\.me\/Filmchinbot\?start=/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  // اگر payload مستقیم باشد
+  if (/^forward_[0-9A-Za-z]+_[0-9]+$/i.test(trimmed)) {
+    return `https://t.me/Filmchinbot?start=${trimmed}`;
+  }
+
+  let url;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    return trimmed;
+  }
+
+  const host = url.hostname.toLowerCase();
+  if (host !== "t.me" && host !== "telegram.me") {
+    return trimmed;
+  }
+
+  const parts = url.pathname.split("/").filter(Boolean);
+
+  // ۱) لینک کانال خصوصی (ساختار /c/internal/message)
+  if (parts.length >= 3 && parts[0] === "c") {
+    const internalId = parts[1];
+    const messageId = parts[2];
+
+    if (/^[0-9]+$/.test(internalId) && /^[0-9]+$/.test(messageId)) {
+      return `https://t.me/Filmchinbot?start=forward_${internalId}_${messageId}`;
+    }
+  }
+
+  // ۲) لینک گروه عمومی با username و messageId
+  if (parts.length === 2) {
+    const username = parts[0];
+    const messageId = parts[1];
+
+    if (/^[A-Za-z0-9_]+$/.test(username) && /^[0-9]+$/.test(messageId)) {
+      return `https://t.me/Filmchinbot?start=forward_${username}_${messageId}`;
+    }
+  }
+
+  return trimmed;
+}
+
+
 function initials(name) {
   if (!name) return "U";
   const parts = name.trim().split(/\s+/);
@@ -2807,45 +2859,49 @@ document.addEventListener("DOMContentLoaded", () => {
       openPostOptions(m);
     });
 
-    // ===================== رفتار دکمه Go to file =====================
-    const goBtn = card.querySelector(".go-btn");
-    goBtn?.addEventListener("click", async () => {
-      const link = goBtn.dataset.link || "#";
+// ===================== رفتار دکمه Go to file (اتصال به بات تلگرام) =====================
+      const goBtn = card.querySelector(".go-btn");
+      goBtn?.addEventListener("click", async () => {
+        const rawLink = goBtn.dataset.link || "#";
 
-      try {
-        const movieId = m.id;
-        const epActiveEl = card.querySelector(
-          ".episodes-list .episode-card.active"
-        );
-        const epIndex = epActiveEl
-          ? Array.from(epActiveEl.parentElement.children).indexOf(epActiveEl)
-          : null;
+        // تبدیل لینک کانال خصوصی به لینک بات Filmchinbot
+        const finalLink = buildTelegramBotUrlFromChannelLink(rawLink);
 
-        const activeTitle = (() => {
-          if (epActiveEl) {
-            const titleEl = epActiveEl.querySelector(".episode-title span");
-            return titleEl ? titleEl.textContent : m.title;
-          }
-          return m.title;
-        })();
+        try {
+          const movieId = m.id;
+          const epActiveEl = card.querySelector(
+            ".episodes-list .episode-card.active"
+          );
+          const epIndex = epActiveEl
+            ? Array.from(epActiveEl.parentElement.children).indexOf(epActiveEl)
+            : null;
 
-        await supabase.from("click_logs").insert([
-          {
-            movie_id: movieId,
-            episode_index: epIndex,
-            link,
-            title: activeTitle,
-          },
-        ]);
-      } catch (err) {
-        console.error("click log error:", err);
-      }
+          const activeTitle = (() => {
+            if (epActiveEl) {
+              const titleEl = epActiveEl.querySelector(".episode-title span");
+              return titleEl ? titleEl.textContent : m.title;
+            }
+            return m.title;
+          })();
 
-      if (link && link !== "#") {
-        window.open(link, "_blank");
-      }
-    });
+          // در لاگ می‌توانی finalLink یا rawLink را ذخیره کنی؛ من finalLink را ذخیره کردم که دقیقاً همان لینکی است که کاربر باز می‌کند
+          await supabase.from("click_logs").insert([
+            {
+              movie_id: movieId,
+              episode_index: epIndex,
+              link: finalLink,
+              title: activeTitle,
+            },
+          ]);
+        } catch (err) {
+          console.error("click log error:", err);
+        }
 
+        if (finalLink && finalLink !== "#") {
+          window.open(finalLink, "_blank");
+        }
+      });
+      
     // ===================== اتصال کامنت‌ها =====================
     attachCommentsHandlers(card, m.id);
 
