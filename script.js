@@ -698,42 +698,34 @@ function buildTelegramBotUrlFromChannelLink(rawLink) {
     return trimmed;
   }
 
-  // اگر payload مستقیم باشد
-  if (/^forward_[0-9A-Za-z]+_[0-9]+$/i.test(trimmed)) {
-    return `https://t.me/Filmchinbot?start=${trimmed}`;
-  }
-
-  let url;
-  try {
-    url = new URL(trimmed);
-  } catch {
-    return trimmed;
-  }
-
-  const host = url.hostname.toLowerCase();
-  if (host !== "t.me" && host !== "telegram.me") {
-    return trimmed;
-  }
-
-  const parts = url.pathname.split("/").filter(Boolean);
-
-  // ۱) لینک کانال خصوصی (ساختار /c/internal/message)
-  if (parts.length >= 3 && parts[0] === "c") {
+  // 1) لینک‌های کانال خصوصی /c/<internal>/<msg>
+  if (/t\.me\/c\/\d+\/\d+/i.test(trimmed)) {
+    const url = new URL(trimmed);
+    const parts = url.pathname.split("/").filter(Boolean);
     const internalId = parts[1];
     const messageId = parts[2];
 
-    if (/^[0-9]+$/.test(internalId) && /^[0-9]+$/.test(messageId)) {
-      return `https://t.me/Filmchinbot?start=forward_${internalId}_${messageId}`;
-    }
+    return `https://t.me/Filmchinbot?start=forward_${internalId}_${messageId}`;
   }
 
-  // ۲) لینک گروه عمومی با username و messageId
-  if (parts.length === 2) {
-    const username = parts[0];
-    const messageId = parts[1];
+  // 2) لینک‌های Group Topic
+  // ساختار: https://t.me/<username>/<topic>/<message>
+  if (/t\.me\/[^\/]+\/\d+\/\d+$/i.test(trimmed)) {
+    try {
+      const url = new URL(trimmed);
+      const parts = url.pathname.split("/").filter(Boolean);
 
-    if (/^[A-Za-z0-9_]+$/.test(username) && /^[0-9]+$/.test(messageId)) {
-      return `https://t.me/Filmchinbot?start=forward_${username}_${messageId}`;
+      const topicId = parts[1];
+      const messageId = parts[2];
+
+      // chat_id واقعی گروه → همین مقدار
+      const REAL_GROUP_CHAT_ID = "-1002862708703";
+
+      const payload = `forwardGroup_${REAL_GROUP_CHAT_ID}_${topicId}_${messageId}`;
+
+      return `https://t.me/Filmchinbot?start=${payload}`;
+    } catch {
+      return trimmed;
     }
   }
 
