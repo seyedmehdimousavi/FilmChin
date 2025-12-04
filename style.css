@@ -1432,7 +1432,7 @@ body.dark .movie-title {
 .released_movies,
 #social-links-section,
 .admin-search-wrapper {
-  background: rgba(0, 74, 124, 0.06);
+  background: var(--post-day);
   border-radius: 10px;
   padding: 5px;
   margin-bottom: 15px;
@@ -5408,6 +5408,8 @@ body.dark .tabs-container .tab-link {
   border: 1px solid #ffffff;
 }
 .tabs-container .tab-link.active {
+  background: #017ada;
+  transition: all 1.5s;
   color: #fff;
 }
 
@@ -5440,7 +5442,7 @@ body.dark .tabs-container .tab-link {
   background: #017ada;
   transition: all 0.3s cubic-bezier(0.25, 1, 0.3, 1);
   z-index: 1;
-  opacity: 0.9;
+  opacity: 1;
 }
 
 .tabs-container .tab-link.active.count {
