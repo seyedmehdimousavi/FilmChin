@@ -309,23 +309,28 @@ Body.dark .side-menu {
   font-size: 0.95rem;
 }
 
-body.dark-mode .seo-intro {
+body.dark .seo-intro {
   background: rgba(255, 255, 255, 0.03);
 }
 
 .seo-intro h1 {
+  direction: rtl;
   font-size: 1.25rem;
   margin: 0 0 8px 0;
   font-weight: 700;
+  text-align: center;
 }
 
 .seo-intro p {
   margin: 4px 0;
+  direction: rtl;
+  text-align: justify;
 }
 
 .seo-features-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   margin-top: 10px;
   padding: 6px 14px;
@@ -354,7 +359,6 @@ body.dark-mode .seo-intro {
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 16px;
 }
-
 
 /* movie card */
 .movie-card {
@@ -404,17 +408,11 @@ Body.dark .field-label {
 
 /* quote style */
 .field-quote {
-  background: linear-gradient(
-    90deg,
-    hsla(204, 77%, 44%, 0.1) 0%,
-    hsla(204, 100%, 24%, 0.06) 100%
-  );
-  border: 1px solid rgba(0, 74, 124, 0.05);
+  background: rgba(0, 74, 124, 0.06);
   border-left: 4px solid rgba(33, 133, 213, 0.9);
   border-radius: 6px;
   margin-bottom: 6px;
   color: #263345;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.09);
   padding: 6px 3px;
 }
 Body.dark .field-quote {
@@ -705,7 +703,9 @@ Body.dark .admin-header {
   padding: 12px;
   border-radius: 10px;
   border: 0;
-  background: #f9f9f9;
+  /* background: #f9f9f9; */
+  background: var(--bg-day);
+  color: var(--btn-day);
 }
 Body.dark #adminProfile input,
 Body.dark #adminProfile textarea {
@@ -1442,11 +1442,12 @@ Body.dark .social-item {
 }
 .movie-title {
   font-family: "IRANSans", "ProductSans2", sans-serif;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); */
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: rgba(0, 74, 124, 0.06);
+  /* background: rgba(0, 74, 124, 0.06); */
   flex: 1;
   width: 100%;
   font-weight: bold;
@@ -3685,26 +3686,26 @@ Body.dark .carousel-bg::after {
   );
 }
 /* حالت شب برای مودال */
-body.dark-mode .movie-modal-content {
+body.dark .movie-modal-content {
   background: #1e1e1e;
   color: #f0f0f0;
 }
 
-body.dark-mode .movie-modal-content .field-label {
+body.dark .movie-modal-content .field-label {
   color: #ccc;
 }
 
-body.dark-mode .movie-modal-content .go-btn {
+body.dark .movie-modal-content .go-btn {
   background: #3498db;
   color: #fff;
 }
 
-body.dark-mode .movie-modal-content .close-btn {
+body.dark .movie-modal-content .close-btn {
   background: #e74c3c;
   color: #fff;
 }
 
-body.dark-mode .movie-modal-content .close-btn:hover {
+body.dark .movie-modal-content .close-btn:hover {
   background: #c0392b;
 }
 
@@ -5832,42 +5833,45 @@ body.dark .search-highlight {
   backdrop-filter: blur(6px);
 }
 
-body.dark-mode .site-features {
-  background: rgba(255, 255, 255, 0.03);
-}
-
 .site-features h2 {
   font-size: 1.15rem;
   margin: 0 0 12px 0;
   font-weight: 700;
+  text-align: center;
+  direction: rtl;
 }
 
 /* آکاردئون امکانات */
 .feature-accordion {
   border-radius: 14px;
+  display: flex;
+  justify-content: center;
+  padding: 9px;
+  align-items: center;
+  flex-direction: column;
   background: rgba(255, 255, 255, 0.9);
   margin-bottom: 8px;
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
-body.dark-mode .feature-accordion {
-  background: rgba(10, 10, 20, 0.9);
-  border-color: rgba(255, 255, 255, 0.08);
+body.dark .feature-accordion {
+  background: var(--post-night);
 }
 
 .feature-accordion-header {
-  width: 100%;
+  width: 90%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
   background: transparent;
   border: none;
   cursor: pointer;
   font-size: 0.95rem;
 }
-
+.feature-accordion-header span {
+  padding: 5px 10px;
+}
 /* برای دسترسی‌پذیری */
 .feature-accordion-header:focus-visible {
   outline: 2px solid rgba(88, 86, 214, 0.85);
@@ -5890,9 +5894,11 @@ body.dark-mode .feature-accordion {
   font-size: 0.88rem;
   line-height: 1.7;
   padding: 0 12px 0;
+  text-align: justify;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.25s ease, padding-bottom 0.25s ease;
+  direction: rtl;
 }
 
 .feature-accordion.open .feature-accordion-body {
