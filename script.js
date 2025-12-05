@@ -693,44 +693,70 @@ function buildTelegramBotUrlFromChannelLink(rawLink) {
   const trimmed = (rawLink || "").trim();
   if (!trimmed || trimmed === "#") return trimmed;
 
-  // اگر لینک همین حالا لینک بات است
+  // اگر همین حالا لینک بات باشد
   if (/^https?:\/\/t\.me\/Filmchinbot\?start=/i.test(trimmed)) {
     return trimmed;
   }
 
-  // 1) لینک‌های کانال خصوصی /c/<internal>/<msg>
-  if (/t\.me\/c\/\d+\/\d+/i.test(trimmed)) {
-    const url = new URL(trimmed);
-    const parts = url.pathname.split("/").filter(Boolean);
+  let url;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    return trimmed;
+  }
+
+  const host = url.hostname.toLowerCase();
+  if (host !== "t.me" && host !== "telegram.me") {
+    return trimmed; // لینک تلگرامی نیست
+  }
+
+  const parts = url.pathname.split("/").filter(Boolean);
+  if (parts.length === 0) return trimmed;
+
+  // -------------------------------------------------------
+  // 1) کانال خصوصی: /c/2195618604/403
+  // -------------------------------------------------------
+  if (parts[0] === "c" && parts.length >= 3) {
     const internalId = parts[1];
     const messageId = parts[2];
 
-    return `https://t.me/Filmchinbot?start=forward_${internalId}_${messageId}`;
-  }
-
-  // 2) لینک‌های Group Topic
-  // ساختار: https://t.me/<username>/<topic>/<message>
-  if (/t\.me\/[^\/]+\/\d+\/\d+$/i.test(trimmed)) {
-    try {
-      const url = new URL(trimmed);
-      const parts = url.pathname.split("/").filter(Boolean);
-
-      const topicId = parts[1];
-      const messageId = parts[2];
-
-      // chat_id واقعی گروه → همین مقدار
-      const REAL_GROUP_CHAT_ID = "-1002862708703";
-
-      const payload = `forwardGroup_${REAL_GROUP_CHAT_ID}_${topicId}_${messageId}`;
-
+    if (/^[0-9]+$/.test(internalId) && /^[0-9]+$/.test(messageId)) {
+      const payload = `forward_${internalId}_${messageId}`;
       return `https://t.me/Filmchinbot?start=${payload}`;
-    } catch {
-      return trimmed;
     }
   }
 
+  // -------------------------------------------------------
+  // 2) گروه public بدون تاپیک: /username/403
+  // -------------------------------------------------------
+  if (parts.length === 2) {
+    const username = parts[0];
+    const messageId = parts[1];
+
+    if (/^[A-Za-z0-9_]+$/.test(username) && /^[0-9]+$/.test(messageId)) {
+      const payload = `forward_${username}_${messageId}`;
+      return `https://t.me/Filmchinbot?start=${payload}`;
+    }
+  }
+
+  // -------------------------------------------------------
+  // 3) گروه تاپیک‌دار: /username/topicId/messageId
+  // ما topicId را حذف می‌کنیم و فقط messageId را استفاده می‌کنیم
+  // -------------------------------------------------------
+  if (parts.length === 3) {
+    const username = parts[0];
+    const messageId = parts[2]; // بخش آخر همیشه messageId واقعی است
+
+    if (/^[A-Za-z0-9_]+$/.test(username) && /^[0-9]+$/.test(messageId)) {
+      const payload = `forward_${username}_${messageId}`;
+      return `https://t.me/Filmchinbot?start=${payload}`;
+    }
+  }
+
+  // اگر هیچ ساختاری تطابق نداشت → بدون تغییر
   return trimmed;
 }
+
 
 
 function initials(name) {
