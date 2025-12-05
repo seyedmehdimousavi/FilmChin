@@ -756,6 +756,34 @@ function buildTelegramBotUrlFromChannelLink(rawLink) {
   // اگر هیچ ساختاری تطابق نداشت → بدون تغییر
   return trimmed;
 }
+// ===================== GLOBAL: normalize all Go to file links via Telegram bot =====================
+// این لیسنر روی همه دکمه‌های .go-btn در صفحه کار می‌کند (کارت‌ها، مودال‌ها، ...)
+
+document.addEventListener(
+  "click",
+  (e) => {
+    const btn = e.target.closest(".go-btn");
+    if (!btn) return;
+
+    const rawLink =
+      btn.dataset.link ||
+      btn.getAttribute("data-link") ||
+      btn.getAttribute("href") ||
+      "";
+
+    if (!rawLink) return;
+
+    const finalLink = buildTelegramBotUrlFromChannelLink(rawLink);
+
+    if (!finalLink || finalLink === rawLink) return;
+
+    btn.dataset.link = finalLink;
+    if (btn.tagName === "A") {
+      btn.setAttribute("href", finalLink);
+    }
+  },
+  true
+);
 
 
 
