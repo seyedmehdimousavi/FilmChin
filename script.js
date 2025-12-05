@@ -1238,9 +1238,16 @@ function initFeatureAccordions() {
 
   accordions.forEach((acc) => {
     const header = acc.querySelector(".feature-accordion-header");
-    if (!header) return;
+    const body = acc.querySelector(".feature-accordion-body");
 
-    header.addEventListener("click", () => {
+    // اگر ساختار ناقص باشد، رد شو
+    if (!header || !body) return;
+
+    // دسترسی بهتر برای div
+    header.setAttribute("role", "button");
+    header.setAttribute("tabindex", "0");
+
+    const toggleAccordion = () => {
       const isOpen = acc.classList.contains("open");
 
       // بستن همه آکاردئون‌ها
@@ -1248,14 +1255,24 @@ function initFeatureAccordions() {
         other.classList.remove("open");
       });
 
-      // اگر قبلاً بسته بوده، این‌یکی را باز کن
+      // اگر قبلاً بسته بوده، الان باز شود
       if (!isOpen) {
         acc.classList.add("open");
+      }
+    };
+
+    // کلیک با ماوس / لمس
+    header.addEventListener("click", toggleAccordion);
+
+    // پشتیبانی از Enter و Space برای div (جهت دسترسی‌پذیری بهتر)
+    header.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleAccordion();
       }
     });
   });
 }
-
 // Scroll to card
 function scrollToMovie(index) {
   const cards = document.querySelectorAll(".movie-card");

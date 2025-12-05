@@ -5879,6 +5879,8 @@ body.dark .feature-accordion {
 
 .feature-title {
   text-align: right;
+  font-size: 15px;
+  font-weight: bold;
 }
 
 .feature-icon {
