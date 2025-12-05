@@ -1154,6 +1154,108 @@ function renderStoriesForPage(pageItems) {
     .join("");
 }
 
+function updateMoviesSchemaStructuredData(allMovies) {
+  try {
+    const head =
+      document.head || document.getElementsByTagName("head")[0];
+    if (!head) return;
+
+    // اسکریپت‌های قبلی این اسکیما را حذف کن تا تکراری نشود
+    const oldScripts = head.querySelectorAll(
+      'script[data-seo-movies-schema="1"]'
+    );
+    oldScripts.forEach((el) => el.remove());
+
+    if (!Array.isArray(allMovies) || allMovies.length === 0) return;
+
+    // برای جلوگیری از زیاد شدن حجم، مثلا حداکثر 50 فیلم
+    const maxItems = 50;
+    const items = allMovies.slice(0, maxItems);
+
+    const schemaMovies = items
+      .map((m) => {
+        const title = (m.title || m.name || "").trim();
+        const image = (m.cover || "").trim();
+        const description = (m.synopsis || "").trim();
+        const genres = (m.genre || "")
+          .split(" ")
+          .map((g) => g.trim())
+          .filter(Boolean);
+
+        // تلاش برای استخراج سال از release_info (مثلا: 2024، 2023 و ...)
+        let year = "";
+        if (m.release_info) {
+          const match = String(m.release_info).match(/(19|20)\d{2}/);
+          if (match) {
+            year = match[0];
+          }
+        }
+
+        const ratingVal = parseFloat(m.imdb || "");
+        const hasRating = !Number.isNaN(ratingVal) && ratingVal > 0;
+
+        // اگر حتی عنوان نداشته باشد، بی‌خیال این مورد می‌شویم
+        if (!title) return null;
+
+        const baseSchema = {
+          "@context": "https://schema.org",
+          "@type": "Movie",
+          name: title,
+        };
+
+        if (image) baseSchema.image = image;
+        if (description) baseSchema.description = description;
+        if (genres.length) baseSchema.genre = genres;
+        if (year) baseSchema.datePublished = year;
+
+        if (hasRating) {
+          baseSchema.aggregateRating = {
+            "@type": "AggregateRating",
+            ratingValue: ratingVal.toString(),
+          };
+        }
+
+        return baseSchema;
+      })
+      .filter(Boolean);
+
+    if (!schemaMovies.length) return;
+
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.setAttribute("data-seo-movies-schema", "1");
+    script.textContent = JSON.stringify(schemaMovies);
+
+    head.appendChild(script);
+  } catch (err) {
+    console.error("updateMoviesSchemaStructuredData error:", err);
+  }
+}
+
+function initFeatureAccordions() {
+  const accordions = document.querySelectorAll(".feature-accordion");
+  if (!accordions.length) return;
+
+  accordions.forEach((acc) => {
+    const header = acc.querySelector(".feature-accordion-header");
+    if (!header) return;
+
+    header.addEventListener("click", () => {
+      const isOpen = acc.classList.contains("open");
+
+      // بستن همه آکاردئون‌ها
+      accordions.forEach((other) => {
+        other.classList.remove("open");
+      });
+
+      // اگر قبلاً بسته بوده، این‌یکی را باز کن
+      if (!isOpen) {
+        acc.classList.add("open");
+      }
+    });
+  });
+}
+
 // Scroll to card
 function scrollToMovie(index) {
   const cards = document.querySelectorAll(".movie-card");
@@ -3193,23 +3295,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // -------------------- هایلایت نتایج جست‌وجو --------------------
-  applySearchHighlightsInGrid(searchTerm);
+// -------------------- هایلایت نتایج جست‌وجو --------------------
+    applySearchHighlightsInGrid(searchTerm);
 
-  // صفحه‌بندی
-  renderPagination(filtered.length);
+    // صفحه‌بندی
+    renderPagination(filtered.length);
 
-  // ژانرهای بالای صفحه
-  buildTabGenres(filtered);
+    // ژانرهای بالای صفحه
+    buildTabGenres(filtered);
 
-  // اسکرول به بالا
-  if (!skipScroll) {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // اسکرول به بالا
+    if (!skipScroll) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // آپدیت استوری‌ها
+    renderStoriesForPage(pageItems);
+
+    // اسکیما برای فیلم‌ها (Structured Data برای سئو)
+    // از کل لیست فیلترشده استفاده می‌کنیم تا گوگل تصویر بهتری از آرشیو بگیرد
+    updateMoviesSchemaStructuredData(filtered);
   }
-
-  // آپدیت استوری‌ها
-  renderStoriesForPage(pageItems);
-}
+  
 
 // ======================= Close keyboard on Enter (Go) =======================
 searchInput?.addEventListener("keydown", (e) => {
@@ -6958,7 +7065,7 @@ searchInput?.addEventListener("keydown", (e) => {
   if (document.querySelector(".admin-tabs .tab-btn")) {
     initAdminTabs();
   }
-
+  initFeatureAccordions();
   fetchMovies();
   fetchPopularMovies();
   fetchPopularForIndex();

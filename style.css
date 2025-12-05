@@ -297,11 +297,64 @@ Body.dark .side-menu {
   -webkit-background-clip: text;
 }
 
+/* --- SEO intro block --- */
+.seo-intro {
+  max-width: 1100px;
+  margin: 12px auto 24px auto;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.02);
+  backdrop-filter: blur(6px);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+body.dark-mode .seo-intro {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.seo-intro h1 {
+  font-size: 1.25rem;
+  margin: 0 0 8px 0;
+  font-weight: 700;
+}
+
+.seo-intro p {
+  margin: 4px 0;
+}
+
+.seo-features-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  background: var(--gradient-purple-magenta);
+  color: #ffffff;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.seo-features-btn:hover {
+  opacity: 0.95;
+}
+
+.seo-features-icon {
+  font-size: 0.9rem;
+}
+
+/* --- end SEO intro --- */
+
 .movies-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 16px;
 }
+
 
 /* movie card */
 .movie-card {
@@ -5768,3 +5821,83 @@ body.dark .post-option-favorite.favorite-active {
 body.dark .search-highlight {
   background-color: rgba(255, 255, 0, 0.35);
 }
+/* ---- Site features footer ---- */
+
+.site-features {
+  max-width: 1100px;
+  margin: 40px auto 32px;
+  padding: 20px 18px 24px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(6px);
+}
+
+body.dark-mode .site-features {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.site-features h2 {
+  font-size: 1.15rem;
+  margin: 0 0 12px 0;
+  font-weight: 700;
+}
+
+/* آکاردئون امکانات */
+.feature-accordion {
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  margin-bottom: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+body.dark-mode .feature-accordion {
+  background: rgba(10, 10, 20, 0.9);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.feature-accordion-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+/* برای دسترسی‌پذیری */
+.feature-accordion-header:focus-visible {
+  outline: 2px solid rgba(88, 86, 214, 0.85);
+}
+
+.feature-title {
+  text-align: right;
+}
+
+.feature-icon {
+  transition: transform 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.feature-accordion.open .feature-icon {
+  transform: rotate(180deg);
+}
+
+.feature-accordion-body {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  padding: 0 12px 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease, padding-bottom 0.25s ease;
+}
+
+.feature-accordion.open .feature-accordion-body {
+  max-height: 260px; /* کافی برای متن هر گزینه؛ در صورت نیاز عدد را بیشتر کن */
+  padding-bottom: 10px;
+}
+
+/* ---- end site features ---- */
