@@ -3649,8 +3649,6 @@ body.dark .carousel-item button.more-info {
   text-align: center;
   font-size: 14px;
 }
-.movie-modal-content .close-btn span {
-}
 .carousel-bg {
   position: absolute;
   top: 0;
@@ -5465,7 +5463,7 @@ ease;
     font-size: 14px;
     font-weight: 700;
 }
-}
+
 body.dark .tabs-container .tab-link {
   color: #ffffff;
   border: 1px solid #ffffff;
@@ -5865,7 +5863,7 @@ body.dark .search-highlight {
 }
 
 body.dark .feature-accordion {
-  background: var(--post-night);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .feature-accordion-header {
