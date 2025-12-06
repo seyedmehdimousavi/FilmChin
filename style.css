@@ -5465,6 +5465,7 @@ ease;
 }
 
 body.dark .tabs-container .tab-link {
+  background: rgba(255, 255, 255, 0.03);
   color: #ffffff;
   border: 1px solid #ffffff;
 }
