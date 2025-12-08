@@ -5562,7 +5562,12 @@ body.dark .tabs-container .tab-link {
 }
 .tabs-container .tab-link.active {
   background: #017ada;
-  transition: all 1.5s;
+  transition: all .5s;
+  color: #fff;
+}
+body.dark .tabs-container .tab-link.active {
+  background: #017ada;
+  transition: all .5s;
   color: #fff;
 }
 
