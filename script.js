@@ -6032,116 +6032,180 @@ searchInput?.addEventListener("keydown", (e) => {
         showToast("Error updating version");
       }
     });
+  
   // === IMDb Rating Filter (with persistent toast badge) ===
-  const ratingTrack = document.getElementById("ratingTrack");
-  const ratingFill = document.getElementById("ratingFill");
-  const ratingKnob = document.getElementById("ratingKnob");
-  const ratingBubbleValue = document.getElementById("ratingBubbleValue");
-  const applyRatingFilterBtn = document.getElementById("applyRatingFilter");
-  const activeFiltersContainer = document.getElementById("activeFilters");
+const ratingTrack = document.getElementById("ratingTrack");
+const ratingFill = document.getElementById("ratingFill");
+const ratingKnob = document.getElementById("ratingKnob");
+const ratingBubbleValue = document.getElementById("ratingBubbleValue");
+const applyRatingFilterBtn = document.getElementById("applyRatingFilter");
+const activeFiltersContainer = document.getElementById("activeFilters");
+// نکته: imdbMinRating در بالای فایل به صورت global تعریف شده
+// let imdbMinRating = null;  // اینجا دیگر تعریفش نکن
 
-  let imdbMinRating = null;
+function setSliderPercent(pct) {
+  if (!ratingFill || !ratingKnob) return;
+  const clamped = Math.max(0, Math.min(100, pct));
+  ratingFill.style.width = clamped + "%";
+  ratingKnob.style.left = clamped + "%";
+  const value = (clamped / 10).toFixed(1); // 0..100 => 0.0..10.0
+  ratingKnob.setAttribute("aria-valuenow", value);
+  if (ratingBubbleValue) ratingBubbleValue.textContent = value;
+  return parseFloat(value);
+}
 
-  function setSliderPercent(pct) {
-    const clamped = Math.max(0, Math.min(100, pct));
-    ratingFill.style.width = clamped + "%";
-    ratingKnob.style.left = clamped + "%";
-    const value = (clamped / 10).toFixed(1); // 0..100 => 0.0..10.0
-    ratingKnob.setAttribute("aria-valuenow", value);
-    if (ratingBubbleValue) ratingBubbleValue.textContent = value;
-    return parseFloat(value);
-  }
+// منطق drag روی knob
+if (ratingTrack && ratingKnob && ratingFill && ratingBubbleValue) {
+  const trackRect = () => ratingTrack.getBoundingClientRect();
 
-  // Knob drag logic
-  if (ratingTrack && ratingKnob && ratingFill && ratingBubbleValue) {
-    const trackRect = () => ratingTrack.getBoundingClientRect();
+  const onMove = (clientX) => {
+    const rect = trackRect();
+    const x = Math.max(rect.left, Math.min(clientX, rect.right));
+    const pct = ((x - rect.left) / rect.width) * 100;
+    setSliderPercent(pct);
+  };
 
-    const onMove = (clientX) => {
-      const rect = trackRect();
-      const x = Math.max(rect.left, Math.min(clientX, rect.right));
-      const pct = ((x - rect.left) / rect.width) * 100;
-      setSliderPercent(pct);
-    };
+  let dragging = false;
 
-    let dragging = false;
+  ratingKnob.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    dragging = true;
+    ratingKnob.classList.add("dragging");
+  });
 
-    ratingKnob.addEventListener("mousedown", (e) => {
-      e.preventDefault();
+  document.addEventListener("mousemove", (e) => {
+    if (dragging) onMove(e.clientX);
+  });
+
+  document.addEventListener("mouseup", () => {
+    if (dragging) {
+      dragging = false;
+      ratingKnob.classList.remove("dragging");
+    }
+  });
+
+  ratingKnob.addEventListener(
+    "touchstart",
+    (e) => {
       dragging = true;
       ratingKnob.classList.add("dragging");
-    });
-    document.addEventListener("mousemove", (e) => {
-      if (dragging) onMove(e.clientX);
-    });
-    document.addEventListener("mouseup", () => {
+    },
+    { passive: true }
+  );
+
+  document.addEventListener(
+    "touchmove",
+    (e) => {
+      if (!dragging) return;
+      const touch = e.touches[0];
+      if (touch) onMove(touch.clientX);
+    },
+    { passive: true }
+  );
+
+  document.addEventListener(
+    "touchend",
+    () => {
       if (dragging) {
         dragging = false;
         ratingKnob.classList.remove("dragging");
       }
-    });
+    },
+    { passive: true }
+  );
 
-    ratingKnob.addEventListener(
-      "touchstart",
-      () => {
-        dragging = true;
-        ratingKnob.classList.add("dragging");
-      },
-      { passive: true }
-    );
-    document.addEventListener(
-      "touchmove",
-      (e) => {
-        if (dragging) {
-          const touch = e.touches[0];
-          onMove(touch.clientX);
-        }
-      },
-      { passive: true }
-    );
-    document.addEventListener("touchend", () => {
-      if (dragging) {
-        dragging = false;
-        ratingKnob.classList.remove("dragging");
-      }
-    });
+  // حالت اولیه
+  setSliderPercent(0);
+}
 
-    ratingTrack.addEventListener("click", (e) => {
-      onMove(e.clientX);
-    });
+/**
+ * فقط badge مربوط به IMDb را آپدیت می‌کند
+ * - اگر imdbMinRating == null باشد، فقط همان badge را حذف می‌کند.
+ * - دیگر badgeها (مثل Year) دست‌نخورده می‌مانند.
+ */
+function updateImdbBadge() {
+  if (!activeFiltersContainer) return;
 
-    setSliderPercent(0);
+  // badge فعلی IMDb (اگر وجود داشته باشد)
+  let badge = activeFiltersContainer.querySelector('[data-filter="imdb"]');
+
+  // اگر فیلتر غیرفعال است، فقط badge خودش را حذف کن و برگرد
+  if (imdbMinRating == null) {
+    if (badge) badge.remove();
+    return;
   }
 
-  // دکمه اعمال فیلتر
-  if (applyRatingFilterBtn) {
-    applyRatingFilterBtn.addEventListener("click", () => {
-      const val = parseFloat(ratingBubbleValue.textContent || "0");
-      imdbMinRating = val > 0 ? val : null;
-      renderPagedMovies();
+  // اگر badge وجود ندارد، بساز
+  if (!badge) {
+    badge = document.createElement("div");
+    badge.className = "filter-badge";
+    badge.dataset.filter = "imdb";
 
-      if (imdbMinRating !== null) {
-        activeFiltersContainer.innerHTML = `
-    <div class="filter-badge">
-      امتیاز ≥ ${imdbMinRating.toFixed(1)}
-      <div class="button-wrap"><button id="btnClearRatingFilter" aria-label="Remove rating filter"><span>×</span></button><div class="button-shadow"></div></div>
-    </div>
-  `;
-        document
-          .getElementById("btnClearRatingFilter")
-          .addEventListener("click", clearRatingFilter, { once: true });
-      } else {
-        activeFiltersContainer.innerHTML = "";
-      }
-    });
+    const label = document.createElement("span");
+    label.className = "filter-label";
+    badge.appendChild(label);
+
+    const btnWrap = document.createElement("div");
+    btnWrap.className = "button-wrap";
+
+    const btn = document.createElement("button");
+    btn.id = "btnClearRatingFilter";
+    btn.type = "button";
+    btn.innerHTML = "<span>×</span>";
+    btn.addEventListener("click", clearRatingFilter);
+
+    const shadow = document.createElement("div");
+    shadow.className = "button-shadow";
+
+    btnWrap.appendChild(btn);
+    btnWrap.appendChild(shadow);
+    badge.appendChild(btnWrap);
+  } else if (badge.parentNode === activeFiltersContainer) {
+    // قبل از insert دوباره، حذفش کن تا به بالای لیست منتقل شود
+    activeFiltersContainer.removeChild(badge);
   }
 
-  // تابع پاک کردن فیلتر
-  function clearRatingFilter() {
-    imdbMinRating = null;
-    setSliderPercent(0);
-    renderPagedMovies();
-    activeFiltersContainer.innerHTML = "";
+  // متن label را آپدیت کن
+  const labelEl = badge.querySelector(".filter-label");
+  if (labelEl) {
+    labelEl.textContent = `IMDb ≥ ${imdbMinRating.toFixed(1)}`;
   }
+
+  // همیشه badge جدید یا آپدیت‌شده را بالاتر از بقیه قرار بده
+  if (activeFiltersContainer.firstChild) {
+    activeFiltersContainer.insertBefore(badge, activeFiltersContainer.firstChild);
+  } else {
+    activeFiltersContainer.appendChild(badge);
+  }
+}
+
+// کلیک روی دکمه Apply برای فیلتر IMDb
+if (applyRatingFilterBtn) {
+  applyRatingFilterBtn.addEventListener("click", () => {
+    const val = parseFloat(ratingBubbleValue?.textContent || "0");
+    imdbMinRating = val > 0 ? val : null;
+
+    // وقتی فیلتر عوض می‌شود، از صفحه ۱ رندر کن
+    currentPage = 1;
+    renderPagedMovies(true);
+
+    // فقط badge IMDb را بساز/آپدیت کن
+    updateImdbBadge();
+  });
+}
+
+// پاک‌کردن فقط فیلتر IMDb (بدون دست زدن به Year)
+function clearRatingFilter() {
+  imdbMinRating = null;
+  setSliderPercent(0);
+
+  currentPage = 1;
+  renderPagedMovies(true);
+
+  // فقط badge خودش را حذف کند
+  updateImdbBadge();
+}
+
 
   // ===== Chat to Admin =====
 
@@ -7204,42 +7268,28 @@ searchInput?.addEventListener("keydown", (e) => {
     if (!img.loading) img.loading = "lazy";
   });
 
+
 // ==============================
-//  YEAR FILTER (Release date)
+//  YEAR FILTER (Release Date)
 // ==============================
 (function () {
   const maxYear = new Date().getFullYear();
-  let currentYear = maxYear - 10; // سال پایهٔ اولیه (می‌توانی هر عددی خواستی بگذاری)
+  let currentYear = maxYear - 10;
   let isDragging = false;
   let dragStartY = 0;
   let accumulatedDelta = 0;
-  const STEP_PX = 26; // هر ~۲۶ پیکسل یک سال جابه‌جا شود
+  const STEP_PX = 26;
 
   const spinner = document.getElementById("yearSpinner");
   const topEl = document.getElementById("yearSpinnerTop");
   const centerEl = document.getElementById("yearSpinnerCenter");
   const bottomEl = document.getElementById("yearSpinnerBottom");
   const applyBtn = document.getElementById("applyYearFilter");
-  const activeFiltersEl = document.getElementById("activeFilters");
 
-  if (!spinner || !topEl || !centerEl || !bottomEl || !applyBtn) {
-    // اگر سایدمنو هنوز رندر نشده، کاری نکن
-    return;
-  }
+  if (!spinner || !topEl || !centerEl || !bottomEl || !applyBtn) return;
 
-  // ===== ذخیره ترتیب اولیه کارت‌ها برای Reset =====
   let originalCardsOrder = null;
-  let yearFilterActive = false;
-  let lastAppliedYear = null;
 
-  function captureOriginalOrder() {
-    if (originalCardsOrder) return;
-    const cards = Array.from(document.querySelectorAll(".movie-card"));
-    if (!cards.length) return;
-    originalCardsOrder = cards.slice();
-  }
-
-  // ===== به‌روزرسانی UI اسپینر =====
   function clampYear(y) {
     return y > maxYear ? maxYear : y;
   }
@@ -7247,32 +7297,17 @@ searchInput?.addEventListener("keydown", (e) => {
   function updateSpinnerUI() {
     currentYear = clampYear(currentYear);
 
-    const maxYear = new Date().getFullYear();
-    const next = currentYear - 1; // پایین همیشه سال قبلی
-    let prev = "";
+    const next = currentYear - 1;
+    const prev = currentYear < maxYear ? currentYear + 1 : "";
 
-    // اگر هنوز به آخرین سال نرسیده‌ایم، بالای مستطیل = سال بعد
-    if (currentYear < maxYear) {
-      prev = currentYear + 1;
-    } else {
-      // اگر در آخرین سال (مثلاً ۲۰۲۵) هستیم، بالا خالی باشد
-      prev = "";
-    }
-
-    topEl.innerText = prev === "" ? "" : String(prev);
+    topEl.innerText = prev;
     centerEl.innerText = currentYear;
-    bottomEl.innerText = String(next);
+    bottomEl.innerText = next;
   }
-  
 
-  function changeYear(direction) {
-    if (direction === "up") {
-      if (currentYear < maxYear) {
-        currentYear++;
-      }
-    } else if (direction === "down") {
-      currentYear--;
-    }
+  function changeYear(dir) {
+    if (dir === "up" && currentYear < maxYear) currentYear++;
+    else if (dir === "down") currentYear--;
     updateSpinnerUI();
   }
 
@@ -7288,14 +7323,12 @@ searchInput?.addEventListener("keydown", (e) => {
     }
   }
 
-  // ===== رویدادهای mouse wheel =====
   spinner.addEventListener("wheel", (e) => {
-  e.preventDefault();
-  e.stopPropagation();  // جلوگیری از اسکرول صفحه
-  handleDelta(e.deltaY);
-}, { passive: false });
+    e.preventDefault();
+    e.stopPropagation();
+    handleDelta(e.deltaY);
+  }, { passive: false });
 
-  // ===== رویدادهای drag با ماوس =====
   spinner.addEventListener("mousedown", (e) => {
     e.preventDefault();
     isDragging = true;
@@ -7314,83 +7347,73 @@ searchInput?.addEventListener("keydown", (e) => {
     accumulatedDelta = 0;
   });
 
-  // ===== رویدادهای touch (موبایل) =====
-spinner.addEventListener("touchstart", (e) => {
-  e.stopPropagation();
-  isDragging = true;
-  dragStartY = e.touches[0].clientY;
-}, { passive: false });
+  spinner.addEventListener("touchstart", (e) => {
+    e.stopPropagation();
+    isDragging = true;
+    dragStartY = e.touches[0].clientY;
+  }, { passive: false });
 
-spinner.addEventListener("touchmove", (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-  if (!e.touches.length) return;
-  const dy = e.touches[0].clientY - dragStartY;
-  dragStartY = e.touches[0].clientY;
-  handleDelta(dy);
-}, { passive: false });
+  spinner.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!e.touches.length) return;
+    const dy = e.touches[0].clientY - dragStartY;
+    dragStartY = e.touches[0].clientY;
+    handleDelta(dy);
+  }, { passive: false });
 
-spinner.addEventListener("touchend", (e) => {
-  e.stopPropagation();
-  isDragging = false;
-  accumulatedDelta = 0;
-});
-  // ===== تابع کمکی: پارس کردن تاریخ از کارت =====
-  function parseReleaseFromCard(card) {
-    const text = card.innerText || "";
-    const info = parseReleaseFromString(text);
-    if (!info) return null;
-    card.dataset.releaseYear = info.year;
-    card.dataset.releaseTs = info.ts;
-    return info;
-  }
-  
-// ========== ACTIVE FILTERS BADGE SYSTEM ==========
-function ensureActiveFiltersContainer() {
-  let container = document.getElementById("activeFilters");
-  if (!container) {
-    container = document.createElement("div");
-    container.id = "activeFilters";
-    container.className = "active-filters-toast";
-    document.body.appendChild(container);
-  }
-  return container;
-}
+  spinner.addEventListener("touchend", () => {
+    isDragging = false;
+    accumulatedDelta = 0;
+  });
 
-function updateYearFilterBadge() {
-  const container = ensureActiveFiltersContainer();
-  let badge = container.querySelector('[data-filter="year"]');
-
-  if (!badge) {
-    badge = document.createElement("div");
-    badge.className = "filter-badge";
-    badge.dataset.filter = "year";
-
-    const label = document.createElement("span");
-    label.className = "filter-label";
-    label.innerText = "Year filter active";
-    badge.appendChild(label);
-
-    const closeBtn = document.createElement("button");
-    closeBtn.innerText = "×";
-    closeBtn.addEventListener("click", (e) => {
-  e.stopPropagation();   // جلوگیری از bubbling
-  yearMinFilter = null;
-  removeYearFilterBadge();
-  currentPage = 1;
-  renderPagedMovies(true);
-});
-    badge.appendChild(closeBtn);
-
-    container.appendChild(badge);
+  // ===== BADGE SYSTEM =====
+  function ensureActiveFiltersContainer() {
+    let container = document.getElementById("activeFilters");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "activeFilters";
+      container.className = "active-filters-toast";
+      document.body.appendChild(container);
+    }
+    return container;
   }
 
-  const label = badge.querySelector(".filter-label");
-  if (label && typeof yearMinFilter === "number") {
+  function updateYearFilterBadge() {
+    const container = ensureActiveFiltersContainer();
+    let badge = container.querySelector('[data-filter="year"]');
+
+    if (!badge) {
+      badge = document.createElement("div");
+      badge.className = "filter-badge";
+      badge.dataset.filter = "year";
+
+      const label = document.createElement("span");
+      label.className = "filter-label";
+      badge.appendChild(label);
+
+      const closeBtn = document.createElement("button");
+      closeBtn.type = "button";
+      closeBtn.innerText = "×";
+      closeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        yearMinFilter = null;
+        removeYearFilterBadge();
+        currentPage = 1;
+        renderPagedMovies(true);
+      });
+      badge.appendChild(closeBtn);
+    } else {
+      container.removeChild(badge);
+    }
+
+    container.insertBefore(badge, container.firstChild);
+
+    const label = badge.querySelector(".filter-label");
     label.innerText = `Year ≥ ${yearMinFilter}`;
   }
-}
-function updateImdbFilterBadge() {
+
+  function updateImdbFilterBadge() {
   const container = ensureActiveFiltersContainer();
   let badge = container.querySelector('[data-filter="imdb"]');
 
@@ -7404,127 +7427,68 @@ function updateImdbFilterBadge() {
     badge.appendChild(label);
 
     const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
     closeBtn.innerText = "×";
+
     closeBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       imdbMinRating = null;
-      removeImdbFilterBadge();
+      removeImdbFilterBadge(container);
       currentPage = 1;
       renderPagedMovies(true);
     });
 
     badge.appendChild(closeBtn);
-    container.appendChild(badge);
+  } else {
+    // remove قبل از insert تا بالا جابه‌جا شود
+    container.removeChild(badge);
   }
+
+  // IMDb همیشه بالای لیست قرار می‌گیرد
+  container.insertBefore(badge, container.firstChild);
 
   const label = badge.querySelector(".filter-label");
-  if (label) {
-    label.innerText = `IMDb ≥ ${imdbMinRating}`;
-  }
+  label.innerText = `IMDb ≥ ${imdbMinRating}`;
 }
 
-function removeImdbFilterBadge() {
-  const container = document.getElementById("activeFilters");
-  if (!container) return;
+function removeImdbFilterBadge(container = null) {
+  container = container || ensureActiveFiltersContainer();
   const badge = container.querySelector('[data-filter="imdb"]');
   if (badge) badge.remove();
 }
-function removeYearFilterBadge() {
-  const container = document.getElementById("activeFilters");
-  if (!container) return;
-  const badge = container.querySelector('[data-filter="year"]');
-  if (badge) badge.remove();
-}
 
+  function removeYearFilterBadge() {
+    const el = document.querySelector('[data-filter="year"]');
+    if (el) el.remove();
+  }
 
-  // ===== مرتب‌سازی و اعمال فیلتر سال =====
-  function applyYearFilter() {
-  const selectedYear = parseInt(centerEl.innerText, 10);
-  if (!selectedYear || isNaN(selectedYear)) return;
-
-  yearMinFilter = selectedYear;
-  lastFilterPriority = "year";
-
-  updateYearFilterBadge();   // اکنون این تابع تعریف شده و خطا نمی‌دهد
-
-  currentPage = 1;
-  renderPagedMovies(true);   // مرتب‌سازی درست روی کل movies (نه فقط DOM)
-}
   
 
-  // ===== Reset فیلتر سال (برگرداندن ترتیب اولیه) =====
-  function resetYearFilter() {
-    const currentCenter = parseInt(centerEl.innerText, 10);
-    currentYear = clampYear(currentCenter);
-    updateSpinnerUI();
+  // ===== APPLY YEAR FILTER =====
+  function applyYearFilter() {
+    const y = parseInt(centerEl.innerText, 10);
+    if (!y || isNaN(y)) return;
 
-    // پاک کردن state گلوبال فیلتر سال
-    yearMinFilter = null;
+    yearMinFilter = y;
 
-    removeYearFilterBadge();
+    updateYearFilterBadge();
 
-    // برگرداندن لیست به حالت نرمال با توجه به بقیه فیلترها (IMDb، ژانر، سرچ و ...)
     currentPage = 1;
     renderPagedMovies(true);
   }
-  
 
-  // ===== Active Filters Toast (فقط برای سال) =====
-  function ensureActiveFiltersContainer() {
-    if (activeFiltersEl) return activeFiltersEl;
-    const div = document.createElement("div");
-    div.id = "activeFilters";
-    div.className = "active-filters-toast";
-    document.body.appendChild(div);
-    return div;
+  function resetYearFilter() {
+    yearMinFilter = null;
+    removeYearFilterBadge();
+    currentPage = 1;
+    renderPagedMovies(true);
   }
 
-  function showYearFilterBadge(year) {
-    const container = ensureActiveFiltersContainer();
-
-    let badge = container.querySelector('[data-filter-type="year"]');
-    if (!badge) {
-      badge = document.createElement("div");
-      badge.className = "filter-badge";
-      badge.dataset.filterType = "year";
-
-      const labelSpan = document.createElement("span");
-      labelSpan.className = "filter-label";
-      badge.appendChild(labelSpan);
-
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.innerText = "×";
-      btn.addEventListener("click", () => {
-        resetYearFilter();
-      });
-
-      badge.appendChild(btn);
-      container.appendChild(badge);
-    }
-
-    const label = badge.querySelector(".filter-label");
-    if (label) {
-      label.textContent = `Year ≥ ${year}`;
-    }
-  }
-
-  function removeYearFilterBadge() {
-    const container = document.getElementById("activeFilters");
-    if (!container) return;
-    const badge = container.querySelector('[data-filter-type="year"]');
-    if (badge) {
-      container.removeChild(badge);
-    }
-  }
-
-  // ===== بایند دکمه Apply =====
   applyBtn.addEventListener("click", (e) => {
     e.preventDefault();
     applyYearFilter();
   });
 
-  // ===== مقدار اولیه اسپینر =====
   updateSpinnerUI();
 })();
 
