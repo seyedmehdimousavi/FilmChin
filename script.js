@@ -41,7 +41,9 @@ const PAGE_SIZE = 10;
 let currentPage = 1;
 let episodesByMovie = new Map();
 let imdbMinRating = null;
-
+// ===== Year filter global state =====
+let yearMinFilter = null;      // حداقل سالی که از اسپینر انتخاب شده
+let lastFilterPriority = null; // "year" یا "imdb"
 // ✅ Favorites state
 const FAVORITES_PAGE_SIZE = 6;
 let favoriteMovieIds = new Set();
@@ -2350,8 +2352,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const val = parseFloat(e.target.value).toFixed(1);
         imdbValueBubble.textContent = `Rating > ${val}`;
         imdbMinRating = parseFloat(val);
+lastFilterPriority = "imdb";
+updateImdbFilterBadge();
+
+currentPage = 1;
+renderPagedMovies(true);
+
+        // این فیلتر آخرین فیلتر فعال شده است
+        lastFilterPriority = "imdb";
+
+        // با هر تغییر ریتینگ از صفحه اول رندر شود
+        currentPage = 1;
+        renderPagedMovies(true);
       });
     }
+    
 
     // وقتی کاربر سرچ رو نهایی کرد (خروج از فیلد)
     searchInput.addEventListener("change", async (e) => {
@@ -2814,15 +2829,14 @@ document.addEventListener("DOMContentLoaded", () => {
       return t === currentTypeFilter;
     });
   }
-
-  // 3. فیلتر ژانر
+// 3. فیلتر ژانر
   if (currentTabGenre) {
     filtered = filtered.filter((m) => {
       return (m.genre || "").split(" ").includes(currentTabGenre);
     });
   }
 
-  // فیلتر IMDb
+  // 4. فیلتر IMDb
   if (imdbMinRating !== null) {
     filtered = filtered.filter((m) => {
       const val = parseFloat(m.imdb || "0");
@@ -2830,14 +2844,64 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (imdbMinRating !== null) {
+  // 5. فیلتر سال انتشار (Year >= yearMinFilter)
+  if (typeof yearMinFilter === "number") {
     filtered = filtered.filter((m) => {
-      const val = parseFloat(m.imdb || "0");
-      return val >= imdbMinRating;
+      const info = parseReleaseFromString(m.release_info || m.release || "");
+      if (!info) return false;
+      return info.year >= yearMinFilter;
+    });
+  }
+
+  // 6. سورت نهایی بر اساس اولویت آخرین فیلتر
+  if (imdbMinRating !== null || typeof yearMinFilter === "number") {
+    filtered = filtered.slice(); // کپی برای سورت امن
+
+    filtered.sort((a, b) => {
+      const aRelease = parseReleaseFromString(a.release_info || a.release || "");
+      const bRelease = parseReleaseFromString(b.release_info || b.release || "");
+
+      const aYear = aRelease?.year ?? 0;
+      const bYear = bRelease?.year ?? 0;
+      const aTs = aRelease?.ts ?? 0;
+      const bTs = bRelease?.ts ?? 0;
+
+      const aImdb = parseFloat(a.imdb || "0") || 0;
+      const bImdb = parseFloat(b.imdb || "0") || 0;
+
+      // اگر هر دو فیلتر فعال‌اند و اولویت مشخص است
+      if (lastFilterPriority === "year" && typeof yearMinFilter === "number" && imdbMinRating !== null) {
+        // اول سال/تاریخ صعودی, بعد IMDb نزولی
+        if (aYear !== bYear) return aYear - bYear;
+        if (aTs !== bTs) return aTs - bTs;
+        return bImdb - aImdb;
+      }
+
+      if (lastFilterPriority === "imdb" && imdbMinRating !== null && typeof yearMinFilter === "number") {
+        // اول IMDb نزولی, بعد سال/تاریخ صعودی
+        if (aImdb !== bImdb) return bImdb - aImdb;
+        if (aYear !== bYear) return aYear - bYear;
+        return aTs - bTs;
+      }
+
+      // فقط سال فعال است
+      if (typeof yearMinFilter === "number" && imdbMinRating === null) {
+        if (aYear !== bYear) return aYear - bYear;
+        return aTs - bTs;
+      }
+
+      // فقط IMDb فعال است
+      if (imdbMinRating !== null && typeof yearMinFilter !== "number") {
+        if (aImdb !== bImdb) return bImdb - aImdb;
+        return 0;
+      }
+
+      return 0;
     });
   }
 
   if (typeof updateTypeCounts === "function") updateTypeCounts();
+  
 
   const totalPages = computeTotalPages(filtered.length);
 
@@ -3334,7 +3398,69 @@ document.addEventListener("DOMContentLoaded", () => {
     updateMoviesSchemaStructuredData(filtered);
   }
   
+// =====================
+//  Helper: parse release_info string -> { year, ts }
+// پشتیبانی از سه مدل: "10 / 10 / 2025", "10/10/2025", "July 10, 2020"
+// =====================
+function parseReleaseFromString(text) {
+  if (!text) return null;
+  const raw = String(text).trim();
+  if (!raw) return null;
 
+  // گرفتن سال (اولین سال 19xx یا 20xx)
+  const yearMatch = raw.match(/(19|20)\d{2}/);
+  const year = yearMatch ? parseInt(yearMatch[0], 10) : null;
+  if (!year) return null;
+
+  // نرمال‌سازی برای تشخیص فرمت 10/10/2025 و 10 / 10 / 2025
+  const normalized = raw.replace(/\s+/g, "");
+  let day = 1;
+  let monthIndex = 0; // 0-based برای Date
+
+  // فرمت عددی: 10/10/2025 یا 10.10.2025
+  const numeric = normalized.match(/(\d{1,2})[\/.](\d{1,2})[\/.](\d{4})/);
+  if (numeric) {
+    const d = parseInt(numeric[1], 10);
+    const m = parseInt(numeric[2], 10);
+    if (!isNaN(d) && d >= 1 && d <= 31) day = d;
+    if (!isNaN(m) && m >= 1 && m <= 12) monthIndex = m - 1;
+  } else {
+    // فرمت متنی: July 10, 2020
+    const months = [
+      "january",
+      "february",
+      "march",
+      "april",
+      "may",
+      "june",
+      "july",
+      "august",
+      "september",
+      "october",
+      "november",
+      "december",
+    ];
+    const lower = raw.toLowerCase();
+    let foundMonth = -1;
+    for (let i = 0; i < months.length; i++) {
+      if (lower.includes(months[i])) {
+        foundMonth = i;
+        break;
+      }
+    }
+    if (foundMonth >= 0) {
+      monthIndex = foundMonth;
+      const dayMatch = lower.match(/(\d{1,2})\s*,/);
+      if (dayMatch) {
+        const d = parseInt(dayMatch[1], 10);
+        if (!isNaN(d) && d >= 1 && d <= 31) day = d;
+      }
+    }
+  }
+
+  const ts = new Date(year, monthIndex, day).getTime();
+  return { year, ts };
+}
 // ======================= Close keyboard on Enter (Go) =======================
 searchInput?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
@@ -7077,6 +7203,331 @@ searchInput?.addEventListener("keydown", (e) => {
   document.querySelectorAll("img").forEach((img) => {
     if (!img.loading) img.loading = "lazy";
   });
+
+// ==============================
+//  YEAR FILTER (Release date)
+// ==============================
+(function () {
+  const maxYear = new Date().getFullYear();
+  let currentYear = maxYear - 10; // سال پایهٔ اولیه (می‌توانی هر عددی خواستی بگذاری)
+  let isDragging = false;
+  let dragStartY = 0;
+  let accumulatedDelta = 0;
+  const STEP_PX = 26; // هر ~۲۶ پیکسل یک سال جابه‌جا شود
+
+  const spinner = document.getElementById("yearSpinner");
+  const topEl = document.getElementById("yearSpinnerTop");
+  const centerEl = document.getElementById("yearSpinnerCenter");
+  const bottomEl = document.getElementById("yearSpinnerBottom");
+  const applyBtn = document.getElementById("applyYearFilter");
+  const activeFiltersEl = document.getElementById("activeFilters");
+
+  if (!spinner || !topEl || !centerEl || !bottomEl || !applyBtn) {
+    // اگر سایدمنو هنوز رندر نشده، کاری نکن
+    return;
+  }
+
+  // ===== ذخیره ترتیب اولیه کارت‌ها برای Reset =====
+  let originalCardsOrder = null;
+  let yearFilterActive = false;
+  let lastAppliedYear = null;
+
+  function captureOriginalOrder() {
+    if (originalCardsOrder) return;
+    const cards = Array.from(document.querySelectorAll(".movie-card"));
+    if (!cards.length) return;
+    originalCardsOrder = cards.slice();
+  }
+
+  // ===== به‌روزرسانی UI اسپینر =====
+  function clampYear(y) {
+    return y > maxYear ? maxYear : y;
+  }
+
+  function updateSpinnerUI() {
+    currentYear = clampYear(currentYear);
+
+    const maxYear = new Date().getFullYear();
+    const next = currentYear - 1; // پایین همیشه سال قبلی
+    let prev = "";
+
+    // اگر هنوز به آخرین سال نرسیده‌ایم، بالای مستطیل = سال بعد
+    if (currentYear < maxYear) {
+      prev = currentYear + 1;
+    } else {
+      // اگر در آخرین سال (مثلاً ۲۰۲۵) هستیم، بالا خالی باشد
+      prev = "";
+    }
+
+    topEl.innerText = prev === "" ? "" : String(prev);
+    centerEl.innerText = currentYear;
+    bottomEl.innerText = String(next);
+  }
+  
+
+  function changeYear(direction) {
+    if (direction === "up") {
+      if (currentYear < maxYear) {
+        currentYear++;
+      }
+    } else if (direction === "down") {
+      currentYear--;
+    }
+    updateSpinnerUI();
+  }
+
+  function handleDelta(dy) {
+    accumulatedDelta += dy;
+    while (accumulatedDelta <= -STEP_PX) {
+      changeYear("up");
+      accumulatedDelta += STEP_PX;
+    }
+    while (accumulatedDelta >= STEP_PX) {
+      changeYear("down");
+      accumulatedDelta -= STEP_PX;
+    }
+  }
+
+  // ===== رویدادهای mouse wheel =====
+  spinner.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  e.stopPropagation();  // جلوگیری از اسکرول صفحه
+  handleDelta(e.deltaY);
+}, { passive: false });
+
+  // ===== رویدادهای drag با ماوس =====
+  spinner.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    isDragging = true;
+    dragStartY = e.clientY;
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+    const dy = e.clientY - dragStartY;
+    dragStartY = e.clientY;
+    handleDelta(dy);
+  });
+
+  document.addEventListener("mouseup", () => {
+    isDragging = false;
+    accumulatedDelta = 0;
+  });
+
+  // ===== رویدادهای touch (موبایل) =====
+spinner.addEventListener("touchstart", (e) => {
+  e.stopPropagation();
+  isDragging = true;
+  dragStartY = e.touches[0].clientY;
+}, { passive: false });
+
+spinner.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  if (!e.touches.length) return;
+  const dy = e.touches[0].clientY - dragStartY;
+  dragStartY = e.touches[0].clientY;
+  handleDelta(dy);
+}, { passive: false });
+
+spinner.addEventListener("touchend", (e) => {
+  e.stopPropagation();
+  isDragging = false;
+  accumulatedDelta = 0;
+});
+  // ===== تابع کمکی: پارس کردن تاریخ از کارت =====
+  function parseReleaseFromCard(card) {
+    const text = card.innerText || "";
+    const info = parseReleaseFromString(text);
+    if (!info) return null;
+    card.dataset.releaseYear = info.year;
+    card.dataset.releaseTs = info.ts;
+    return info;
+  }
+  
+// ========== ACTIVE FILTERS BADGE SYSTEM ==========
+function ensureActiveFiltersContainer() {
+  let container = document.getElementById("activeFilters");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "activeFilters";
+    container.className = "active-filters-toast";
+    document.body.appendChild(container);
+  }
+  return container;
+}
+
+function updateYearFilterBadge() {
+  const container = ensureActiveFiltersContainer();
+  let badge = container.querySelector('[data-filter="year"]');
+
+  if (!badge) {
+    badge = document.createElement("div");
+    badge.className = "filter-badge";
+    badge.dataset.filter = "year";
+
+    const label = document.createElement("span");
+    label.className = "filter-label";
+    label.innerText = "Year filter active";
+    badge.appendChild(label);
+
+    const closeBtn = document.createElement("button");
+    closeBtn.innerText = "×";
+    closeBtn.addEventListener("click", (e) => {
+  e.stopPropagation();   // جلوگیری از bubbling
+  yearMinFilter = null;
+  removeYearFilterBadge();
+  currentPage = 1;
+  renderPagedMovies(true);
+});
+    badge.appendChild(closeBtn);
+
+    container.appendChild(badge);
+  }
+
+  const label = badge.querySelector(".filter-label");
+  if (label && typeof yearMinFilter === "number") {
+    label.innerText = `Year ≥ ${yearMinFilter}`;
+  }
+}
+function updateImdbFilterBadge() {
+  const container = ensureActiveFiltersContainer();
+  let badge = container.querySelector('[data-filter="imdb"]');
+
+  if (!badge) {
+    badge = document.createElement("div");
+    badge.className = "filter-badge";
+    badge.dataset.filter = "imdb";
+
+    const label = document.createElement("span");
+    label.className = "filter-label";
+    badge.appendChild(label);
+
+    const closeBtn = document.createElement("button");
+    closeBtn.innerText = "×";
+    closeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      imdbMinRating = null;
+      removeImdbFilterBadge();
+      currentPage = 1;
+      renderPagedMovies(true);
+    });
+
+    badge.appendChild(closeBtn);
+    container.appendChild(badge);
+  }
+
+  const label = badge.querySelector(".filter-label");
+  if (label) {
+    label.innerText = `IMDb ≥ ${imdbMinRating}`;
+  }
+}
+
+function removeImdbFilterBadge() {
+  const container = document.getElementById("activeFilters");
+  if (!container) return;
+  const badge = container.querySelector('[data-filter="imdb"]');
+  if (badge) badge.remove();
+}
+function removeYearFilterBadge() {
+  const container = document.getElementById("activeFilters");
+  if (!container) return;
+  const badge = container.querySelector('[data-filter="year"]');
+  if (badge) badge.remove();
+}
+
+
+  // ===== مرتب‌سازی و اعمال فیلتر سال =====
+  function applyYearFilter() {
+  const selectedYear = parseInt(centerEl.innerText, 10);
+  if (!selectedYear || isNaN(selectedYear)) return;
+
+  yearMinFilter = selectedYear;
+  lastFilterPriority = "year";
+
+  updateYearFilterBadge();   // اکنون این تابع تعریف شده و خطا نمی‌دهد
+
+  currentPage = 1;
+  renderPagedMovies(true);   // مرتب‌سازی درست روی کل movies (نه فقط DOM)
+}
+  
+
+  // ===== Reset فیلتر سال (برگرداندن ترتیب اولیه) =====
+  function resetYearFilter() {
+    const currentCenter = parseInt(centerEl.innerText, 10);
+    currentYear = clampYear(currentCenter);
+    updateSpinnerUI();
+
+    // پاک کردن state گلوبال فیلتر سال
+    yearMinFilter = null;
+
+    removeYearFilterBadge();
+
+    // برگرداندن لیست به حالت نرمال با توجه به بقیه فیلترها (IMDb، ژانر، سرچ و ...)
+    currentPage = 1;
+    renderPagedMovies(true);
+  }
+  
+
+  // ===== Active Filters Toast (فقط برای سال) =====
+  function ensureActiveFiltersContainer() {
+    if (activeFiltersEl) return activeFiltersEl;
+    const div = document.createElement("div");
+    div.id = "activeFilters";
+    div.className = "active-filters-toast";
+    document.body.appendChild(div);
+    return div;
+  }
+
+  function showYearFilterBadge(year) {
+    const container = ensureActiveFiltersContainer();
+
+    let badge = container.querySelector('[data-filter-type="year"]');
+    if (!badge) {
+      badge = document.createElement("div");
+      badge.className = "filter-badge";
+      badge.dataset.filterType = "year";
+
+      const labelSpan = document.createElement("span");
+      labelSpan.className = "filter-label";
+      badge.appendChild(labelSpan);
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.innerText = "×";
+      btn.addEventListener("click", () => {
+        resetYearFilter();
+      });
+
+      badge.appendChild(btn);
+      container.appendChild(badge);
+    }
+
+    const label = badge.querySelector(".filter-label");
+    if (label) {
+      label.textContent = `Year ≥ ${year}`;
+    }
+  }
+
+  function removeYearFilterBadge() {
+    const container = document.getElementById("activeFilters");
+    if (!container) return;
+    const badge = container.querySelector('[data-filter-type="year"]');
+    if (badge) {
+      container.removeChild(badge);
+    }
+  }
+
+  // ===== بایند دکمه Apply =====
+  applyBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    applyYearFilter();
+  });
+
+  // ===== مقدار اولیه اسپینر =====
+  updateSpinnerUI();
+})();
+
 
   // -------------------- Initial load --------------------
   if (document.querySelector(".admin-tabs .tab-btn")) {

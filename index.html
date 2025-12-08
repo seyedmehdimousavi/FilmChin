@@ -16,17 +16,17 @@
 
     <!-- ================= Basic SEO ================= -->
     <title>
-      فیلمچین | دانلود فیلم و سریال، کالکشن و سریال‌های روز | FilmChiin
+      فیلمچین | دانلود فیلم و سریال های برتر | FilmChiin
     </title>
 
     <meta
       name="description"
-      content="فیلمچین (FilmChiin) آرشیوی از فیلم‌، سریال، کالکشن و سریال‌های روز جهان است با جستجو و فیلتر پیشرفته بر اساس ژانر، کشور سازنده، سال انتشار و امتیاز IMDB."
+      content="فیلمچین (FilmChiin) آرشیوی از فیلم‌و سریال‌های برتر جهان است با جستجو و فیلتر پیشرفته بر اساس ژانر، کشور سازنده، سال انتشار و امتیاز IMDB و ..."
     />
 
     <meta
       name="keywords"
-      content="دانلود فیلم,دانلود سریال,فیلم جدید,سریال جدید,دانلود کالکشن,آرشیو فیلم,فیلم خارجی,فیلم دوبله,فیلم زیرنویس فارسی,FilmChiin,فیلمچین"
+      content="دانلود فیلم,دانلود سریال,فیلم جدید,سریال جدید,دانلود کالکشن,آرشیو فیلم,فیلم خارجی,فیلم ،بدون سانسور، دوبله فارسی,FilmChiin,فیلمچین"
     />
 
     <!-- Robots -->
@@ -418,6 +418,29 @@
             <div class="button-shadow"></div>
           </div>
         </div>
+        
+        <!-- YEAR FILTER (no changes to IMDb) -->
+<div class="year-filter">
+  <div class="year-filter-row">
+    <div class="year-filter-label">Sort by Release date</div>
+    <div class="year-filter-sign">+</div>
+
+    <div class="year-spinner" id="yearSpinner">
+      <div class="year-spinner-item year-spinner-top" id="yearSpinnerTop"></div>
+      <div class="year-spinner-item year-spinner-center" id="yearSpinnerCenter"></div>
+      <div class="year-spinner-item year-spinner-bottom" id="yearSpinnerBottom"></div>
+    </div>
+  </div>
+
+  <div class="year-apply-wrap button-wrap">
+    <button id="applyYearFilter" class="apply-imdb small">
+      <span>Apply</span>
+    </button>
+    <div class="button-shadow"></div>
+  </div>
+</div>
+
+        
       </div>
 
       <section class="side-menu-bottom">
@@ -694,9 +717,8 @@
       <section class="seo-intro" aria-label="About FilmChiin movies">
         <h1>دانلود فیلم و سریال های برتر با FilmChiin</h1>
         <p>
-          FilmChiin یک آرشیو شخصی از فیلم‌ها و سریال‌هاست که لینک دریافت فایل‌ها
-          به‌صورت امن از طریق ربات تلگرام ارائه می‌شود. همه پست‌ها از کانال‌ها و
-          گروه‌های خصوصی مدیریت‌شده ارسال می‌شوند.
+          FilmChiin (فیلمچین) یک آرشیو شخصی از فیلم‌ها و سریال‌های برتر(دوبله فارسی و بدون سانسور)است که فایل‌ها
+          به‌صورت امن از طریق ربات تلگرام ارائه می‌شود.
         </p>
         <p>
           می‌توانید عناوین را بر اساس <strong>ژانر</strong>،
@@ -824,6 +846,21 @@
         </div>
       </section>
 
+<section class="feature-accordion">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title">مرتب‌سازی بر اساس سال انتشار</span>
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p>
+            می‌توانید صفحه اصلی را با استفاده از فیلتر سال انتشار در sideMenu به گونه ای مرتب کنید که فیلم های با تاریخ انتشار سال تایین شده(و پست های بعدی با سال انتشار بالاتر) در صفحه اصلی قرار گیرند.
+          </p>
+        </div>
+      </section>
+
+
       <!-- 5) نمایش آمار دقیق فیلم‌ها -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
@@ -935,7 +972,7 @@
       <!-- 11) طراحی liquid glass و تجربه کاربری -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title">طراحی Liquid Glassواکنش‌گرا</span>
+          <span class="feature-title">طراحی Liquid Glass واکنش‌گرا</span>
           <span class="feature-icon"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
           /></span>
