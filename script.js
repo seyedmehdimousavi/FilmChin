@@ -6416,51 +6416,92 @@ function clearRatingFilter() {
       .eq("id", chatThreadId);
   }
 
-  function renderChatMessages(arr) {
-    chatMessagesList.innerHTML = (arr || [])
-      .map((m) => {
-        const sideClass = m.role === "user" ? "user" : "admin";
-        const imageHtml = m.image_url
-          ? `<img class="msg-image" src="${escapeHtml(
-              m.image_url
-            )}" alt="image">`
-          : "";
-        const textHtml = m.text
-          ? `<div class="msg-text">${escapeHtml(m.text)}</div>`
-          : "";
-        const time = new Date(m.created_at).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+ function renderChatMessages(arr) {
+  if (!chatMessagesList) return;
 
-        // فقط برای پیام‌های ارسالی کاربر تیک داشته باشیم
-        let tickIcon = "";
-        if (m.role === "user") {
-          tickIcon = m.seen_by_admin
-            ? `<img src="/images/icons8-double-tick-50.png" alt="seen">`
-            : `<img src="/images/icons8-tick-96.png" alt="sent">`;
-        } else {
-          tickIcon = ""; // پیام‌های ورودی (ادمین) بدون تیک
-        }
+  chatMessagesList.innerHTML = (arr || [])
+    .map((m) => {
+      const sideClass = m.role === "user" ? "user" : "admin";
 
-        return `
-      <div class="msg-row ${sideClass}">
-        <div class="msg-bubble ${sideClass}">
-          ${imageHtml}
-          ${textHtml}
-          <div class="msg-meta">
-            <span>${escapeHtml(time)}</span>
-            ${tickIcon}
+      const imageHtml = m.image_url
+        ? `<img class="msg-image" src="${escapeHtml(m.image_url)}" alt="image">`
+        : "";
+
+      const textHtml = m.text
+        ? `<div class="msg-text">${escapeHtml(m.text)}</div>`
+        : "";
+
+      const time = new Date(m.created_at).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      // فقط برای پیام‌های ارسالی کاربر تیک داشته باشیم
+      let tickIcon = "";
+      if (m.role === "user") {
+        tickIcon = m.seen_by_admin
+          ? `<img src="/images/icons8-double-tick-50.png" alt="seen">`
+          : `<img src="/images/icons8-tick-96.png" alt="sent">`;
+      } else {
+        tickIcon = ""; // پیام‌های ورودی (ادمین) بدون تیک
+      }
+
+      return `
+        <div class="msg-row ${sideClass}">
+          <div class="msg-bubble ${sideClass}">
+            ${imageHtml}
+            ${textHtml}
+            <div class="msg-meta">
+              <span>${escapeHtml(time)}</span>
+              ${tickIcon}
+            </div>
           </div>
         </div>
+      `;
+    })
+    .join("");
+
+  setTimeout(() => {
+    chatMessagesList.scrollTop = chatMessagesList.scrollHeight;
+  }, 60);
+}
+
+// تابع جدید حباب در حال ارسال
+function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
+  if (!chatMessagesList) return;
+
+  const imageHtml = imageUrl
+    ? `<img class="msg-image" src="${escapeHtml(imageUrl)}" alt="image">`
+    : "";
+
+  const textHtml = text
+    ? `<div class="msg-text">${escapeHtml(text)}</div>`
+    : "";
+
+  const time = new Date().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const html = `
+    <div class="msg-row user msg-pending">
+      <div class="msg-bubble user">
+        ${imageHtml}
+        ${textHtml}
+        <div class="msg-meta">
+          <span>${escapeHtml(time)}</span>
+          <span class="msg-status-pending"></span>
+        </div>
       </div>
-    `;
-      })
-      .join("");
-    setTimeout(() => {
-      chatMessagesList.scrollTop = chatMessagesList.scrollHeight;
-    }, 60);
-  }
+    </div>
+  `;
+
+  chatMessagesList.insertAdjacentHTML("beforeend", html);
+
+  setTimeout(() => {
+    chatMessagesList.scrollTop = chatMessagesList.scrollHeight;
+  }, 30);
+}
 
   async function loadOrCreateThreadAndMessages() {
     const tid = await ensureThread();
@@ -6478,16 +6519,20 @@ function clearRatingFilter() {
     updateSendEnabled();
   });
 
-  // ارسال از اوورلی
+// ارسال از اوورلی
   overlaySendBtn?.addEventListener("click", async () => {
     if (overlaySendBtn.classList.contains("disabled")) return;
     const text = (overlayInput?.value || "").trim();
     if (!text) return;
+
+    // حباب موقت با وضعیت در حال ارسال
+    appendPendingChatMessage({ text });
+
     await sendChat({ text, overlay: true });
     overlayInput.value = "";
     updateSendEnabled();
   });
-
+  
   // سنجاق حالت جمع‌شده
   chatAttachFile?.addEventListener("change", async (e) => {
     const file = e.target.files?.[0];
@@ -6498,16 +6543,30 @@ function clearRatingFilter() {
     e.target.value = "";
   });
 
-  // سنجاق در اوورلی
+// سنجاق در اوورلی
   overlayAttachFile?.addEventListener("change", async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // پیش‌نمایش محلی + حباب موقت با وضعیت در حال ارسال
+    const objectUrl = URL.createObjectURL(file);
+    appendPendingChatMessage({ imageUrl: objectUrl });
+
     const url = await uploadChatImage(file);
-    if (!url) return;
+    if (!url) {
+      // اگر آپلود ناموفق بود، لیست را از سرور دوباره بخوان تا حباب موقت پاک شود
+      if (chatOverlay && chatOverlay.getAttribute("aria-hidden") === "false") {
+        await loadMessages();
+      }
+      URL.revokeObjectURL(objectUrl);
+      return;
+    }
+
     await sendChat({ image_url: url, overlay: true });
+    URL.revokeObjectURL(objectUrl);
     e.target.value = "";
   });
-
+  
   async function sendChat({
     text = null,
     image_url = null,
@@ -6534,6 +6593,14 @@ function clearRatingFilter() {
     if (error) {
       console.error("send chat error", error);
       showToast("ارسال ناموفق ❌");
+
+      // اگر اوورلی باز است، لیست را دوباره لود کن تا حباب موقت پاک شود
+      const isOverlayOpen =
+        chatOverlay && chatOverlay.getAttribute("aria-hidden") === "false";
+      if (isOverlayOpen) {
+        await loadMessages();
+      }
+
       return;
     }
 
@@ -6546,7 +6613,10 @@ function clearRatingFilter() {
       })
       .eq("id", tid);
 
-    if (chatOverlay && chatOverlay.style.display === "grid") {
+    const isOverlayOpen =
+      chatOverlay && chatOverlay.getAttribute("aria-hidden") === "false";
+
+    if (isOverlayOpen) {
       await loadMessages();
     } else {
       // بدج روی حباب و منو

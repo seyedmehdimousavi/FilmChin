@@ -4097,6 +4097,27 @@ body.dark .msg-meta {
   height: 14px;
 }
 
+/* وضعیت در حال ارسال پیام (دایره چرخان کوچک) */
+.msg-status-pending {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.15);
+  border-top-color: #2ecc71;
+  animation: msg-spin 0.8s linear infinite;
+}
+
+body.dark .msg-status-pending {
+  border-color: rgba(255, 255, 255, 0.25);
+  border-top-color: #2ecc71;
+}
+
+@keyframes msg-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* بدج روی دکمه منو */
 #menuBtn .chat-menu-badge {
   position: absolute;
