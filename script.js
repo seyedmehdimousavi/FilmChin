@@ -220,6 +220,13 @@ async function loadFavoritesForCurrentUser() {
 function showToast(message, type = "success") {
   const c = document.getElementById("toast-container");
   if (!c) return;
+
+  // اگر همین پیام همین الان روی صفحه هست، دوباره نساز
+  const existing = Array.from(c.querySelectorAll(".toast")).find(
+    (t) => t.textContent === message
+  );
+  if (existing) return;
+
   const el = document.createElement("div");
   el.className = `toast ${type}`;
   el.textContent = message;
@@ -230,6 +237,7 @@ function showToast(message, type = "success") {
     setTimeout(() => el.remove(), 250);
   }, 3000);
 }
+
 function setButtonLoading(btn, text) {
   if (!btn) return;
   btn.dataset.originalText = btn.innerHTML;
@@ -2433,18 +2441,29 @@ renderPagedMovies(true);
     return isNaN(p) || p < 1 ? 1 : p;
   }
 
-  /* =============== SET TAB IN URL =============== */
-  function setTabInUrl(type) {
-    const url = new URL(location.href);
+/* =============== SET TAB IN URL =============== */
+function setTabInUrl(type) {
+  const url = new URL(location.href);
 
-    if (type === "all") {
-      url.searchParams.delete("tab");
-    } else {
-      url.searchParams.set("tab", type);
-    }
-
-    history.pushState({}, "", url);
+  if (type === "all") {
+    url.searchParams.delete("tab");
+  } else {
+    url.searchParams.set("tab", type);
   }
+
+  // تب all مبناست:
+  // - اگر الان روی all هستیم و داریم به تب دیگری می‌رویم → pushState (تا با Back برگردیم به all)
+  // - در بقیه حالت‌ها → replaceState (history باد نکند)
+  const currentType = getTabFromUrl(); // از همان helper موجود استفاده می‌کنیم
+  const isCurrentAll = currentType === "all";
+  const isTargetAll = type === "all";
+
+  if (isCurrentAll && !isTargetAll) {
+    history.pushState({}, "", url);
+  } else {
+    history.replaceState({}, "", url);
+  }
+}
 
   /* =============== UPDATE COUNTS =============== */
   function updateTypeCounts() {
@@ -3514,15 +3533,23 @@ searchInput?.addEventListener("keydown", (e) => {
       console.warn("applyActiveTab error:", e);
     }
 
-    // کمی صبر می‌کنیم تا گرید رندر شود، بعد مودال را باز می‌کنیم
-    setTimeout(() => {
-      try {
-        openMovieModal(targetMovie);
-      } catch (e) {
-        console.error("openMovieModal error:", e);
-      }
-    }, 300);
+// قبل از باز شدن مودال برای لینک مستقیم، یک state برای Back ثبت کن
+  try {
+    history.pushState({ overlay: "modal", movieId: targetMovie.id }, "");
+  } catch (e) {
+    console.warn("deep-link pushState error:", e);
   }
+
+  // کمی صبر می‌کنیم تا گرید رندر شود، بعد مودال را باز می‌کنیم
+  setTimeout(() => {
+    try {
+      openMovieModal(targetMovie);
+    } catch (e) {
+      console.error("openMovieModal error:", e);
+    }
+  }, 300);
+}
+
 
   // -------------------- Admin guard --------------------
   async function enforceAdminGuard() {
@@ -6285,7 +6312,7 @@ function clearRatingFilter() {
     chatBubble?.classList.remove("chat-open");
   }
 
-  // اتصال‌ها
+// اتصال‌ها
   chatInput?.addEventListener("focus", (e) => {
     e.stopPropagation();
     openChatOverlay();
@@ -6299,29 +6326,16 @@ function clearRatingFilter() {
   // دکمه Back داخل اوورلی
   userChatBackBtn?.addEventListener("click", (e) => {
     e.stopPropagation();
-    // بستن با دکمه داخلی → مستقیم ببند، history را دست نمی‌زنیم
     closeChatOverlay();
   });
-
-  // اتصال‌ها
-  chatInput?.addEventListener("focus", (e) => {
-    e.stopPropagation();
-    openChatOverlay();
-  });
-
-  chatBubble?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    openChatOverlay();
-  });
-
+  
   userChatBackBtn?.addEventListener("click", (e) => {
     e.stopPropagation();
     closeChatOverlay();
   });
 
-  chatInput?.addEventListener("focus", openChatOverlay);
-  chatBubble?.addEventListener("click", openChatOverlay);
-
+  
+  
   // سنجاق
   chatAttachBtn?.addEventListener("click", () => chatAttachFile?.click());
   overlayAttachBtn?.addEventListener("click", () => overlayAttachFile?.click());
