@@ -6835,7 +6835,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
           tickIcon = ""; // پیام‌های ورودی از کاربر بدون تیک
         }
 
-        return `
+return `
       <div class="msg-row ${sideClass}">
         <div class="msg-bubble ${sideClass}">
           ${imageHtml}
@@ -6854,28 +6854,83 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
       adminThreadMessages.scrollTop = adminThreadMessages.scrollHeight;
     }, 60);
   }
+
+  // حباب موقت در حال ارسال برای سمت ادمین
+  function appendPendingAdminMessage({ text = null, imageUrl = null } = {}) {
+    if (!adminThreadMessages) return;
+
+    const imageHtml = imageUrl
+      ? `<img class="msg-image" src="${escapeHtml(imageUrl)}" alt="image">`
+      : "";
+
+    const textHtml = text
+      ? `<div class="msg-text">${escapeHtml(text)}</div>`
+      : "";
+
+    const time = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    const html = `
+      <div class="msg-row admin msg-pending">
+        <div class="msg-bubble admin">
+          ${imageHtml}
+          ${textHtml}
+          <div class="msg-meta">
+            <span>${escapeHtml(time)}</span>
+            <span class="msg-status-pending"></span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    adminThreadMessages.insertAdjacentHTML("beforeend", html);
+
+    setTimeout(() => {
+      adminThreadMessages.scrollTop = adminThreadMessages.scrollHeight;
+    }, 30);
+  }
+
   // ارسال پیام
   adminThreadSendBtn?.addEventListener("click", async () => {
     if (adminThreadSendBtn.classList.contains("disabled")) return;
     const text = (adminThreadInput?.value || "").trim();
     if (!text || !currentAdminThreadId) return;
+
+    // حباب موقت برای پیام ادمین (با حلقه لودینگ زیر پیام)
+    appendPendingAdminMessage({ text });
+
     await adminSendMessage({ text });
     adminThreadInput.value = "";
     updateAdminSendEnabled();
   });
-
   // ارسال عکس
   adminThreadAttachBtn?.addEventListener("click", () =>
     adminThreadAttachFile?.click()
   );
+
   adminThreadAttachFile?.addEventListener("change", async (e) => {
     const file = e.target.files?.[0];
     if (!file || !currentAdminThreadId) return;
+
+    // پیش‌نمایش محلی + حباب موقت با حلقه لودینگ
+    const objectUrl = URL.createObjectURL(file);
+    appendPendingAdminMessage({ imageUrl: objectUrl });
+
     const url = await uploadChatImage(file);
-    if (!url) return;
+    if (!url) {
+      // اگر آپلود ناموفق بود، لیست را دوباره از سرور بخوان تا حباب موقت پاک شود
+      await loadAdminThreadMessages();
+      URL.revokeObjectURL(objectUrl);
+      return;
+    }
+
     await adminSendMessage({ image_url: url });
+    URL.revokeObjectURL(objectUrl);
     e.target.value = "";
   });
+  
 
   async function adminSendMessage({ text = null, image_url = null } = {}) {
     const { error } = await supabase.from("user_admin_messages").insert([
@@ -6888,9 +6943,14 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
         sent: true,
       },
     ]);
+
     if (error) {
       console.error("admin send error", error);
       showToast("ارسال ناموفق ❌");
+
+      // در صورت خطا، لیست را دوباره لود کن تا حباب موقت پاک شود
+      await loadAdminThreadMessages();
+
       return;
     }
 
@@ -6905,7 +6965,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
 
     await loadAdminThreadMessages();
   }
-
+  
   // ===== بدج پیام‌های کاربران برای ادمین =====
   const adminMessagesBadge = document.getElementById("adminMessagesBadge");
 
