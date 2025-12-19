@@ -2,13 +2,23 @@
 const SUPABASE_URL = "https://gwsmvcgjdodmkoqupdal.supabase.co";
 const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
-});
+
+if (!window._supabaseClient) {
+  window._supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+    }
+  );
+}
+
+// ❗ اسم امن (نه supabase)
+const db = window._supabaseClient;
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
@@ -16,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.location.pathname.endsWith("index.html") ||
       window.location.pathname === "/"
     ) {
-      await supabase.from("visits").insert([
+      await db.from("visits").insert([
         {
           path: window.location.pathname,
           ua: navigator.userAgent,
@@ -104,7 +114,7 @@ async function loadAuthState() {
     const {
       data: { session },
       error,
-    } = await supabase.auth.getSession();
+    } = await db.auth.getSession();
     if (error) {
       console.error("session error:", error);
       currentUser = null;
@@ -121,7 +131,7 @@ async function loadAuthState() {
       return null;
     }
 
-    const { data: dbUser, error: dbErr } = await supabase
+    const { data: dbUser, error: dbErr } = await db
       .from("users")
       .select("*")
       .eq("id", user.id)
@@ -143,7 +153,7 @@ async function loadAuthState() {
     }
 
     const avatarUrl = dbUser?.avatar_url
-      ? supabase.storage.from("avatars").getPublicUrl(dbUser.avatar_url).data
+      ? db.storage.from("avatars").getPublicUrl(dbUser.avatar_url).data
           .publicUrl
       : null;
 
@@ -197,7 +207,7 @@ async function loadFavoritesForCurrentUser() {
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("favorites")
       .select("movie_id, created_at")
       .eq("user_id", currentUser.id)
@@ -319,7 +329,7 @@ signupNextBtn?.addEventListener("click", async (e) => {
 
     try {
       // 🔹 چک بلاک بودن قبل از ثبت‌نام
-      const { data: blocked, error: blockErr } = await supabase
+      const { data: blocked, error: blockErr } = await db
         .from("blocked_users")
         .select("id")
         .or(`email.eq.${email},username.eq.${username}`)
@@ -339,7 +349,7 @@ signupNextBtn?.addEventListener("click", async (e) => {
       }
 
       // ادامه ثبت‌نام
-      const { data: signData, error: signErr } = await supabase.auth.signUp({
+      const { data: signData, error: signErr } = await db.auth.signUp({
         email,
         password,
       });
@@ -352,7 +362,7 @@ signupNextBtn?.addEventListener("click", async (e) => {
       pendingPassword = password;
 
       if (!signData.session) {
-        const { error: signInErr } = await supabase.auth.signInWithPassword({
+        const { error: signInErr } = await db.auth.signInWithPassword({
           email,
           password,
         });
@@ -384,12 +394,12 @@ signupNextBtn?.addEventListener("click", async (e) => {
 
     try {
       // بررسی session معتبر
-      const { data: sessionCheck } = await supabase.auth.getSession();
+      const { data: sessionCheck } = await db.auth.getSession();
       if (!sessionCheck?.session) {
         console.warn(
           "⚠️ session lost before avatar upload, attempting re-login..."
         );
-        const { error: reLoginErr } = await supabase.auth.signInWithPassword({
+        const { error: reLoginErr } = await db.auth.signInWithPassword({
           email: pendingEmail,
           password: pendingPassword,
         });
@@ -397,17 +407,17 @@ signupNextBtn?.addEventListener("click", async (e) => {
       }
 
       const filePath = `${pendingUserId}/${Date.now()}_${avatar.name}`;
-      const { error: uploadErr } = await supabase.storage
+      const { error: uploadErr } = await db.storage
         .from("avatars")
         .upload(filePath, avatar);
       if (uploadErr) throw uploadErr;
 
-      const { data: publicData } = supabase.storage
+      const { data: publicData } = db.storage
         .from("avatars")
         .getPublicUrl(filePath);
       const avatarUrl = publicData?.publicUrl || null;
 
-      const { error: upsertErr } = await supabase.from("users").upsert(
+      const { error: upsertErr } = await db.from("users").upsert(
         [
           {
             id: pendingUserId,
@@ -471,7 +481,7 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
     const password = loginPassword.value.trim();
 
     // 🔹 چک بلاک بودن قبل از ورود
-    const { data: blocked, error: blockErr } = await supabase
+    const { data: blocked, error: blockErr } = await db
       .from("blocked_users")
       .select("id")
       .eq("email", email)
@@ -492,18 +502,18 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
 
     // ادامه ورود
     const { data: signInData, error: signInErr } =
-      await supabase.auth.signInWithPassword({ email, password });
+      await db.auth.signInWithPassword({ email, password });
     if (signInErr || !signInData.user) throw signInErr;
 
     const userId = signInData.user.id;
-    const { data: dbUser } = await supabase
+    const { data: dbUser } = await db
       .from("users")
       .select("*")
       .eq("id", userId)
       .maybeSingle();
 
     const avatarUrl = dbUser?.avatar_url
-      ? supabase.storage.from("avatars").getPublicUrl(dbUser.avatar_url).data
+      ? db.storage.from("avatars").getPublicUrl(dbUser.avatar_url).data
           .publicUrl
       : null;
 
@@ -574,7 +584,7 @@ profileBtn?.addEventListener("click", async () => {
 // خروج از حساب
 async function doLogoutAndRefresh() {
   try {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await db.auth.signOut();
     if (error) throw error;
     showToast("خروج انجام شد ✅", "success");
   } catch (err) {
@@ -877,16 +887,16 @@ async function uploadWithProgress(file, path) {
       const {
         data: { session },
         error,
-      } = await supabase.auth.getSession();
+      } = await db.auth.getSession();
       if (error || !session) {
         return reject(new Error("No active session. Please login as admin."));
       }
 
       const xhr = new XMLHttpRequest();
-      xhr.open("POST", `${SUPABASE_URL}/storage/v1/object/covers/${path}`);
+      xhr.open("POST", `${db_URL}/storage/v1/object/covers/${path}`);
 
       // apikey هم باید باشه، ولی Authorization باید با توکن session باشه
-      xhr.setRequestHeader("apikey", SUPABASE_KEY);
+      xhr.setRequestHeader("apikey", db_KEY);
       xhr.setRequestHeader("Authorization", `Bearer ${session.access_token}`);
 
       xhr.upload.onprogress = (e) => {
@@ -1321,7 +1331,7 @@ function escapeHtml(text) {
 // -------------------- Comments --------------------
 async function loadComments(movieId) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("comments")
       .select("*")
       .eq("movie_id", movieId)
@@ -1329,7 +1339,7 @@ async function loadComments(movieId) {
       .order("created_at", { ascending: true })
       .limit(500);
     if (error) {
-      console.error("Supabase select error (loadComments):", error);
+      console.error("db select error (loadComments):", error);
       return [];
     }
     return data || [];
@@ -1424,7 +1434,7 @@ function attachCommentsHandlers(card, movieId) {
     const originalText = sendBtn.textContent;
     sendBtn.textContent = "Sending...";
     try {
-      const { error } = await supabase
+      const { error } = await db
         .from("comments")
         .insert([
           { movie_id: movieId, name, text, approved: false, published: false },
@@ -1599,7 +1609,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       if (isFavorite) {
-        const { error } = await supabase
+        const { error } = await db
           .from("favorites")
           .delete()
           .eq("user_id", currentUser.id)
@@ -1614,7 +1624,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updatePostOptionsFavoriteUI(false);
         showToast("Removed from favorites ✅", "success");
       } else {
-        const { error } = await supabase.from("favorites").insert([
+        const { error } = await db.from("favorites").insert([
           {
             user_id: currentUser.id,
             movie_id: movieId,
@@ -2078,7 +2088,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchMovies() {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("movies")
         .select("*")
         .order("created_at", { ascending: false });
@@ -2097,7 +2107,7 @@ document.addEventListener("DOMContentLoaded", () => {
       currentPage = getPageFromUrl();
 
       // رندر فیلم‌ها در صفحه
-      await renderPagedMovies(); // note: await for inner supabase calls in bundles
+      await renderPagedMovies(); // note: await for inner db calls in bundles
 
       // 🔹 مهم‌ترین بخش: اگر لینک مستقیم فیلم باشد، مودال را باز کن
       if (typeof handleDeepLinkMovieOpen === "function") {
@@ -2119,7 +2129,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchMessages() {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("messages")
         .select("*")
         .order("id", { ascending: false });
@@ -2138,7 +2148,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   async function fetchEpisodes() {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("movie_items")
         .select("*")
         .order("movie_id", { ascending: true })
@@ -2381,7 +2391,7 @@ renderPagedMovies(true);
       const q = e.target.value.trim();
       if (!q) return;
       try {
-        await supabase.from("search_logs").insert([{ query: q }]);
+        await db.from("search_logs").insert([{ query: q }]);
       } catch (err) {
         console.error("search log error:", err);
       }
@@ -2393,7 +2403,7 @@ renderPagedMovies(true);
         const q = searchInput.value.trim();
         if (!q) return;
         try {
-          await supabase.from("search_logs").insert([{ query: q }]);
+          await db.from("search_logs").insert([{ query: q }]);
         } catch (err) {
           console.error("search log error:", err);
         }
@@ -3133,7 +3143,7 @@ function setTabInUrl(type) {
           })();
 
           // در لاگ می‌توانی finalLink یا rawLink را ذخیره کنی؛ من finalLink را ذخیره کردم که دقیقاً همان لینکی است که کاربر باز می‌کند
-          await supabase.from("click_logs").insert([
+          await db.from("click_logs").insert([
             {
               movie_id: movieId,
               episode_index: epIndex,
@@ -3156,7 +3166,7 @@ function setTabInUrl(type) {
     // ===================== نسخه سالم و کامل اپیزودها — بازگردانی =====================
     if (m.type === "collection" || m.type === "serial") {
       (async () => {
-        const { data: eps, error: epsErr } = await supabase
+        const { data: eps, error: epsErr } = await db
           .from("movie_items")
           .select("*")
           .eq("movie_id", m.id)
@@ -3580,7 +3590,7 @@ searchInput?.addEventListener("keydown", (e) => {
     logoutBtn.addEventListener("click", async () => {
       logoutBtn.disabled = true;
       try {
-        await supabase.auth.signOut();
+        await db.auth.signOut();
         currentUser = null;
         setUserProfile(null);
         window.location.href = "index.html";
@@ -3598,11 +3608,11 @@ searchInput?.addEventListener("keydown", (e) => {
 
   async function loadAdminMovies(page = 1) {
     adminCurrentPage = page;
-    const { count } = await supabase
+    const { count } = await db
       .from("movies")
       .select("*", { count: "exact", head: true });
     adminTotalPages = Math.ceil((count || 0) / adminPageSize);
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("movies")
       .select("*")
       .order("created_at", { ascending: false })
@@ -3678,7 +3688,7 @@ searchInput?.addEventListener("keydown", (e) => {
         const isNowPopular = !m.is_popular;
 
         try {
-          const { error } = await supabase
+          const { error } = await db
             .from("movies")
             .update({ is_popular: isNowPopular })
             .eq("id", id)
@@ -3743,7 +3753,7 @@ searchInput?.addEventListener("keydown", (e) => {
         if (m.type === "collection" || m.type === "serial") {
           if (actionsBar) actionsBar.classList.add("show");
 
-          const { data: eps, error } = await supabase
+          const { data: eps, error } = await db
             .from("movie_items")
             .select("*")
             .eq("movie_id", m.id)
@@ -3774,7 +3784,7 @@ searchInput?.addEventListener("keydown", (e) => {
           type: "confirm",
         });
         if (!ok) return;
-        const { error } = await supabase.from("movies").delete().eq("id", m.id);
+        const { error } = await db.from("movies").delete().eq("id", m.id);
         if (error) {
           console.error("delete movie err", error);
           showToast("Delete failed");
@@ -3790,7 +3800,7 @@ searchInput?.addEventListener("keydown", (e) => {
       toggleBtn?.addEventListener("click", async () => {
         const panel = row.querySelector(".admin-comments-panel");
         if (panel.style.display === "none") {
-          const { data, error } = await supabase
+          const { data, error } = await db
             .from("comments")
             .select("*")
             .eq("movie_id", m.id)
@@ -3828,7 +3838,7 @@ searchInput?.addEventListener("keydown", (e) => {
                 });
                 if (!ok2) return;
                 const id = btn.dataset.id;
-                const { error: delErr } = await supabase
+                const { error: delErr } = await db
                   .from("comments")
                   .delete()
                   .eq("id", id);
@@ -3888,7 +3898,7 @@ searchInput?.addEventListener("keydown", (e) => {
         const isNowPopular = !m.is_popular;
 
         try {
-          const { error } = await supabase
+          const { error } = await db
             .from("movies")
             .update({ is_popular: isNowPopular })
             .eq("id", id)
@@ -3920,7 +3930,7 @@ searchInput?.addEventListener("keydown", (e) => {
   }
   async function fetchPopularMovies() {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("movies")
         .select("*")
         .eq("is_popular", true)
@@ -3940,7 +3950,7 @@ searchInput?.addEventListener("keydown", (e) => {
   let autoSlide;
 
   async function fetchPopularForIndex() {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("movies")
       .select("*")
       .eq("is_popular", true)
@@ -4202,7 +4212,7 @@ searchInput?.addEventListener("keydown", (e) => {
 
     if (m.type === "collection" || m.type === "serial") {
       (async () => {
-        const { data: eps } = await supabase
+        const { data: eps } = await db
           .from("movie_items")
           .select("*")
           .eq("movie_id", m.id)
@@ -4539,7 +4549,7 @@ searchInput?.addEventListener("keydown", (e) => {
         showToast("Message cannot be empty");
         return;
       }
-      const { error } = await supabase.from("messages").insert([{ text }]);
+      const { error } = await db.from("messages").insert([{ text }]);
       if (error) {
         console.error("insert message err", error);
         showToast("Add message failed");
@@ -4592,7 +4602,7 @@ searchInput?.addEventListener("keydown", (e) => {
           defaultValue: msg.text,
         });
         if (newText === null) return;
-        const { error } = await supabase
+        const { error } = await db
           .from("messages")
           .update({ text: newText })
           .eq("id", id);
@@ -4611,7 +4621,7 @@ searchInput?.addEventListener("keydown", (e) => {
           type: "confirm",
         });
         if (!ok) return;
-        const { error } = await supabase.from("messages").delete().eq("id", id);
+        const { error } = await db.from("messages").delete().eq("id", id);
         if (error) {
           console.error("msg delete err", error);
           showToast("Delete failed");
@@ -4657,14 +4667,14 @@ searchInput?.addEventListener("keydown", (e) => {
     if (!ok) return;
 
     // دریافت داده‌ها از ویوها
-    const { data: visits, error: vErr } = await supabase
+    const { data: visits, error: vErr } = await db
       .from("v_visits_daily")
       .select("*");
-    const { data: searches, error: sErr } = await supabase
+    const { data: searches, error: sErr } = await db
       .from("v_top_searches")
       .select("*")
       .limit(10);
-    const { data: clicks, error: cErr } = await supabase
+    const { data: clicks, error: cErr } = await db
       .from("v_top_clicks")
       .select("*")
       .limit(10);
@@ -4762,7 +4772,7 @@ searchInput?.addEventListener("keydown", (e) => {
       return;
     }
 
-    let query = supabase
+    let query = db
       .from("users")
       .select("id, username, email, avatar_url, created_at, role", {
         count: "exact",
@@ -4804,7 +4814,7 @@ searchInput?.addEventListener("keydown", (e) => {
 
     data.forEach((u) => {
       const avatar = u.avatar_url
-        ? supabase.storage.from("avatars").getPublicUrl(u.avatar_url).data
+        ? db.storage.from("avatars").getPublicUrl(u.avatar_url).data
             .publicUrl
         : "/images/icons8-user-96.png";
 
@@ -4851,7 +4861,7 @@ searchInput?.addEventListener("keydown", (e) => {
       return;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("users")
       .select("id, username, email, avatar_url, role")
       .in("role", ["owner", "admin"])
@@ -4883,7 +4893,7 @@ searchInput?.addEventListener("keydown", (e) => {
 
     data.forEach((u) => {
       const avatar = u.avatar_url
-        ? supabase.storage.from("avatars").getPublicUrl(u.avatar_url).data
+        ? db.storage.from("avatars").getPublicUrl(u.avatar_url).data
             .publicUrl
         : "/images/icons8-user-96.png";
 
@@ -5011,7 +5021,7 @@ searchInput?.addEventListener("keydown", (e) => {
     if (!ok) return;
 
     try {
-      const { data: existing, error: selErr } = await supabase
+      const { data: existing, error: selErr } = await db
         .from("blocked_users")
         .select("email")
         .eq("email", email)
@@ -5024,7 +5034,7 @@ searchInput?.addEventListener("keydown", (e) => {
       }
 
       if (!existing || existing.length === 0) {
-        const { error: insErr } = await supabase
+        const { error: insErr } = await db
           .from("blocked_users")
           .insert([{ email, user_id: userId }]);
         if (insErr) {
@@ -5034,7 +5044,7 @@ searchInput?.addEventListener("keydown", (e) => {
         }
       }
 
-      const { error: updErr } = await supabase
+      const { error: updErr } = await db
         .from("users")
         .update({ is_blocked: true })
         .eq("id", userId);
@@ -5075,7 +5085,7 @@ searchInput?.addEventListener("keydown", (e) => {
       });
       if (!password) return;
 
-      const { data: ownerData, error: ownerErr } = await supabase
+      const { data: ownerData, error: ownerErr } = await db
         .from("users")
         .select("id, password")
         .eq("id", currentUser.id)
@@ -5092,7 +5102,7 @@ searchInput?.addEventListener("keydown", (e) => {
         return;
       }
 
-      const { error: updErr } = await supabase
+      const { error: updErr } = await db
         .from("users")
         .update({ role: "user" })
         .eq("id", userId);
@@ -5123,7 +5133,7 @@ searchInput?.addEventListener("keydown", (e) => {
     if (!password) return;
 
     try {
-      const { data: ownerData, error: ownerErr } = await supabase
+      const { data: ownerData, error: ownerErr } = await db
         .from("users")
         .select("id, password")
         .eq("id", currentUser.id)
@@ -5140,7 +5150,7 @@ searchInput?.addEventListener("keydown", (e) => {
         return;
       }
 
-      const { error: updErr } = await supabase
+      const { error: updErr } = await db
         .from("users")
         .update({ role: "admin" })
         .eq("id", userId);
@@ -5310,7 +5320,7 @@ searchInput?.addEventListener("keydown", (e) => {
           try {
             const filename = `public/${Date.now()}_${coverFile.name}`;
             await uploadWithProgress(coverFile, filename);
-            const { data: publicUrl } = supabase.storage
+            const { data: publicUrl } = db.storage
               .from("covers")
               .getPublicUrl(filename);
             coverUrl = publicUrl.publicUrl;
@@ -5334,7 +5344,7 @@ searchInput?.addEventListener("keydown", (e) => {
               try {
                 const filename = `public/items/${Date.now()}_${i}_${file.name}`;
                 await uploadWithProgress(file, filename);
-                const { data: publicUrl } = supabase.storage
+                const { data: publicUrl } = db.storage
                   .from("covers")
                   .getPublicUrl(filename);
                 if (items[i]) items[i].cover = publicUrl.publicUrl;
@@ -5366,12 +5376,12 @@ searchInput?.addEventListener("keydown", (e) => {
             const okUpload = await uploadItemCoversInPlace(items);
             if (!okUpload) return;
 
-            await supabase.from("movie_items").delete().eq("movie_id", movieId);
+            await db.from("movie_items").delete().eq("movie_id", movieId);
             if (items.length > 0) {
-              await supabase.from("movie_items").insert(items);
+              await db.from("movie_items").insert(items);
             }
           } else {
-            await supabase.from("movie_items").delete().eq("movie_id", movieId);
+            await db.from("movie_items").delete().eq("movie_id", movieId);
           }
 
           let finalType = "single";
@@ -5395,7 +5405,7 @@ searchInput?.addEventListener("keydown", (e) => {
           };
           if (coverUrl) updateData.cover = coverUrl;
 
-          const { error: updErr } = await supabase
+          const { error: updErr } = await db
             .from("movies")
             .update(updateData)
             .eq("id", movieId);
@@ -5444,7 +5454,7 @@ searchInput?.addEventListener("keydown", (e) => {
           type: provisionalType,
         };
 
-        const { data: inserted, error: addErr } = await supabase
+        const { data: inserted, error: addErr } = await db
           .from("movies")
           .insert([newMovie])
           .select()
@@ -5465,7 +5475,7 @@ searchInput?.addEventListener("keydown", (e) => {
           if (provisionalType === "collection" && items.length < 1) {
             finishPostProgress(false);
             showToast("Collection requires at least 1 item");
-            await supabase.from("movies").delete().eq("id", inserted.id);
+            await db.from("movies").delete().eq("id", inserted.id);
             return;
           }
 
@@ -5473,7 +5483,7 @@ searchInput?.addEventListener("keydown", (e) => {
           if (!okUpload) return;
 
           if (items.length > 0) {
-            const { error: itemsError } = await supabase
+            const { error: itemsError } = await db
               .from("movie_items")
               .insert(items);
             completePart(); // درج آیتم‌ها
@@ -5481,7 +5491,7 @@ searchInput?.addEventListener("keydown", (e) => {
               console.error("movie_items insert err", itemsError);
               finishPostProgress(false);
               showToast("Add items failed");
-              await supabase.from("movies").delete().eq("id", inserted.id);
+              await db.from("movies").delete().eq("id", inserted.id);
               return;
             }
           }
@@ -5494,7 +5504,7 @@ searchInput?.addEventListener("keydown", (e) => {
           finalType = "serial";
         }
 
-        await supabase
+        await db
           .from("movies")
           .update({ type: finalType })
           .eq("id", inserted.id);
@@ -5521,7 +5531,7 @@ searchInput?.addEventListener("keydown", (e) => {
         return;
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("comments")
         .select("id")
         .eq("approved", false)
@@ -5548,7 +5558,7 @@ searchInput?.addEventListener("keydown", (e) => {
   // -------------------- Social links --------------------
   async function fetchSocialLinks() {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("social_links")
         .select("*")
         .order("created_at", { ascending: false });
@@ -5596,7 +5606,7 @@ searchInput?.addEventListener("keydown", (e) => {
   let editingSocialId = null;
 
   async function fetchAdminSocialLinks() {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("social_links")
       .select("*")
       .order("created_at", { ascending: false });
@@ -5642,14 +5652,14 @@ searchInput?.addEventListener("keydown", (e) => {
       if (iconEl.files && iconEl.files[0]) {
         const file = iconEl.files[0];
         const filename = `social/${Date.now()}_${file.name}`;
-        const { data: upData, error: upErr } = await supabase.storage
+        const { data: upData, error: upErr } = await db.storage
           .from("covers")
           .upload(filename, file, { upsert: true });
         if (upErr) {
           showToast("Error uploading icon");
           return;
         }
-        const { data: publicUrl } = supabase.storage
+        const { data: publicUrl } = db.storage
           .from("covers")
           .getPublicUrl(upData.path);
         iconUrl = publicUrl.publicUrl;
@@ -5660,7 +5670,7 @@ searchInput?.addEventListener("keydown", (e) => {
           // update
           const payload = { title, url };
           if (iconUrl) payload.icon = iconUrl;
-          const { error } = await supabase
+          const { error } = await db
             .from("social_links")
             .update(payload)
             .eq("id", editingSocialId);
@@ -5670,7 +5680,7 @@ searchInput?.addEventListener("keydown", (e) => {
           addSocialForm.querySelector(".admin-submit").textContent = "Add link";
         } else {
           // insert
-          const { error } = await supabase
+          const { error } = await db
             .from("social_links")
             .insert([{ title, url, icon: iconUrl }]);
           if (error) throw error;
@@ -5698,7 +5708,7 @@ searchInput?.addEventListener("keydown", (e) => {
           type: "confirm",
         });
         if (!ok) return;
-        const { error } = await supabase
+        const { error } = await db
           .from("social_links")
           .delete()
           .eq("id", id);
@@ -5711,7 +5721,7 @@ searchInput?.addEventListener("keydown", (e) => {
       }
 
       if (btn.classList.contains("btn-edit")) {
-        const { data, error } = await supabase
+        const { data, error } = await db
           .from("social_links")
           .select("*")
           .eq("id", id)
@@ -5846,7 +5856,7 @@ searchInput?.addEventListener("keydown", (e) => {
       }
 
       // سرچ در دیتابیس
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("movies")
         .select("*")
         .or(`title.ilike.%${q}%,director.ilike.%${q}%,genre.ilike.%${q}%`)
@@ -5928,7 +5938,7 @@ searchInput?.addEventListener("keydown", (e) => {
   // هر 10 دقیقه یکبار یک درخواست ساده به سوپابیس
   setInterval(async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("movie_items")
         .select("id")
         .limit(1);
@@ -6026,7 +6036,7 @@ searchInput?.addEventListener("keydown", (e) => {
 
   async function loadAppVersion() {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("app_meta")
         .select("value")
         .eq("key", "version")
@@ -6048,7 +6058,7 @@ searchInput?.addEventListener("keydown", (e) => {
       const version = document.getElementById("versionInput").value.trim();
       if (!version) return;
 
-      const { error } = await supabase
+      const { error } = await db
         .from("app_meta")
         .upsert({ key: "version", value: version });
 
@@ -6344,7 +6354,7 @@ function clearRatingFilter() {
   async function uploadChatImage(file) {
     if (!file || !currentUser) return null;
     const path = `${currentUser.id}/${Date.now()}_${file.name}`;
-    const { data, error } = await supabase.storage
+    const { data, error } = await db.storage
       .from("chat")
       .upload(path, file);
     if (error) {
@@ -6352,14 +6362,14 @@ function clearRatingFilter() {
       showToast("خطا در آپلود تصویر ❌");
       return null;
     }
-    const { data: pub } = supabase.storage.from("chat").getPublicUrl(data.path);
+    const { data: pub } = db.storage.from("chat").getPublicUrl(data.path);
     return pub?.publicUrl || null;
   }
   async function ensureThread() {
     if (!currentUser) return null;
     if (chatThreadId) return chatThreadId;
 
-    const { data: existing, error } = await supabase
+    const { data: existing, error } = await db
       .from("user_admin_threads")
       .select("id")
       .eq("user_id", currentUser.id)
@@ -6373,7 +6383,7 @@ function clearRatingFilter() {
       return chatThreadId;
     }
 
-    const { data: created, error: insErr } = await supabase
+    const { data: created, error: insErr } = await db
       .from("user_admin_threads")
       .insert([{ user_id: currentUser.id }])
       .select()
@@ -6389,7 +6399,7 @@ function clearRatingFilter() {
   // لود پیام‌ها
   async function loadMessages() {
     if (!chatThreadId) return;
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("user_admin_messages")
       .select("*")
       .eq("thread_id", chatThreadId)
@@ -6402,7 +6412,7 @@ function clearRatingFilter() {
     renderChatMessages(data || []);
 
     // پیام‌های ادمین → seen_by_user
-    await supabase
+    await db
       .from("user_admin_messages")
       .update({ seen_by_user: true })
       .eq("thread_id", chatThreadId)
@@ -6410,7 +6420,7 @@ function clearRatingFilter() {
       .eq("seen_by_user", false);
 
     // نخ → unread_for_user false
-    await supabase
+    await db
       .from("user_admin_threads")
       .update({ unread_for_user: false })
       .eq("id", chatThreadId);
@@ -6587,7 +6597,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
       image_url: image_url || null,
       sent: true,
     };
-    const { error } = await supabase
+    const { error } = await db
       .from("user_admin_messages")
       .insert([payload]);
     if (error) {
@@ -6605,7 +6615,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
     }
 
     // نخ → unread_for_admin true
-    await supabase
+    await db
       .from("user_admin_threads")
       .update({
         unread_for_admin: true,
@@ -6634,7 +6644,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
   // پول وضعیت نخ برای بدج‌ها
   async function pollChatFlags() {
     if (!currentUser) return;
-    const { data } = await supabase
+    const { data } = await db
       .from("user_admin_threads")
       .select("id, unread_for_user")
       .eq("user_id", currentUser.id)
@@ -6675,7 +6685,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
     const from = (page - 1) * THREADS_PAGE_SIZE;
     const to = page * THREADS_PAGE_SIZE - 1;
 
-    const { data, error, count } = await supabase
+    const { data, error, count } = await db
       .from("user_admin_threads")
       .select("id, user_id, last_message_at, unread_for_admin", {
         count: "exact",
@@ -6692,18 +6702,18 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
     grid.innerHTML = "";
 
     for (const t of data || []) {
-      const { data: user } = await supabase
+      const { data: user } = await db
         .from("users")
         .select("username, avatar_url")
         .eq("id", t.user_id)
         .maybeSingle();
 
       const avatar = user?.avatar_url
-        ? supabase.storage.from("avatars").getPublicUrl(user.avatar_url).data
+        ? db.storage.from("avatars").getPublicUrl(user.avatar_url).data
             .publicUrl
         : "/images/icons8-user-96.png";
 
-      const { data: lastMsg } = await supabase
+      const { data: lastMsg } = await db
         .from("user_admin_messages")
         .select("text, image_url")
         .eq("thread_id", t.id)
@@ -6777,7 +6787,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
     await loadAdminThreadMessages();
 
     // پیام‌های کاربر → seen_by_admin
-    await supabase
+    await db
       .from("user_admin_messages")
       .update({ seen_by_admin: true })
       .eq("thread_id", threadId)
@@ -6785,7 +6795,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
       .eq("seen_by_admin", false);
 
     // نخ → unread_for_admin false
-    await supabase
+    await db
       .from("user_admin_threads")
       .update({ unread_for_admin: false })
       .eq("id", threadId);
@@ -6801,7 +6811,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
 
   // لود پیام‌های یک نخ
   async function loadAdminThreadMessages() {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("user_admin_messages")
       .select("*")
       .eq("thread_id", currentAdminThreadId)
@@ -6933,7 +6943,7 @@ return `
   
 
   async function adminSendMessage({ text = null, image_url = null } = {}) {
-    const { error } = await supabase.from("user_admin_messages").insert([
+    const { error } = await db.from("user_admin_messages").insert([
       {
         thread_id: currentAdminThreadId,
         user_id: currentUser.id, // ادمین
@@ -6955,7 +6965,7 @@ return `
     }
 
     // نخ → unread_for_user true
-    await supabase
+    await db
       .from("user_admin_threads")
       .update({
         unread_for_user: true,
@@ -6971,7 +6981,7 @@ return `
 
   async function pollAdminUnread() {
     if (!adminMessagesBadge) return;
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("user_admin_threads")
       .select("id")
       .eq("unread_for_admin", true);
@@ -7657,7 +7667,7 @@ function removeImdbFilterBadge(container = null) {
       const ok = await enforceAdminGuard();
       if (!ok) return;
       container.innerHTML = '<div class="loading">Loading Comments…</div>';
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("comments")
         .select("*")
         .eq("approved", false)
@@ -7714,7 +7724,7 @@ function removeImdbFilterBadge(container = null) {
           if (!id) return;
           if (btn.classList.contains("btn-approve")) {
             btn.disabled = true;
-            const { error: upErr } = await supabase
+            const { error: upErr } = await db
               .from("comments")
               .update({ approved: true, published: true })
               .eq("id", id);
@@ -7734,7 +7744,7 @@ function removeImdbFilterBadge(container = null) {
             });
             if (!ok) return;
             btn.disabled = true;
-            const { error: delErr } = await supabase
+            const { error: delErr } = await db
               .from("comments")
               .delete()
               .eq("id", id);
