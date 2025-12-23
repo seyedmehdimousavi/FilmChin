@@ -6059,3 +6059,83 @@ body.dark .feature-accordion {
   padding: 0;
   border-radius: 999vw;
 }
+/* =========================================
+   Admin Popular Movies - Episodes List
+   ========================================= */
+.admin-popular-episodes-container {
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 10px 0;
+  margin-top: 10px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  scrollbar-width: thin;
+}
+
+/* اسکرول بار باریک برای زیبایی بیشتر در ادمین */
+.admin-popular-episodes-container::-webkit-scrollbar {
+  height: 6px;
+}
+.admin-popular-episodes-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.admin-ep-card {
+  display: inline-flex;
+  flex-direction: column;
+  width: 90px; /* کمی بزرگتر برای ادمین */
+  margin-right: 10px;
+  vertical-align: top;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  background: #fff;
+  border: 1px solid #eee;
+  position: relative;
+}
+
+body.dark .admin-ep-card {
+  background: #2a2a2a;
+  border-color: #444;
+}
+
+.admin-ep-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.admin-ep-card.active-popular {
+  border: 2px solid #e74c3c; /* رنگ قرمز برای نشان دادن انتخاب */
+  box-shadow: 0 0 8px rgba(231, 76, 60, 0.4);
+}
+
+/* بج روی کارت فعال */
+.admin-ep-card.active-popular::after {
+  content: "Selected";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #e74c3c;
+  color: white;
+  font-size: 9px;
+  text-align: center;
+  padding: 2px;
+}
+
+.admin-ep-img {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+}
+
+.admin-ep-title {
+  font-size: 10px;
+  padding: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
