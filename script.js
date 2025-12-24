@@ -2088,9 +2088,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchMovies() {
     try {
+      // 🚀 مرتب‌سازی هوشمند: 
+      // ۱. ابتدا بر اساس آخرین تغییرات (updated_at) تا پست‌های بروز شده صدرنشین شوند
+      // ۲. سپس بر اساس زمان ساخت (created_at) برای حفظ نظم پست‌های جدید ادیت نشده
       const { data, error } = await db
         .from("movies")
         .select("*")
+        .order("updated_at", { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -2100,32 +2104,38 @@ document.addEventListener("DOMContentLoaded", () => {
         movies = data || [];
       }
 
-      // دریافت اپیزودها
+      // دریافت اپیزودها از دیتابیس
       await fetchEpisodes();
 
-      // صفحه فعلی را از URL بخوان
+      // صفحه فعلی را از پارامترهای URL (مثل ?page=2) بخوان
       currentPage = getPageFromUrl();
 
-      // رندر فیلم‌ها در صفحه
-      await renderPagedMovies(); // note: await for inner db calls in bundles
+      // رندر فیلم‌ها در صفحه و نمایش کارت‌های پست
+      await renderPagedMovies(); 
 
-      // 🔹 مهم‌ترین بخش: اگر لینک مستقیم فیلم باشد، مودال را باز کن
+      // 🔹 باز کردن مودال در صورت وجود لینک مستقیم (Deep Link) برای فیلم خاص
       if (typeof handleDeepLinkMovieOpen === "function") {
         handleDeepLinkMovieOpen();
       }
 
-      // ساخت گرید ژانر
-      buildGenreGrid();
+      // ساخت و بروزرسانی گرید ژانرها در سایدبار یا بخش فیلترها
+      if (typeof buildGenreGrid === "function") {
+        buildGenreGrid();
+      }
 
-      // اگر در صفحه ادمین هستیم، لیست محدود رندر کن
-      if (document.getElementById("movieList")) {
+      // اگر در صفحه مدیریت (Admin) هستیم، لیست مدیریت را بروزرسانی کن
+      const adminListEl = document.getElementById("movieList");
+      if (adminListEl) {
+        // نمایش ۱۰ فیلم آخر که اخیراً اضافه یا تغییر کرده‌اند در پنل مدیریت
         renderAdminMovieList(movies.slice(0, 10));
       }
+      
     } catch (err) {
       console.error("fetchMovies catch", err);
       movies = [];
     }
-  }
+}
+
 
   async function fetchMessages() {
     try {
@@ -5147,11 +5157,11 @@ function openMovieModal(m, startIdx = 0) {
               type === "collection" ? linkValCollection : linkValSerial;
             if (!titleVal && !linkVal) return;
 
-            // کاور آیتم: یا فایل جدید یا کاور قبلی ذخیره‌شده
+            // کاور آیتم
             let coverVal = "";
             const fileInput = formEl.querySelector('input[type="file"]');
             if (fileInput && fileInput.files && fileInput.files.length > 0) {
-              coverVal = URL.createObjectURL(fileInput.files[0]); // موقت
+              coverVal = URL.createObjectURL(fileInput.files[0]); 
             } else if (formEl.dataset.existingCover) {
               coverVal = formEl.dataset.existingCover;
             }
@@ -5163,32 +5173,12 @@ function openMovieModal(m, startIdx = 0) {
                 cover: coverVal,
                 link: linkValCollection,
                 synopsis: formEl.querySelector("textarea")?.value?.trim() || "",
-                director:
-                  formEl
-                    .querySelector('input[placeholder="Director"]')
-                    ?.value?.trim() || "",
-                product:
-                  formEl
-                    .querySelector('input[placeholder="Product"]')
-                    ?.value?.trim() || "",
-                stars:
-                  formEl
-                    .querySelector('input[placeholder="Stars"]')
-                    ?.value?.trim() || "",
-                imdb:
-                  formEl
-                    .querySelector('input[placeholder="IMDB"]')
-                    ?.value?.trim() || "",
-                release_info:
-                  formEl
-                    .querySelector('input[placeholder="Release Info"]')
-                    ?.value?.trim() || "",
-                genre:
-                  formEl
-                    .querySelector(
-                      'input[placeholder="Genre (space-separated)"]'
-                    )
-                    ?.value?.trim() || "",
+                director: formEl.querySelector('input[placeholder="Director"]')?.value?.trim() || "",
+                product: formEl.querySelector('input[placeholder="Product"]')?.value?.trim() || "",
+                stars: formEl.querySelector('input[placeholder="Stars"]')?.value?.trim() || "",
+                imdb: formEl.querySelector('input[placeholder="IMDB"]')?.value?.trim() || "",
+                release_info: formEl.querySelector('input[placeholder="Release Info"]')?.value?.trim() || "",
+                genre: formEl.querySelector('input[placeholder="Genre (space-separated)"]')?.value?.trim() || "",
                 order_index: idx,
               });
             } else {
@@ -5204,7 +5194,6 @@ function openMovieModal(m, startIdx = 0) {
           return out;
         };
 
-        // --------- شمارش کل بخش‌ها برای Progress کلی پست ---------
         const uploadParts =
           (coverFile ? 1 : 0) +
           bundleChildren.reduce((acc, formEl) => {
@@ -5222,25 +5211,21 @@ function openMovieModal(m, startIdx = 0) {
         const totalParts = uploadParts + dbParts;
         startPostProgress(totalParts, "در حال آپلود و ثبت پست...");
 
-        // --------- آپلود کاور اصلی با Progress واقعی ---------
         if (coverFile) {
           try {
             const filename = `public/${Date.now()}_${coverFile.name}`;
             await uploadWithProgress(coverFile, filename);
-            const { data: publicUrl } = db.storage
-              .from("covers")
-              .getPublicUrl(filename);
+            const { data: publicUrl } = db.storage.from("covers").getPublicUrl(filename);
             coverUrl = publicUrl.publicUrl;
             completePart();
           } catch (err) {
-            console.error("main cover upload error", err);
+            console.error(err);
             finishPostProgress(false);
             showToast("Upload cover failed");
             return;
           }
         }
 
-        // --------- آپلود کاور آیتم‌ها با Progress واقعی ---------
         const uploadItemCoversInPlace = async (items) => {
           for (let i = 0; i < bundleChildren.length; i++) {
             const formEl = bundleChildren[i];
@@ -5251,33 +5236,28 @@ function openMovieModal(m, startIdx = 0) {
               try {
                 const filename = `public/items/${Date.now()}_${i}_${file.name}`;
                 await uploadWithProgress(file, filename);
-                const { data: publicUrl } = db.storage
-                  .from("covers")
-                  .getPublicUrl(filename);
+                const { data: publicUrl } = db.storage.from("covers").getPublicUrl(filename);
                 if (items[i]) items[i].cover = publicUrl.publicUrl;
                 completePart();
               } catch (err) {
-                console.error("item cover upload error", err);
+                console.error(err);
                 finishPostProgress(false);
-                showToast("Error uploading an item cover");
                 return false;
               }
             } else {
               const existing = formEl.dataset.existingCover;
-              if (existing && items[i]) {
-                items[i].cover = existing;
-              }
+              if (existing && items[i]) items[i].cover = existing;
             }
           }
           return true;
         };
+
         // ==================== EDIT ====================
         if (isEditing) {
           const movieId = editingMovie.id;
-
           let intendedType = selectedType;
-
           let items = [];
+
           if (intendedType !== "single") {
             items = buildItemsFromForms(movieId, intendedType);
             const okUpload = await uploadItemCoversInPlace(items);
@@ -5291,42 +5271,25 @@ function openMovieModal(m, startIdx = 0) {
             await db.from("movie_items").delete().eq("movie_id", movieId);
           }
 
-          let finalType = "single";
-          if (intendedType === "collection" && items.length >= 0) {
-            finalType = "collection";
-          } else if (intendedType === "serial" && items.length >= 0) {
-            finalType = "serial";
-          }
+          let finalType = items.length > 0 ? intendedType : "single";
 
           const updateData = {
-            title,
-            link,
-            synopsis,
-            director,
-            product,
-            stars,
-            imdb,
-            release_info,
-            genre,
+            title, link, synopsis, director, product, stars, imdb, release_info, genre,
             type: finalType,
+            updated_at: new Date().toISOString() // 🚀 بروزرسانی زمان برای بالا آمدن پست
           };
           if (coverUrl) updateData.cover = coverUrl;
 
-          const { error: updErr } = await db
-            .from("movies")
-            .update(updateData)
-            .eq("id", movieId);
-          completePart(); // بخش دیتابیس
+          const { error: updErr } = await db.from("movies").update(updateData).eq("id", movieId);
+          completePart(); 
 
           if (updErr) {
-            console.error("update movie error", updErr);
-            finishPostProgress(false);
-            showToast("Update movie failed");
-            return;
+            console.error(updErr);
+            finishPostProgress(false); showToast("Update movie failed"); return;
           }
 
           finishPostProgress(true);
-          showToast("Movie updated");
+          showToast("فیلم بروزرسانی شد و به صدر لیست رفت");
           editingMovie = null;
           addMovieForm.reset();
           if (typeof window.resetMode === "function") window.resetMode();
@@ -5342,88 +5305,54 @@ function openMovieModal(m, startIdx = 0) {
           return;
         }
 
-        let provisionalType = "single";
-        if (selectedType !== "single" && hasBundleForms) {
-          provisionalType = selectedType;
-        }
+        let provisionalType = (selectedType !== "single" && hasBundleForms) ? selectedType : "single";
 
         const newMovie = {
-          title,
-          cover: coverUrl,
-          link,
-          synopsis,
-          director,
-          product,
-          stars,
-          imdb,
-          release_info,
-          genre,
+          title, cover: coverUrl, link, synopsis, director, product, stars, imdb, release_info, genre,
           type: provisionalType,
+          updated_at: new Date().toISOString() 
         };
 
-        const { data: inserted, error: addErr } = await db
-          .from("movies")
-          .insert([newMovie])
-          .select()
-          .single();
-        completePart(); // درج فیلم
+        const { data: inserted, error: addErr } = await db.from("movies").insert([newMovie]).select().single();
+        completePart(); 
 
         if (addErr || !inserted) {
-          console.error("movie insert err", addErr);
-          finishPostProgress(false);
-          showToast("Add movie failed");
-          return;
+          console.error(addErr);
+          finishPostProgress(false); showToast("Add movie failed"); return;
         }
 
         let items = [];
         if (provisionalType !== "single") {
           items = buildItemsFromForms(inserted.id, provisionalType);
-
-          if (provisionalType === "collection" && items.length < 1) {
-            finishPostProgress(false);
-            showToast("Collection requires at least 1 item");
-            await db.from("movies").delete().eq("id", inserted.id);
-            return;
-          }
-
           const okUpload = await uploadItemCoversInPlace(items);
           if (!okUpload) return;
 
           if (items.length > 0) {
-            const { error: itemsError } = await db
-              .from("movie_items")
-              .insert(items);
-            completePart(); // درج آیتم‌ها
+            const { error: itemsError } = await db.from("movie_items").insert(items);
+            completePart(); 
             if (itemsError) {
-              console.error("movie_items insert err", itemsError);
-              finishPostProgress(false);
-              showToast("Add items failed");
               await db.from("movies").delete().eq("id", inserted.id);
-              return;
+              finishPostProgress(false); return;
             }
           }
         }
 
-        let finalType = "single";
-        if (provisionalType === "collection" && items.length >= 1) {
-          finalType = "collection";
-        } else if (provisionalType === "serial" && items.length >= 1) {
-          finalType = "serial";
-        }
-
-        await db
-          .from("movies")
-          .update({ type: finalType })
-          .eq("id", inserted.id);
-        completePart(); // آپدیت نوع نهایی
+        let finalType = items.length > 0 ? provisionalType : "single";
+        
+        // 🚀 مرحله نهایی: آپدیت نوع و زمان قطعی برای صدرنشینی
+        await db.from("movies").update({ 
+          type: finalType, 
+          updated_at: new Date().toISOString() 
+        }).eq("id", inserted.id);
+        
+        completePart(); 
 
         finishPostProgress(true);
-        showToast("Movie added");
+        showToast("فیلم جدید اضافه شد");
         addMovieForm.reset();
         if (typeof window.resetMode === "function") window.resetMode();
         await fetchMovies();
         await fetchPopularMovies();
-        return;
       });
     }
   }
