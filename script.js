@@ -881,6 +881,7 @@ function finishPostProgress(success = true) {
 }
 
 // -------------------- Upload file with real progress via XHR --------------------
+
 async function uploadWithProgress(file, path) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -888,21 +889,26 @@ async function uploadWithProgress(file, path) {
         data: { session },
         error,
       } = await db.auth.getSession();
+      
       if (error || !session) {
         return reject(new Error("No active session. Please login as admin."));
       }
 
       const xhr = new XMLHttpRequest();
-      xhr.open("POST", `${db_URL}/storage/v1/object/covers/${path}`);
+      // 🚀 اصلاح شد: استفاده از SUPABASE_URL به جای db_URL
+      xhr.open("POST", `${SUPABASE_URL}/storage/v1/object/covers/${path}`);
 
-      // apikey هم باید باشه، ولی Authorization باید با توکن session باشه
-      xhr.setRequestHeader("apikey", db_KEY);
+      // 🚀 اصلاح شد: استفاده از SUPABASE_KEY به جای db_KEY
+      xhr.setRequestHeader("apikey", SUPABASE_KEY);
       xhr.setRequestHeader("Authorization", `Bearer ${session.access_token}`);
 
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
           const percent = Math.round((e.loaded / e.total) * 100);
-          updatePartProgress(percent);
+          // اطمینان حاصل کنید این تابع در جای دیگری تعریف شده است
+          if (typeof updatePartProgress === "function") {
+            updatePartProgress(percent);
+          }
         }
       };
 
@@ -910,16 +916,22 @@ async function uploadWithProgress(file, path) {
         if (xhr.status >= 200 && xhr.status < 300) {
           resolve({ ok: true });
         } else {
+          try {
+            const errRes = JSON.parse(xhr.responseText);
+            console.error("Upload Error Details:", errRes);
+          } catch(e) {}
           reject(new Error(`Upload failed (${xhr.status})`));
         }
       };
 
-      xhr.onerror = () => reject(new Error("Network error"));
+      xhr.onerror = () => reject(new Error("Network error during upload"));
 
-      const formData = new FormData();
-      formData.append("file", file);
-      xhr.send(formData);
+      // نکته مهم: برای Supabase Storage نباید فایل را داخل FormData بفرستید
+      // باید مستقیماً خود فایل (Blob/File) ارسال شود
+      xhr.send(file); 
+      
     } catch (err) {
+      console.error("Catch Error in upload:", err);
       reject(err);
     }
   });
