@@ -4068,7 +4068,6 @@ body.dark .msg-bubble.admin {
 }
 
 .msg-image {
-  width: 220px;
   max-width: 76vw;
   border-radius: 10px;
   object-fit: cover;
@@ -4263,12 +4262,6 @@ body.dark .msg-bubble.admin {
   border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
-.msg-image {
-  width: 220px;
-  max-width: 76vw;
-  border-radius: 10px;
-  object-fit: cover;
-}
 .msg-text {
   white-space: pre-wrap;
   word-wrap: break-word;
