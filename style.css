@@ -5386,8 +5386,6 @@ body.dark .homepage-manager-submenu {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 4px;
-  font-size: 14px;
   color: #111827;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
@@ -6154,7 +6152,6 @@ body.dark .admin-ep-card {
 .sidemenu-accordion {
   background: rgba(255, 255, 255, 0.5); /* زمینه غیر شیشه‌ای دکمه‌ای، شبیه پایین سایت */
   border-radius: 12px;
-  margin-bottom: 12px;
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
@@ -6218,8 +6215,7 @@ body.dark .sidemenu-accordion-body {
 
 /* پدینگ داخلی محتوا */
 .sidemenu-content-inner {
-  padding: 15px;
-  padding-top: 5px;
+  padding: 5px;
 }
 
 /* --- وضعیت باز شده (Active) --- */
