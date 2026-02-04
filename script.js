@@ -2274,17 +2274,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const genreToggle = document.getElementById("genreToggle");
   const genreSubmenu = document.getElementById("genreSubmenu");
-  if (genreToggle && genreSubmenu) {
-    genreToggle.addEventListener("click", () => {
-      const isOpen = genreSubmenu.style.display === "block";
-      genreSubmenu.style.display = isOpen ? "none" : "block";
-    });
-    document.getElementById("sideMenu")?.addEventListener("click", (e) => {
-      const clickedInside =
-        genreSubmenu.contains(e.target) || genreToggle.contains(e.target);
-      if (!clickedInside) genreSubmenu.style.display = "none";
-    });
-  }
 
   // Pagination helpers
   function computeTotalPages(length) {
@@ -5434,21 +5423,6 @@ function openMovieModal(m, startIdx = 0) {
   }
 
   const linksHeader = document.getElementById("linksHeader");
-  if (linksHeader) {
-    linksHeader.addEventListener("click", () => {
-      const grid = document.getElementById("socialGrid");
-      grid.classList.toggle("hidden");
-      const icon = linksHeader.querySelector(".toggle-icon");
-      if (grid.classList.contains("hidden")) {
-        icon.classList.remove("bi-chevron-up");
-        icon.classList.add("bi-chevron-down");
-      } else {
-        icon.classList.remove("bi-chevron-down");
-        icon.classList.add("bi-chevron-up");
-      }
-    });
-  }
-
   const addSocialForm = document.getElementById("addSocialForm");
   const socialList = document.getElementById("socialList");
   let editingSocialId = null;
@@ -6892,23 +6866,12 @@ return `
   }
 
   // =====================
-  // HOMEPAGE MANAGER LOGIC
+  // HOMEPAGE MANAGER LOGIC (FIXED FOR ACCORDION)
   // =====================
   (function () {
-    const homepageManagerToggle = document.getElementById(
-      "homepageManagerToggle"
-    );
-    const homepageManagerSubmenu = document.getElementById(
-      "homepageManagerSubmenu"
-    );
-
-    if (!homepageManagerToggle || !homepageManagerSubmenu) return;
-
-    // open/close manager section
-    homepageManagerToggle.addEventListener("click", () => {
-      homepageManagerSubmenu.style.display =
-        homepageManagerSubmenu.style.display === "none" ? "block" : "none";
-    });
+    // نکته مهم: دیگر نیازی به گرفتن دکمه‌های باز/بسته کردن منو در اینجا نیست
+    // چون آن بخش توسط لاجیک آکاردئون مدیریت می‌شود.
+    // ما مستقیم سراغ دکمه‌های تنظیمات (Toggle ها) می‌رویم.
 
     // Toggles
     const toggleTabs = document.getElementById("toggleTabs");
@@ -6916,19 +6879,21 @@ return `
     const togglePopularMovies = document.getElementById("togglePopularMovies");
     const toggleBackToTop = document.getElementById("toggleBackToTop");
     const toggleFloatingPanel = document.getElementById("toggleFloatingPanel");
-    const toggleReduceAnimations = document.getElementById(
-      "toggleReduceAnimations"
-    );
+    const toggleReduceAnimations = document.getElementById("toggleReduceAnimations");
 
-    // DOM elements
+    // اگر خود دکمه‌های سوئیچ در صفحه نبودند، کلاً کاری نکن
+    if (!toggleTabs && !toggleReduceAnimations) return;
+
+    // DOM elements (Target elements to show/hide)
     const elTabs = document.querySelector(".movie-type-tabs");
     const elSubTabGenresWrapper = document.querySelector(".tab-genres-wrapper");
-    const elPopularMovies = document.querySelector("#popular-carousel");
+    const elPopularMovies = document.querySelector("#popular-carousel"); // چک کنید کلاس یا آی‌دی درست باشد
+    // اگر المنت اسلایدر کلاس است، از .popular-movies-section استفاده کنید، اگر آیدی است #
+    const elPopularSection = document.querySelector(".popular-movies-section") || document.querySelector("#popular-carousel");
+    
     const elBackToTopContainer = document.querySelector(".go-top-container");
     const elFloatingWrapper = document.querySelector(".floating-wrapper");
-    const elFloatingBtnContainer = document.querySelector(
-      ".floating-btn-container"
-    );
+    const elFloatingBtnContainer = document.querySelector(".floating-btn-container");
 
     function hideOrShow(el, show) {
       if (!el) return;
@@ -6942,33 +6907,34 @@ return `
       popular: "homepage_popular_movies",
       backToTop: "homepage_back_to_top",
       floating: "homepage_floating_panel",
-      animations: "homepage_reduce_animations", // 1 = ON , 0 = OFF
+      animations: "homepage_reduce_animations", // 1 = ON (Animations Enabled) , 0 = OFF
     };
 
-    // Global flag (used also by render functions)
-    window.filmchiReduceAnimations =
-      localStorage.getItem(PREF.animations) === "0";
+    // Global flag
+    // پیش‌فرض: اگر چیزی ست نشده بود، انیمیشن فعال باشد (یعنی reduceAnimations نباشد)
+    const storedAnim = localStorage.getItem(PREF.animations);
+    window.filmchiReduceAnimations = storedAnim === "0";
 
     // ==================================================
-    // ANIMATIONS — ENABLE / DISABLE  (FINAL FIXED VERSION)
+    // 1. ANIMATIONS SETTING
     // ==================================================
     function applyAnimationSetting() {
-      const animationsEnabled = !!toggleReduceAnimations.checked;
+      if (!toggleReduceAnimations) return;
+      
+      const animationsEnabled = toggleReduceAnimations.checked;
       window.filmchiReduceAnimations = !animationsEnabled;
 
-      // فقط کارت‌ها و اجزای داخل کارت
+      // المنت‌های هدف
       const cards = document.querySelectorAll(".movie-card");
       const animatedEls = document.querySelectorAll(
         ".movie-card .anim-horizontal, .movie-card .anim-vertical, .movie-card .anim-left-right"
       );
 
-      // -----------------------------------
-      //   ENABLE ANIMATIONS
-      // -----------------------------------
       if (animationsEnabled) {
+        // --- ENABLE ANIMATIONS ---
         document.body.classList.remove("reduce-animations");
 
-        // کلاس‌های فعال قبلی حذف می‌شوند تا دوباره با اسکرول فعال شوند
+        // ریست کردن کلاس‌ها برای فعال شدن مجدد آبزرور
         cards.forEach((card) => {
           card.classList.remove("active-down", "active-up", "no-reveal");
         });
@@ -6976,104 +6942,94 @@ return `
           el.classList.remove("active-down", "active-up", "no-reveal");
         });
 
-        // بازنشانی Observerها
+        // اتصال مجدد Observer ها (اگر تعریف شده باشند)
         try {
-          if (typeof cardObserver !== "undefined") cardObserver.disconnect();
-        } catch {}
-        try {
-          if (typeof animObserver !== "undefined") animObserver.disconnect();
-        } catch {}
+          if (typeof cardObserver !== "undefined") {
+            cardObserver.disconnect();
+            cards.forEach(card => cardObserver.observe(card));
+          }
+          if (typeof animObserver !== "undefined") {
+            animObserver.disconnect();
+            animatedEls.forEach(el => animObserver.observe(el));
+          }
+        } catch (e) { console.log("Observer warning:", e); }
 
-        // فعال کردن دوباره مشاهده برای کارت‌ها
-        cards.forEach((card) => {
-          try {
-            cardObserver.observe(card);
-          } catch {}
-        });
-
-        animatedEls.forEach((el) => {
-          try {
-            animObserver.observe(el);
-          } catch {}
-        });
-
-        // -----------------------------------
-        //   DISABLE ANIMATIONS
-        // -----------------------------------
       } else {
+        // --- DISABLE ANIMATIONS ---
         document.body.classList.add("reduce-animations");
 
-        // توقف کامل observer ها
         try {
           if (typeof cardObserver !== "undefined") cardObserver.disconnect();
-        } catch {}
-        try {
           if (typeof animObserver !== "undefined") animObserver.disconnect();
-        } catch {}
+        } catch (e) {}
 
-        // کارت‌ها از همان اول ظاهر شوند؛ و دکمه More Info هم کار کند
+        // نمایش کامل همه کارت‌ها
         cards.forEach((card) => {
           card.classList.add("active-down", "active-up", "no-reveal");
         });
-
         animatedEls.forEach((el) => {
           el.classList.add("active-down", "active-up", "no-reveal");
         });
       }
 
-      // ذخیره انتخاب
       localStorage.setItem(PREF.animations, animationsEnabled ? "1" : "0");
     }
 
     // ==================================================
-    // APPLY FUNCTIONS
+    // 2. OTHER SETTINGS APPLY FUNCTIONS
     // ==================================================
     function applyTabsSetting() {
-      const enabled = !!toggleTabs.checked;
+      if (!toggleTabs) return;
+      const enabled = toggleTabs.checked;
 
+      // اگر تب‌ها غیرفعال شوند، تب All انتخاب شود
       if (!enabled) {
-        const activeBtn = document.querySelector(
-          ".movie-type-tabs button.active"
-        );
-        const allBtn = document.querySelector(
-          '.movie-type-tabs button[data-type="all"]'
-        );
-
+        const activeBtn = document.querySelector(".movie-type-tabs button.active");
+        const allBtn = document.querySelector('.movie-type-tabs button[data-type="all"]');
         if (activeBtn && allBtn && activeBtn !== allBtn) allBtn.click();
       }
 
       hideOrShow(elTabs, enabled);
+      // اگر تب‌ها خاموش باشند، زیرژانر هم باید مخفی شود
       if (!enabled) hideOrShow(elSubTabGenresWrapper, false);
+      else applySubTabGenresSetting(); // اگر روشن شد، وضعیت زیرژانر چک شود
 
       localStorage.setItem(PREF.tabs, enabled ? "1" : "0");
     }
 
     function applySubTabGenresSetting() {
-      const enabled = !!toggleSubTabGenres.checked;
-      const show = enabled && !!toggleTabs && toggleTabs.checked;
-
-      hideOrShow(elSubTabGenresWrapper, show);
+      if (!toggleSubTabGenres) return;
+      const enabled = toggleSubTabGenres.checked;
+      // زیرژانر فقط وقتی نشان داده شود که هم خودش فعال باشد و هم تب‌ها فعال باشند
+      const tabsOn = toggleTabs ? toggleTabs.checked : true;
+      
+      hideOrShow(elSubTabGenresWrapper, enabled && tabsOn);
       localStorage.setItem(PREF.subGenres, enabled ? "1" : "0");
     }
 
     function applyPopularMoviesSetting() {
-      const enabled = !!togglePopularMovies.checked;
-      hideOrShow(elPopularMovies, enabled);
+      if (!togglePopularMovies) return;
+      const enabled = togglePopularMovies.checked;
+      hideOrShow(elPopularSection, enabled);
       localStorage.setItem(PREF.popular, enabled ? "1" : "0");
     }
 
     function applyBackToTopSetting() {
-      const enabled = !!toggleBackToTop.checked;
-      hideOrShow(elBackToTopContainer, enabled);
+      if (!toggleBackToTop) return;
+      const enabled = toggleBackToTop.checked;
+      // نکته: دکمه GoTop معمولا با اسکرول هم کنترل می‌شود، اما اینجا فورس می‌کنیم
+      if(elBackToTopContainer) {
+          if(!enabled) elBackToTopContainer.style.display = 'none';
+          else elBackToTopContainer.style.display = ''; // برگرداندن به حالت مدیریت توسط CSS/JS اسکرول
+      }
       localStorage.setItem(PREF.backToTop, enabled ? "1" : "0");
     }
 
     function applyFloatingSetting() {
-      const enabled = !!toggleFloatingPanel.checked;
-
+      if (!toggleFloatingPanel) return;
+      const enabled = toggleFloatingPanel.checked;
       hideOrShow(elFloatingWrapper, enabled);
       hideOrShow(elFloatingBtnContainer, enabled);
-
       localStorage.setItem(PREF.floating, enabled ? "1" : "0");
     }
 
@@ -7081,107 +7037,71 @@ return `
     // RESTORE ON PAGE LOAD
     // ==================================================
     function restoreSettings() {
-      if (localStorage.getItem(PREF.tabs) === "0") toggleTabs.checked = false;
-      if (localStorage.getItem(PREF.subGenres) === "0")
-        toggleSubTabGenres.checked = false;
-      if (localStorage.getItem(PREF.popular) === "0")
-        togglePopularMovies.checked = false;
-      if (localStorage.getItem(PREF.backToTop) === "0")
-        toggleBackToTop.checked = false;
-      if (localStorage.getItem(PREF.floating) === "0")
-        toggleFloatingPanel.checked = false;
-      // ==================================================
-      // ANIMATIONS —  / DISABLE (FINAL FIXED VERSION)
-      // ==================================================
-      function applyAnimationSetting() {
-        const animationsEnabled = !!toggleReduceAnimations.checked;
-        window.filmchiReduceAnimations = !animationsEnabled;
-
-        // ❗ فقط کارت‌های اصلی صفحه
-        const mainCards = document.querySelectorAll(
-          ".movie-card:not(.expanded)" // کارت‌های صفحه index، نه داخل مودال و نه carousel
-        );
-
-        // فقط المنت‌های انیمیشنی داخل کارت‌های اصلی
-        const animatedEls = document.querySelectorAll(
-          ".movie-card .anim-horizontal, .movie-card .anim-vertical, .movie-card .anim-left-right"
-        );
-
-        if (animationsEnabled) {
-          // ---------------- ENABLE ANIMATIONS ----------------
-          document.body.classList.remove("reduce-animations");
-
-          mainCards.forEach((card) =>
-            card.classList.remove("active-down", "active-up", "no-reveal")
-          );
-
-          animatedEls.forEach((el) =>
-            el.classList.remove("active-down", "active-up")
-          );
-
-          // فعال کردن دوباره آبزرورها
-          try {
-            if (typeof cardObserver !== "undefined") {
-              cardObserver.disconnect();
-              mainCards.forEach((card) => cardObserver.observe(card));
-            }
-
-            if (typeof animObserver !== "undefined") {
-              animObserver.disconnect();
-              animatedEls.forEach((el) => animObserver.observe(el));
-            }
-          } catch {}
-        } else {
-          // ---------------- DISABLE ANIMATIONS ----------------
-          document.body.classList.add("reduce-animations");
-
-          // قطع آبزرورها
-          try {
-            if (typeof cardObserver !== "undefined") cardObserver.disconnect();
-            if (typeof animObserver !== "undefined") animObserver.disconnect();
-          } catch {}
-
-          // کارت‌های اصلی → کاملاً نمایش داده شوند
-          mainCards.forEach((card) => {
-            card.classList.add("active-down", "active-up", "no-reveal");
-          });
-
-          animatedEls.forEach((el) => {
-            el.classList.add("active-down", "active-up");
-          });
-        }
-
-        localStorage.setItem(PREF.animations, animationsEnabled ? "1" : "0");
-      }
-      if (localStorage.getItem(PREF.animations) === "0") {
-        toggleReduceAnimations.checked = false;
-        window.filmchiReduceAnimations = true;
+      // خواندن مقادیر از حافظه (پیش‌فرض: "1" یا null به معنی فعال)
+      
+      if (toggleTabs) {
+          const val = localStorage.getItem(PREF.tabs);
+          if (val === "0") toggleTabs.checked = false;
+          else toggleTabs.checked = true;
+          applyTabsSetting();
       }
 
-      applyTabsSetting();
-      applySubTabGenresSetting();
-      applyPopularMoviesSetting();
-      applyBackToTopSetting();
-      applyFloatingSetting();
-      applyAnimationSetting();
+      if (toggleSubTabGenres) {
+          const val = localStorage.getItem(PREF.subGenres);
+          if (val === "0") toggleSubTabGenres.checked = false;
+          else toggleSubTabGenres.checked = true;
+          applySubTabGenresSetting();
+      }
+
+      if (togglePopularMovies) {
+          const val = localStorage.getItem(PREF.popular);
+          if (val === "0") togglePopularMovies.checked = false;
+          else togglePopularMovies.checked = true;
+          applyPopularMoviesSetting();
+      }
+
+      if (toggleBackToTop) {
+          const val = localStorage.getItem(PREF.backToTop);
+          if (val === "0") toggleBackToTop.checked = false;
+          else toggleBackToTop.checked = true;
+          applyBackToTopSetting();
+      }
+
+      if (toggleFloatingPanel) {
+          const val = localStorage.getItem(PREF.floating);
+          if (val === "0") toggleFloatingPanel.checked = false;
+          else toggleFloatingPanel.checked = true;
+          applyFloatingSetting();
+      }
+
+      if (toggleReduceAnimations) {
+          const val = localStorage.getItem(PREF.animations);
+          // اگر 0 بود یعنی انیمیشن غیرفعال (reduceAnimations = true) -> چک‌باکس خاموش
+          // اگر 1 یا نال بود یعنی انیمیشن فعال -> چک‌باکس روشن
+          if (val === "0") toggleReduceAnimations.checked = false; 
+          else toggleReduceAnimations.checked = true;
+          applyAnimationSetting();
+      }
     }
 
     // ==================================================
     // EVENT LISTENERS
     // ==================================================
-    toggleTabs.addEventListener("change", () => {
+    if(toggleTabs) toggleTabs.addEventListener("change", () => {
       applyTabsSetting();
-      applySubTabGenresSetting();
+      applySubTabGenresSetting(); // آپدیت وابسته
     });
 
-    toggleSubTabGenres.addEventListener("change", applySubTabGenresSetting);
-    togglePopularMovies.addEventListener("change", applyPopularMoviesSetting);
-    toggleBackToTop.addEventListener("change", applyBackToTopSetting);
-    toggleFloatingPanel.addEventListener("change", applyFloatingSetting);
-    toggleReduceAnimations.addEventListener("change", applyAnimationSetting);
+    if(toggleSubTabGenres) toggleSubTabGenres.addEventListener("change", applySubTabGenresSetting);
+    if(togglePopularMovies) togglePopularMovies.addEventListener("change", applyPopularMoviesSetting);
+    if(toggleBackToTop) toggleBackToTop.addEventListener("change", applyBackToTopSetting);
+    if(toggleFloatingPanel) toggleFloatingPanel.addEventListener("change", applyFloatingSetting);
+    if(toggleReduceAnimations) toggleReduceAnimations.addEventListener("change", applyAnimationSetting);
 
+    // Run once on load
     restoreSettings();
   })();
+
 
   // Service Worker registration (caching)
   if ("serviceWorker" in navigator) {
@@ -7493,6 +7413,50 @@ function removeImdbFilterBadge(container = null) {
 
   updateSpinnerUI();
 })();
+// ==========================================
+//  SIDE MENU ACCORDION LOGIC (NEW)
+// ==========================================
+function initSideMenuAccordions() {
+  const accordions = document.querySelectorAll(".sidemenu-accordion");
+
+  accordions.forEach((acc) => {
+    const header = acc.querySelector(".sidemenu-accordion-header");
+    const body = acc.querySelector(".sidemenu-accordion-body");
+
+    if (!header || !body) return;
+
+    header.addEventListener("click", (e) => {
+      e.stopPropagation(); // جلوگیری از تداخل با بستن سایدبار
+
+      const isOpen = acc.classList.contains("open");
+
+      // 1. بستن همه آکاردئون‌های دیگر
+      accordions.forEach((other) => {
+        if (other !== acc && other.classList.contains("open")) {
+          other.classList.remove("open");
+          const otherBody = other.querySelector(".sidemenu-accordion-body");
+          if (otherBody) otherBody.style.maxHeight = "0";
+        }
+      });
+
+      // 2. تغییر وضعیت آکاردئون جاری
+      if (isOpen) {
+        // اگر باز بود، ببند
+        acc.classList.remove("open");
+        body.style.maxHeight = "0";
+      } else {
+        // اگر بسته بود، باز کن
+        acc.classList.add("open");
+        // تنظیم ارتفاع بر اساس محتوا
+        body.style.maxHeight = body.scrollHeight + "px";
+      }
+    });
+  });
+}
+
+// اجرای تابع
+initSideMenuAccordions();
+
 
 
   // -------------------- Initial load --------------------

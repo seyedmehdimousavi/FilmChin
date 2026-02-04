@@ -299,149 +299,144 @@
 
     <nav id="sideMenu" class="side-menu" aria-hidden="true">
       <div class="menu-section">
-        <div class="homepage-manager-section">
-          <div class="button-wrap homepage-manager-btn">
-            <button id="homepageManagerToggle" class="menu-toggle">
-              <span><i class="bi bi-gear"></i> Homepage Manager</span>
-            </button>
-            <div class="button-shadow"></div>
+
+  <div class="sidemenu-accordion" id="acc-homepage">
+    <div class="sidemenu-accordion-header">
+      <div class="sidemenu-header-content">
+        <i class="bi bi-gear"></i>
+        <span>Homepage Manager</span>
+      </div>
+      <i class="bi bi-chevron-down sidemenu-arrow"></i>
+    </div>
+    <div class="sidemenu-accordion-body">
+      <div class="sidemenu-content-inner">
+        <div id="homepageManagerSubmenu" class="homepage-manager-submenu">
+          
+          <div class="toggle-row">
+            <span>Animations</span>
+            <label class="switch">
+              <input type="checkbox" id="toggleReduceAnimations" checked />
+              <span class="slider"></span>
+            </label>
           </div>
 
-          <div
-            id="homepageManagerSubmenu"
-            class="submenu homepage-manager-submenu"
-            style="display: none"
-          >
-            <div class="toggle-row">
-              <span>Animations</span>
-              <label class="switch">
-                <input type="checkbox" id="toggleReduceAnimations" checked />
-                <span class="slider"></span>
-              </label>
-            </div>
-
-            <div class="toggle-row">
-              <span>Tabs</span>
-              <label class="switch">
-                <input type="checkbox" id="toggleTabs" checked />
-                <span class="slider"></span>
-              </label>
-            </div>
-
-            <div class="toggle-row">
-              <span>Sub-tab genres</span>
-              <label class="switch">
-                <input type="checkbox" id="toggleSubTabGenres" checked />
-                <span class="slider"></span>
-              </label>
-            </div>
-
-            <div class="toggle-row">
-              <span>Popular movies</span>
-              <label class="switch">
-                <input type="checkbox" id="togglePopularMovies" checked />
-                <span class="slider"></span>
-              </label>
-            </div>
-
-            <div class="toggle-row">
-              <span>Back to Top Button</span>
-              <label class="switch">
-                <input type="checkbox" id="toggleBackToTop" checked />
-                <span class="slider"></span>
-              </label>
-            </div>
-
-            <div class="toggle-row">
-              <span>Floating Summary Panel</span>
-              <label class="switch">
-                <input type="checkbox" id="toggleFloatingPanel" checked />
-                <span class="slider"></span>
-              </label>
-            </div>
+          <div class="toggle-row">
+            <span>Tabs</span>
+            <label class="switch">
+              <input type="checkbox" id="toggleTabs" checked />
+              <span class="slider"></span>
+            </label>
           </div>
+
+          <div class="toggle-row">
+            <span>Sub-tab genres</span>
+            <label class="switch">
+              <input type="checkbox" id="toggleSubTabGenres" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <span>Popular movies</span>
+            <label class="switch">
+              <input type="checkbox" id="togglePopularMovies" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <span>Back to Top Button</span>
+            <label class="switch">
+              <input type="checkbox" id="toggleBackToTop" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <span>Floating Summary Panel</span>
+            <label class="switch">
+              <input type="checkbox" id="toggleFloatingPanel" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+
         </div>
-        <div class="gs">
-          <div class="button-wrap">
-            <button id="genreToggle" class="menu-toggle">
-              <span><i class="bi bi-list"></i> Genres</span>
-            </button>
-            <div class="button-shadow"></div>
-          </div>
-          <div id="genreSubmenu" class="submenu" style="display: none">
-            <div id="genreGrid" class="genre-grid"></div>
-          </div>
-        </div>
-        <div class="sl">
-          <div id="linksHeader">
-            <div class="button-wrap">
-              <button
-                class="links-toggle"
-                style="display: flex; align-items: center"
-              >
-                <span> <i class="bi bi-link-45deg"></i> Links </span>
-              </button>
-              <div class="button-shadow"></div>
-            </div>
-          </div>
-          <div id="socialGrid" class="social-grid hidden"></div>
-        </div>
-
-        <div id="ratingFilter" class="rating-filter">
-          <h4 class="rating-filter-title">Sort by imdb rating</h4>
-
-          <div class="rating-process-wrapper">
-            <div class="rating-min">0</div>
-            <div class="rating-track" id="ratingTrack" aria-hidden="false">
-              <div class="rating-track-fill" id="ratingFill"></div>
-              <div
-                class="rating-knob"
-                id="ratingKnob"
-                role="slider"
-                tabindex="0"
-                aria-valuemin="0"
-                aria-valuemax="10"
-                aria-valuenow="0"
-              >
-                <div class="rating-bubble" id="ratingBubble" aria-hidden="true">
-                  Rating &gt; <span id="ratingBubbleValue">0.0</span>
-                </div>
-              </div>
-            </div>
-            <div class="rating-max">10</div>
-          </div>
-
-          <div class="rating-controls button-wrap">
-            <button id="applyRatingFilter" class="apply-imdb small">
-              <span>Apply</span>
-            </button>
-            <div class="button-shadow"></div>
-          </div>
-        </div>
-        
-        <!-- YEAR FILTER (no changes to IMDb) -->
-<div class="year-filter">
-  <div class="year-filter-row">
-    <div class="year-filter-label">Sort by Release date</div>
-    <div class="year-filter-sign">+</div>
-
-    <div class="year-spinner" id="yearSpinner">
-      <div class="year-spinner-item year-spinner-top" id="yearSpinnerTop"></div>
-      <div class="year-spinner-item year-spinner-center" id="yearSpinnerCenter"></div>
-      <div class="year-spinner-item year-spinner-bottom" id="yearSpinnerBottom"></div>
+      </div>
     </div>
   </div>
 
-  <div class="year-apply-wrap button-wrap">
-    <button id="applyYearFilter" class="apply-imdb small">
-      <span>Apply</span>
-    </button>
-    <div class="button-shadow"></div>
+  <div class="sidemenu-accordion" id="acc-genre">
+    <div class="sidemenu-accordion-header">
+      <div class="sidemenu-header-content">
+        <i class="bi bi-list"></i>
+        <span>Genres</span>
+      </div>
+      <i class="bi bi-chevron-down sidemenu-arrow"></i>
+    </div>
+    <div class="sidemenu-accordion-body">
+      <div class="sidemenu-content-inner">
+        <div id="genreGrid" class="genre-grid"></div>
+      </div>
+    </div>
   </div>
+
+  <div class="sidemenu-accordion" id="acc-links">
+    <div class="sidemenu-accordion-header">
+      <div class="sidemenu-header-content">
+        <i class="bi bi-link-45deg"></i>
+        <span>Links</span>
+      </div>
+      <i class="bi bi-chevron-down sidemenu-arrow"></i>
+    </div>
+    <div class="sidemenu-accordion-body">
+      <div class="sidemenu-content-inner">
+        <div id="socialGrid" class="social-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ratingFilter" class="rating-filter">
+    <h4 class="rating-filter-title">Sort by imdb rating</h4>
+    <div class="rating-process-wrapper">
+      <div class="rating-min">0</div>
+      <div class="rating-track" id="ratingTrack">
+        <div class="rating-track-fill" id="ratingFill"></div>
+        <div class="rating-knob" id="ratingKnob" role="slider" tabindex="0">
+          <div class="rating-bubble" id="ratingBubble">
+            Rating &gt; <span id="ratingBubbleValue">0.0</span>
+          </div>
+        </div>
+      </div>
+      <div class="rating-max">10</div>
+    </div>
+    <div class="rating-controls button-wrap">
+      <button id="applyRatingFilter" class="apply-imdb small">
+        <span>Apply</span>
+      </button>
+      <div class="button-shadow"></div>
+    </div>
+  </div>
+
+  <div class="year-filter">
+    <div class="year-filter-row">
+      <div class="year-filter-label">Sort by Release date</div>
+      <div class="year-filter-sign">+</div>
+      <div class="year-spinner" id="yearSpinner">
+        <div class="year-spinner-item year-spinner-top" id="yearSpinnerTop"></div>
+        <div class="year-spinner-item year-spinner-center" id="yearSpinnerCenter"></div>
+        <div class="year-spinner-item year-spinner-bottom" id="yearSpinnerBottom"></div>
+      </div>
+    </div>
+    <div class="year-apply-wrap button-wrap">
+      <button id="applyYearFilter" class="apply-imdb small">
+        <span>Apply</span>
+      </button>
+      <div class="button-shadow"></div>
+    </div>
+  </div>
+
 </div>
 
-        
-      </div>
 
       <section class="side-menu-bottom">
         <!--  to admin bubble -->

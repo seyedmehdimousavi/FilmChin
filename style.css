@@ -6134,3 +6134,120 @@ body.dark .admin-ep-card {
   text-overflow: ellipsis;
   text-align: center;
 }
+/* =========================================
+   Side Menu Accordion Style (New Design)
+   ========================================= */
+
+/* حذف استایل‌های مزاحم قبلی */
+.menu-section .sidemenu-accordion-body .homepage-manager-submenu,
+.menu-section .sidemenu-accordion-body .submenu {
+  display: block !important; /* جلوگیری از display:none توسط کدهای قدیمی */
+  max-height: none !important;
+  opacity: 1 !important;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* کانتینر اصلی هر آیتم آکاردئون */
+.sidemenu-accordion {
+  background: rgba(255, 255, 255, 0.5); /* زمینه غیر شیشه‌ای دکمه‌ای، شبیه پایین سایت */
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+body.dark .sidemenu-accordion {
+  background: rgba(33, 42, 51, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* هدر آیتم (بخشی که کلیک می‌شود) */
+.sidemenu-accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: inherit;
+  user-select: none;
+}
+
+.sidemenu-accordion-header:hover {
+  background: rgba(0,0,0,0.03);
+}
+body.dark .sidemenu-accordion-header:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+/* بخش آیکون و متن سمت چپ */
+.sidemenu-header-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidemenu-header-content i {
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+/* آیکون فلش سمت راست */
+.sidemenu-arrow {
+  font-size: 0.8rem;
+  opacity: 0.5;
+  transition: transform 0.3s ease;
+}
+
+/* بدنه آکاردئون (مخفی به صورت پیش‌فرض) */
+.sidemenu-accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+body.dark .sidemenu-accordion-body {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* پدینگ داخلی محتوا */
+.sidemenu-content-inner {
+  padding: 15px;
+  padding-top: 5px;
+}
+
+/* --- وضعیت باز شده (Active) --- */
+.sidemenu-accordion.open {
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  border-color: transparent;
+}
+
+body.dark .sidemenu-accordion.open {
+  background: #2c353f;
+}
+
+.sidemenu-accordion.open .sidemenu-arrow {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+/* اصلاح فاصله‌های داخلی تاگل‌ها برای قرارگیری بهتر */
+.sidemenu-content-inner .toggle-row {
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.sidemenu-content-inner .toggle-row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+body.dark .sidemenu-content-inner .toggle-row {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
