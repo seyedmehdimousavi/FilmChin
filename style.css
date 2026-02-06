@@ -71,7 +71,8 @@
 @font-face {
   font-family: "IRANSans";
   src: url("IRANSansWeb(FaNum)_Light.woff") format("woff");
-  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF; /* محدوده‌ی یونیکد فارسی/عربی */
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+08A0-08FF; /* محدوده‌ی یونیکد فارسی/عربی */
 }
 /* فونت انگلیسی */
 @font-face {
@@ -107,7 +108,9 @@ Body {
   margin: 0;
   background: var(--bg-day);
   color: #222;
-  transition: background 0.25s, color 0.25s;
+  transition:
+    background 0.25s,
+    color 0.25s;
   margin-top: 170px;
 }
 body.admin-body {
@@ -533,7 +536,9 @@ Body.dark .avatar {
   height: 0;
   overflow: hidden;
   opacity: 0;
-  transition: height 0.26s ease, opacity 0.18s ease;
+  transition:
+    height 0.26s ease,
+    opacity 0.18s ease;
   z-index: 40;
   display: flex;
   justify-content: center;
@@ -924,7 +929,9 @@ Body.dark #loginModal .close-btn:hover {
   border: 1px solid rgba(0, 74, 124, 0.06);
   border-radius: 6px;
   font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 #loginModal input:focus {
   border-color: #007bff;
@@ -1014,7 +1021,9 @@ Body.dark #loginModal .close-btn:hover {
   border: 0;
   border-radius: 6px;
   font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 .admin-form input:focus,
 .admin-form textarea:focus {
@@ -1536,7 +1545,9 @@ body.dark .movie-title {
   text-align: center;
   opacity: 0;
   transform: translateY(-8px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
 }
 /* بادی پنل ادمین در دارک مود */
 Body.admin-body.dark {
@@ -1692,7 +1703,7 @@ Body.admin-body.dark h2 {
   white-space: nowrap;
   -ms-overflow-style: none;
   scrollbar-width: none;
-  background: rgba(0, 74, 124, 0.06);
+  background: rgba(0, 74, 124, 0.03);
   border-radius: 6px;
 }
 
@@ -1715,7 +1726,9 @@ Body.admin-body.dark h2 {
   align-items: center;
   text-align: center;
   background: #fafafa;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   flex: 0 0 auto; /* جلوگیری از کشیده شدن */
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.58);
   padding: 0.2rem;
@@ -1867,7 +1880,9 @@ body.dark .episode-card {
   line-height: 1;
   cursor: pointer;
   user-select: none;
-  transition: background 160ms ease, transform 120ms ease;
+  transition:
+    background 160ms ease,
+    transform 120ms ease;
   padding: 5px 10px;
   font-size: 12px;
   font-weight: bold;
@@ -1993,7 +2008,7 @@ body.dark .genre-chip.active {
   padding: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   direction: ltr;
-  background: rgba(0, 74, 124, 0.05);
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
@@ -2438,7 +2453,9 @@ body.dark .year-spinner-center {
   border-radius: 6px;
   padding: 2px;
   background: linear-gradient(135deg, #4ce964, #48cad8);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   transition: all 0.4s ease;
@@ -2607,7 +2624,10 @@ body.dark .message-bubble {
   border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
 
-  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .admin-tabs .tab-circle img {
@@ -2698,7 +2718,7 @@ body.dark .links-toggle {
   padding: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   direction: ltr;
-  background: rgba(0, 74, 124, 0.05);
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
@@ -2789,7 +2809,9 @@ body.dark .rating-knob {
   border-radius: 8px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
   pointer-events: none;
-  transition: transform 0.08s ease, opacity 0.08s ease;
+  transition:
+    transform 0.08s ease,
+    opacity 0.08s ease;
   opacity: 0;
   font-weight: bold;
   background: #f5c518;
@@ -3014,7 +3036,9 @@ body.dark .active-filters-toast .filter-badge {
 
 .fade-step {
   opacity: 0;
-  transition: opacity 0.5s ease, transform 0.4s ease;
+  transition:
+    opacity 0.5s ease,
+    transform 0.4s ease;
   transform: translateY(10px);
 }
 .fade-step.active-step {
@@ -3190,7 +3214,9 @@ body.dark .role-badge.user {
   margin-bottom: 8px;
   border-radius: 8px;
   background: var(--card-bg, #f9f9f9);
-  transition: background 0.25s, box-shadow 0.25s;
+  transition:
+    background 0.25s,
+    box-shadow 0.25s;
   min-width: 680px; /* جلوگیری از شکستن چیدمان در کانتینر باریک و فعال شدن اسکرول */
 }
 
@@ -3260,7 +3286,10 @@ body.dark .role-badge.user {
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.05s ease, opacity 0.2s ease, background 0.2s ease;
+  transition:
+    transform 0.05s ease,
+    opacity 0.2s ease,
+    background 0.2s ease;
   white-space: nowrap;
 }
 
@@ -3678,7 +3707,9 @@ body.dark .carousel-item button.more-info {
   text-align: center;
   opacity: 0.6;
   transform: scale(0.9);
-  transition: transform 0.3s, opacity 0.3s;
+  transition:
+    transform 0.3s,
+    opacity 0.3s;
   padding: 0 5px; /* کمی فاصله بین کارت‌ها */
   box-sizing: border-box;
 }
@@ -3866,7 +3897,9 @@ body.dark .designer-credit {
   border-radius: 20px;
   text-decoration: none;
   font-weight: bold;
-  transition: background 0.3s, transform 0.2s;
+  transition:
+    background 0.3s,
+    transform 0.2s;
   cursor: pointer;
 }
 
@@ -4404,7 +4437,9 @@ min-tabs .tab-circle .badge {
 .movie-card .anim-vertical,
 .movie-card .anim-left-right {
   will-change: transform, opacity;
-  transition: transform 300ms ease, opacity 300ms ease;
+  transition:
+    transform 300ms ease,
+    opacity 300ms ease;
 }
 
 /* وقتی active-down */
@@ -4555,7 +4590,9 @@ min-tabs .tab-circle .badge {
   left: calc(var(--shadow-cuttoff-fix) - 0.875em);
   padding: 0.125em;
   box-sizing: border-box;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
   mask-composite: exclude;
   transition: all var(--anim--hover-time) var(--anim--hover-ease);
   overflow: visible;
@@ -4580,7 +4617,8 @@ button {
     rgba(255, 255, 255, 0.05)
   );
   border-radius: 999vw;
-  box-shadow: inset 0 0.125em 0.125em rgba(0, 0, 0, 0.05),
+  box-shadow:
+    inset 0 0.125em 0.125em rgba(0, 0, 0, 0.05),
     inset 0 -0.125em 0.125em rgba(255, 255, 255, 0.5),
     0 0.25em 0.125em -0.125em rgba(0, 0, 0, 0.2),
     0 0 0.1em 0.25em inset rgba(255, 255, 255, 0.2),
@@ -4598,7 +4636,8 @@ button:hover {
   -webkit-backdrop-filter: blur(0.01em);
   -moz-backdrop-filter: blur(0.01em);
   -ms-backdrop-filter: blur(0.01em);
-  box-shadow: inset 0 0.125em 0.125em rgba(0, 0, 0, 0.05),
+  box-shadow:
+    inset 0 0.125em 0.125em rgba(0, 0, 0, 0.05),
     inset 0 -0.125em 0.125em rgba(255, 255, 255, 0.5),
     0 0.15em 0.05em -0.1em rgba(0, 0, 0, 0.25),
     0 0 0.05em 0.1em inset rgba(255, 255, 255, 0.5),
@@ -4657,7 +4696,8 @@ button span::after {
   background-size: 200% 200%;
   background-position: 0% 50%;
   background-repeat: no-repeat;
-  transition: background-position calc(var(--anim--hover-time) * 1.25)
+  transition:
+    background-position calc(var(--anim--hover-time) * 1.25)
       var(--anim--hover-ease),
     --angle-2 calc(var(--anim--hover-time) * 1.25) var(--anim--hover-ease);
 }
@@ -4694,7 +4734,8 @@ button::after {
   left: calc(0% - var(--border-width) / 2);
   padding: var(--border-width);
   box-sizing: border-box;
-  background: conic-gradient(
+  background:
+    conic-gradient(
       from var(--angle-1) at 50% 50%,
       rgba(0, 0, 0, 0.5),
       rgba(0, 0, 0, 0) 5% 40%,
@@ -4703,9 +4744,12 @@ button::after {
       rgba(0, 0, 0, 0.5)
     ),
     linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5));
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
   mask-composite: exclude;
-  transition: all var(--anim--hover-time) var(--anim--hover-ease),
+  transition:
+    all var(--anim--hover-time) var(--anim--hover-ease),
     --angle-1 500ms ease;
   box-shadow: inset 0 0 0 calc(var(--border-width) / 2) rgba(255, 255, 255, 0.5);
 }
@@ -4746,7 +4790,8 @@ button:active::after {
 }
 
 .button-wrap:has(button:active) button {
-  box-shadow: inset 0 0.125em 0.125em rgba(0, 0, 0, 0.05),
+  box-shadow:
+    inset 0 0.125em 0.125em rgba(0, 0, 0, 0.05),
     inset 0 -0.125em 0.125em rgba(255, 255, 255, 0.5),
     0 0.125em 0.125em -0.125em rgba(0, 0, 0, 0.2),
     0 0 0.1em 0.25em inset rgba(255, 255, 255, 0.2),
@@ -4876,9 +4921,11 @@ body.dark .chat-back-btn {
   border-radius: var(--container-radius);
   overflow: hidden;
   cursor: pointer;
-  -webkit-box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25),
+  -webkit-box-shadow:
+    0em -0.062em 0.062em rgba(0, 0, 0, 0.25),
     0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
-  box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25),
+  box-shadow:
+    0em -0.062em 0.062em rgba(0, 0, 0, 0.25),
     0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
   -webkit-transition: var(--transition);
   -o-transition: var(--transition);
@@ -4897,9 +4944,11 @@ body.dark .chat-back-btn {
   position: absolute;
   z-index: 1;
   inset: 0;
-  -webkit-box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset,
+  -webkit-box-shadow:
+    0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset,
     0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
-  box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset,
+  box-shadow:
+    0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset,
     0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
   border-radius: var(--container-radius);
 }
@@ -4916,11 +4965,13 @@ body.dark .chat-back-btn {
   left: var(--circle-container-offset);
   top: var(--circle-container-offset);
   border-radius: var(--container-radius);
-  -webkit-box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1),
+  -webkit-box-shadow:
+    inset 0 0 0 3.375em rgba(255, 255, 255, 0.1),
     inset 0 0 0 3.375em rgba(255, 255, 255, 0.1),
     0 0 0 0.625em rgba(255, 255, 255, 0.1),
     0 0 0 1.25em rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1),
+  box-shadow:
+    inset 0 0 0 3.375em rgba(255, 255, 255, 0.1),
     inset 0 0 0 3.375em rgba(255, 255, 255, 0.1),
     0 0 0 0.625em rgba(255, 255, 255, 0.1),
     0 0 0 1.25em rgba(255, 255, 255, 0.1);
@@ -4942,10 +4993,11 @@ body.dark .chat-back-btn {
   margin: auto;
   border-radius: var(--container-radius);
   background-color: var(--sun-bg);
-  -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61)
-      inset,
+  -webkit-box-shadow:
+    0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset,
     0em -0.062em 0.062em 0em #a1872a inset;
-  box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset,
+  box-shadow:
+    0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset,
     0em -0.062em 0.062em 0em #a1872a inset;
   -webkit-filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25))
     drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
@@ -4971,16 +5023,19 @@ body.dark .chat-back-btn {
   height: 100%;
   background-color: var(--moon-bg);
   border-radius: inherit;
-  -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61)
-      inset,
+  -webkit-box-shadow:
+    0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset,
     0em -0.062em 0.062em 0em #969696 inset;
-  box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset,
+  box-shadow:
+    0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset,
     0em -0.062em 0.062em 0em #969696 inset;
   -webkit-transition: var(--transition);
   -o-transition: var(--transition);
   transition: var(--transition);
   position: relative;
-  transition: all var(--transition), transform 0.3s ease;
+  transition:
+    all var(--transition),
+    transform 0.3s ease;
 }
 
 .theme-switch__moon:hover {
@@ -5026,23 +5081,33 @@ body.dark .chat-back-btn {
   position: absolute;
   bottom: -0.625em;
   left: 0.312em;
-  -webkit-box-shadow: 0.937em 0.312em var(--clouds-color),
+  -webkit-box-shadow:
+    0.937em 0.312em var(--clouds-color),
     -0.312em -0.312em var(--back-clouds-color),
-    1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color),
-    2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color),
-    2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color),
-    3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color),
+    1.437em 0.375em var(--clouds-color),
+    0.5em -0.125em var(--back-clouds-color),
+    2.187em 0 var(--clouds-color),
+    1.25em -0.062em var(--back-clouds-color),
+    2.937em 0.312em var(--clouds-color),
+    2em -0.312em var(--back-clouds-color),
+    3.625em -0.062em var(--clouds-color),
+    2.625em 0em var(--back-clouds-color),
     4.5em -0.312em var(--clouds-color),
     3.375em -0.437em var(--back-clouds-color),
     4.625em -1.75em 0 0.437em var(--clouds-color),
     4em -0.625em var(--back-clouds-color),
     4.125em -2.125em 0 0.437em var(--back-clouds-color);
-  box-shadow: 0.937em 0.312em var(--clouds-color),
+  box-shadow:
+    0.937em 0.312em var(--clouds-color),
     -0.312em -0.312em var(--back-clouds-color),
-    1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color),
-    2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color),
-    2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color),
-    3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color),
+    1.437em 0.375em var(--clouds-color),
+    0.5em -0.125em var(--back-clouds-color),
+    2.187em 0 var(--clouds-color),
+    1.25em -0.062em var(--back-clouds-color),
+    2.937em 0.312em var(--clouds-color),
+    2em -0.312em var(--back-clouds-color),
+    3.625em -0.062em var(--clouds-color),
+    2.625em 0em var(--back-clouds-color),
     4.5em -0.312em var(--clouds-color),
     3.375em -0.437em var(--back-clouds-color),
     4.625em -1.75em 0 0.437em var(--clouds-color),
@@ -5370,10 +5435,7 @@ body.dark .chat-back-btn {
 ========================= */
 
 .homepage-manager-submenu {
-  padding: 10px 8px;
   border-radius: 12px;
-  margin: 10px 0;
-  background: rgba(0, 74, 124, 0.05); /* شبیه rating-filter، بدون گلس */
   border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
@@ -5546,7 +5608,7 @@ body.reduce-animations .episode-title.scrolling {
   background: #eef3f7;
   justify-content: space-around;
   border-radius: 18px;
-  gap: 4px;
+  /* gap: 4px; */
 }
 body.dark .tabs-container {
   background: rgba(255, 255, 255, 0.03);
@@ -5561,10 +5623,10 @@ body.dark .tabs-container {
   gap: 6px;
   transition: all 0.2s ease;
   flex: 0 0 auto;
-  color: #0b3d5c;
-  border: 1px solid #6e6e6e26;
+  color: #0b3d5cba;
+  /* border: 1px solid #6e6e6e26; */
   border-radius: 20px;
-  padding: 3px 5px;
+  padding: 3px 7px;
   font-size: 14px;
   font-weight: 700;
 }
@@ -5575,13 +5637,12 @@ body.dark .tabs-container .tab-link {
   border: 1px solid #ffffff;
 }
 .tabs-container .tab-link.active {
-  background: #017ada;
-  transition: all .5s;
-  color: #fff;
+  transition: all 0.5s;
+  color: #006abf;
 }
 body.dark .tabs-container .tab-link.active {
   background: #017ada;
-  transition: all .5s;
+  transition: all 0.5s;
   color: #fff;
 }
 
@@ -5592,7 +5653,7 @@ body.dark .tabs-container .tab-link.active {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #017ada;
+  background: #0b3d5cba;
   color: #fff;
   font-size: 10px;
   font-weight: bold;
@@ -5600,18 +5661,22 @@ body.dark .tabs-container .tab-link.active {
   box-sizing: border-box;
 }
 .tabs-container .tab-link.active .count {
-  background: white;
-  color: #017ada;
+  background: #006abf;
+  color: #fafafa;
 }
-
+.tab-link span {
+  font-size: 15px;
+  font-weight: bold;
+}
 /* حباب شناور */
 .tab-indicator {
   position: absolute;
-  top: 6px;
-  bottom: 6px;
+  top: 0;
+  bottom: 0;
   width: 0;
   border-radius: 20px;
-  background: #017ada;
+  background: rgba(0, 146, 254, 0.2);
+  color: rgba(33, 150, 234, 255);
   transition: all 0.3s cubic-bezier(0.25, 1, 0.3, 1);
   z-index: 1;
   opacity: 1;
@@ -5769,7 +5834,9 @@ body.dark .favorites-page-btn {
 .movie-card.highlight-favorite {
   outline: 2px solid #32b768;
   box-shadow: 0 0 0 3px rgba(50, 183, 104, 0.4);
-  transition: box-shadow 0.2s ease, outline 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    outline 0.2s ease;
 }
 /* ===================== Post Options Overlay ===================== */
 
@@ -6018,7 +6085,9 @@ body.dark .feature-accordion {
   text-align: justify;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.25s ease, padding-bottom 0.25s ease;
+  transition:
+    max-height 0.25s ease,
+    padding-bottom 0.25s ease;
   direction: rtl;
 }
 
@@ -6061,7 +6130,7 @@ body.dark .feature-accordion {
   white-space: nowrap;
   padding: 10px 0;
   margin-top: 10px;
-  border-top: 1px solid rgba(0,0,0,0.05);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
   scrollbar-width: thin;
 }
 
@@ -6083,7 +6152,9 @@ body.dark .feature-accordion {
   cursor: pointer;
   border-radius: 8px;
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   background: #fff;
   border: 1px solid #eee;
   position: relative;
@@ -6096,7 +6167,7 @@ body.dark .admin-ep-card {
 
 .admin-ep-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .admin-ep-card.active-popular {
@@ -6143,14 +6214,18 @@ body.dark .admin-ep-card {
   max-height: none !important;
   opacity: 1 !important;
   margin: 0;
-  padding: 0;
   background: transparent;
   box-shadow: none;
 }
 
 /* کانتینر اصلی هر آیتم آکاردئون */
 .sidemenu-accordion {
-  background: rgba(255, 255, 255, 0.5); /* زمینه غیر شیشه‌ای دکمه‌ای، شبیه پایین سایت */
+  background: rgba(
+    255,
+    255,
+    255,
+    0.5
+  ); /* زمینه غیر شیشه‌ای دکمه‌ای، شبیه پایین سایت */
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.05);
@@ -6158,8 +6233,8 @@ body.dark .admin-ep-card {
 }
 
 body.dark .sidemenu-accordion {
-  background: rgba(33, 42, 51, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* هدر آیتم (بخشی که کلیک می‌شود) */
@@ -6167,7 +6242,7 @@ body.dark .sidemenu-accordion {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
+  padding: 12px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
@@ -6176,10 +6251,10 @@ body.dark .sidemenu-accordion {
 }
 
 .sidemenu-accordion-header:hover {
-  background: rgba(0,0,0,0.03);
+  background: rgba(0, 0, 0, 0.03);
 }
 body.dark .sidemenu-accordion-header:hover {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 /* بخش آیکون و متن سمت چپ */
@@ -6221,7 +6296,7 @@ body.dark .sidemenu-accordion-body {
 /* --- وضعیت باز شده (Active) --- */
 .sidemenu-accordion.open {
   background: #fff;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
   border-color: transparent;
 }
 
@@ -6236,14 +6311,14 @@ body.dark .sidemenu-accordion.open {
 
 /* اصلاح فاصله‌های داخلی تاگل‌ها برای قرارگیری بهتر */
 .sidemenu-content-inner .toggle-row {
-  margin-bottom: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+  margin-bottom: 2px;
+  padding: 8px 5px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 .sidemenu-content-inner .toggle-row:last-child {
   border-bottom: none;
   margin-bottom: 0;
 }
 body.dark .sidemenu-content-inner .toggle-row {
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
