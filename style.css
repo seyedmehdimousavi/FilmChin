@@ -286,6 +286,15 @@ Body.dark .side-menu {
   margin: 0px auto 18px auto;
   padding: 8px;
 }
+.movie-count-container{
+  display: inline-block;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.02);
+  backdrop-filter: blur(6px);
+}
+body.dark .movie-count-container{
+  background: rgba(255, 255, 255, 0.03);
+}
 .movie-count {
   display: inline-block;
   font-weight: bold;
@@ -299,6 +308,8 @@ Body.dark .side-menu {
   background: var(--gradient-purple-magenta);
   background-clip: text;
   -webkit-background-clip: text;
+  
+  
 }
 
 /* --- SEO intro block --- */
