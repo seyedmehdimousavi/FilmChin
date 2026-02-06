@@ -5605,7 +5605,7 @@ body.reduce-animations .episode-title.scrolling {
   display: flex;
   padding: 2px;
   width: 100%;
-  
+
   justify-content: space-around;
   border-radius: 18px;
   /* gap: 4px; */
@@ -5629,18 +5629,11 @@ body.reduce-animations .episode-title.scrolling {
 }
 
 body.dark .tabs-container .tab-link {
-  background: rgba(255, 255, 255, 0.03);
   color: #ffffff;
-  border: 1px solid #ffffff;
 }
 .tabs-container .tab-link.active {
   transition: all 0.5s;
   color: #006abf;
-}
-body.dark .tabs-container .tab-link.active {
-  background: #017ada;
-  transition: all 0.5s;
-  color: #fff;
 }
 
 .tabs-container .tab-link .count {
@@ -5656,6 +5649,10 @@ body.dark .tabs-container .tab-link.active {
   font-weight: bold;
   line-height: 1;
   box-sizing: border-box;
+}
+body.dark .tabs-container .tab-link .count {
+  background: #ffffff;
+  color: rgba(30, 36, 40, 255);
 }
 .tabs-container .tab-link.active .count {
   background: #006abf;
@@ -5678,7 +5675,9 @@ body.dark .tabs-container .tab-link.active {
   z-index: 1;
   opacity: 1;
 }
-
+body.dark .tab-indicator {
+  background: rgba(0, 146, 254, 0.5);
+}
 .tabs-container .tab-link.active.count {
   background: var(--primary-bg);
   color: #017ada;
