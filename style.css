@@ -5605,13 +5605,10 @@ body.reduce-animations .episode-title.scrolling {
   display: flex;
   padding: 2px;
   width: 100%;
-  background: #eef3f7;
+  
   justify-content: space-around;
   border-radius: 18px;
   /* gap: 4px; */
-}
-body.dark .tabs-container {
-  background: rgba(255, 255, 255, 0.03);
 }
 .tabs-container .tab-link {
   position: relative;
