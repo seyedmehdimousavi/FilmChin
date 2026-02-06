@@ -6279,7 +6279,6 @@ body.dark .sidemenu-accordion-header:hover {
 /* آیکون فلش سمت راست */
 .sidemenu-arrow {
   font-size: 0.8rem;
-  opacity: 0.5;
   transition: transform 0.3s ease;
 }
 
@@ -6312,7 +6311,9 @@ body.dark .sidemenu-accordion.open {
 }
 
 .sidemenu-accordion.open .sidemenu-arrow {
-  transform: rotate(180deg);
+  transform: rotate(90deg);
+  transition: transform 0.3s ease;
+  transform-origin: center; 
   opacity: 1;
 }
 
