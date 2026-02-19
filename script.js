@@ -3069,9 +3069,17 @@ function setTabInUrl(type) {
     </div>
   </div>
 </div>
+
+<button class="post-collapse-toggle" type="button" aria-expanded="false" aria-label="Expand post details">
+  <span class="collapse-arrow">⌄</span>
+</button>
 `;
 
     moviesGrid.appendChild(card);
+
+    if (document.body.classList.contains("posts-collapsed-mode")) {
+      card.classList.add("post-collapsible");
+    }
 
     // احترام به تنظیم Animations
     if (window.filmchiReduceAnimations) {
@@ -3112,6 +3120,9 @@ function setTabInUrl(type) {
       // دکمه toggle synopsis
       if (target.closest(".quote-toggle-btn")) return;
 
+      // collapse toggle
+      if (target.closest(".post-collapse-toggle")) return;
+
       // متن سینوپسیس
       if (target.closest(".quote-text")) return;
 
@@ -3127,6 +3138,16 @@ function setTabInUrl(type) {
       // فقط در صورتی که هیچ مورد بالا نبود:
       openPostOptions(m);
     });
+
+    const collapseBtn = card.querySelector(".post-collapse-toggle");
+    if (collapseBtn) {
+      collapseBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isExpanded = card.classList.toggle("post-expanded");
+        collapseBtn.setAttribute("aria-expanded", String(isExpanded));
+      });
+    }
 
 // ===================== رفتار دکمه Go to file (اتصال به بات تلگرام) =====================
       const goBtn = card.querySelector(".go-btn");
@@ -6880,6 +6901,7 @@ return `
     const toggleBackToTop = document.getElementById("toggleBackToTop");
     const toggleFloatingPanel = document.getElementById("toggleFloatingPanel");
     const toggleReduceAnimations = document.getElementById("toggleReduceAnimations");
+    const toggleCollapsePosts = document.getElementById("toggleCollapsePosts");
 
     // اگر خود دکمه‌های سوئیچ در صفحه نبودند، کلاً کاری نکن
     if (!toggleTabs && !toggleReduceAnimations) return;
@@ -6908,6 +6930,7 @@ return `
       backToTop: "homepage_back_to_top",
       floating: "homepage_floating_panel",
       animations: "homepage_reduce_animations", // 1 = ON (Animations Enabled) , 0 = OFF
+      collapsePosts: "homepage_collapse_posts",
     };
 
     // Global flag
@@ -7033,6 +7056,23 @@ return `
       localStorage.setItem(PREF.floating, enabled ? "1" : "0");
     }
 
+    function applyCollapsePostsSetting() {
+      if (!toggleCollapsePosts) return;
+      const enabled = toggleCollapsePosts.checked;
+      document.body.classList.toggle("posts-collapsed-mode", enabled);
+
+      document.querySelectorAll(".movie-card").forEach((card) => {
+        if (enabled) {
+          card.classList.add("post-collapsible");
+          card.classList.remove("post-expanded");
+        } else {
+          card.classList.remove("post-collapsible", "post-expanded");
+        }
+      });
+
+      localStorage.setItem(PREF.collapsePosts, enabled ? "1" : "0");
+    }
+
     // ==================================================
     // RESTORE ON PAGE LOAD
     // ==================================================
@@ -7082,6 +7122,13 @@ return `
           else toggleReduceAnimations.checked = true;
           applyAnimationSetting();
       }
+
+      if (toggleCollapsePosts) {
+          const val = localStorage.getItem(PREF.collapsePosts);
+          if (val === "1") toggleCollapsePosts.checked = true;
+          else toggleCollapsePosts.checked = false;
+          applyCollapsePostsSetting();
+      }
     }
 
     // ==================================================
@@ -7097,6 +7144,7 @@ return `
     if(toggleBackToTop) toggleBackToTop.addEventListener("change", applyBackToTopSetting);
     if(toggleFloatingPanel) toggleFloatingPanel.addEventListener("change", applyFloatingSetting);
     if(toggleReduceAnimations) toggleReduceAnimations.addEventListener("change", applyAnimationSetting);
+    if(toggleCollapsePosts) toggleCollapsePosts.addEventListener("change", applyCollapsePostsSetting);
 
     // Run once on load
     restoreSettings();

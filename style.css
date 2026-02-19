@@ -559,6 +559,161 @@ Body.dark .avatar {
   height: 100%;
   opacity: 1;
 }
+
+.post-collapse-toggle {
+  display: none;
+  width: 100%;
+  border: 0;
+  border-top: 1px solid rgba(33, 133, 213, 0.2);
+  background: rgba(33, 133, 213, 0.08);
+  color: #1c5f93;
+  cursor: pointer;
+  min-height: 28px;
+}
+body.dark .post-collapse-toggle {
+  background: rgba(255, 255, 255, 0.08);
+  color: #c6d8ec;
+}
+.collapse-arrow {
+  display: inline-block;
+  font-size: 18px;
+  transition: transform 300ms ease;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  grid-template-rows: auto 28px;
+  align-items: center;
+  gap: 0 10px;
+  padding: 10px;
+  border-radius: 14px;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible .cover-container {
+  grid-column: 1;
+  grid-row: 1;
+  height: 70px;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 340ms ease;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible .cover-blur {
+  filter: blur(8px);
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible .cover-image {
+  width: 100%;
+  object-fit: cover;
+  padding: 0;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible .movie-info {
+  grid-column: 2 / 4;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 0;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible .movie-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible .movie-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible .movie-info > .field-label,
+body.posts-collapsed-mode .movie-card.post-collapsible .movie-info > .field-quote,
+body.posts-collapsed-mode .movie-card.post-collapsible .movie-info > .episodes-container,
+body.posts-collapsed-mode .movie-card.post-collapsible .movie-info > .comment-summary,
+body.posts-collapsed-mode .movie-card.post-collapsible .movie-info > .comments-panel {
+  max-height: 0;
+  margin: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(-10px);
+  transition: all 300ms ease;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible .movie-info > .button-wrap {
+  margin: 0;
+  grid-column: 2;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible .movie-info > .button-wrap .go-btn {
+  margin: 0;
+  width: auto;
+  min-width: 120px;
+  padding: 8px 12px;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible .post-collapse-toggle {
+  display: flex;
+  grid-column: 1 / 4;
+  grid-row: 2;
+  align-items: center;
+  justify-content: center;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 0;
+  padding: 0;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .cover-container,
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .movie-info,
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .movie-info > .button-wrap {
+  grid-column: auto;
+  grid-row: auto;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .cover-container {
+  height: 400px;
+  border-radius: 0;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .movie-info {
+  display: block;
+  padding: 12px;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .movie-info > .field-label,
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .movie-info > .field-quote,
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .movie-info > .episodes-container,
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .movie-info > .comment-summary,
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .movie-info > .comments-panel {
+  max-height: 1400px;
+  opacity: 1;
+  overflow: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .movie-info > .button-wrap .go-btn {
+  width: 100%;
+  margin-top: 8px;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .post-collapse-toggle {
+  grid-column: auto;
+  grid-row: auto;
+}
+
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .collapse-arrow {
+  transform: rotate(180deg);
+}
 .comments-panel-inner {
   width: 100%;
   display: flex;
