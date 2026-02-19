@@ -3070,42 +3070,16 @@ function setTabInUrl(type) {
   </div>
 </div>
 
-<div class="post-collapse-bar" role="button" tabindex="0" aria-expanded="false" aria-label="Expand post details">
+<button class="post-collapse-toggle" type="button" aria-expanded="false" aria-label="Expand post details">
   <span class="collapse-arrow">⌄</span>
-</div>
+</button>
 `;
 
     moviesGrid.appendChild(card);
 
-    const collapseBar = card.querySelector(".post-collapse-bar");
-    const goBtnLabel = card.querySelector(".go-btn span");
-
-    const syncCollapseUi = () => {
-      const inCollapsedMode = document.body.classList.contains(
-        "posts-collapsed-mode"
-      );
-      const isExpanded = card.classList.contains("post-expanded");
-
-      if (goBtnLabel) {
-        goBtnLabel.textContent =
-          inCollapsedMode && !isExpanded ? "File" : "Go to file";
-      }
-
-      if (collapseBar) {
-        collapseBar.setAttribute("aria-expanded", String(isExpanded));
-        collapseBar.setAttribute(
-          "aria-label",
-          isExpanded ? "Collapse post details" : "Expand post details"
-        );
-      }
-    };
-
-    card._syncCollapseUi = syncCollapseUi;
-
     if (document.body.classList.contains("posts-collapsed-mode")) {
       card.classList.add("post-collapsible");
     }
-    syncCollapseUi();
 
     // احترام به تنظیم Animations
     if (window.filmchiReduceAnimations) {
@@ -3147,7 +3121,7 @@ function setTabInUrl(type) {
       if (target.closest(".quote-toggle-btn")) return;
 
       // collapse toggle
-      if (target.closest(".post-collapse-bar")) return;
+      if (target.closest(".post-collapse-toggle")) return;
 
       // متن سینوپسیس
       if (target.closest(".quote-text")) return;
@@ -3165,22 +3139,13 @@ function setTabInUrl(type) {
       openPostOptions(m);
     });
 
-    if (collapseBar) {
-      const toggleCollapseState = (e) => {
+    const collapseBtn = card.querySelector(".post-collapse-toggle");
+    if (collapseBtn) {
+      collapseBtn.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
         const isExpanded = card.classList.toggle("post-expanded");
-        if (collapseBar) {
-          collapseBar.setAttribute("aria-expanded", String(isExpanded));
-        }
-        syncCollapseUi();
-      };
-
-      collapseBar.addEventListener("click", toggleCollapseState);
-      collapseBar.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          toggleCollapseState(e);
-        }
+        collapseBtn.setAttribute("aria-expanded", String(isExpanded));
       });
     }
 
@@ -7102,10 +7067,6 @@ return `
           card.classList.remove("post-expanded");
         } else {
           card.classList.remove("post-collapsible", "post-expanded");
-        }
-
-        if (typeof card._syncCollapseUi === "function") {
-          card._syncCollapseUi();
         }
       });
 
