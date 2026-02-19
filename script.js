@@ -3069,9 +3069,43 @@ function setTabInUrl(type) {
     </div>
   </div>
 </div>
+
+<div class="post-collapse-bar" role="button" tabindex="0" aria-expanded="false" aria-label="Expand post details">
+  <span class="collapse-arrow">⌄</span>
+</div>
 `;
 
     moviesGrid.appendChild(card);
+
+    const collapseBar = card.querySelector(".post-collapse-bar");
+    const goBtnLabel = card.querySelector(".go-btn span");
+
+    const syncCollapseUi = () => {
+      const inCollapsedMode = document.body.classList.contains(
+        "posts-collapsed-mode"
+      );
+      const isExpanded = card.classList.contains("post-expanded");
+
+      if (goBtnLabel) {
+        goBtnLabel.textContent =
+          inCollapsedMode && !isExpanded ? "File" : "Go to file";
+      }
+
+      if (collapseBar) {
+        collapseBar.setAttribute("aria-expanded", String(isExpanded));
+        collapseBar.setAttribute(
+          "aria-label",
+          isExpanded ? "Collapse post details" : "Expand post details"
+        );
+      }
+    };
+
+    card._syncCollapseUi = syncCollapseUi;
+
+    if (document.body.classList.contains("posts-collapsed-mode")) {
+      card.classList.add("post-collapsible");
+    }
+    syncCollapseUi();
 
     // احترام به تنظیم Animations
     if (window.filmchiReduceAnimations) {
@@ -3112,6 +3146,9 @@ function setTabInUrl(type) {
       // دکمه toggle synopsis
       if (target.closest(".quote-toggle-btn")) return;
 
+      // collapse toggle
+      if (target.closest(".post-collapse-bar")) return;
+
       // متن سینوپسیس
       if (target.closest(".quote-text")) return;
 
@@ -3127,6 +3164,25 @@ function setTabInUrl(type) {
       // فقط در صورتی که هیچ مورد بالا نبود:
       openPostOptions(m);
     });
+
+    if (collapseBar) {
+      const toggleCollapseState = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isExpanded = card.classList.toggle("post-expanded");
+        if (collapseBar) {
+          collapseBar.setAttribute("aria-expanded", String(isExpanded));
+        }
+        syncCollapseUi();
+      };
+
+      collapseBar.addEventListener("click", toggleCollapseState);
+      collapseBar.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          toggleCollapseState(e);
+        }
+      });
+    }
 
 // ===================== رفتار دکمه Go to file (اتصال به بات تلگرام) =====================
       const goBtn = card.querySelector(".go-btn");
@@ -6880,6 +6936,7 @@ return `
     const toggleBackToTop = document.getElementById("toggleBackToTop");
     const toggleFloatingPanel = document.getElementById("toggleFloatingPanel");
     const toggleReduceAnimations = document.getElementById("toggleReduceAnimations");
+    const toggleCollapsePosts = document.getElementById("toggleCollapsePosts");
 
     // اگر خود دکمه‌های سوئیچ در صفحه نبودند، کلاً کاری نکن
     if (!toggleTabs && !toggleReduceAnimations) return;
@@ -6908,6 +6965,7 @@ return `
       backToTop: "homepage_back_to_top",
       floating: "homepage_floating_panel",
       animations: "homepage_reduce_animations", // 1 = ON (Animations Enabled) , 0 = OFF
+      collapsePosts: "homepage_collapse_posts",
     };
 
     // Global flag
@@ -7033,6 +7091,27 @@ return `
       localStorage.setItem(PREF.floating, enabled ? "1" : "0");
     }
 
+    function applyCollapsePostsSetting() {
+      if (!toggleCollapsePosts) return;
+      const enabled = toggleCollapsePosts.checked;
+      document.body.classList.toggle("posts-collapsed-mode", enabled);
+
+      document.querySelectorAll(".movie-card").forEach((card) => {
+        if (enabled) {
+          card.classList.add("post-collapsible");
+          card.classList.remove("post-expanded");
+        } else {
+          card.classList.remove("post-collapsible", "post-expanded");
+        }
+
+        if (typeof card._syncCollapseUi === "function") {
+          card._syncCollapseUi();
+        }
+      });
+
+      localStorage.setItem(PREF.collapsePosts, enabled ? "1" : "0");
+    }
+
     // ==================================================
     // RESTORE ON PAGE LOAD
     // ==================================================
@@ -7082,6 +7161,13 @@ return `
           else toggleReduceAnimations.checked = true;
           applyAnimationSetting();
       }
+
+      if (toggleCollapsePosts) {
+          const val = localStorage.getItem(PREF.collapsePosts);
+          if (val === "1") toggleCollapsePosts.checked = true;
+          else toggleCollapsePosts.checked = false;
+          applyCollapsePostsSetting();
+      }
     }
 
     // ==================================================
@@ -7097,6 +7183,7 @@ return `
     if(toggleBackToTop) toggleBackToTop.addEventListener("change", applyBackToTopSetting);
     if(toggleFloatingPanel) toggleFloatingPanel.addEventListener("change", applyFloatingSetting);
     if(toggleReduceAnimations) toggleReduceAnimations.addEventListener("change", applyAnimationSetting);
+    if(toggleCollapsePosts) toggleCollapsePosts.addEventListener("change", applyCollapsePostsSetting);
 
     // Run once on load
     restoreSettings();
