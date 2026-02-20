@@ -286,13 +286,13 @@ Body.dark .side-menu {
   margin: 0px auto 18px auto;
   padding: 8px;
 }
-.movie-count-container{
+.movie-count-container {
   display: inline-block;
   border-radius: 16px;
   background: rgba(0, 0, 0, 0.02);
   backdrop-filter: blur(6px);
 }
-body.dark .movie-count-container{
+body.dark .movie-count-container {
   background: rgba(255, 255, 255, 0.03);
 }
 .movie-count {
@@ -308,8 +308,6 @@ body.dark .movie-count-container{
   background: var(--gradient-purple-magenta);
   background-clip: text;
   -webkit-background-clip: text;
-  
-  
 }
 
 /* --- SEO intro block --- */
@@ -578,8 +576,7 @@ body.dark .post-collapse-bar {
 }
 .collapse-arrow {
   display: block;
-  width: 20px;
-  height: 20px;
+  width: 15px;
   object-fit: contain;
   transform: rotate(-90deg);
   transition: transform 300ms ease;
@@ -595,7 +592,9 @@ body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) {
   border-radius: 14px;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .cover-container {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .cover-container {
   grid-column: 1;
   grid-row: 1;
   width: 64px;
@@ -606,18 +605,24 @@ body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .cove
   justify-self: start;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .cover-blur {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .cover-blur {
   filter: blur(8px);
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .cover-image {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .cover-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
   padding: 0;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .movie-info {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .movie-info {
   grid-column: 2 / 4;
   grid-row: 1;
   display: grid;
@@ -627,26 +632,40 @@ body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .movi
   padding: 0;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .movie-info > * {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .movie-info
+  > * {
   display: none !important;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .movie-title,
-body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .movie-info > .button-wrap {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .movie-title,
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .movie-info
+  > .button-wrap {
   display: block !important;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .movie-title {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .movie-title {
   margin: 0;
   font-size: 1rem;
   grid-column: 1;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .collection-badge {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .collection-badge {
   display: none !important;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .movie-name {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .movie-name {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -655,13 +674,20 @@ body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .movi
   line-height: 1.35;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .movie-info > .button-wrap {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .movie-info
+  > .button-wrap {
   margin: 0;
   grid-column: 2;
   align-self: center;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .movie-info > .button-wrap .go-btn {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .movie-info
+  > .button-wrap
+  .go-btn {
   margin: 0;
   width: auto;
   min-width: 60px;
@@ -674,7 +700,9 @@ body.posts-collapsed-mode .movie-card.post-collapsible .post-collapse-bar {
   width: 100%;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .post-collapse-bar {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .post-collapse-bar {
   grid-column: 1 / 4;
   grid-row: 2;
   width: calc(100% + 20px);
@@ -682,7 +710,9 @@ body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .post
   border-radius: 0 0 14px 14px;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .post-collapse-bar {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible.post-expanded
+  .post-collapse-bar {
   margin-top: 0;
 }
 
@@ -690,11 +720,17 @@ body.posts-collapsed-mode .movie-card.post-collapsible,
 body.posts-collapsed-mode .movie-card.post-collapsible .cover-container,
 body.posts-collapsed-mode .movie-card.post-collapsible .movie-info,
 body.posts-collapsed-mode .movie-card.post-collapsible .movie-title,
-body.posts-collapsed-mode .movie-card.post-collapsible .movie-info > .button-wrap .go-btn {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible
+  .movie-info
+  > .button-wrap
+  .go-btn {
   transition: all 280ms ease;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .collapse-arrow {
+body.posts-collapsed-mode
+  .movie-card.post-collapsible.post-expanded
+  .collapse-arrow {
   transform: rotate(90deg);
 }
 .comments-panel-inner {
@@ -6451,7 +6487,7 @@ body.dark .sidemenu-accordion.open {
 .sidemenu-accordion.open .sidemenu-arrow {
   transform: rotate(90deg);
   transition: transform 0.3s ease;
-  transform-origin: center; 
+  transform-origin: center;
   opacity: 1;
 }
 
