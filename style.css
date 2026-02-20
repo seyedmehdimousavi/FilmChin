@@ -577,8 +577,11 @@ body.dark .post-collapse-bar {
   color: #c6d8ec;
 }
 .collapse-arrow {
-  display: inline-block;
-  font-size: 14px;
+  display: block;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  transform: rotate(-90deg);
   transition: transform 300ms ease;
 }
 
@@ -674,7 +677,9 @@ body.posts-collapsed-mode .movie-card.post-collapsible .post-collapse-bar {
 body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) .post-collapse-bar {
   grid-column: 1 / 4;
   grid-row: 2;
+  width: calc(100% + 20px);
   margin: 8px -10px 0;
+  border-radius: 0 0 14px 14px;
 }
 
 body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .post-collapse-bar {
@@ -690,7 +695,7 @@ body.posts-collapsed-mode .movie-card.post-collapsible .movie-info > .button-wra
 }
 
 body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded .collapse-arrow {
-  transform: rotate(180deg);
+  transform: rotate(90deg);
 }
 .comments-panel-inner {
   width: 100%;

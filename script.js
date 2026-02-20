@@ -3071,7 +3071,7 @@ function setTabInUrl(type) {
 </div>
 
 <div class="post-collapse-bar" role="button" tabindex="0" aria-expanded="false" aria-label="Expand post details">
-  <span class="collapse-arrow">⌄</span>
+  <img class="collapse-arrow" src="/images/icons8-double-left.apng" alt="toggle post" />
 </div>
 `;
 
