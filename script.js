@@ -2040,6 +2040,86 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===== Theme switch + Background Blur =====
 
   const themeSwitchCheckbox = document.getElementById("themeSwitchCheckbox");
+  const themePalette = document.getElementById("themePalette");
+
+  const colorThemes = {
+    blue: {
+      accentRgb: "0, 74, 124",
+      accentDark: "#004a7c",
+      accent: "#0091d5",
+      accentLight: "#2185d5",
+      accentContrast: "#0d47a1",
+      bgDay: "#f1f4f9",
+      bgSoft: "#e8f0fa",
+    },
+    green: {
+      accentRgb: "25, 114, 64",
+      accentDark: "#197240",
+      accent: "#31aa63",
+      accentLight: "#4bb97a",
+      accentContrast: "#0f5c32",
+      bgDay: "#f1f8f3",
+      bgSoft: "#e6f4eb",
+    },
+    yellow: {
+      accentRgb: "156, 124, 19",
+      accentDark: "#9c7c13",
+      accent: "#d3a72a",
+      accentLight: "#e0be4e",
+      accentContrast: "#7a6008",
+      bgDay: "#faf7ed",
+      bgSoft: "#f7f0d8",
+    },
+    red: {
+      accentRgb: "152, 49, 49",
+      accentDark: "#983131",
+      accent: "#cb4a4a",
+      accentLight: "#de6a6a",
+      accentContrast: "#7a2323",
+      bgDay: "#faf1f1",
+      bgSoft: "#f5e3e3",
+    },
+    purple: {
+      accentRgb: "84, 63, 153",
+      accentDark: "#543f99",
+      accent: "#7f63d0",
+      accentLight: "#9a83de",
+      accentContrast: "#3e2c7a",
+      bgDay: "#f5f2fb",
+      bgSoft: "#ece6f7",
+    },
+    teal: {
+      accentRgb: "19, 106, 114",
+      accentDark: "#136a72",
+      accent: "#1d98a2",
+      accentLight: "#40afb7",
+      accentContrast: "#0f5258",
+      bgDay: "#f0f7f8",
+      bgSoft: "#deeff1",
+    },
+  };
+
+  function applyColorTheme(themeName) {
+    const selectedTheme = colorThemes[themeName] || colorThemes.blue;
+    const rootStyle = document.documentElement.style;
+
+    rootStyle.setProperty("--theme-accent-rgb", selectedTheme.accentRgb);
+    rootStyle.setProperty("--theme-accent-dark", selectedTheme.accentDark);
+    rootStyle.setProperty("--theme-accent", selectedTheme.accent);
+    rootStyle.setProperty("--theme-accent-light", selectedTheme.accentLight);
+    rootStyle.setProperty(
+      "--theme-accent-contrast",
+      selectedTheme.accentContrast
+    );
+    rootStyle.setProperty("--theme-bg-day", selectedTheme.bgDay);
+    rootStyle.setProperty("--theme-bg-soft", selectedTheme.bgSoft);
+
+    localStorage.setItem("colorTheme", themeName);
+    if (!themePalette) return;
+    themePalette.querySelectorAll(".theme-palette-dot").forEach((dot) => {
+      dot.classList.toggle("active", dot.dataset.themeColor === themeName);
+    });
+  }
 
   function applyThemeSmooth(dark) {
     const bg = document.getElementById("siteBgBlur");
@@ -2071,6 +2151,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // مقدار ذخیره‌شده
   const savedTheme = localStorage.getItem("theme");
   if (savedTheme === "dark") themeSwitchCheckbox.checked = true;
+
+  const savedColorTheme = localStorage.getItem("colorTheme") || "blue";
+  applyColorTheme(savedColorTheme);
+
+  if (themePalette) {
+    themePalette.querySelectorAll(".theme-palette-dot").forEach((dot) => {
+      dot.addEventListener("click", () => {
+        const themeName = dot.dataset.themeColor || "blue";
+        applyColorTheme(themeName);
+      });
+    });
+  }
 
   applyThemeSmooth(savedTheme === "dark");
   // Side menu
