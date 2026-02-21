@@ -2073,6 +2073,36 @@ body.dark .genre-chip-mini {
   transform: scale(0.96);
   background: rgba(var(--theme-accent-rgb), 0.25);
 }
+.person-chip {
+  display: inline-block;
+  border-radius: 12px;
+  background: var(--accent-soft-chip);
+  color: var(--theme-accent-dark);
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background 160ms ease,
+    transform 120ms ease;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: bold;
+}
+body.dark .person-chip {
+  background: rgba(var(--theme-accent-rgb), 0.35);
+  color: #ffffffe3;
+}
+.person-chip:active {
+  transform: scale(0.96);
+  background: rgba(var(--theme-accent-rgb), 0.25);
+}
+.chip-separator {
+  color: var(--theme-accent-dark);
+  font-weight: 700;
+}
+body.dark .chip-separator {
+  color: var(--theme-accent-light);
+}
 .tab-genres-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;

@@ -1641,7 +1641,8 @@ document.addEventListener("DOMContentLoaded", () => {
     ".movie-name",       // عنوان
     ".quote-text",       // synopsis
     ".genre-chip-mini",  // ژانر
-    ".country-chip"      // Product / کشور
+    ".country-chip",     // Product / کشور
+    ".person-chip"       // Stars / Director
   ];
 
   selectors.forEach((sel) => {
@@ -3002,30 +3003,60 @@ function setTabInUrl(type) {
   }
 
   const episodeMatches = new Map();
-  function renderChips(str) {
+
+  function setSearchFromChip(rawValue) {
+    const searchEl = document.getElementById("search");
+    if (!searchEl) return;
+    searchEl.value = rawValue;
+    searchEl.setAttribute("dir", "auto");
+    searchEl.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  function buildSearchChip(value, className) {
+    const safeValue = escapeHtml(value);
+    const encodedValue = encodeURIComponent(value);
+    return `<span class="${className}" dir="auto" onclick="(function(){window.__filmchinSetSearchFromChip && window.__filmchinSetSearchFromChip(decodeURIComponent('${encodedValue}'));})();">${safeValue}</span>`;
+  }
+
+  function extractHashtagTokens(str) {
+    if (!str) return [];
+    return (str.match(/#[^\s,،]+/g) || []).map((tag) => tag.trim()).filter(Boolean);
+  }
+
+  function extractCommaSeparatedNames(str) {
+    if (!str) return [];
+    return str
+      .split(/[،,]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  function renderChips(str, mode = "hashtags") {
     if (!str || str === "-") return "-";
+
+    if (mode === "names") {
+      const names = extractCommaSeparatedNames(str);
+      if (!names.length) return escapeHtml(str);
+      return names.map((name) => buildSearchChip(name, "person-chip")).join(" <span class=\"chip-separator\">,</span> ");
+    }
+
+    const tags = extractHashtagTokens(str);
+    if (tags.length) {
+      return tags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join(" ");
+    }
+
     return str
       .split(" ")
       .filter((g) => g.trim())
       .map((g) => {
-        if (g.startsWith("#")) {
-          const clean = escapeHtml(g);
-          return `<span class="genre-chip-mini" dir="auto" onclick="(function(){
-          const searchEl=document.getElementById('search');
-          searchEl.value='${clean}';
-          searchEl.dispatchEvent(new Event('input'));
-        })();">${clean}</span>`;
-        } else {
-          const clean = escapeHtml(g);
-          return `<a href="#" dir="auto" onclick="(function(){
-          const searchEl=document.getElementById('search');
-          searchEl.value='${clean}';
-          searchEl.dispatchEvent(new Event('input'));
-        })();">${clean}</a>`;
-        }
+        const clean = escapeHtml(g);
+        const encoded = encodeURIComponent(g);
+        return `<a href="#" class="country-chip" dir="auto" onclick="(function(){window.__filmchinSetSearchFromChip && window.__filmchinSetSearchFromChip(decodeURIComponent('${encoded}'));})();">${clean}</a>`;
       })
       .join(" ");
   }
+
+  window.__filmchinSetSearchFromChip = setSearchFromChip;
   async function renderPagedMovies(skipScroll) {
   if (!moviesGrid || !movieCount) return;
 
@@ -3170,8 +3201,8 @@ function setTabInUrl(type) {
     );
     const title = escapeHtml(m.title || "-");
     const synopsis = escapeHtml((m.synopsis || "-").trim());
-    const director = escapeHtml(m.director || "-");
-    const stars = escapeHtml(m.stars || "-");
+    const director = renderChips(m.director || "-", "names");
+    const stars = renderChips(m.stars || "-", "names");
     const imdb = escapeHtml(m.imdb || "-");
     const release_info = escapeHtml(m.release_info || "-");
 
@@ -3211,7 +3242,7 @@ function setTabInUrl(type) {
   </div>
 
   <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span>
-  <div class="field-quote anim-left-right">${director}</div>
+  <div class="field-quote anim-left-right director-field">${director}</div>
 
   <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
   <div class="field-quote anim-horizontal">
@@ -3219,7 +3250,7 @@ function setTabInUrl(type) {
   </div>
 
   <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
-  <div class="field-quote anim-left-right">${stars}</div>
+  <div class="field-quote anim-left-right stars-field">${stars}</div>
 
   <span class="field-label anim-vertical">
     <img src="/images/icons8-imdb-48.png" class="imdb-bell" style="width:20px;height:20px;">
@@ -3366,6 +3397,9 @@ function setTabInUrl(type) {
 
       // Product → کشور سازنده
       if (target.closest(".country-chip")) return;
+
+      // Stars / Director
+      if (target.closest(".person-chip")) return;
 
       // فقط در صورتی که هیچ مورد بالا نبود:
       openPostOptions(m);
@@ -3517,13 +3551,17 @@ function setTabInUrl(type) {
               }')`;
             card.querySelector(".quote-text").textContent =
               ep.synopsis || m.synopsis;
-            card.querySelectorAll(".field-quote")[1].textContent =
-              ep.director || m.director;
+            card.querySelectorAll(".field-quote")[1].innerHTML = renderChips(
+              ep.director || m.director || "-",
+              "names"
+            );
             card.querySelectorAll(".field-quote")[2].innerHTML = renderChips(
               ep.product || m.product || "-"
             );
-            card.querySelectorAll(".field-quote")[3].textContent =
-              ep.stars || m.stars;
+            card.querySelectorAll(".field-quote")[3].innerHTML = renderChips(
+              ep.stars || m.stars || "-",
+              "names"
+            );
             if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
             card.querySelectorAll(".field-quote")[5].textContent =
               ep.release_info || m.release_info;
@@ -3599,12 +3637,16 @@ function setTabInUrl(type) {
                 }')`;
               card.querySelector(".quote-text").textContent =
                 ep.synopsis || m.synopsis;
-              card.querySelectorAll(".field-quote")[1].textContent =
-                ep.director || m.director;
+              card.querySelectorAll(".field-quote")[1].innerHTML = renderChips(
+                ep.director || m.director || "-",
+                "names"
+              );
               card.querySelectorAll(".field-quote")[2].innerHTML =
                 renderChips(ep.product || m.product || "-");
-              card.querySelectorAll(".field-quote")[3].textContent =
-                ep.stars || m.stars;
+              card.querySelectorAll(".field-quote")[3].innerHTML = renderChips(
+                ep.stars || m.stars || "-",
+                "names"
+              );
               if (imdbChip) imdbChip.textContent = ep.imdb || m.imdb;
               card.querySelectorAll(".field-quote")[5].textContent =
                 ep.release_info || m.release_info;
@@ -4366,9 +4408,9 @@ function openMovieModal(m, startIdx = 0) {
           <div class="field-quote synopsis-quote"><div class="quote-text">${escapeHtml(data.synopsis || "-")}</div>
             <div class="button-wrap"><button class="quote-toggle-btn"><span>More</span></button></div>
           </div>
-          <span class="field-label">Director:</span><div class="field-quote director-field">${escapeHtml(data.director || "-")}</div>
+          <span class="field-label">Director:</span><div class="field-quote director-field">${renderChips(data.director || "-", "names")}</div>
           <span class="field-label">Product:</span><div class="field-quote product-field">${renderChips(data.product || "-")}</div>
-          <span class="field-label">Stars:</span><div class="field-quote stars-field">${escapeHtml(data.stars || "-")}</div>
+          <span class="field-label">Stars:</span><div class="field-quote stars-field">${renderChips(data.stars || "-", "names")}</div>
           <span class="field-label">IMDB:</span><div class="field-quote"><span class="chip imdb-chip">${escapeHtml(data.imdb || "-")}</span></div>
           <span class="field-label">Release:</span><div class="field-quote release-field">${escapeHtml(data.release_info || "-")}</div>
           <span class="field-label">Genre:</span><div class="field-quote genre-grid">${renderChips(data.genre || "-")}</div>
@@ -4384,9 +4426,9 @@ function openMovieModal(m, startIdx = 0) {
       content.querySelector(".cover-image").src = ep.cover || m.cover;
       content.querySelector(".cover-blur").style.backgroundImage = `url('${ep.cover || m.cover}')`;
       content.querySelector(".quote-text").textContent = ep.synopsis || "-";
-      content.querySelector(".director-field").textContent = ep.director || "-";
+      content.querySelector(".director-field").innerHTML = renderChips(ep.director || "-", "names");
       content.querySelector(".product-field").innerHTML = renderChips(ep.product || "-");
-      content.querySelector(".stars-field").textContent = ep.stars || "-";
+      content.querySelector(".stars-field").innerHTML = renderChips(ep.stars || "-", "names");
       content.querySelector(".imdb-chip").textContent = ep.imdb || "-";
       content.querySelector(".release-field").textContent = ep.release_info || "-";
       content.querySelector(".genre-grid").innerHTML = renderChips(ep.genre || "-");
@@ -4487,6 +4529,8 @@ function openMovieModal(m, startIdx = 0) {
           e.target.closest("button") ||
           e.target.closest(".chip") ||
           e.target.closest(".genre-grid") ||
+          e.target.closest(".person-chip") ||
+          e.target.closest(".country-chip") ||
           e.target.closest(".field-quote")
         ) {
           return;
