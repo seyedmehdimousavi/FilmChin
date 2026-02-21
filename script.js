@@ -1616,6 +1616,8 @@ document.addEventListener("DOMContentLoaded", () => {
       writeReplyPlaceholder: "Write a reply...",
       usersMessages: "Users messages",
       conversation: "Conversation",
+      popularMovies: "Popular movies",
+      versionExample: "e.g. 1.3.3",
     },
     fa: {
       languageLabel: "زبان / Language",
@@ -1625,6 +1627,8 @@ document.addEventListener("DOMContentLoaded", () => {
       writeReplyPlaceholder: "بنویس...",
       usersMessages: "پیام‌های کاربران",
       conversation: "گفت‌وگو",
+      popularMovies: "فیلم‌های پرطرفدار",
+      versionExample: "مثلاً 1.3.3",
     },
   };
 
@@ -1632,7 +1636,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextLang = lang === "fa" ? "fa" : "en";
     localStorage.setItem("siteLanguage", nextLang);
     document.documentElement.lang = nextLang;
-    document.documentElement.dir = nextLang === "fa" ? "rtl" : "ltr";
 
     document.querySelectorAll("[data-i18n]").forEach((el) => {
       const key = el.getAttribute("data-i18n");
@@ -1655,6 +1658,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   languageButtons.forEach((btn) => {
     btn.addEventListener("click", () => applyLanguage(btn.dataset.lang || "en"));
+    btn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        applyLanguage(btn.dataset.lang || "en");
+      }
+    });
   });
 
   applyLanguage(localStorage.getItem("siteLanguage") || "en");

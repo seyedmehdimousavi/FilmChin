@@ -37,10 +37,6 @@ function mt(key) {
 
 function applyMovieStaticTranslations() {
   document.documentElement.lang = pageLang;
-  const dir = pageLang === "fa" ? "rtl" : "ltr";
-  document.documentElement.dir = dir;
-  document.body?.setAttribute("dir", dir);
-
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
     if (!key) return;
