@@ -2229,6 +2229,16 @@ document.addEventListener("DOMContentLoaded", () => {
     rootStyle.setProperty("--theme-bg-day", selectedTheme.bgDay);
     rootStyle.setProperty("--theme-bg-soft", selectedTheme.bgSoft);
 
+    const goPageColors = {
+      blue: "#7c4dff",
+      green: "#d97706",
+      yellow: "#0ea5e9",
+      red: "#10b981",
+      purple: "#f59e0b",
+      teal: "#ef4444",
+    };
+    rootStyle.setProperty("--go-page-bg", goPageColors[themeName] || "#7c4dff");
+
     localStorage.setItem("colorTheme", themeName);
     if (!themePalette) return;
     themePalette.querySelectorAll(".theme-palette-dot").forEach((dot) => {

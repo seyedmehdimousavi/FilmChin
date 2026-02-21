@@ -6691,7 +6691,7 @@ body.dark .sidemenu-content-inner .toggle-row {
   justify-content: center;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--go-page-bg, #7c4dff);
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.3),
     0 0.3em 0.2em -0.2em rgba(0, 0, 0, 0.35),
@@ -6702,7 +6702,7 @@ body.dark .sidemenu-content-inner .toggle-row {
 }
 
 .go-page-btn span {
-  color: #242526;
+  color: #ffffff;
   font-size: 1rem;
   font-weight: 700;
 }
@@ -6759,5 +6759,19 @@ body.dark .go-page-btn span {
 }
 
 .movie-info .post-action-row {
+  flex-direction: row !important;
+}
+
+
+.movie-card.no-reveal .anim-horizontal,
+.movie-card.no-reveal .anim-vertical,
+.movie-card.no-reveal .anim-left-right {
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+/* keep actions side-by-side as requested */
+.post-action-row {
   flex-direction: row !important;
 }

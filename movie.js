@@ -98,6 +98,17 @@ function applySavedTheme() {
   s.setProperty("--theme-accent-contrast", selected.accentContrast);
   s.setProperty("--theme-bg-day", selected.bgDay);
   s.setProperty("--theme-bg-soft", selected.bgSoft);
+
+  const goPageColors = {
+    blue: "#7c4dff",
+    green: "#d97706",
+    yellow: "#0ea5e9",
+    red: "#10b981",
+    purple: "#f59e0b",
+    teal: "#ef4444",
+  };
+  const themeName = localStorage.getItem("colorTheme") || "blue";
+  s.setProperty("--go-page-bg", goPageColors[themeName] || "#7c4dff");
 }
 
 function setSeo(movie, slug) {
@@ -176,7 +187,7 @@ function renderMovieCard(container, movie, episodes = []) {
     .join("");
 
   container.innerHTML = `
-  <div class="movie-card reveal movie-page-card-only" data-movie-id="${escapeHtml(movie.id)}">
+  <div class="movie-card no-reveal movie-page-card-only" data-movie-id="${escapeHtml(movie.id)}">
     <div class="cover-container anim-vertical"><div class="cover-blur anim-vertical" style="background-image: url('${cover}');"></div><img class="cover-image anim-vertical" src="${cover}" alt="${title}"></div>
     <div class="movie-info anim-vertical">
       <div class="movie-title anim-left-right"><span class="movie-name anim-horizontal">${title}</span></div>
