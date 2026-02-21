@@ -6775,3 +6775,91 @@ body.dark .go-page-btn span {
 .post-action-row {
   flex-direction: row !important;
 }
+
+.similar-movies-container .episodes-list {
+  align-items: stretch;
+}
+
+.similar-movie-card {
+  min-width: 170px;
+  max-width: 170px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.similar-go-wrap {
+  width: 100%;
+}
+
+.similar-go-btn {
+  min-height: 38px;
+  border-radius: 12px;
+}
+
+.similar-go-btn span {
+  font-size: 0.82rem;
+}
+
+.movie-page-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--accent-soft-chip);
+  border: 1px solid rgba(var(--theme-accent-rgb), 0.28);
+  color: var(--theme-accent-dark);
+  font-weight: 700;
+}
+
+body.dark .movie-page-back {
+  color: var(--theme-accent-light);
+  border-color: rgba(var(--theme-accent-rgb), 0.55);
+}
+
+.quote-text {
+  white-space: pre-line;
+}
+
+.synopsis-segment {
+  display: block;
+}
+
+.synopsis-fa {
+  text-align: right;
+}
+
+.synopsis-en {
+  text-align: left;
+}
+
+.genre-chip-mini,
+.person-chip {
+  margin: 3px 2px;
+}
+
+.similar-movies-section {
+  margin-top: 14px;
+}
+
+.similar-movies-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 8px 8px;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.similar-movies-container .episode-title span {
+  font-size: 0.92rem;
+}
+
+.similar-go-btn {
+  min-height: 32px;
+}
+
+.similar-go-btn span {
+  font-size: 0.76rem;
+}
