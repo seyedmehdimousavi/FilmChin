@@ -6775,3 +6775,28 @@ body.dark .go-page-btn span {
 .post-action-row {
   flex-direction: row !important;
 }
+
+.similar-movies-container .episodes-list {
+  align-items: stretch;
+}
+
+.similar-movie-card {
+  min-width: 170px;
+  max-width: 170px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.similar-go-wrap {
+  width: 100%;
+}
+
+.similar-go-btn {
+  min-height: 38px;
+  border-radius: 12px;
+}
+
+.similar-go-btn span {
+  font-size: 0.82rem;
+}

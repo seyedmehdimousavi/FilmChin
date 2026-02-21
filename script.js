@@ -1611,6 +1611,18 @@ document.addEventListener("DOMContentLoaded", () => {
       currentPage = 1;
       renderPagedMovies(true);
     });
+
+    const urlSearchValue = new URLSearchParams(window.location.search).get("search");
+    const pendingSearch = localStorage.getItem("filmchin_pending_search");
+    const initialSearch = (urlSearchValue || pendingSearch || "").trim();
+    if (initialSearch) {
+      searchInput.value = initialSearch;
+      searchInput.setAttribute("dir", "auto");
+      localStorage.removeItem("filmchin_pending_search");
+      setTimeout(() => {
+        searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+      }, 0);
+    }
   }
 
   const moviesGrid = document.getElementById("moviesGrid");
