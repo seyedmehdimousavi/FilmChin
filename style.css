@@ -6573,3 +6573,96 @@ body.dark .sidemenu-accordion.open {
 body.dark .sidemenu-content-inner .toggle-row {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
+
+/* Dedicated movie page */
+.movie-page-body {
+  margin: 0;
+  font-family: "IRANSans", sans-serif;
+  background: var(--bg-color, #0f1117);
+  color: var(--text-color, #fff);
+}
+
+.movie-page-container {
+  max-width: 980px;
+  margin: 24px auto;
+  padding: 0 16px 40px;
+}
+
+.movie-page-back {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #69a7ff;
+  text-decoration: none;
+}
+
+.movie-page-status {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.movie-page-card {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.movie-page-cover {
+  width: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.movie-page-content h1 {
+  margin-top: 0;
+}
+
+.movie-page-meta {
+  list-style: none;
+  padding: 0;
+}
+
+.movie-page-meta li {
+  margin-bottom: 8px;
+}
+
+.movie-page-meta span {
+  font-weight: 700;
+}
+
+.movie-page-go {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 14px;
+  background: #2f79ff;
+  color: #fff;
+  border-radius: 10px;
+  text-decoration: none;
+}
+
+.movie-page-episodes {
+  margin-top: 20px;
+}
+
+.movie-page-episode {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+  .movie-page-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+.movie-detail-link {
+  text-decoration: none;
+  color: inherit;
+}
