@@ -1605,6 +1605,59 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileMenu = document.getElementById("profileMenu");
 
   const searchInput = document.getElementById("search");
+  const languageIndicator = document.getElementById("languageIndicator");
+  const languageButtons = document.querySelectorAll(".language-option");
+  const languageMap = {
+    en: {
+      languageLabel: "Language / زبان",
+      themePaletteTitle: "Site color theme",
+      messageToAdmin: "Message to admin",
+      messageToAdminPlaceholder: "Message to admin",
+      writeReplyPlaceholder: "Write a reply...",
+      usersMessages: "Users messages",
+      conversation: "Conversation",
+    },
+    fa: {
+      languageLabel: "زبان / Language",
+      themePaletteTitle: "قالب رنگی سایت",
+      messageToAdmin: "پیام به ادمین",
+      messageToAdminPlaceholder: "پیام به ادمین",
+      writeReplyPlaceholder: "بنویس...",
+      usersMessages: "پیام‌های کاربران",
+      conversation: "گفت‌وگو",
+    },
+  };
+
+  function applyLanguage(lang) {
+    const nextLang = lang === "fa" ? "fa" : "en";
+    localStorage.setItem("siteLanguage", nextLang);
+    document.documentElement.lang = nextLang;
+    document.documentElement.dir = nextLang === "fa" ? "rtl" : "ltr";
+
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const key = el.getAttribute("data-i18n");
+      if (!key) return;
+      el.textContent = languageMap[nextLang][key] || languageMap.en[key] || key;
+    });
+
+    document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+      const key = el.getAttribute("data-i18n-placeholder");
+      if (!key) return;
+      el.setAttribute("placeholder", languageMap[nextLang][key] || languageMap.en[key] || "");
+    });
+
+    languageButtons.forEach((btn, idx) => {
+      const active = btn.dataset.lang === nextLang;
+      btn.classList.toggle("active", active);
+      if (active && languageIndicator) languageIndicator.style.transform = `translateX(${idx * 100}%)`;
+    });
+  }
+
+  languageButtons.forEach((btn) => {
+    btn.addEventListener("click", () => applyLanguage(btn.dataset.lang || "en"));
+  });
+
+  applyLanguage(localStorage.getItem("siteLanguage") || "en");
 
   if (searchInput) {
     searchInput.addEventListener("input", () => {
@@ -2171,58 +2224,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const colorThemes = {
     blue: {
-      accentRgb: "0, 74, 124",
-      accentDark: "#004a7c",
-      accent: "#0091d5",
-      accentLight: "#2185d5",
+      accentRgb: "30, 136, 229",
+      accentDark: "#1565c0",
+      accent: "#1e88e5",
+      accentLight: "#42a5f5",
       accentContrast: "#0d47a1",
-      bgDay: "#f1f4f9",
-      bgSoft: "#e8f0fa",
+      bgDay: "#f2f7ff",
+      bgSoft: "#e5f0ff",
     },
     green: {
-      accentRgb: "25, 114, 64",
-      accentDark: "#197240",
-      accent: "#31aa63",
-      accentLight: "#4bb97a",
-      accentContrast: "#0f5c32",
-      bgDay: "#f1f8f3",
-      bgSoft: "#e6f4eb",
+      accentRgb: "0, 172, 193",
+      accentDark: "#00838f",
+      accent: "#00acc1",
+      accentLight: "#26c6da",
+      accentContrast: "#006064",
+      bgDay: "#f0fbfc",
+      bgSoft: "#ddf5f8",
     },
     yellow: {
-      accentRgb: "156, 124, 19",
-      accentDark: "#9c7c13",
-      accent: "#d3a72a",
-      accentLight: "#e0be4e",
-      accentContrast: "#7a6008",
-      bgDay: "#faf7ed",
-      bgSoft: "#f7f0d8",
+      accentRgb: "94, 96, 206",
+      accentDark: "#4345a3",
+      accent: "#5e60ce",
+      accentLight: "#7476dd",
+      accentContrast: "#31338e",
+      bgDay: "#f4f5ff",
+      bgSoft: "#e8e9ff",
     },
     red: {
-      accentRgb: "152, 49, 49",
-      accentDark: "#983131",
-      accent: "#cb4a4a",
-      accentLight: "#de6a6a",
-      accentContrast: "#7a2323",
-      bgDay: "#faf1f1",
-      bgSoft: "#f5e3e3",
+      accentRgb: "58, 134, 255",
+      accentDark: "#2d6fd1",
+      accent: "#3a86ff",
+      accentLight: "#69a4ff",
+      accentContrast: "#1f4fa3",
+      bgDay: "#f2f7ff",
+      bgSoft: "#e4eeff",
     },
     purple: {
-      accentRgb: "84, 63, 153",
-      accentDark: "#543f99",
-      accent: "#7f63d0",
-      accentLight: "#9a83de",
-      accentContrast: "#3e2c7a",
-      bgDay: "#f5f2fb",
-      bgSoft: "#ece6f7",
+      accentRgb: "123, 97, 255",
+      accentDark: "#5f46d2",
+      accent: "#7b61ff",
+      accentLight: "#a68fff",
+      accentContrast: "#47329e",
+      bgDay: "#f7f4ff",
+      bgSoft: "#eee8ff",
     },
     teal: {
-      accentRgb: "19, 106, 114",
-      accentDark: "#136a72",
-      accent: "#1d98a2",
-      accentLight: "#40afb7",
-      accentContrast: "#0f5258",
-      bgDay: "#f0f7f8",
-      bgSoft: "#deeff1",
+      accentRgb: "76, 201, 240",
+      accentDark: "#2c9bc0",
+      accent: "#4cc9f0",
+      accentLight: "#7fdcf7",
+      accentContrast: "#1f6e87",
+      bgDay: "#f2fbff",
+      bgSoft: "#e2f6ff",
     },
   };
 
@@ -6817,7 +6870,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
     overlay = false,
   } = {}) {
     if (!currentUser) {
-      showToast("ابتدا لاگین کنید");
+      showToast((localStorage.getItem("siteLanguage") === "fa") ? "ابتدا لاگین کنید" : "Please login first");
       return;
     }
     const tid = await ensureThread();
@@ -6836,7 +6889,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
       .insert([payload]);
     if (error) {
       console.error("send chat error", error);
-      showToast("ارسال ناموفق ❌");
+      showToast((localStorage.getItem("siteLanguage") === "fa") ? "ارسال ناموفق ❌" : "Send failed ❌");
 
       // اگر اوورلی باز است، لیست را دوباره لود کن تا حباب موقت پاک شود
       const isOverlayOpen =
@@ -6964,7 +7017,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
       card.className = "user-thread-card";
       card.innerHTML = `
       <img src="${avatar}" alt="avatar">
-      <div class="user-thread-name">${user?.username || "کاربر"}</div>
+      <div class="user-thread-name">${user?.username || ((localStorage.getItem("siteLanguage") === "fa") ? "کاربر" : "User")}</div>
       <div class="user-thread-snippet">${snippet || ""}</div>
       ${t.unread_for_admin ? '<span class="thread-badge">!</span>' : ""}
     `;
@@ -7011,7 +7064,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
   // باز کردن اوورلی
   async function openAdminThread(threadId, user, avatar) {
     document.getElementById("adminThreadTitle").textContent =
-      user?.username || "کاربر";
+      user?.username || ((localStorage.getItem("siteLanguage") === "fa") ? "کاربر" : "User");
     document.getElementById("adminThreadAvatar").src = avatar;
 
     currentAdminThreadId = threadId;
@@ -7190,7 +7243,7 @@ return `
 
     if (error) {
       console.error("admin send error", error);
-      showToast("ارسال ناموفق ❌");
+      showToast((localStorage.getItem("siteLanguage") === "fa") ? "ارسال ناموفق ❌" : "Send failed ❌");
 
       // در صورت خطا، لیست را دوباره لود کن تا حباب موقت پاک شود
       await loadAdminThreadMessages();
