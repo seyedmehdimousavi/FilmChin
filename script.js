@@ -3107,7 +3107,7 @@ function setTabInUrl(type) {
             seg.dir === "fa" ? "rtl" : "ltr"
           }">${escapeHtml(seg.text)}</span>`
       )
-      .join(" ");
+      .join("");
   }
 
   function renderChips(str, mode = "hashtags") {
@@ -3121,7 +3121,7 @@ function setTabInUrl(type) {
 
     const tags = extractHashtagTokens(str);
     if (tags.length) {
-      return tags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join(" ");
+      return tags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join("");
     }
 
     return str
@@ -3132,7 +3132,7 @@ function setTabInUrl(type) {
         const encoded = encodeURIComponent(g);
         return `<a href="#" class="country-chip" dir="auto" onclick="(function(){window.__filmchinSetSearchFromChip && window.__filmchinSetSearchFromChip(decodeURIComponent('${encoded}'));})();">${clean}</a>`;
       })
-      .join(" ");
+      .join("");
   }
 
   window.__filmchinSetSearchFromChip = setSearchFromChip;
@@ -3475,7 +3475,7 @@ function setTabInUrl(type) {
       }
 
       // دکمه toggle synopsis
-      if (target.closest(".quote-toggle-btn") || target.closest(".synopsis-quote") || target.closest(".quote-text")) return;
+      if (target.closest(".quote-toggle-btn") || target.closest(".synopsis-quote") || target.closest(".quote-text") || target.closest(".synopsis-segment")) return;
 
       // collapse toggle
       if (target.closest(".post-collapse-bar")) return;

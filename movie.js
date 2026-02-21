@@ -91,14 +91,14 @@ function renderChips(str, mode = "hashtags") {
 
   const tags = extractHashtagTokens(str);
   if (tags.length) {
-    return tags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join(" ");
+    return tags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join("");
   }
 
   return String(str)
     .split(" ")
     .filter((g) => g.trim())
     .map((g) => buildSearchChip(g, "country-chip"))
-    .join(" ");
+    .join("");
 }
 
 
@@ -148,7 +148,7 @@ function buildSynopsisSegments(rawText) {
 function makeSynopsisHtml(rawText) {
   return buildSynopsisSegments(rawText)
     .map((seg) => `<span class="synopsis-segment synopsis-${seg.dir}" dir="${seg.dir === "fa" ? "rtl" : "ltr"}">${escapeHtml(seg.text)}</span>`)
-    .join(" ");
+    .join("");
 }
 
 function buildTelegramBotUrlFromChannelLink(rawLink) {
@@ -426,7 +426,7 @@ function renderSimilarMovies(container, similarMovies) {
   section.className = "similar-movies-section";
   section.innerHTML = `
     <div class="similar-movies-title"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Similar movies:</div>
-    <div class="episodes-container anim-vertical similar-movies-container"><div class="episodes-list anim-left-right">${html || '<div class="episode-card">No similar movies found.</div>'}</div></div>
+    <div class="episodes-container similar-movies-container"><div class="episodes-list">${html || '<div class="episode-card">No similar movies found.</div>'}</div></div>
   `;
   container.appendChild(section);
 
@@ -454,7 +454,8 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
     .map((ep, idx) => {
       const epTitle = escapeHtml(ep.title || `Episode ${idx + 1}`);
       const epCover = escapeHtml(ep.cover || "https://via.placeholder.com/120x80?text=No+Cover");
-      return `<button class="episode-card ${idx === 0 ? "active" : ""}" type="button" data-link="${escapeHtml(ep.link || "#")}" data-title="${epTitle}"><img src="${epCover}" alt="${epTitle}" class="episode-cover"><span class="episode-title"><span>${epTitle}</span></span></button>`;
+      const scrollable = epTitle.length > 16 ? "scrollable" : "";
+      return `<button class="episode-card ${idx === 0 ? "active" : ""}" type="button" data-link="${escapeHtml(ep.link || "#")}" data-title="${epTitle}"><img src="${epCover}" alt="${epTitle}" class="episode-cover"><span class="episode-title ${scrollable}"><span>${epTitle}</span></span></button>`;
     })
     .join("");
 
@@ -484,7 +485,7 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
   card?.addEventListener("click", (e) => {
     const target = e.target;
     if (!(target instanceof Element)) return;
-    if (target.closest(".go-btn") || target.closest(".episode-card") || target.closest(".quote-toggle-btn") || target.closest(".quote-text") || target.closest(".synopsis-quote") || target.closest("a") || target.closest(".comment-summary") || target.closest(".comments-panel")) return;
+    if (target.closest(".go-btn") || target.closest(".episode-card") || target.closest(".quote-toggle-btn") || target.closest(".quote-text") || target.closest(".synopsis-quote") || target.closest(".synopsis-segment") || target.closest("a") || target.closest(".comment-summary") || target.closest(".comments-panel")) return;
     openPostOptions();
   });
 

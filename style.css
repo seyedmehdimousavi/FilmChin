@@ -6819,15 +6819,19 @@ body.dark .movie-page-back {
 }
 
 .synopsis-segment {
-  display: inline;
+  display: block;
+  width: 100%;
+  unicode-bidi: plaintext;
 }
 
 .synopsis-fa {
   text-align: right;
+  direction: rtl;
 }
 
 .synopsis-en {
   text-align: left;
+  direction: ltr;
 }
 
 
@@ -6867,4 +6871,19 @@ body.dark .movie-page-back {
 
 .movie-page-actions .button-wrap {
   flex: 1;
+}
+
+
+.quote-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+
+.similar-movies-container .episodes-list,
+.similar-movies-container .episode-card,
+.similar-movies-section {
+  opacity: 1 !important;
+  transform: none !important;
 }
