@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="ltr">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -21,10 +21,16 @@
     <script defer src="/movie.js"></script>
   </head>
   <body class="movie-page-body">
+    <header class="main-header movie-page-header-only">
+      <div id="movieBannerMount" class="site-banner"></div>
+    </header>
+
     <main class="movie-page-container">
       <a class="movie-page-back" href="/">← بازگشت به صفحه اصلی</a>
       <section id="moviePageStatus" class="movie-page-status">در حال بارگذاری...</section>
-      <article id="moviePageCard" class="movie-page-card" hidden></article>
+      <section id="moviePageCard" class="movie-page-single" hidden></section>
     </main>
+
+    <div id="movieFeaturesMount"></div>
   </body>
 </html>

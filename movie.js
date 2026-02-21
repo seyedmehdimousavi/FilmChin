@@ -24,13 +24,21 @@ function makeMovieSlug(title) {
     .replace(/^-|-$/g, "");
 }
 
-function normalizeListField(raw) {
-  if (!raw) return "-";
-  return String(raw)
+function renderChips(str, mode = "hashtags") {
+  const raw = String(str || "").trim();
+  if (!raw || raw === "-") return '<span class="chip">-</span>';
+
+  return raw
     .split(",")
-    .map((x) => x.trim())
+    .map((s) => s.trim())
     .filter(Boolean)
-    .join("، ");
+    .map((item) => {
+      if (mode === "names") {
+        return `<span class="chip person-chip">${escapeHtml(item)}</span>`;
+      }
+      return `<span class="chip country-chip">${escapeHtml(item)}</span>`;
+    })
+    .join(" ");
 }
 
 function parseSlug() {
@@ -41,6 +49,52 @@ function parseSlug() {
 
   const params = new URLSearchParams(window.location.search);
   return (params.get("slug") || "").trim();
+}
+
+function buildTelegramBotUrlFromChannelLink(rawLink) {
+  const trimmed = (rawLink || "").trim();
+  if (!trimmed || trimmed === "#") return trimmed;
+
+  if (/^https?:\/\/t\.me\/Filmchinbot\?start=/i.test(trimmed)) return trimmed;
+
+  let url;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    return trimmed;
+  }
+
+  const host = url.hostname.toLowerCase();
+  if (host !== "t.me" && host !== "telegram.me") return trimmed;
+
+  const parts = url.pathname.split("/").filter(Boolean);
+  if (!parts.length) return trimmed;
+
+  if (parts[0] === "c" && parts.length >= 3) {
+    const internalId = parts[1];
+    const messageId = parts[2];
+    if (/^[0-9]+$/.test(internalId) && /^[0-9]+$/.test(messageId)) {
+      return `https://t.me/Filmchinbot?start=forward_${internalId}_${messageId}`;
+    }
+  }
+
+  if (parts.length === 2) {
+    const username = parts[0];
+    const messageId = parts[1];
+    if (/^[A-Za-z0-9_]+$/.test(username) && /^[0-9]+$/.test(messageId)) {
+      return `https://t.me/Filmchinbot?start=forward_${username}_${messageId}`;
+    }
+  }
+
+  if (parts.length === 3) {
+    const username = parts[0];
+    const messageId = parts[2];
+    if (/^[A-Za-z0-9_]+$/.test(username) && /^[0-9]+$/.test(messageId)) {
+      return `https://t.me/Filmchinbot?start=forward_${username}_${messageId}`;
+    }
+  }
+
+  return trimmed;
 }
 
 function setSeo(movie, slug) {
@@ -69,50 +123,143 @@ function setSeo(movie, slug) {
   if (canonicalEl) canonicalEl.setAttribute("href", canonical);
 }
 
-function renderMovie(card, movie, episodes = []) {
+function renderMovieCard(container, movie, episodes = []) {
+  const cover = escapeHtml(movie.cover || "https://via.placeholder.com/300x200?text=No+Image");
   const title = escapeHtml(movie.title || "-");
   const synopsis = escapeHtml((movie.synopsis || "-").trim());
-  const director = escapeHtml(normalizeListField(movie.director));
-  const product = escapeHtml(normalizeListField(movie.product));
-  const stars = escapeHtml(normalizeListField(movie.stars));
-  const genre = escapeHtml(normalizeListField(movie.genre));
+  const director = renderChips(movie.director || "-", "names");
+  const stars = renderChips(movie.stars || "-", "names");
   const imdb = escapeHtml(movie.imdb || "-");
-  const release = escapeHtml(movie.release_info || "-");
-  const cover = escapeHtml(movie.cover || "https://via.placeholder.com/450x650?text=No+Image");
+  const releaseInfo = escapeHtml(movie.release_info || "-");
 
-  const episodesHtml = episodes.length
-    ? `<div class="movie-page-episodes"><h2>اپیزودها</h2>${episodes
-        .map(
-          (ep, idx) => `<div class="movie-page-episode">
-            <strong>Episode ${idx + 1}</strong>
-            <a href="${escapeHtml(ep.link || "#")}" target="_blank" rel="noopener">لینک فایل</a>
-          </div>`
-        )
-        .join("")}</div>`
-    : "";
+  const episodesHtml = (episodes || [])
+    .map((ep, idx) => {
+      const epTitle = escapeHtml(ep.title || `Episode ${idx + 1}`);
+      return `<button class="episode-card" type="button" data-link="${escapeHtml(ep.link || "#")}" data-title="${epTitle}">
+        <span class="episode-title"><span>${epTitle}</span></span>
+      </button>`;
+    })
+    .join("");
 
-  card.innerHTML = `
-    <img class="movie-page-cover" src="${cover}" alt="${title}" />
-    <div class="movie-page-content">
-      <h1>${title}</h1>
-      <p class="movie-page-synopsis">${synopsis}</p>
-      <ul class="movie-page-meta">
-        <li><span>Director:</span> ${director}</li>
-        <li><span>Product:</span> ${product}</li>
-        <li><span>Stars:</span> ${stars}</li>
-        <li><span>Genre:</span> ${genre}</li>
-        <li><span>IMDB:</span> ${imdb}</li>
-        <li><span>Release:</span> ${release}</li>
-      </ul>
-      <a class="movie-page-go" href="${escapeHtml(movie.link || "#")}" target="_blank" rel="noopener">Go to file</a>
-      ${episodesHtml}
+  container.innerHTML = `
+  <div class="movie-card reveal movie-page-card-only" data-movie-id="${escapeHtml(movie.id)}">
+    <div class="cover-container anim-vertical">
+      <div class="cover-blur anim-vertical" style="background-image: url('${cover}');"></div>
+      <img class="cover-image anim-vertical" src="${cover}" alt="${title}">
     </div>
-  `;
+
+    <div class="movie-info anim-vertical">
+      <div class="movie-title anim-left-right">
+        <span class="movie-name anim-horizontal">${title}</span>
+      </div>
+
+      <span class="field-label anim-vertical"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
+      <div class="field-quote anim-left-right synopsis-quote">
+        <div class="quote-text anim-horizontal">${synopsis}</div>
+      </div>
+
+      <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span>
+      <div class="field-quote anim-left-right director-field">${director}</div>
+
+      <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
+      <div class="field-quote anim-horizontal">${renderChips(movie.product || "-")}</div>
+
+      <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
+      <div class="field-quote anim-left-right stars-field">${stars}</div>
+
+      <span class="field-label anim-vertical"><img src="/images/icons8-imdb-48.png" class="imdb-bell" style="width:20px;height:20px;"> IMDB:</span>
+      <div class="field-quote anim-left-right"><span class="chip imdb-chip anim-horizontal">${imdb}</span></div>
+
+      <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span>
+      <div class="field-quote anim-left-right">${releaseInfo}</div>
+
+      <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span>
+      <div class="field-quote genre-grid anim-horizontal">${renderChips(movie.genre || "-")}</div>
+
+      <div class="episodes-container anim-vertical" data-movie-id="${escapeHtml(movie.id)}">
+        <div class="episodes-list anim-left-right">${episodesHtml}</div>
+      </div>
+
+      <div class="post-action-row movie-page-actions">
+        <div class="button-wrap">
+          <button class="go-btn anim-vertical" data-link="${escapeHtml(movie.link || "#")}"><span>Go to file</span></button>
+          <div class="button-shadow"></div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  const goBtn = container.querySelector(".go-btn");
+  const episodeCards = container.querySelectorAll(".episode-card");
+
+  episodeCards.forEach((ep) => {
+    ep.addEventListener("click", () => {
+      episodeCards.forEach((x) => x.classList.remove("active"));
+      ep.classList.add("active");
+      if (goBtn) goBtn.dataset.link = ep.dataset.link || "#";
+    });
+  });
+
+  goBtn?.addEventListener("click", () => {
+    const finalLink = buildTelegramBotUrlFromChannelLink(goBtn.dataset.link || "#");
+    if (finalLink && finalLink !== "#") window.open(finalLink, "_blank", "noopener");
+  });
+}
+
+function initFeatureAccordions() {
+  const accordions = document.querySelectorAll(".feature-accordion");
+  if (!accordions.length) return;
+
+  accordions.forEach((acc) => {
+    const header = acc.querySelector(".feature-accordion-header");
+    const body = acc.querySelector(".feature-accordion-body");
+    if (!header || !body) return;
+
+    header.setAttribute("role", "button");
+    header.setAttribute("tabindex", "0");
+
+    const toggleAccordion = () => {
+      const isOpen = acc.classList.contains("open");
+      accordions.forEach((other) => other.classList.remove("open"));
+      if (!isOpen) acc.classList.add("open");
+    };
+
+    header.addEventListener("click", toggleAccordion);
+    header.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleAccordion();
+      }
+    });
+  });
+}
+
+async function hydrateSharedSectionsFromHome() {
+  try {
+    const resp = await fetch("/");
+    const html = await resp.text();
+    const doc = new DOMParser().parseFromString(html, "text/html");
+
+    const banner = doc.querySelector("#site-banner .banner-content");
+    const bannerMount = document.getElementById("movieBannerMount");
+    if (banner && bannerMount) bannerMount.innerHTML = banner.outerHTML;
+
+    const features = doc.querySelector("#siteFeatures");
+    const featuresMount = document.getElementById("movieFeaturesMount");
+    if (features && featuresMount) {
+      featuresMount.innerHTML = features.outerHTML;
+      initFeatureAccordions();
+    }
+  } catch (err) {
+    console.error("hydrateSharedSectionsFromHome error:", err);
+  }
 }
 
 async function loadMoviePage() {
   const status = document.getElementById("moviePageStatus");
-  const card = document.getElementById("moviePageCard");
+  const cardContainer = document.getElementById("moviePageCard");
+
+  await hydrateSharedSectionsFromHome();
 
   const slug = parseSlug();
   if (!slug) {
@@ -121,7 +268,6 @@ async function loadMoviePage() {
   }
 
   const { data: movies, error } = await db.from("movies").select("*");
-
   if (error || !Array.isArray(movies)) {
     status.textContent = "خطا در دریافت اطلاعات پست.";
     return;
@@ -140,10 +286,10 @@ async function loadMoviePage() {
     .order("episode_number", { ascending: true });
 
   setSeo(movie, slug);
-  renderMovie(card, movie, episodes || []);
+  renderMovieCard(cardContainer, movie, episodes || []);
 
   status.hidden = true;
-  card.hidden = false;
+  cardContainer.hidden = false;
 }
 
 document.addEventListener("DOMContentLoaded", loadMoviePage);
