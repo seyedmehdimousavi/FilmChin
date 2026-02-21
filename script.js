@@ -5420,16 +5420,16 @@ function openMovieModal(m, startIdx = 0) {
               type === "collection" ? linkValCollection : linkValSerial;
             if (!titleVal && !linkVal) return;
 
-            // کاور آیتم
-            let coverVal = "";
-            const fileInput = formEl.querySelector('input[type="file"]');
-            if (fileInput && fileInput.files && fileInput.files.length > 0) {
-              coverVal = URL.createObjectURL(fileInput.files[0]); 
-            } else if (formEl.dataset.existingCover) {
-              coverVal = formEl.dataset.existingCover;
-            }
-
             if (type === "collection") {
+              // کاور آیتم (فقط برای کالکشن)
+              let coverVal = "";
+              const fileInput = formEl.querySelector('input[type="file"]');
+              if (fileInput && fileInput.files && fileInput.files.length > 0) {
+                coverVal = URL.createObjectURL(fileInput.files[0]);
+              } else if (formEl.dataset.existingCover) {
+                coverVal = formEl.dataset.existingCover;
+              }
+
               out.push({
                 movie_id: movieId,
                 title: titleVal,
@@ -5448,13 +5448,19 @@ function openMovieModal(m, startIdx = 0) {
               out.push({
                 movie_id: movieId,
                 title: titleVal,
-                cover: coverVal,
                 link: linkValSerial,
                 order_index: idx,
               });
             }
           });
           return out;
+        };
+
+        const applySerialCoverFromMain = (items, serialCover) => {
+          if (!Array.isArray(items) || !items.length || !serialCover) return;
+          items.forEach((item) => {
+            item.cover = serialCover;
+          });
         };
 
         const uploadParts =
@@ -5526,6 +5532,11 @@ function openMovieModal(m, startIdx = 0) {
             const okUpload = await uploadItemCoversInPlace(items);
             if (!okUpload) return;
 
+            if (intendedType === "serial") {
+              const serialCover = coverUrl || editingMovie?.cover || "";
+              applySerialCoverFromMain(items, serialCover);
+            }
+
             await db.from("movie_items").delete().eq("movie_id", movieId);
             if (items.length > 0) {
               await db.from("movie_items").insert(items);
@@ -5589,6 +5600,10 @@ function openMovieModal(m, startIdx = 0) {
           items = buildItemsFromForms(inserted.id, provisionalType);
           const okUpload = await uploadItemCoversInPlace(items);
           if (!okUpload) return;
+
+          if (provisionalType === "serial") {
+            applySerialCoverFromMain(items, coverUrl);
+          }
 
           if (items.length > 0) {
             const { error: itemsError } = await db.from("movie_items").insert(items);
@@ -5910,7 +5925,6 @@ function openMovieModal(m, startIdx = 0) {
       div.className = "admin-form bundle-item";
       div.innerHTML = `
         <input type="text" placeholder="Title" />
-        <input type="file" accept="image/*" />
         <input type="text" placeholder="Link" />
       `;
       formsWrap.appendChild(div);
