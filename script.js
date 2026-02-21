@@ -3107,7 +3107,7 @@ function setTabInUrl(type) {
             seg.dir === "fa" ? "rtl" : "ltr"
           }">${escapeHtml(seg.text)}</span>`
       )
-      .join("\n");
+      .join(" ");
   }
 
   function renderChips(str, mode = "hashtags") {
@@ -3475,7 +3475,7 @@ function setTabInUrl(type) {
       }
 
       // دکمه toggle synopsis
-      if (target.closest(".quote-toggle-btn")) return;
+      if (target.closest(".quote-toggle-btn") || target.closest(".synopsis-quote") || target.closest(".quote-text")) return;
 
       // collapse toggle
       if (target.closest(".post-collapse-bar")) return;

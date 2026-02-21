@@ -6818,12 +6818,8 @@ body.dark .movie-page-back {
   border-color: rgba(var(--theme-accent-rgb), 0.55);
 }
 
-.quote-text {
-  white-space: pre-line;
-}
-
 .synopsis-segment {
-  display: block;
+  display: inline;
 }
 
 .synopsis-fa {
@@ -6834,10 +6830,6 @@ body.dark .movie-page-back {
   text-align: left;
 }
 
-.genre-chip-mini,
-.person-chip {
-  margin: 3px 2px;
-}
 
 .similar-movies-section {
   margin-top: 14px;
@@ -6862,4 +6854,17 @@ body.dark .movie-page-back {
 
 .similar-go-btn span {
   font-size: 0.76rem;
+}
+
+
+.post-action-row .button-wrap:first-child {
+  flex: 7;
+}
+
+.post-action-row .button-wrap:last-child {
+  flex: 3;
+}
+
+.movie-page-actions .button-wrap {
+  flex: 1;
 }

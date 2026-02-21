@@ -148,7 +148,7 @@ function buildSynopsisSegments(rawText) {
 function makeSynopsisHtml(rawText) {
   return buildSynopsisSegments(rawText)
     .map((seg) => `<span class="synopsis-segment synopsis-${seg.dir}" dir="${seg.dir === "fa" ? "rtl" : "ltr"}">${escapeHtml(seg.text)}</span>`)
-    .join("\n");
+    .join(" ");
 }
 
 function buildTelegramBotUrlFromChannelLink(rawLink) {
@@ -450,11 +450,6 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
       ? `<span class="collection-badge ${movie.type === "collection" ? "badge-collection" : "badge-serial"}">${movie.type === "collection" ? "Collection" : "Series"}<span class="badge-count anim-left-right">${(episodes || []).length} episodes</span></span>`
       : "";
 
-  const badgeHtml =
-    movie.type && movie.type !== "single"
-      ? `<span class="collection-badge ${movie.type === "collection" ? "badge-collection" : "badge-serial"}">${movie.type === "collection" ? "Collection" : "Series"}<span class="badge-count anim-left-right">${(episodes || []).length}</span></span>`
-      : "";
-
   const episodesHtml = (episodes || [])
     .map((ep, idx) => {
       const epTitle = escapeHtml(ep.title || `Episode ${idx + 1}`);
@@ -489,7 +484,7 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
   card?.addEventListener("click", (e) => {
     const target = e.target;
     if (!(target instanceof Element)) return;
-    if (target.closest(".go-btn") || target.closest(".episode-card") || target.closest(".quote-toggle-btn") || target.closest("a") || target.closest(".comment-summary") || target.closest(".comments-panel")) return;
+    if (target.closest(".go-btn") || target.closest(".episode-card") || target.closest(".quote-toggle-btn") || target.closest(".quote-text") || target.closest(".synopsis-quote") || target.closest("a") || target.closest(".comment-summary") || target.closest(".comments-panel")) return;
     openPostOptions();
   });
 
@@ -580,46 +575,55 @@ async function loadMoviePage() {
   const status = document.getElementById("moviePageStatus");
   const cardContainer = document.getElementById("moviePageCard");
 
-  applySavedTheme();
-  await hydrateSharedSectionsFromHome();
+  try {
+    applySavedTheme();
+    try {
+      await hydrateSharedSectionsFromHome();
+    } catch (err) {
+      console.error("hydrateSharedSectionsFromHome error:", err);
+    }
 
-  const slug = parseSlug();
-  if (!slug) return (status.textContent = "اسلاگ پست مشخص نیست.");
+    const slug = parseSlug();
+    if (!slug) return (status.textContent = "اسلاگ پست مشخص نیست.");
 
-  const { data: movies, error } = await db.from("movies").select("*");
-  if (error || !Array.isArray(movies)) return (status.textContent = "خطا در دریافت اطلاعات پست.");
+    const { data: movies, error } = await db.from("movies").select("*");
+    if (error || !Array.isArray(movies)) return (status.textContent = "خطا در دریافت اطلاعات پست.");
 
-  const movie = movies.find((item) => makeMovieSlug(item.title) === slug);
-  if (!movie) return (status.textContent = "پست مورد نظر پیدا نشد.");
+    const movie = movies.find((item) => makeMovieSlug(item.title) === slug);
+    if (!movie) return (status.textContent = "پست مورد نظر پیدا نشد.");
 
-  currentMovie = movie;
+    currentMovie = movie;
 
-  const { data: items } = await db.from("movie_items").select("*").eq("movie_id", movie.id).order("order_index", { ascending: true });
-  const episodes = (movie.type === "collection" || movie.type === "serial")
-    ? [
-        {
-          title: movie.title,
-          cover: movie.cover,
-          link: movie.link,
-          synopsis: movie.synopsis,
-          director: movie.director,
-          product: movie.product,
-          stars: movie.stars,
-          imdb: movie.imdb,
-          release_info: movie.release_info,
-          genre: movie.genre,
-        },
-        ...(items || []),
-      ]
-    : [];
+    const { data: items } = await db.from("movie_items").select("*").eq("movie_id", movie.id).order("order_index", { ascending: true });
+    const episodes = (movie.type === "collection" || movie.type === "serial")
+      ? [
+          {
+            title: movie.title,
+            cover: movie.cover,
+            link: movie.link,
+            synopsis: movie.synopsis,
+            director: movie.director,
+            product: movie.product,
+            stars: movie.stars,
+            imdb: movie.imdb,
+            release_info: movie.release_info,
+            genre: movie.genre,
+          },
+          ...(items || []),
+        ]
+      : [];
 
-  await loadCurrentUserAndFavorites();
-  bindPostOptions(slug);
-  syncFavoriteOptionUi();
-  setSeo(movie, slug);
-  renderMovieCard(cardContainer, movie, movies, episodes);
-  status.hidden = true;
-  cardContainer.hidden = false;
+    await loadCurrentUserAndFavorites();
+    bindPostOptions(slug);
+    syncFavoriteOptionUi();
+    setSeo(movie, slug);
+    renderMovieCard(cardContainer, movie, movies, episodes);
+    status.hidden = true;
+    cardContainer.hidden = false;
+  } catch (err) {
+    console.error("loadMoviePage error:", err);
+    status.textContent = "خطا در بارگذاری صفحه پست.";
+  }
 }
 
 document.addEventListener("DOMContentLoaded", loadMoviePage);
