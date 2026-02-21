@@ -7,6 +7,47 @@ let currentMovie = null;
 let currentUser = null;
 let favoriteMovieIds = new Set();
 
+const pageLang = localStorage.getItem("siteLanguage") || "en";
+const movieI18n = {
+  en: {
+    backToHome: "← Back to homepage",
+    loading: "Loading...",
+    missingSlug: "Post slug is missing.",
+    fetchError: "Error fetching post data.",
+    notFound: "Requested post was not found.",
+    pageLoadError: "Error loading post page.",
+    postPageTitle: "FilmChiin | Post page",
+    postPageDesc: "Full details of this post on FilmChiin",
+  },
+  fa: {
+    backToHome: "← بازگشت به صفحه اصلی",
+    loading: "در حال بارگذاری...",
+    missingSlug: "اسلاگ پست مشخص نیست.",
+    fetchError: "خطا در دریافت اطلاعات پست.",
+    notFound: "پست مورد نظر پیدا نشد.",
+    pageLoadError: "خطا در بارگذاری صفحه پست.",
+    postPageTitle: "FilmChiin | صفحه پست",
+    postPageDesc: "جزئیات کامل این پست در FilmChiin",
+  },
+};
+
+function mt(key) {
+  return movieI18n[pageLang]?.[key] || movieI18n.en[key] || key;
+}
+
+function applyMovieStaticTranslations() {
+  document.documentElement.lang = pageLang;
+  const dir = pageLang === "fa" ? "rtl" : "ltr";
+  document.documentElement.dir = dir;
+  document.body?.setAttribute("dir", dir);
+
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
+    if (!key) return;
+    el.textContent = mt(key);
+  });
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -208,8 +249,8 @@ function applySavedTheme() {
 }
 
 function setSeo(movie, slug) {
-  const title = movie?.title ? `${movie.title} | FilmChiin` : "FilmChiin | صفحه پست";
-  const desc = (movie?.synopsis || "").trim() || "جزئیات کامل این پست در FilmChiin";
+  const title = movie?.title ? `${movie.title} | FilmChiin` : mt("postPageTitle");
+  const desc = (movie?.synopsis || "").trim() || mt("postPageDesc");
   const cover = movie?.cover || "https://filmchiin.ir/images/banner-icon.png";
   const canonical = `https://filmchiin.ir/movie/${encodeURIComponent(slug)}`;
 
@@ -585,13 +626,13 @@ async function loadMoviePage() {
     }
 
     const slug = parseSlug();
-    if (!slug) return (status.textContent = "اسلاگ پست مشخص نیست.");
+    if (!slug) return (status.textContent = mt("missingSlug"));
 
     const { data: movies, error } = await db.from("movies").select("*");
-    if (error || !Array.isArray(movies)) return (status.textContent = "خطا در دریافت اطلاعات پست.");
+    if (error || !Array.isArray(movies)) return (status.textContent = mt("fetchError"));
 
     const movie = movies.find((item) => makeMovieSlug(item.title) === slug);
-    if (!movie) return (status.textContent = "پست مورد نظر پیدا نشد.");
+    if (!movie) return (status.textContent = mt("notFound"));
 
     currentMovie = movie;
 
@@ -623,7 +664,7 @@ async function loadMoviePage() {
     cardContainer.hidden = false;
   } catch (err) {
     console.error("loadMoviePage error:", err);
-    status.textContent = "خطا در بارگذاری صفحه پست.";
+    status.textContent = mt("pageLoadError");
   }
 }
 

@@ -370,6 +370,30 @@
             </label>
           </div>
 
+          <div class="language-row" id="languageSwitchRow">
+            <div class="language-row-label">
+              <i class="bi bi-translate"></i>
+              <span data-i18n="languageLabel">Language / زبان</span>
+            </div>
+            <div class="language-capsule" role="tablist" aria-label="Language switch">
+              <div id="languageIndicator" class="language-indicator"></div>
+              <button id="langEnBtn" class="language-option active" type="button" data-lang="en">EN</button>
+              <button id="langFaBtn" class="language-option" type="button" data-lang="fa">FA</button>
+            </div>
+          </div>
+
+          <div class="theme-palette" id="themePalette">
+            <div class="theme-palette-title" data-i18n="themePaletteTitle">Site color theme</div>
+            <div class="theme-palette-options" role="radiogroup" aria-label="Select theme color">
+              <button class="theme-palette-dot active" type="button" data-theme-color="blue" aria-label="Azure" style="background:#1e88e5"></button>
+              <button class="theme-palette-dot" type="button" data-theme-color="green" aria-label="Ocean" style="background:#00acc1"></button>
+              <button class="theme-palette-dot" type="button" data-theme-color="yellow" aria-label="Indigo" style="background:#5e60ce"></button>
+              <button class="theme-palette-dot" type="button" data-theme-color="red" aria-label="Royal" style="background:#3a86ff"></button>
+              <button class="theme-palette-dot" type="button" data-theme-color="purple" aria-label="Violet" style="background:#7b61ff"></button>
+              <button class="theme-palette-dot" type="button" data-theme-color="teal" aria-label="Sky" style="background:#4cc9f0"></button>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -453,22 +477,11 @@
 
 
       <section class="side-menu-bottom">
-        <div class="theme-palette" id="themePalette">
-          <div class="theme-palette-title">قالب رنگی سایت</div>
-          <div class="theme-palette-options" role="radiogroup" aria-label="انتخاب تم رنگی">
-            <button class="theme-palette-dot active" type="button" data-theme-color="blue" aria-label="آبی" style="background:#1d79c8"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="green" aria-label="سبز" style="background:#2e9d57"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="yellow" aria-label="زرد" style="background:#c5a317"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="red" aria-label="قرمز" style="background:#c84646"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="purple" aria-label="بنفش" style="background:#6f4dbb"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="teal" aria-label="فیروزه‌ای" style="background:#188a94"></button>
-          </div>
-        </div>
 
         <!--  to admin bubble -->
         <div id="chatBubble" class="chat-bubble">
           <div class="chat-bubble-header">
-            <span class="chat-bubble-title">پیام به ادمین</span>
+            <span class="chat-bubble-title" data-i18n="messageToAdmin">Message to admin</span>
             <span id="chatBubbleBadge" class="badge" style="display: none"
               >!</span
             >
@@ -476,7 +489,7 @@
 
           <!-- ردیف جمع‌شده (کالپس) -->
           <div class="chat-input-row" id="chatInputRow">
-            <input id="chatInput" type="text" placeholder="پیام به ادمین" />
+            <input id="chatInput" type="text" placeholder="Message to admin" data-i18n-placeholder="messageToAdminPlaceholder" />
             <div class="chat-actions">
               <div class="button-wrap">
                 <button
@@ -522,14 +535,14 @@
                 src="/images/Admin-logo.png"
                 alt="admin"
               />
-              <div class="chat-overlay-title">پیام به ادمین</div>
+              <div class="chat-overlay-title" data-i18n="messageToAdmin">Message to admin</div>
             </div>
 
             <div id="chatMessagesList" class="chat-messages-list"></div>
 
             <!-- کامپوزر پایین -->
             <div class="chat-composer">
-              <input id="overlayInput" type="text" placeholder="بنویس..." />
+              <input id="overlayInput" type="text" placeholder="Write a reply..." data-i18n-placeholder="writeReplyPlaceholder" />
               <div class="button-wrap">
                 <button
                   id="overlayAttachBtn"
