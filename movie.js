@@ -450,6 +450,11 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
       ? `<span class="collection-badge ${movie.type === "collection" ? "badge-collection" : "badge-serial"}">${movie.type === "collection" ? "Collection" : "Series"}<span class="badge-count anim-left-right">${(episodes || []).length} episodes</span></span>`
       : "";
 
+  const badgeHtml =
+    movie.type && movie.type !== "single"
+      ? `<span class="collection-badge ${movie.type === "collection" ? "badge-collection" : "badge-serial"}">${movie.type === "collection" ? "Collection" : "Series"}<span class="badge-count anim-left-right">${(episodes || []).length}</span></span>`
+      : "";
+
   const episodesHtml = (episodes || [])
     .map((ep, idx) => {
       const epTitle = escapeHtml(ep.title || `Episode ${idx + 1}`);
