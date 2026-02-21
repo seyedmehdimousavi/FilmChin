@@ -3228,7 +3228,9 @@ function setTabInUrl(type) {
 
 <div class="movie-info anim-vertical">
   <div class="movie-title anim-left-right">
-    <span class="movie-name anim-horizontal">${title}</span>
+    <a class="movie-name anim-horizontal movie-detail-link" href="/movie/${encodeURIComponent(
+      makeMovieSlug(m.title || "")
+    )}">${title}</a>
     ${badgeHtml}
   </div>
 
@@ -3272,12 +3274,20 @@ function setTabInUrl(type) {
     <div class="episodes-list anim-left-right"></div>
   </div>
 
-   <div class="button-wrap">
-       <button class="go-btn anim-vertical" data-link="${escapeHtml(
-         m.link || "#"
-       )}"><span>Go to file</span></button>
-       <div class="button-shadow"></div>
-   </div>
+   <div class="post-action-row">
+      <div class="button-wrap">
+        <button class="go-btn anim-vertical" data-link="${escapeHtml(
+          m.link || "#"
+        )}"><span>Go to file</span></button>
+        <div class="button-shadow"></div>
+      </div>
+      <div class="button-wrap">
+        <a class="go-page-btn anim-vertical" href="/movie/${encodeURIComponent(
+          makeMovieSlug(m.title || "")
+        )}"><span>Go to page</span></a>
+        <div class="button-shadow"></div>
+      </div>
+    </div>
 
   <div class="comment-summary anim-horizontal">
     <div class="avatars"></div>
@@ -3377,6 +3387,11 @@ function setTabInUrl(type) {
 
       // دکمه Go to file
       if (target.closest(".go-btn")) {
+        return;
+      }
+
+      // دکمه Go to page / لینک صفحه اختصاصی
+      if (target.closest(".go-page-btn") || target.closest(".movie-detail-link")) {
         return;
       }
 
