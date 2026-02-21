@@ -1605,6 +1605,68 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileMenu = document.getElementById("profileMenu");
 
   const searchInput = document.getElementById("search");
+  const languageIndicator = document.getElementById("languageIndicator");
+  const languageButtons = document.querySelectorAll(".language-option");
+  const languageMap = {
+    en: {
+      languageLabel: "Language / زبان",
+      themePaletteTitle: "Site color theme",
+      messageToAdmin: "Message to admin",
+      messageToAdminPlaceholder: "Message to admin",
+      writeReplyPlaceholder: "Write a reply...",
+      usersMessages: "Users messages",
+      conversation: "Conversation",
+      popularMovies: "Popular movies",
+      versionExample: "e.g. 1.3.3",
+    },
+    fa: {
+      languageLabel: "زبان / Language",
+      themePaletteTitle: "قالب رنگی سایت",
+      messageToAdmin: "پیام به ادمین",
+      messageToAdminPlaceholder: "پیام به ادمین",
+      writeReplyPlaceholder: "بنویس...",
+      usersMessages: "پیام‌های کاربران",
+      conversation: "گفت‌وگو",
+      popularMovies: "فیلم‌های پرطرفدار",
+      versionExample: "مثلاً 1.3.3",
+    },
+  };
+
+  function applyLanguage(lang) {
+    const nextLang = lang === "fa" ? "fa" : "en";
+    localStorage.setItem("siteLanguage", nextLang);
+    document.documentElement.lang = nextLang;
+
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const key = el.getAttribute("data-i18n");
+      if (!key) return;
+      el.textContent = languageMap[nextLang][key] || languageMap.en[key] || key;
+    });
+
+    document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+      const key = el.getAttribute("data-i18n-placeholder");
+      if (!key) return;
+      el.setAttribute("placeholder", languageMap[nextLang][key] || languageMap.en[key] || "");
+    });
+
+    languageButtons.forEach((btn, idx) => {
+      const active = btn.dataset.lang === nextLang;
+      btn.classList.toggle("active", active);
+      if (active && languageIndicator) languageIndicator.style.transform = `translateX(${idx * 100}%)`;
+    });
+  }
+
+  languageButtons.forEach((btn) => {
+    btn.addEventListener("click", () => applyLanguage(btn.dataset.lang || "en"));
+    btn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        applyLanguage(btn.dataset.lang || "en");
+      }
+    });
+  });
+
+  applyLanguage(localStorage.getItem("siteLanguage") || "en");
 
   if (searchInput) {
     searchInput.addEventListener("input", () => {
@@ -2171,13 +2233,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const colorThemes = {
     blue: {
-      accentRgb: "0, 74, 124",
-      accentDark: "#004a7c",
-      accent: "#0091d5",
-      accentLight: "#2185d5",
+      accentRgb: "30, 136, 229",
+      accentDark: "#1565c0",
+      accent: "#1e88e5",
+      accentLight: "#42a5f5",
       accentContrast: "#0d47a1",
-      bgDay: "#f1f4f9",
-      bgSoft: "#e8f0fa",
+      bgDay: "#f2f7ff",
+      bgSoft: "#e5f0ff",
     },
     green: {
       accentRgb: "25, 114, 64",
@@ -6817,7 +6879,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
     overlay = false,
   } = {}) {
     if (!currentUser) {
-      showToast("ابتدا لاگین کنید");
+      showToast((localStorage.getItem("siteLanguage") === "fa") ? "ابتدا لاگین کنید" : "Please login first");
       return;
     }
     const tid = await ensureThread();
@@ -6836,7 +6898,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
       .insert([payload]);
     if (error) {
       console.error("send chat error", error);
-      showToast("ارسال ناموفق ❌");
+      showToast((localStorage.getItem("siteLanguage") === "fa") ? "ارسال ناموفق ❌" : "Send failed ❌");
 
       // اگر اوورلی باز است، لیست را دوباره لود کن تا حباب موقت پاک شود
       const isOverlayOpen =
@@ -6964,7 +7026,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
       card.className = "user-thread-card";
       card.innerHTML = `
       <img src="${avatar}" alt="avatar">
-      <div class="user-thread-name">${user?.username || "کاربر"}</div>
+      <div class="user-thread-name">${user?.username || ((localStorage.getItem("siteLanguage") === "fa") ? "کاربر" : "User")}</div>
       <div class="user-thread-snippet">${snippet || ""}</div>
       ${t.unread_for_admin ? '<span class="thread-badge">!</span>' : ""}
     `;
@@ -7011,7 +7073,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
   // باز کردن اوورلی
   async function openAdminThread(threadId, user, avatar) {
     document.getElementById("adminThreadTitle").textContent =
-      user?.username || "کاربر";
+      user?.username || ((localStorage.getItem("siteLanguage") === "fa") ? "کاربر" : "User");
     document.getElementById("adminThreadAvatar").src = avatar;
 
     currentAdminThreadId = threadId;
@@ -7190,7 +7252,7 @@ return `
 
     if (error) {
       console.error("admin send error", error);
-      showToast("ارسال ناموفق ❌");
+      showToast((localStorage.getItem("siteLanguage") === "fa") ? "ارسال ناموفق ❌" : "Send failed ❌");
 
       // در صورت خطا، لیست را دوباره لود کن تا حباب موقت پاک شود
       await loadAdminThreadMessages();
