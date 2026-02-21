@@ -3228,7 +3228,9 @@ function setTabInUrl(type) {
 
 <div class="movie-info anim-vertical">
   <div class="movie-title anim-left-right">
-    <span class="movie-name anim-horizontal">${title}</span>
+    <a class="movie-name anim-horizontal movie-detail-link" href="/movie/${encodeURIComponent(
+      makeMovieSlug(m.title || "")
+    )}">${title}</a>
     ${badgeHtml}
   </div>
 
@@ -3377,6 +3379,11 @@ function setTabInUrl(type) {
 
       // دکمه Go to file
       if (target.closest(".go-btn")) {
+        return;
+      }
+
+      // لینک صفحه اختصاصی پست
+      if (target.closest(".movie-detail-link")) {
         return;
       }
 
