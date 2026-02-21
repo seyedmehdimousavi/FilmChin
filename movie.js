@@ -101,6 +101,56 @@ function renderChips(str, mode = "hashtags") {
     .join(" ");
 }
 
+
+function classifySynopsisChar(ch) {
+  if (/\s/.test(ch)) return "neutral";
+  if (/[\u0600-\u06FF]/.test(ch)) return "fa";
+  if (/[A-Za-z0-9]/.test(ch)) return "en";
+  return "neutral";
+}
+
+function buildSynopsisSegments(rawText) {
+  const text = String(rawText || "").trim();
+  if (!text || text === "-") return [{ dir: "fa", text: "-" }];
+
+  const segments = [];
+  let current = "";
+  let currentDir = "en";
+
+  for (const ch of text) {
+    const kind = classifySynopsisChar(ch);
+    const nextDir = kind === "neutral" ? currentDir : kind;
+
+    if (current && nextDir !== currentDir) {
+      segments.push({ dir: currentDir, text: current.trim() });
+      current = "";
+    }
+
+    currentDir = nextDir;
+    current += ch;
+  }
+
+  if (current.trim()) {
+    segments.push({ dir: currentDir, text: current.trim() });
+  }
+
+  const merged = [];
+  segments.forEach((seg) => {
+    if (!seg.text) return;
+    const prev = merged[merged.length - 1];
+    if (prev && prev.dir === seg.dir) prev.text = `${prev.text} ${seg.text}`.trim();
+    else merged.push(seg);
+  });
+
+  return merged.length ? merged : [{ dir: "fa", text }];
+}
+
+function makeSynopsisHtml(rawText) {
+  return buildSynopsisSegments(rawText)
+    .map((seg) => `<span class="synopsis-segment synopsis-${seg.dir}" dir="${seg.dir === "fa" ? "rtl" : "ltr"}">${escapeHtml(seg.text)}</span>`)
+    .join("\n");
+}
+
 function buildTelegramBotUrlFromChannelLink(rawLink) {
   const trimmed = (rawLink || "").trim();
   if (!trimmed || trimmed === "#") return trimmed;
@@ -358,7 +408,7 @@ function buildSimilarMovies(current, allMovies) {
     .map((x) => x.movie);
 }
 
-function renderSimilarMovies(card, similarMovies) {
+function renderSimilarMovies(container, similarMovies) {
   const html = (similarMovies || [])
     .map((m) => {
       const title = escapeHtml(m.title || "-");
@@ -373,12 +423,12 @@ function renderSimilarMovies(card, similarMovies) {
     .join("");
 
   const section = document.createElement("div");
-  section.className = "episodes-container anim-vertical similar-movies-container";
+  section.className = "similar-movies-section";
   section.innerHTML = `
-    <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Similar movies:</span>
-    <div class="episodes-list anim-left-right">${html || '<div class="episode-card">No similar movies found.</div>'}</div>
+    <div class="similar-movies-title"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Similar movies:</div>
+    <div class="episodes-container anim-vertical similar-movies-container"><div class="episodes-list anim-left-right">${html || '<div class="episode-card">No similar movies found.</div>'}</div></div>
   `;
-  card.querySelector(".movie-info")?.appendChild(section);
+  container.appendChild(section);
 
   section.querySelectorAll(".similar-go-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
@@ -393,7 +443,12 @@ function renderSimilarMovies(card, similarMovies) {
 function renderMovieCard(container, movie, allMovies, episodes = []) {
   const cover = escapeHtml(movie.cover || "https://via.placeholder.com/300x200?text=No+Image");
   const title = escapeHtml(movie.title || "-");
-  const synopsis = escapeHtml((movie.synopsis || "-").trim());
+  const synopsis = makeSynopsisHtml(movie.synopsis || "-");
+
+  const badgeHtml =
+    movie.type && movie.type !== "single"
+      ? `<span class="collection-badge ${movie.type === "collection" ? "badge-collection" : "badge-serial"}">${movie.type === "collection" ? "Collection" : "Series"}<span class="badge-count anim-left-right">${(episodes || []).length} episodes</span></span>`
+      : "";
 
   const badgeHtml =
     movie.type && movie.type !== "single"
@@ -415,11 +470,11 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
       <div class="movie-title anim-left-right"><span class="movie-name anim-horizontal">${title}</span>${badgeHtml}</div>
       <span class="field-label anim-vertical"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span><div class="field-quote anim-left-right synopsis-quote"><div class="quote-text anim-horizontal">${synopsis}</div></div>
       <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span><div class="field-quote anim-left-right director-field">${renderChips(movie.director || "-", "names")}</div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span><div class="field-quote anim-horizontal">${renderChips(movie.product || "-")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span><div class="field-quote anim-horizontal product-field">${renderChips(movie.product || "-")}</div>
       <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span><div class="field-quote anim-left-right stars-field">${renderChips(movie.stars || "-", "names")}</div>
       <span class="field-label anim-vertical"><img src="/images/icons8-imdb-48.png" class="imdb-bell" style="width:20px;height:20px;"> IMDB:</span><div class="field-quote anim-left-right"><span class="chip imdb-chip anim-horizontal">${escapeHtml(movie.imdb || "-")}</span></div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span><div class="field-quote anim-left-right">${escapeHtml(movie.release_info || "-")}</div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span><div class="field-quote genre-grid anim-horizontal">${renderChips(movie.genre || "-")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span><div class="field-quote anim-left-right release-field">${escapeHtml(movie.release_info || "-")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span><div class="field-quote genre-grid anim-horizontal genre-field">${renderChips(movie.genre || "-")}</div>
       <div class="episodes-container anim-vertical" data-movie-id="${escapeHtml(movie.id)}"><div class="episodes-list anim-left-right">${episodesHtml}</div></div>
       <div class="post-action-row movie-page-actions"><div class="button-wrap"><button class="go-btn anim-vertical" data-link="${escapeHtml((episodes[0] && episodes[0].link) || movie.link || "#")}"><span>Go to file</span></button><div class="button-shadow"></div></div></div>
       <div class="comment-summary anim-horizontal"><div class="avatars"></div><div class="comments-count">0 comments</div><div class="enter-comments"><img src="/images/icons8-comment.apng" style="width:22px;height:22px;"></div></div>
@@ -438,11 +493,39 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
     openPostOptions();
   });
 
-  episodeCards.forEach((ep) => {
-    ep.addEventListener("click", () => {
+  const movieNameEl = container.querySelector(".movie-name");
+  const quoteTextEl = container.querySelector(".quote-text");
+  const directorFieldEl = container.querySelector(".director-field");
+  const productFieldEl = container.querySelector(".product-field");
+  const starsFieldEl = container.querySelector(".stars-field");
+  const imdbChipEl = container.querySelector(".imdb-chip");
+  const releaseFieldEl = container.querySelector(".release-field");
+  const genreFieldEl = container.querySelector(".genre-field");
+  const coverImgEl = container.querySelector(".cover-image");
+  const coverBlurEl = container.querySelector(".cover-blur");
+
+  episodeCards.forEach((epCard, idx) => {
+    epCard.addEventListener("click", () => {
       episodeCards.forEach((x) => x.classList.remove("active"));
-      ep.classList.add("active");
-      if (goBtn) goBtn.dataset.link = ep.dataset.link || "#";
+      epCard.classList.add("active");
+
+      const ep = episodes[idx] || movie;
+      if (goBtn) goBtn.dataset.link = ep.link || "#";
+
+      if (movie.type === "collection") {
+        if (movieNameEl) movieNameEl.textContent = ep.title || movie.title;
+        if (quoteTextEl) quoteTextEl.innerHTML = makeSynopsisHtml(ep.synopsis || movie.synopsis || "-");
+        if (directorFieldEl) directorFieldEl.innerHTML = renderChips(ep.director || movie.director || "-", "names");
+        if (productFieldEl) productFieldEl.innerHTML = renderChips(ep.product || movie.product || "-");
+        if (starsFieldEl) starsFieldEl.innerHTML = renderChips(ep.stars || movie.stars || "-", "names");
+        if (imdbChipEl) imdbChipEl.textContent = ep.imdb || movie.imdb || "-";
+        if (releaseFieldEl) releaseFieldEl.textContent = ep.release_info || movie.release_info || "-";
+        if (genreFieldEl) genreFieldEl.innerHTML = renderChips(ep.genre || movie.genre || "-");
+        if (coverImgEl) coverImgEl.src = ep.cover || movie.cover || "";
+        if (coverBlurEl) coverBlurEl.style.backgroundImage = `url('${ep.cover || movie.cover || ""}')`;
+      } else if (movie.type === "serial") {
+        if (movieNameEl) movieNameEl.textContent = ep.title || movie.title;
+      }
     });
   });
 
@@ -454,7 +537,7 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
   });
 
   attachCommentsHandlers(card, movie.id);
-  renderSimilarMovies(card, buildSimilarMovies(movie, allMovies));
+  renderSimilarMovies(container, buildSimilarMovies(movie, allMovies));
 }
 
 function initFeatureAccordions() {
@@ -518,6 +601,13 @@ async function loadMoviePage() {
           title: movie.title,
           cover: movie.cover,
           link: movie.link,
+          synopsis: movie.synopsis,
+          director: movie.director,
+          product: movie.product,
+          stars: movie.stars,
+          imdb: movie.imdb,
+          release_info: movie.release_info,
+          genre: movie.genre,
         },
         ...(items || []),
       ]

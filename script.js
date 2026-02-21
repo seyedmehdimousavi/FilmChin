@@ -3053,6 +3053,63 @@ function setTabInUrl(type) {
       .filter(Boolean);
   }
 
+  function classifySynopsisChar(ch) {
+    if (/\s/.test(ch)) return "neutral";
+    if (/[\u0600-\u06FF]/.test(ch)) return "fa";
+    if (/[A-Za-z0-9]/.test(ch)) return "en";
+    return "neutral";
+  }
+
+  function buildSynopsisSegments(rawText) {
+    const text = String(rawText || "").trim();
+    if (!text || text === "-") return [{ dir: "fa", text: "-" }];
+
+    const segments = [];
+    let current = "";
+    let currentDir = "en";
+
+    for (const ch of text) {
+      const kind = classifySynopsisChar(ch);
+      const nextDir = kind === "neutral" ? currentDir : kind;
+
+      if (current && nextDir !== currentDir) {
+        segments.push({ dir: currentDir, text: current.trim() });
+        current = "";
+      }
+
+      currentDir = nextDir;
+      current += ch;
+    }
+
+    if (current.trim()) {
+      segments.push({ dir: currentDir, text: current.trim() });
+    }
+
+    const merged = [];
+    segments.forEach((seg) => {
+      if (!seg.text) return;
+      const prev = merged[merged.length - 1];
+      if (prev && prev.dir === seg.dir) {
+        prev.text = `${prev.text} ${seg.text}`.trim();
+      } else {
+        merged.push(seg);
+      }
+    });
+
+    return merged.length ? merged : [{ dir: "fa", text: text }];
+  }
+
+  function makeSynopsisHtml(rawText) {
+    return buildSynopsisSegments(rawText)
+      .map(
+        (seg) =>
+          `<span class="synopsis-segment synopsis-${seg.dir}" dir="${
+            seg.dir === "fa" ? "rtl" : "ltr"
+          }">${escapeHtml(seg.text)}</span>`
+      )
+      .join("\n");
+  }
+
   function renderChips(str, mode = "hashtags") {
     if (!str || str === "-") return "-";
 
@@ -3222,7 +3279,7 @@ function setTabInUrl(type) {
       m.cover || "https://via.placeholder.com/300x200?text=No+Image"
     );
     const title = escapeHtml(m.title || "-");
-    const synopsis = escapeHtml((m.synopsis || "-").trim());
+    const synopsis = makeSynopsisHtml(m.synopsis || "-");
     const director = renderChips(m.director || "-", "names");
     const stars = renderChips(m.stars || "-", "names");
     const imdb = escapeHtml(m.imdb || "-");
@@ -3596,8 +3653,9 @@ function setTabInUrl(type) {
               coverBlur.style.backgroundImage = `url('${
                 ep.cover || m.cover
               }')`;
-            card.querySelector(".quote-text").textContent =
-              ep.synopsis || m.synopsis;
+            card.querySelector(".quote-text").innerHTML = makeSynopsisHtml(
+              ep.synopsis || m.synopsis
+            );
             card.querySelectorAll(".field-quote")[1].innerHTML = renderChips(
               ep.director || m.director || "-",
               "names"
@@ -3620,13 +3678,6 @@ function setTabInUrl(type) {
           if (m.type === "serial") {
             const nameEl = card.querySelector(".movie-name");
             if (nameEl) nameEl.textContent = ep.title || m.title;
-            const coverImg = card.querySelector(".cover-image");
-            if (coverImg) coverImg.src = ep.cover || m.cover;
-            const coverBlur = card.querySelector(".cover-blur");
-            if (coverBlur)
-              coverBlur.style.backgroundImage = `url('${
-                ep.cover || m.cover
-              }')`;
             goBtn.dataset.link = ep.link;
           }
         }
@@ -3664,13 +3715,6 @@ function setTabInUrl(type) {
             if (m.type === "serial") {
               const nameEl = card.querySelector(".movie-name");
               if (nameEl) nameEl.textContent = ep.title || m.title;
-              const coverImg = card.querySelector(".cover-image");
-              if (coverImg) coverImg.src = ep.cover || m.cover;
-              const coverBlur = card.querySelector(".cover-blur");
-              if (coverBlur)
-                coverBlur.style.backgroundImage = `url('${
-                  ep.cover || m.cover
-                }')`;
               goBtn.dataset.link = ep.link;
             } else if (m.type === "collection") {
               const nameEl = card.querySelector(".movie-name");
@@ -3682,8 +3726,9 @@ function setTabInUrl(type) {
                 coverBlur.style.backgroundImage = `url('${
                   ep.cover || m.cover
                 }')`;
-              card.querySelector(".quote-text").textContent =
-                ep.synopsis || m.synopsis;
+              card.querySelector(".quote-text").innerHTML = makeSynopsisHtml(
+                ep.synopsis || m.synopsis
+              );
               card.querySelectorAll(".field-quote")[1].innerHTML = renderChips(
                 ep.director || m.director || "-",
                 "names"
@@ -3732,13 +3777,13 @@ function setTabInUrl(type) {
 
       function applyState() {
         if (collapsed) {
-          textEl.textContent = shortText;
+          textEl.innerHTML = makeSynopsisHtml(shortText);
           quote.style.overflow = "hidden";
           quote.style.maxHeight = "120px";
           quote.classList.add("collapsed");
           btn.textContent = "More";
         } else {
-          textEl.textContent = fullText;
+          textEl.innerHTML = makeSynopsisHtml(fullText);
           quote.style.maxHeight = "1000px";
           quote.classList.remove("collapsed");
           btn.textContent = "Less";
@@ -4545,13 +4590,13 @@ function openMovieModal(m, startIdx = 0) {
 
       function applyState() {
         if (collapsed) {
-          textEl.textContent = shortText;
+          textEl.innerHTML = makeSynopsisHtml(shortText);
           quote.style.overflow = "hidden";
           quote.style.maxHeight = "120px";
           quote.classList.add("collapsed");
           btn.textContent = "More";
         } else {
-          textEl.textContent = fullText;
+          textEl.innerHTML = makeSynopsisHtml(fullText);
           quote.style.maxHeight = "1000px";
           quote.classList.remove("collapsed");
           btn.textContent = "Less";
