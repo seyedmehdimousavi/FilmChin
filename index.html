@@ -174,7 +174,7 @@
               <!-- ✅ NEW: Favorite movies button -->
               <div class="button-wrap">
                 <button id="favoriteMoviesBtn" class="profile-favorites">
-                  <span>Favorite movies</span>
+                  <span data-i18n="favoriteMovies">Favorite movies</span>
                 </button>
                 <div class="button-shadow"></div>
               </div>
@@ -183,14 +183,14 @@
 
               <div class="button-wrap">
                 <button id="logoutBtn" class="profile-logout">
-                  <span>Logout</span>
+                  <span data-i18n="logout">Logout</span>
                 </button>
                 <div class="button-shadow"></div>
               </div>
             </div>
           </div>
 
-          <input id="search" type="text" placeholder="Search..." dir="auto" />
+          <input id="search" type="text" placeholder="Search..." dir="auto" data-i18n-placeholder="searchPlaceholder" />
 
           <div class="button-wrap">
             <button
@@ -272,22 +272,22 @@
           <div class="tab-indicator"></div>
 
           <a href="?tab=all" data-type="all" class="tab-link">
-            <span>All</span>
+            <span data-i18n="tabAll">All</span>
             <span class="count">0</span>
           </a>
 
           <a href="?tab=collection" data-type="collection" class="tab-link">
-            <span>Collections</span>
+            <span data-i18n="tabCollections">Collections</span>
             <span class="count">0</span>
           </a>
 
           <a href="?tab=series" data-type="series" class="tab-link">
-            <span>Series</span>
+            <span data-i18n="tabSeries">Series</span>
             <span class="count">0</span>
           </a>
 
           <a href="?tab=single" data-type="single" class="tab-link">
-            <span>Movies</span>
+            <span data-i18n="tabMovies">Movies</span>
             <span class="count">0</span>
           </a>
         </div>
@@ -403,7 +403,7 @@
     <div class="sidemenu-accordion-header">
       <div class="sidemenu-header-content">
         <i class="bi bi-list"></i>
-        <span>Genres</span>
+        <span data-i18n="genres">Genres</span>
       </div>
        <span class="feature-icon sidemenu-arrow"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
@@ -608,7 +608,7 @@
         <div class="popular-title">
           <div class="button-wrap">
             <button>
-              <span>Popular Movies</span>
+              <span data-i18n="popularMovies">Popular Movies</span>
             </button>
             <div class="button-shadow"></div>
           </div>

@@ -239,7 +239,7 @@ function applySavedTheme() {
   s.setProperty("--theme-bg-day", selected.bgDay);
   s.setProperty("--theme-bg-soft", selected.bgSoft);
 
-  const goPageColors = { blue: "#7c4dff", green: "#d97706", yellow: "#0ea5e9", red: "#10b981", purple: "#f59e0b", teal: "#ef4444" };
+  const goPageColors = { blue: "#1e88e5", green: "#2e9d57", yellow: "#c5a317", red: "#c84646", purple: "#6f4dbb", teal: "#188a94" };
   const themeName = localStorage.getItem("colorTheme") || "blue";
   s.setProperty("--go-page-bg", goPageColors[themeName] || "#7c4dff");
 }
