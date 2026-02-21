@@ -3228,7 +3228,9 @@ function setTabInUrl(type) {
 
 <div class="movie-info anim-vertical">
   <div class="movie-title anim-left-right">
-    <span class="movie-name anim-horizontal">${title}</span>
+    <a class="movie-name anim-horizontal movie-detail-link" href="/movie/${encodeURIComponent(
+      makeMovieSlug(m.title || "")
+    )}">${title}</a>
     ${badgeHtml}
   </div>
 
@@ -3272,12 +3274,20 @@ function setTabInUrl(type) {
     <div class="episodes-list anim-left-right"></div>
   </div>
 
-   <div class="button-wrap">
-       <button class="go-btn anim-vertical" data-link="${escapeHtml(
-         m.link || "#"
-       )}"><span>Go to file</span></button>
-       <div class="button-shadow"></div>
-   </div>
+   <div class="post-action-row">
+      <div class="button-wrap">
+        <button class="go-btn anim-vertical" data-link="${escapeHtml(
+          m.link || "#"
+        )}"><span>Go to file</span></button>
+        <div class="button-shadow"></div>
+      </div>
+      <div class="button-wrap">
+        <button class="go-page-btn anim-vertical" data-url="/movie/${encodeURIComponent(
+          makeMovieSlug(m.title || "")
+        )}"><span>Go to page</span></button>
+        <div class="button-shadow"></div>
+      </div>
+    </div>
 
   <div class="comment-summary anim-horizontal">
     <div class="avatars"></div>
@@ -3380,6 +3390,11 @@ function setTabInUrl(type) {
         return;
       }
 
+      // دکمه Go to page / لینک صفحه اختصاصی
+      if (target.closest(".go-page-btn") || target.closest(".movie-detail-link")) {
+        return;
+      }
+
       // دکمه toggle synopsis
       if (target.closest(".quote-toggle-btn")) return;
 
@@ -3426,6 +3441,16 @@ function setTabInUrl(type) {
 
 // ===================== رفتار دکمه Go to file (اتصال به بات تلگرام) =====================
       const goBtn = card.querySelector(".go-btn");
+      const goPageBtn = card.querySelector(".go-page-btn");
+      goPageBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const url = goPageBtn.dataset.url || "#";
+        if (url && url !== "#") {
+          window.location.href = url;
+        }
+      });
+
       goBtn?.addEventListener("click", async () => {
         const rawLink = goBtn.dataset.link || "#";
 
