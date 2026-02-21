@@ -4,6 +4,8 @@ const SUPABASE_KEY =
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentMovie = null;
+let currentUser = null;
+let favoriteMovieIds = new Set();
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -12,6 +14,29 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function initials(name) {
+  return String(name || "G")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((s) => s[0]?.toUpperCase() || "")
+    .join("");
+}
+
+function timeAgo(date) {
+  const now = Date.now();
+  const ts = new Date(date).getTime();
+  if (!ts || Number.isNaN(ts)) return "now";
+  const diffSec = Math.max(1, Math.floor((now - ts) / 1000));
+  if (diffSec < 60) return `${diffSec}s ago`;
+  const mins = Math.floor(diffSec / 60);
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
 }
 
 function makeMovieSlug(title) {
@@ -25,27 +50,105 @@ function makeMovieSlug(title) {
     .replace(/^-|-$/g, "");
 }
 
-function renderChips(str, mode = "hashtags") {
-  const raw = String(str || "").trim();
-  if (!raw || raw === "-") return '<span class="chip">-</span>';
-  return raw
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .map((item) =>
-      mode === "names"
-        ? `<span class="chip person-chip">${escapeHtml(item)}</span>`
-        : `<span class="chip country-chip">${escapeHtml(item)}</span>`
-    )
-    .join(" ");
-}
-
 function parseSlug() {
   const pathname = window.location.pathname || "";
   if (pathname.startsWith("/movie/")) {
     return decodeURIComponent(pathname.replace("/movie/", "").replace(/\/+$/, ""));
   }
   return (new URLSearchParams(window.location.search).get("slug") || "").trim();
+}
+
+function extractHashtagTokens(str) {
+  if (!str) return [];
+  return (str.match(/#[^\s,،]+/g) || []).map((tag) => tag.trim()).filter(Boolean);
+}
+
+function extractCommaSeparatedNames(str) {
+  if (!str) return [];
+  return str
+    .split(/[،,]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function buildHomeSearchHref(value) {
+  return `/?search=${encodeURIComponent(value)}`;
+}
+
+function buildSearchChip(value, className) {
+  const safeValue = escapeHtml(value);
+  return `<a class="${className}" dir="auto" href="${buildHomeSearchHref(value)}">${safeValue}</a>`;
+}
+
+function renderChips(str, mode = "hashtags") {
+  if (!str || str === "-") return '<span class="chip">-</span>';
+
+  if (mode === "names") {
+    const names = extractCommaSeparatedNames(str);
+    if (!names.length) return `<span class="chip">${escapeHtml(str)}</span>`;
+    return names.map((name) => buildSearchChip(name, "person-chip")).join(' <span class="chip-separator">,</span> ');
+  }
+
+  const tags = extractHashtagTokens(str);
+  if (tags.length) {
+    return tags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join(" ");
+  }
+
+  return String(str)
+    .split(" ")
+    .filter((g) => g.trim())
+    .map((g) => buildSearchChip(g, "country-chip"))
+    .join(" ");
+}
+
+
+function classifySynopsisChar(ch) {
+  if (/\s/.test(ch)) return "neutral";
+  if (/[\u0600-\u06FF]/.test(ch)) return "fa";
+  if (/[A-Za-z0-9]/.test(ch)) return "en";
+  return "neutral";
+}
+
+function buildSynopsisSegments(rawText) {
+  const text = String(rawText || "").trim();
+  if (!text || text === "-") return [{ dir: "fa", text: "-" }];
+
+  const segments = [];
+  let current = "";
+  let currentDir = "en";
+
+  for (const ch of text) {
+    const kind = classifySynopsisChar(ch);
+    const nextDir = kind === "neutral" ? currentDir : kind;
+
+    if (current && nextDir !== currentDir) {
+      segments.push({ dir: currentDir, text: current.trim() });
+      current = "";
+    }
+
+    currentDir = nextDir;
+    current += ch;
+  }
+
+  if (current.trim()) {
+    segments.push({ dir: currentDir, text: current.trim() });
+  }
+
+  const merged = [];
+  segments.forEach((seg) => {
+    if (!seg.text) return;
+    const prev = merged[merged.length - 1];
+    if (prev && prev.dir === seg.dir) prev.text = `${prev.text} ${seg.text}`.trim();
+    else merged.push(seg);
+  });
+
+  return merged.length ? merged : [{ dir: "fa", text }];
+}
+
+function makeSynopsisHtml(rawText) {
+  return buildSynopsisSegments(rawText)
+    .map((seg) => `<span class="synopsis-segment synopsis-${seg.dir}" dir="${seg.dir === "fa" ? "rtl" : "ltr"}">${escapeHtml(seg.text)}</span>`)
+    .join(" ");
 }
 
 function buildTelegramBotUrlFromChannelLink(rawLink) {
@@ -99,14 +202,7 @@ function applySavedTheme() {
   s.setProperty("--theme-bg-day", selected.bgDay);
   s.setProperty("--theme-bg-soft", selected.bgSoft);
 
-  const goPageColors = {
-    blue: "#7c4dff",
-    green: "#d97706",
-    yellow: "#0ea5e9",
-    red: "#10b981",
-    purple: "#f59e0b",
-    teal: "#ef4444",
-  };
+  const goPageColors = { blue: "#7c4dff", green: "#d97706", yellow: "#0ea5e9", red: "#10b981", purple: "#f59e0b", teal: "#ef4444" };
   const themeName = localStorage.getItem("colorTheme") || "blue";
   s.setProperty("--go-page-bg", goPageColors[themeName] || "#7c4dff");
 }
@@ -137,7 +233,7 @@ function openPostOptions() {
   const overlay = document.getElementById("postOptionsOverlay");
   const title = document.getElementById("postOptionsTitle");
   if (!overlay || !currentMovie) return;
-  if (title) title.textContent = `Post options · ${currentMovie.title || "Movie"}`;
+  if (title) title.textContent = currentMovie.title || "Post options";
   overlay.classList.add("open");
   overlay.setAttribute("aria-hidden", "false");
 }
@@ -149,12 +245,64 @@ function closePostOptions() {
   overlay.setAttribute("aria-hidden", "true");
 }
 
+async function loadCurrentUserAndFavorites() {
+  try {
+    const { data } = await db.auth.getUser();
+    currentUser = data?.user || null;
+    if (!currentUser) {
+      favoriteMovieIds = new Set();
+      return;
+    }
+    const { data: favs } = await db.from("favorites").select("movie_id").eq("user_id", currentUser.id);
+    favoriteMovieIds = new Set((favs || []).map((f) => f.movie_id));
+  } catch {
+    currentUser = null;
+    favoriteMovieIds = new Set();
+  }
+}
+
+function syncFavoriteOptionUi() {
+  const btn = document.getElementById("postOptionFavorite");
+  const statusEl = document.getElementById("postOptionFavoriteStatus");
+  if (!btn || !statusEl || !currentMovie) return;
+  if (!currentUser) {
+    btn.classList.remove("favorite-active");
+    statusEl.textContent = "Login required";
+    return;
+  }
+  const isFavorite = favoriteMovieIds.has(currentMovie.id);
+  btn.classList.toggle("favorite-active", isFavorite);
+  statusEl.textContent = isFavorite ? "In favorites" : "Add to your favorites";
+}
+
+async function toggleFavoriteCurrentMovie() {
+  if (!currentMovie || !currentUser) {
+    syncFavoriteOptionUi();
+    return;
+  }
+
+  const movieId = currentMovie.id;
+  const has = favoriteMovieIds.has(movieId);
+  if (has) {
+    const { error } = await db.from("favorites").delete().eq("user_id", currentUser.id).eq("movie_id", movieId);
+    if (!error) favoriteMovieIds.delete(movieId);
+  } else {
+    const { error } = await db.from("favorites").insert([{ user_id: currentUser.id, movie_id: movieId }]);
+    if (!error) favoriteMovieIds.add(movieId);
+  }
+  syncFavoriteOptionUi();
+}
+
 function bindPostOptions(slug) {
   document.getElementById("postOptionsCloseBtn")?.addEventListener("click", closePostOptions);
   document.getElementById("postOptionsOverlay")?.addEventListener("click", (e) => {
     if (e.target.id === "postOptionsOverlay" || e.target.classList.contains("post-options-backdrop")) {
       closePostOptions();
     }
+  });
+
+  document.getElementById("postOptionFavorite")?.addEventListener("click", async () => {
+    await toggleFavoriteCurrentMovie();
   });
 
   document.getElementById("postOptionCopyLink")?.addEventListener("click", async () => {
@@ -174,15 +322,139 @@ function bindPostOptions(slug) {
   });
 }
 
-function renderMovieCard(container, movie, episodes = []) {
+async function loadComments(movieId) {
+  const { data } = await db.from("comments").select("*").eq("movie_id", movieId).eq("approved", true).order("created_at", { ascending: true }).limit(500);
+  return data || [];
+}
+
+function attachCommentsHandlers(card, movieId) {
+  const avatarsEl = card.querySelector(".avatars");
+  const countEl = card.querySelector(".comments-count");
+  const summaryRow = card.querySelector(".comment-summary");
+  const enterBtn = card.querySelector(".enter-comments");
+  const panel = card.querySelector(".comments-panel");
+  const closeBtn = card.querySelector(".comments-close");
+  const commentsList = card.querySelector(".comments-list");
+  const nameInput = card.querySelector(".comment-name");
+  const textInput = card.querySelector(".comment-text");
+  const sendBtn = card.querySelector(".comment-send");
+
+  function renderComments(arr) {
+    const latest = (arr || []).slice(-3).map((c) => c.name || "Guest");
+    if (avatarsEl) avatarsEl.innerHTML = latest.map((n) => `<div class="avatar">${escapeHtml(initials(n))}</div>`).join("");
+    if (countEl) countEl.textContent = `${(arr || []).length} comments`;
+    if (commentsList) {
+      commentsList.innerHTML = (arr || []).map((c) => `
+        <div class="comment-row">
+          <div class="comment-avatar">${escapeHtml(initials(c.name))}</div>
+          <div class="comment-body">
+            <div class="comment-meta"><strong>${escapeHtml(c.name || "Guest")}</strong> · <span class="comment-time">${timeAgo(c.created_at)}</span></div>
+            <div class="comment-text-content">${escapeHtml(c.text || "")}</div>
+          </div>
+        </div>`).join("");
+    }
+  }
+
+  const refresh = async () => renderComments(await loadComments(movieId));
+  const openComments = () => {
+    refresh();
+    panel?.classList.add("open");
+    panel?.setAttribute("aria-hidden", "false");
+  };
+  const closeComments = () => {
+    panel?.classList.remove("open");
+    panel?.setAttribute("aria-hidden", "true");
+  };
+
+  enterBtn?.addEventListener("click", openComments);
+  summaryRow?.addEventListener("click", openComments);
+  closeBtn?.addEventListener("click", closeComments);
+
+  sendBtn?.addEventListener("click", async () => {
+    const name = (nameInput?.value || "Guest").trim() || "Guest";
+    const text = (textInput?.value || "").trim();
+    if (!text) return;
+    sendBtn.disabled = true;
+    await db.from("comments").insert([{ movie_id: movieId, name, text, approved: false, published: false }]);
+    if (nameInput) nameInput.value = "";
+    if (textInput) textInput.value = "";
+    await refresh();
+    sendBtn.disabled = false;
+  });
+
+  refresh();
+}
+
+function buildSimilarMovies(current, allMovies) {
+  const currentGenres = new Set(extractHashtagTokens(current.genre || ""));
+  if (!currentGenres.size) return [];
+
+  return allMovies
+    .filter((m) => m.id !== current.id)
+    .map((m) => {
+      const g = new Set(extractHashtagTokens(m.genre || ""));
+      let overlap = 0;
+      currentGenres.forEach((x) => {
+        if (g.has(x)) overlap += 1;
+      });
+      return { movie: m, overlap, total: g.size };
+    })
+    .filter((x) => x.overlap > 0)
+    .sort((a, b) => {
+      if (b.overlap !== a.overlap) return b.overlap - a.overlap;
+      return (a.total || 0) - (b.total || 0);
+    })
+    .slice(0, 15)
+    .map((x) => x.movie);
+}
+
+function renderSimilarMovies(container, similarMovies) {
+  const html = (similarMovies || [])
+    .map((m) => {
+      const title = escapeHtml(m.title || "-");
+      const cover = escapeHtml(m.cover || "https://via.placeholder.com/120x80?text=No+Cover");
+      const url = `/movie/${encodeURIComponent(makeMovieSlug(m.title || ""))}`;
+      return `<div class="episode-card similar-movie-card">
+        <img src="${cover}" alt="${title}" class="episode-cover">
+        <div class="episode-title"><span>${title}</span></div>
+        <div class="button-wrap similar-go-wrap"><button class="go-page-btn similar-go-btn" data-url="${escapeHtml(url)}"><span>Go to page</span></button><div class="button-shadow"></div></div>
+      </div>`;
+    })
+    .join("");
+
+  const section = document.createElement("div");
+  section.className = "similar-movies-section";
+  section.innerHTML = `
+    <div class="similar-movies-title"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Similar movies:</div>
+    <div class="episodes-container anim-vertical similar-movies-container"><div class="episodes-list anim-left-right">${html || '<div class="episode-card">No similar movies found.</div>'}</div></div>
+  `;
+  container.appendChild(section);
+
+  section.querySelectorAll(".similar-go-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const url = btn.dataset.url || "#";
+      if (url !== "#") window.location.href = url;
+    });
+  });
+}
+
+function renderMovieCard(container, movie, allMovies, episodes = []) {
   const cover = escapeHtml(movie.cover || "https://via.placeholder.com/300x200?text=No+Image");
   const title = escapeHtml(movie.title || "-");
-  const synopsis = escapeHtml((movie.synopsis || "-").trim());
+  const synopsis = makeSynopsisHtml(movie.synopsis || "-");
+
+  const badgeHtml =
+    movie.type && movie.type !== "single"
+      ? `<span class="collection-badge ${movie.type === "collection" ? "badge-collection" : "badge-serial"}">${movie.type === "collection" ? "Collection" : "Series"}<span class="badge-count anim-left-right">${(episodes || []).length} episodes</span></span>`
+      : "";
 
   const episodesHtml = (episodes || [])
     .map((ep, idx) => {
       const epTitle = escapeHtml(ep.title || `Episode ${idx + 1}`);
-      return `<button class="episode-card" type="button" data-link="${escapeHtml(ep.link || "#")}"><span class="episode-title"><span>${epTitle}</span></span></button>`;
+      const epCover = escapeHtml(ep.cover || "https://via.placeholder.com/120x80?text=No+Cover");
+      return `<button class="episode-card ${idx === 0 ? "active" : ""}" type="button" data-link="${escapeHtml(ep.link || "#")}" data-title="${epTitle}"><img src="${epCover}" alt="${epTitle}" class="episode-cover"><span class="episode-title"><span>${epTitle}</span></span></button>`;
     })
     .join("");
 
@@ -190,16 +462,18 @@ function renderMovieCard(container, movie, episodes = []) {
   <div class="movie-card no-reveal movie-page-card-only" data-movie-id="${escapeHtml(movie.id)}">
     <div class="cover-container anim-vertical"><div class="cover-blur anim-vertical" style="background-image: url('${cover}');"></div><img class="cover-image anim-vertical" src="${cover}" alt="${title}"></div>
     <div class="movie-info anim-vertical">
-      <div class="movie-title anim-left-right"><span class="movie-name anim-horizontal">${title}</span></div>
+      <div class="movie-title anim-left-right"><span class="movie-name anim-horizontal">${title}</span>${badgeHtml}</div>
       <span class="field-label anim-vertical"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span><div class="field-quote anim-left-right synopsis-quote"><div class="quote-text anim-horizontal">${synopsis}</div></div>
       <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span><div class="field-quote anim-left-right director-field">${renderChips(movie.director || "-", "names")}</div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span><div class="field-quote anim-horizontal">${renderChips(movie.product || "-")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span><div class="field-quote anim-horizontal product-field">${renderChips(movie.product || "-")}</div>
       <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span><div class="field-quote anim-left-right stars-field">${renderChips(movie.stars || "-", "names")}</div>
       <span class="field-label anim-vertical"><img src="/images/icons8-imdb-48.png" class="imdb-bell" style="width:20px;height:20px;"> IMDB:</span><div class="field-quote anim-left-right"><span class="chip imdb-chip anim-horizontal">${escapeHtml(movie.imdb || "-")}</span></div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span><div class="field-quote anim-left-right">${escapeHtml(movie.release_info || "-")}</div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span><div class="field-quote genre-grid anim-horizontal">${renderChips(movie.genre || "-")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span><div class="field-quote anim-left-right release-field">${escapeHtml(movie.release_info || "-")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span><div class="field-quote genre-grid anim-horizontal genre-field">${renderChips(movie.genre || "-")}</div>
       <div class="episodes-container anim-vertical" data-movie-id="${escapeHtml(movie.id)}"><div class="episodes-list anim-left-right">${episodesHtml}</div></div>
-      <div class="post-action-row movie-page-actions"><div class="button-wrap"><button class="go-btn anim-vertical" data-link="${escapeHtml(movie.link || "#")}"><span>Go to file</span></button><div class="button-shadow"></div></div></div>
+      <div class="post-action-row movie-page-actions"><div class="button-wrap"><button class="go-btn anim-vertical" data-link="${escapeHtml((episodes[0] && episodes[0].link) || movie.link || "#")}"><span>Go to file</span></button><div class="button-shadow"></div></div></div>
+      <div class="comment-summary anim-horizontal"><div class="avatars"></div><div class="comments-count">0 comments</div><div class="enter-comments"><img src="/images/icons8-comment.apng" style="width:22px;height:22px;"></div></div>
+      <div class="comments-panel" aria-hidden="true"><div class="comments-panel-inner"><div class="comments-panel-header"><div class="comments-title">Comments</div></div><div class="comments-list"></div><div class="comment-input-row"><div class="name-comments-close"><input class="comment-name" placeholder="Your name" maxlength="60" /><div class="button-wrap"><button class="comments-close"><span>close</span></button><div class="button-shadow"></div></div></div><textarea class="comment-text" placeholder="Write a comment..." rows="2"></textarea><div class="button-wrap"><button class="comment-send"><span>Send</span></button><div class="button-shaddow"></div></div></div></div></div>
     </div>
   </div>`;
 
@@ -210,15 +484,43 @@ function renderMovieCard(container, movie, episodes = []) {
   card?.addEventListener("click", (e) => {
     const target = e.target;
     if (!(target instanceof Element)) return;
-    if (target.closest(".go-btn") || target.closest(".episode-card") || target.closest(".quote-toggle-btn") || target.closest("a")) return;
+    if (target.closest(".go-btn") || target.closest(".episode-card") || target.closest(".quote-toggle-btn") || target.closest(".quote-text") || target.closest(".synopsis-quote") || target.closest("a") || target.closest(".comment-summary") || target.closest(".comments-panel")) return;
     openPostOptions();
   });
 
-  episodeCards.forEach((ep) => {
-    ep.addEventListener("click", () => {
+  const movieNameEl = container.querySelector(".movie-name");
+  const quoteTextEl = container.querySelector(".quote-text");
+  const directorFieldEl = container.querySelector(".director-field");
+  const productFieldEl = container.querySelector(".product-field");
+  const starsFieldEl = container.querySelector(".stars-field");
+  const imdbChipEl = container.querySelector(".imdb-chip");
+  const releaseFieldEl = container.querySelector(".release-field");
+  const genreFieldEl = container.querySelector(".genre-field");
+  const coverImgEl = container.querySelector(".cover-image");
+  const coverBlurEl = container.querySelector(".cover-blur");
+
+  episodeCards.forEach((epCard, idx) => {
+    epCard.addEventListener("click", () => {
       episodeCards.forEach((x) => x.classList.remove("active"));
-      ep.classList.add("active");
-      if (goBtn) goBtn.dataset.link = ep.dataset.link || "#";
+      epCard.classList.add("active");
+
+      const ep = episodes[idx] || movie;
+      if (goBtn) goBtn.dataset.link = ep.link || "#";
+
+      if (movie.type === "collection") {
+        if (movieNameEl) movieNameEl.textContent = ep.title || movie.title;
+        if (quoteTextEl) quoteTextEl.innerHTML = makeSynopsisHtml(ep.synopsis || movie.synopsis || "-");
+        if (directorFieldEl) directorFieldEl.innerHTML = renderChips(ep.director || movie.director || "-", "names");
+        if (productFieldEl) productFieldEl.innerHTML = renderChips(ep.product || movie.product || "-");
+        if (starsFieldEl) starsFieldEl.innerHTML = renderChips(ep.stars || movie.stars || "-", "names");
+        if (imdbChipEl) imdbChipEl.textContent = ep.imdb || movie.imdb || "-";
+        if (releaseFieldEl) releaseFieldEl.textContent = ep.release_info || movie.release_info || "-";
+        if (genreFieldEl) genreFieldEl.innerHTML = renderChips(ep.genre || movie.genre || "-");
+        if (coverImgEl) coverImgEl.src = ep.cover || movie.cover || "";
+        if (coverBlurEl) coverBlurEl.style.backgroundImage = `url('${ep.cover || movie.cover || ""}')`;
+      } else if (movie.type === "serial") {
+        if (movieNameEl) movieNameEl.textContent = ep.title || movie.title;
+      }
     });
   });
 
@@ -228,6 +530,9 @@ function renderMovieCard(container, movie, episodes = []) {
     const finalLink = buildTelegramBotUrlFromChannelLink(goBtn.dataset.link || "#");
     if (finalLink && finalLink !== "#") window.open(finalLink, "_blank", "noopener");
   });
+
+  attachCommentsHandlers(card, movie.id);
+  renderSimilarMovies(container, buildSimilarMovies(movie, allMovies));
 }
 
 function initFeatureAccordions() {
@@ -270,31 +575,55 @@ async function loadMoviePage() {
   const status = document.getElementById("moviePageStatus");
   const cardContainer = document.getElementById("moviePageCard");
 
-  applySavedTheme();
-  await hydrateSharedSectionsFromHome();
+  try {
+    applySavedTheme();
+    try {
+      await hydrateSharedSectionsFromHome();
+    } catch (err) {
+      console.error("hydrateSharedSectionsFromHome error:", err);
+    }
 
-  const slug = parseSlug();
-  if (!slug) return (status.textContent = "اسلاگ پست مشخص نیست.");
+    const slug = parseSlug();
+    if (!slug) return (status.textContent = "اسلاگ پست مشخص نیست.");
 
-  const { data: movies, error } = await db.from("movies").select("*");
-  if (error || !Array.isArray(movies)) return (status.textContent = "خطا در دریافت اطلاعات پست.");
+    const { data: movies, error } = await db.from("movies").select("*");
+    if (error || !Array.isArray(movies)) return (status.textContent = "خطا در دریافت اطلاعات پست.");
 
-  const movie = movies.find((item) => makeMovieSlug(item.title) === slug);
-  if (!movie) return (status.textContent = "پست مورد نظر پیدا نشد.");
+    const movie = movies.find((item) => makeMovieSlug(item.title) === slug);
+    if (!movie) return (status.textContent = "پست مورد نظر پیدا نشد.");
 
-  currentMovie = movie;
+    currentMovie = movie;
 
-  const { data: episodes } = await db
-    .from("movie_episodes")
-    .select("*")
-    .eq("movie_id", movie.id)
-    .order("episode_number", { ascending: true });
+    const { data: items } = await db.from("movie_items").select("*").eq("movie_id", movie.id).order("order_index", { ascending: true });
+    const episodes = (movie.type === "collection" || movie.type === "serial")
+      ? [
+          {
+            title: movie.title,
+            cover: movie.cover,
+            link: movie.link,
+            synopsis: movie.synopsis,
+            director: movie.director,
+            product: movie.product,
+            stars: movie.stars,
+            imdb: movie.imdb,
+            release_info: movie.release_info,
+            genre: movie.genre,
+          },
+          ...(items || []),
+        ]
+      : [];
 
-  bindPostOptions(slug);
-  setSeo(movie, slug);
-  renderMovieCard(cardContainer, movie, episodes || []);
-  status.hidden = true;
-  cardContainer.hidden = false;
+    await loadCurrentUserAndFavorites();
+    bindPostOptions(slug);
+    syncFavoriteOptionUi();
+    setSeo(movie, slug);
+    renderMovieCard(cardContainer, movie, movies, episodes);
+    status.hidden = true;
+    cardContainer.hidden = false;
+  } catch (err) {
+    console.error("loadMoviePage error:", err);
+    status.textContent = "خطا در بارگذاری صفحه پست.";
+  }
 }
 
 document.addEventListener("DOMContentLoaded", loadMoviePage);
