@@ -20,7 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script defer src="/movie.js"></script>
   </head>
-  <body class="movie-page-body">
+  <body class="index-body movie-page-body">
     <header class="main-header movie-page-header-only">
       <div id="movieBannerMount" class="site-banner"></div>
     </header>
@@ -32,5 +32,30 @@
     </main>
 
     <div id="movieFeaturesMount"></div>
+
+    <div id="postOptionsOverlay" class="post-options-overlay" aria-hidden="true">
+      <div class="post-options-backdrop"></div>
+      <div class="post-options-modal" id="postOptionsModal">
+        <div class="post-options-header">
+          <span id="postOptionsTitle" class="post-options-title">Post options</span>
+          <button id="postOptionsCloseBtn" class="post-options-close-btn" aria-label="Close">&times;</button>
+        </div>
+        <div class="post-options-list">
+          <button id="postOptionCopyLink" class="post-option-item" type="button">
+            <div class="post-option-main">
+              <div class="post-option-title">Copy link</div>
+              <div class="post-option-subtitle">Copy movie link ( /movie/slug )</div>
+            </div>
+          </button>
+          <button id="postOptionShareLink" class="post-option-item" type="button">
+            <div class="post-option-main">
+              <div class="post-option-title">Share link</div>
+              <div class="post-option-subtitle">Share movie link with other apps</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
   </body>
 </html>

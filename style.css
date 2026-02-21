@@ -6743,3 +6743,21 @@ body.dark .go-page-btn span {
     max-width: 100%;
   }
 }
+
+/* Movie page parity fixes */
+.movie-page-body {
+  background: inherit;
+  color: inherit;
+}
+
+.post-action-row {
+  flex-wrap: nowrap;
+}
+
+.post-action-row .button-wrap {
+  min-width: 0;
+}
+
+.movie-info .post-action-row {
+  flex-direction: row !important;
+}
