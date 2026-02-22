@@ -146,19 +146,7 @@
           <div class="button-shadow"></div>
         </div>
       </div>
-      <div class="admin-theme-palette-wrap">
-        <div class="theme-palette" id="themePalette">
-          <div class="theme-palette-title" data-i18n="themePaletteTitle">Site color theme</div>
-          <div class="theme-palette-options" role="radiogroup" aria-label="Select theme color">
-            <button class="theme-palette-dot active" type="button" data-theme-color="blue" aria-label="Azure" style="background:#1e88e5"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="green" aria-label="Green" style="background:#2e9d57"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="yellow" aria-label="Yellow" style="background:#c5a317"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="red" aria-label="Red" style="background:#c84646"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="purple" aria-label="Purple" style="background:#6f4dbb"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="teal" aria-label="Teal" style="background:#188a94"></button>
-          </div>
-        </div>
-      </div>
+
     </header>
     <main>
       <div class="admin-tabs">
@@ -216,7 +204,7 @@
       </div>
       <section id="adminProfile" class="admin-section">
         <section class="send_post admin-section-item-1 admin-section-item">
-          <h2>Post Management</h2>
+          <h2 data-i18n="adminPostManagement">Post Management</h2>
 
           <!-- add / edit movie form -->
           <form
@@ -291,7 +279,7 @@
 
         <section class="admin_messages admin-section-item-2 admin-section-item">
           <!-- admin messages section -->
-          <h2>Admin Messages</h2>
+          <h2 data-i18n="adminMessages">Admin Messages</h2>
           <form id="addMessageForm" class="admin-form">
             <textarea
               id="messageText"
@@ -385,7 +373,7 @@
           id="unapproved-comments-section"
           class="admin-section-item-3 admin-section-item"
         >
-          <h2>Unpublished Comments</h2>
+          <h2 data-i18n="adminUnpublishedComments">Unpublished Comments</h2>
           <div id="unapprovedComments"></div>
         </section>
 
@@ -393,7 +381,7 @@
           id="social-links-section"
           class="admin-section-item-4 admin-section-item"
         >
-          <h2>Links in sidemenu</h2>
+          <h2 data-i18n="adminLinksInSidemenu">Links in sidemenu</h2>
           <form id="addSocialForm" class="admin-form">
             <input id="socialTitle" type="text" placeholder="Title" required />
             <input id="socialIcon" type="file" accept="image/*" />
@@ -424,33 +412,48 @@
         >
           <!-- admin search (after messages, before movie list) -->
           <div class="admin-search-wrapper">
-            <h2>Search in released movies</h2>
+            <h2 data-i18n="adminSearchReleasedMovies">Search in released movies</h2>
             <input
               id="adminSearch"
               class="admin-search-input"
               type="text"
-              placeholder="Search movies..."
+              placeholder="Search movies..." data-i18n-placeholder="adminSearchMoviesPlaceholder"
             />
           </div>
           <div>
-            <h2>Released Movies</h2>
+            <h2 data-i18n="adminReleasedMovies">Released Movies</h2>
             <!-- movie list -->
             <div id="movieList" class="movie-list"></div>
             <div id="admin-pagination" class="pagination-container"></div>
           </div>
         </section>
 
+
         <section id="popular-movies-section" class="admin-section-item">
           <h2 data-i18n="popularMovies">Popular movies</h2>
           <div id="popularMoviesList" class="movie-list"></div>
         </section>
+
+        <div class="admin-theme-palette-wrap">
+        <div class="theme-palette" id="themePalette">
+          <div class="theme-palette-title" data-i18n="themePaletteTitle">Site color theme</div>
+          <div class="theme-palette-options" role="radiogroup" aria-label="Select theme color">
+            <button class="theme-palette-dot active" type="button" data-theme-color="blue" aria-label="Azure" style="background:#1e88e5"></button>
+            <button class="theme-palette-dot" type="button" data-theme-color="green" aria-label="Green" style="background:#2e9d57"></button>
+            <button class="theme-palette-dot" type="button" data-theme-color="yellow" aria-label="Yellow" style="background:#c5a317"></button>
+            <button class="theme-palette-dot" type="button" data-theme-color="red" aria-label="Red" style="background:#c84646"></button>
+            <button class="theme-palette-dot" type="button" data-theme-color="purple" aria-label="Purple" style="background:#6f4dbb"></button>
+            <button class="theme-palette-dot" type="button" data-theme-color="teal" aria-label="Teal" style="background:#188a94"></button>
+          </div>
+        </div>
+      </div>
 
         <section
           id="analytics"
           class="admin-section-item-6 admin-section-item"
           style="display: none"
         >
-          <h2>Analytics</h2>
+          <h2 data-i18n="analytics">Analytics</h2>
 
           <h3>Daily visits</h3>
           <canvas id="visitsChart" height="120"></canvas>
@@ -467,7 +470,7 @@
           class="admin-section-item-7 admin-section-item"
           style="display: none"
         >
-          <h2>Users & Admins</h2>
+          <h2 data-i18n="adminUsersAdmins">Users & Admins</h2>
 
           <!-- Admins list -->
           <div

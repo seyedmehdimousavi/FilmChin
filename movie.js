@@ -18,6 +18,23 @@ const movieI18n = {
     pageLoadError: "Error loading post page.",
     postPageTitle: "FilmChiin | Post page",
     postPageDesc: "Full details of this post on FilmChiin",
+    postOptions: "Post options",
+    collection: "Collection",
+    series: "Series",
+    episodes: "episodes",
+    synopsis: "Synopsis",
+    director: "Director",
+    product: "Product",
+    stars: "Stars",
+    release: "Release",
+    genre: "Genre",
+    goToFile: "Go to file",
+    comments: "comments",
+    commentsTitle: "Comments",
+    yourName: "Your name",
+    close: "close",
+    writeComment: "Write a comment...",
+    send: "Send",
   },
   fa: {
     backToHome: "← بازگشت به صفحه اصلی",
@@ -28,6 +45,23 @@ const movieI18n = {
     pageLoadError: "خطا در بارگذاری صفحه پست.",
     postPageTitle: "FilmChiin | صفحه پست",
     postPageDesc: "جزئیات کامل این پست در FilmChiin",
+    postOptions: "گزینه‌های پست",
+    collection: "کالکشن",
+    series: "سریال",
+    episodes: "اپیزود",
+    synopsis: "خلاصه",
+    director: "کارگردان",
+    product: "محصول",
+    stars: "بازیگران",
+    release: "انتشار",
+    genre: "ژانر",
+    goToFile: "رفتن به فایل",
+    comments: "نظر",
+    commentsTitle: "نظرات",
+    yourName: "نام شما",
+    close: "بستن",
+    writeComment: "نظر خود را بنویسید...",
+    send: "ارسال",
   },
 };
 
@@ -270,7 +304,7 @@ function openPostOptions() {
   const overlay = document.getElementById("postOptionsOverlay");
   const title = document.getElementById("postOptionsTitle");
   if (!overlay || !currentMovie) return;
-  if (title) title.textContent = currentMovie.title || "Post options";
+  if (title) title.textContent = currentMovie.title || mt("postOptions");
   overlay.classList.add("open");
   overlay.setAttribute("aria-hidden", "false");
 }
@@ -484,7 +518,7 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
 
   const badgeHtml =
     movie.type && movie.type !== "single"
-      ? `<span class="collection-badge ${movie.type === "collection" ? "badge-collection" : "badge-serial"}">${movie.type === "collection" ? "Collection" : "Series"}<span class="badge-count anim-left-right">${(episodes || []).length} episodes</span></span>`
+      ? `<span class="collection-badge ${movie.type === "collection" ? "badge-collection" : "badge-serial"}">${movie.type === "collection" ? mt("collection") : mt("series")}<span class="badge-count anim-left-right">${(episodes || []).length} ${mt("episodes")}</span></span>`
       : "";
 
   const episodesHtml = (episodes || [])
@@ -501,17 +535,17 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
     <div class="cover-container anim-vertical"><div class="cover-blur anim-vertical" style="background-image: url('${cover}');"></div><img class="cover-image anim-vertical" src="${cover}" alt="${title}"></div>
     <div class="movie-info anim-vertical">
       <div class="movie-title anim-left-right"><span class="movie-name anim-horizontal">${title}</span>${badgeHtml}</div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span><div class="field-quote anim-left-right synopsis-quote"><div class="quote-text anim-horizontal">${synopsis}</div></div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span><div class="field-quote anim-left-right director-field">${renderChips(movie.director || "-", "names")}</div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span><div class="field-quote anim-horizontal product-field">${renderChips(movie.product || "-")}</div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span><div class="field-quote anim-left-right stars-field">${renderChips(movie.stars || "-", "names")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> ${mt("synopsis")}: </span><div class="field-quote anim-left-right synopsis-quote"><div class="quote-text anim-horizontal">${synopsis}</div></div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> ${mt("director")}: </span><div class="field-quote anim-left-right director-field">${renderChips(movie.director || "-", "names")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> ${mt("product")}: </span><div class="field-quote anim-horizontal product-field">${renderChips(movie.product || "-")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> ${mt("stars")}: </span><div class="field-quote anim-left-right stars-field">${renderChips(movie.stars || "-", "names")}</div>
       <span class="field-label anim-vertical"><img src="/images/icons8-imdb-48.png" class="imdb-bell" style="width:20px;height:20px;"> IMDB:</span><div class="field-quote anim-left-right"><span class="chip imdb-chip anim-horizontal">${escapeHtml(movie.imdb || "-")}</span></div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span><div class="field-quote anim-left-right release-field">${escapeHtml(movie.release_info || "-")}</div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span><div class="field-quote genre-grid anim-horizontal genre-field">${renderChips(movie.genre || "-")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> ${mt("release")}: </span><div class="field-quote anim-left-right release-field">${escapeHtml(movie.release_info || "-")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> ${mt("genre")}: </span><div class="field-quote genre-grid anim-horizontal genre-field">${renderChips(movie.genre || "-")}</div>
       <div class="episodes-container anim-vertical" data-movie-id="${escapeHtml(movie.id)}"><div class="episodes-list anim-left-right">${episodesHtml}</div></div>
-      <div class="post-action-row movie-page-actions"><div class="button-wrap"><button class="go-btn anim-vertical" data-link="${escapeHtml((episodes[0] && episodes[0].link) || movie.link || "#")}"><span>Go to file</span></button><div class="button-shadow"></div></div></div>
-      <div class="comment-summary anim-horizontal"><div class="avatars"></div><div class="comments-count">0 comments</div><div class="enter-comments"><img src="/images/icons8-comment.apng" style="width:22px;height:22px;"></div></div>
-      <div class="comments-panel" aria-hidden="true"><div class="comments-panel-inner"><div class="comments-panel-header"><div class="comments-title">Comments</div></div><div class="comments-list"></div><div class="comment-input-row"><div class="name-comments-close"><input class="comment-name" placeholder="Your name" maxlength="60" /><div class="button-wrap"><button class="comments-close"><span>close</span></button><div class="button-shadow"></div></div></div><textarea class="comment-text" placeholder="Write a comment..." rows="2"></textarea><div class="button-wrap"><button class="comment-send"><span>Send</span></button><div class="button-shaddow"></div></div></div></div></div>
+      <div class="post-action-row movie-page-actions"><div class="button-wrap"><button class="go-btn anim-vertical" data-link="${escapeHtml((episodes[0] && episodes[0].link) || movie.link || "#")}"><span>${mt("goToFile")}</span></button><div class="button-shadow"></div></div></div>
+      <div class="comment-summary anim-horizontal"><div class="avatars"></div><div class="comments-count">0 ${mt("comments")}</div><div class="enter-comments"><img src="/images/icons8-comment.apng" style="width:22px;height:22px;"></div></div>
+      <div class="comments-panel" aria-hidden="true"><div class="comments-panel-inner"><div class="comments-panel-header"><div class="comments-title">${mt("commentsTitle")}</div></div><div class="comments-list"></div><div class="comment-input-row"><div class="name-comments-close"><input class="comment-name" placeholder="${mt("yourName")}" maxlength="60" /><div class="button-wrap"><button class="comments-close"><span>${mt("close")}</span></button><div class="button-shadow"></div></div></div><textarea class="comment-text" placeholder="${mt("writeComment")}" rows="2"></textarea><div class="button-wrap"><button class="comment-send"><span>${mt("send")}</span></button><div class="button-shaddow"></div></div></div></div></div>
     </div>
   </div>`;
 

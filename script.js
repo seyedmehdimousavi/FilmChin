@@ -1619,6 +1619,21 @@ document.addEventListener("DOMContentLoaded", () => {
       tabSeries: "Series",
       tabMovies: "Movies",
       genres: "Genres",
+      homepageManager: "Homepage Manager",
+      animations: "Animations",
+      tabs: "Tabs",
+      subTabGenres: "Sub-tab genres",
+      backToTopButton: "Back to Top Button",
+      floatingSummaryPanel: "Floating Summary Panel",
+      collapsePosts: "Collapse posts",
+      links: "Links",
+      sortByImdb: "Sort by IMDb rating",
+      sortByReleaseDate: "Sort by release date",
+      goToPagination: "Go to pagination",
+      postOptions: "Post options",
+      episodeWord: "episodes",
+      less: "Less",
+      moreInfo: "More Info",
       messageToAdmin: "Message to admin",
       messageToAdminPlaceholder: "Message to admin",
       writeReplyPlaceholder: "Write a reply...",
@@ -1644,6 +1659,17 @@ document.addEventListener("DOMContentLoaded", () => {
       close: "close",
       writeComment: "Write a comment...",
       send: "Send",
+      designLabel: "Design :",
+      siteFeaturesButton: "Site features",
+      siteFeaturesTitle: "FilmChiin site features",
+      adminPostManagement: "Post Management",
+      adminMessages: "Admin Messages",
+      adminUnpublishedComments: "Unpublished Comments",
+      adminLinksInSidemenu: "Links in sidemenu",
+      adminSearchReleasedMovies: "Search in released movies",
+      adminReleasedMovies: "Released Movies",
+      adminUsersAdmins: "Users & Admins",
+      adminSearchMoviesPlaceholder: "Search movies...",
     },
     fa: {
       languageLabel: "زبان / Language",
@@ -1656,6 +1682,21 @@ document.addEventListener("DOMContentLoaded", () => {
       tabSeries: "سریال‌ها",
       tabMovies: "فیلم‌ها",
       genres: "ژانرها",
+      homepageManager: "مدیریت صفحه اصلی",
+      animations: "انیمیشن‌ها",
+      tabs: "تب‌ها",
+      subTabGenres: "زیرتب ژانرها",
+      backToTopButton: "دکمه بازگشت به بالا",
+      floatingSummaryPanel: "پنل شناور خلاصه",
+      collapsePosts: "جمع‌کردن پست‌ها",
+      links: "لینک‌ها",
+      sortByImdb: "مرتب‌سازی بر اساس امتیاز IMDb",
+      sortByReleaseDate: "مرتب‌سازی بر اساس تاریخ انتشار",
+      goToPagination: "رفتن به صفحه‌بندی",
+      postOptions: "گزینه‌های پست",
+      episodeWord: "اپیزود",
+      less: "کمتر",
+      moreInfo: "اطلاعات بیشتر",
       messageToAdmin: "پیام به ادمین",
       messageToAdminPlaceholder: "پیام به ادمین",
       writeReplyPlaceholder: "بنویس...",
@@ -1681,6 +1722,17 @@ document.addEventListener("DOMContentLoaded", () => {
       close: "بستن",
       writeComment: "نظر خود را بنویسید...",
       send: "ارسال",
+      designLabel: "طراحی :",
+      siteFeaturesButton: "لیست امکانات سایت",
+      siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
+      adminPostManagement: "مدیریت پست‌ها",
+      adminMessages: "پیام مدیریت",
+      adminUnpublishedComments: "کامنت‌های منتشرنشده",
+      adminLinksInSidemenu: "لینک‌های ساید منو",
+      adminSearchReleasedMovies: "جستجو در فیلم‌های منتشر شده",
+      adminReleasedMovies: "فیلم‌های منتشر شده",
+      adminUsersAdmins: "کاربران و ادمین‌ها",
+      adminSearchMoviesPlaceholder: "جستجوی فیلم...",
     },
   };
 
@@ -3537,7 +3589,7 @@ function setTabInUrl(type) {
 
       if (goBtnLabel) {
         goBtnLabel.textContent =
-          inCollapsedMode && !isExpanded ? uiText("goToFile") : uiText("goToFile");
+          uiText("goToFile");
       }
 
       if (collapseBar) {
@@ -3904,12 +3956,12 @@ function setTabInUrl(type) {
           quote.style.overflow = "hidden";
           quote.style.maxHeight = "120px";
           quote.classList.add("collapsed");
-          btn.textContent = "More";
+          btn.textContent = uiText("more");
         } else {
           textEl.innerHTML = makeSynopsisHtml(fullText);
           quote.style.maxHeight = "1000px";
           quote.classList.remove("collapsed");
-          btn.textContent = "Less";
+          btn.textContent = uiText("less");
         }
       }
 
@@ -4532,7 +4584,7 @@ searchInput?.addEventListener("keydown", (e) => {
       <img src="${escapeHtml(m.dCover || "")}" alt="${escapeHtml(m.dTitle || "")}">
       <h3>${escapeHtml(m.dTitle || "")}</h3>
       <div class="button-wrap">
-        <button class="more-info"><span>More Info</span></button>
+        <button class="more-info"><span>${uiText("moreInfo")}</span></button>
         <div class="button-shadow"></div>
       </div>`;
     
@@ -4609,7 +4661,7 @@ function openMovieModal(m, startIdx = 0) {
       const title = escapeHtml(data.title || "-");
       // ... بقیه کدهای رندر کارت دقیقاً مثل نسخه خودتان ...
       const badgeHtml = data.type && data.type !== "single" ? `<span class="collection-badge ${data.type === "collection" ? "badge-collection" : "badge-serial"}">
-           ${data.type === "collection" ? "Collection" : "Series"} <span class="badge-count">${allEpisodes.length}</span></span>` : "";
+           ${data.type === "collection" ? uiText("collection") : uiText("series")} <span class="badge-count">${allEpisodes.length}</span></span>` : "";
 
       return `
       <div class="movie-card expanded no-reveal">
@@ -4619,19 +4671,19 @@ function openMovieModal(m, startIdx = 0) {
         </div>
         <div class="movie-info">
           <div class="movie-title"><span class="movie-name">${title}</span>${badgeHtml}</div>
-          <span class="field-label">Synopsis:</span>
+          <span class="field-label">${uiText("synopsis")}: </span>
           <div class="field-quote synopsis-quote"><div class="quote-text">${escapeHtml(data.synopsis || "-")}</div>
             <div class="button-wrap"><button class="quote-toggle-btn"><span>${uiText("more")}</span></button></div>
           </div>
-          <span class="field-label">Director:</span><div class="field-quote director-field">${renderChips(data.director || "-", "names")}</div>
-          <span class="field-label">Product:</span><div class="field-quote product-field">${renderChips(data.product || "-")}</div>
-          <span class="field-label">Stars:</span><div class="field-quote stars-field">${renderChips(data.stars || "-", "names")}</div>
+          <span class="field-label">${uiText("director")}: </span><div class="field-quote director-field">${renderChips(data.director || "-", "names")}</div>
+          <span class="field-label">${uiText("product")}: </span><div class="field-quote product-field">${renderChips(data.product || "-")}</div>
+          <span class="field-label">${uiText("stars")}: </span><div class="field-quote stars-field">${renderChips(data.stars || "-", "names")}</div>
           <span class="field-label">IMDB:</span><div class="field-quote"><span class="chip imdb-chip">${escapeHtml(data.imdb || "-")}</span></div>
-          <span class="field-label">Release:</span><div class="field-quote release-field">${escapeHtml(data.release_info || "-")}</div>
-          <span class="field-label">Genre:</span><div class="field-quote genre-grid">${renderChips(data.genre || "-")}</div>
+          <span class="field-label">${uiText("release")}: </span><div class="field-quote release-field">${escapeHtml(data.release_info || "-")}</div>
+          <span class="field-label">${uiText("genre")}: </span><div class="field-quote genre-grid">${renderChips(data.genre || "-")}</div>
           <div class="episodes-container" data-movie-id="${data.id}"><div class="episodes-list"></div></div>
           <div class="button-wrap"><button class="go-btn" data-link="${escapeHtml(data.link || "#")}"><span>${uiText("goToFile")}</span></button><div class="button-shadow"></div></div>
-          <div class="button-wrap"><button class="close-btn"><span>Close</span></button><div class="button-shadow"></div></div>
+          <div class="button-wrap"><button class="close-btn"><span>${uiText("close")}</span></button><div class="button-shadow"></div></div>
         </div>
       </div>`;
     }
@@ -4677,7 +4729,7 @@ function openMovieModal(m, startIdx = 0) {
           </div>`).join("");
 
         const badgeCount = content.querySelector(".badge-count");
-        if (badgeCount) badgeCount.textContent = allEpisodes.length + " episodes";
+        if (badgeCount) badgeCount.textContent = `${allEpisodes.length} ${uiText("episodeWord")}`;
 
         const cards = listEl.querySelectorAll(".episode-card");
         cards.forEach((cardEl, idx) => {
@@ -4717,12 +4769,12 @@ function openMovieModal(m, startIdx = 0) {
           quote.style.overflow = "hidden";
           quote.style.maxHeight = "120px";
           quote.classList.add("collapsed");
-          btn.textContent = "More";
+          btn.textContent = uiText("more");
         } else {
           textEl.innerHTML = makeSynopsisHtml(fullText);
           quote.style.maxHeight = "1000px";
           quote.classList.remove("collapsed");
-          btn.textContent = "Less";
+          btn.textContent = uiText("less");
         }
       }
 
