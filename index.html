@@ -174,7 +174,7 @@
               <!-- ✅ NEW: Favorite movies button -->
               <div class="button-wrap">
                 <button id="favoriteMoviesBtn" class="profile-favorites">
-                  <span>Favorite movies</span>
+                  <span data-i18n="favoriteMovies">Favorite movies</span>
                 </button>
                 <div class="button-shadow"></div>
               </div>
@@ -183,14 +183,14 @@
 
               <div class="button-wrap">
                 <button id="logoutBtn" class="profile-logout">
-                  <span>Logout</span>
+                  <span data-i18n="logout">Logout</span>
                 </button>
                 <div class="button-shadow"></div>
               </div>
             </div>
           </div>
 
-          <input id="search" type="text" placeholder="Search..." dir="auto" />
+          <input id="search" type="text" placeholder="Search..." dir="auto" data-i18n-placeholder="searchPlaceholder" />
 
           <div class="button-wrap">
             <button
@@ -272,22 +272,22 @@
           <div class="tab-indicator"></div>
 
           <a href="?tab=all" data-type="all" class="tab-link">
-            <span>All</span>
+            <span data-i18n="tabAll">All</span>
             <span class="count">0</span>
           </a>
 
           <a href="?tab=collection" data-type="collection" class="tab-link">
-            <span>Collections</span>
+            <span data-i18n="tabCollections">Collections</span>
             <span class="count">0</span>
           </a>
 
           <a href="?tab=series" data-type="series" class="tab-link">
-            <span>Series</span>
+            <span data-i18n="tabSeries">Series</span>
             <span class="count">0</span>
           </a>
 
           <a href="?tab=single" data-type="single" class="tab-link">
-            <span>Movies</span>
+            <span data-i18n="tabMovies">Movies</span>
             <span class="count">0</span>
           </a>
         </div>
@@ -304,7 +304,7 @@
     <div class="sidemenu-accordion-header">
       <div class="sidemenu-header-content">
         <i class="bi bi-gear"></i>
-        <span>Homepage Manager</span>
+        <span data-i18n="homepageManager">Homepage Manager</span>
       </div>
        <span class="feature-icon sidemenu-arrow"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
@@ -315,7 +315,7 @@
         <div id="homepageManagerSubmenu" class="homepage-manager-submenu">
           
           <div class="toggle-row">
-            <span>Animations</span>
+            <span data-i18n="animations">Animations</span>
             <label class="switch">
               <input type="checkbox" id="toggleReduceAnimations" checked />
               <span class="slider"></span>
@@ -323,7 +323,7 @@
           </div>
 
           <div class="toggle-row">
-            <span>Tabs</span>
+            <span data-i18n="tabs">Tabs</span>
             <label class="switch">
               <input type="checkbox" id="toggleTabs" checked />
               <span class="slider"></span>
@@ -331,7 +331,7 @@
           </div>
 
           <div class="toggle-row">
-            <span>Sub-tab genres</span>
+            <span data-i18n="subTabGenres">Sub-tab genres</span>
             <label class="switch">
               <input type="checkbox" id="toggleSubTabGenres" checked />
               <span class="slider"></span>
@@ -339,7 +339,7 @@
           </div>
 
           <div class="toggle-row">
-            <span>Popular movies</span>
+            <span data-i18n="popularMovies">Popular movies</span>
             <label class="switch">
               <input type="checkbox" id="togglePopularMovies" checked />
               <span class="slider"></span>
@@ -347,7 +347,7 @@
           </div>
 
           <div class="toggle-row">
-            <span>Back to Top Button</span>
+            <span data-i18n="backToTopButton">Back to Top Button</span>
             <label class="switch">
               <input type="checkbox" id="toggleBackToTop" checked />
               <span class="slider"></span>
@@ -355,7 +355,7 @@
           </div>
 
           <div class="toggle-row">
-            <span>Floating Summary Panel</span>
+            <span data-i18n="floatingSummaryPanel">Floating Summary Panel</span>
             <label class="switch">
               <input type="checkbox" id="toggleFloatingPanel" checked />
               <span class="slider"></span>
@@ -363,7 +363,7 @@
           </div>
 
           <div class="toggle-row">
-            <span>Collapse posts</span>
+            <span data-i18n="collapsePosts">Collapse posts</span>
             <label class="switch">
               <input type="checkbox" id="toggleCollapsePosts" />
               <span class="slider"></span>
@@ -403,7 +403,7 @@
     <div class="sidemenu-accordion-header">
       <div class="sidemenu-header-content">
         <i class="bi bi-list"></i>
-        <span>Genres</span>
+        <span data-i18n="genres">Genres</span>
       </div>
        <span class="feature-icon sidemenu-arrow"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
@@ -420,7 +420,7 @@
     <div class="sidemenu-accordion-header">
       <div class="sidemenu-header-content">
         <i class="bi bi-link-45deg"></i>
-        <span>Links</span>
+        <span data-i18n="links">Links</span>
       </div>
        <span class="feature-icon sidemenu-arrow"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
@@ -434,7 +434,7 @@
   </div>
 
   <div id="ratingFilter" class="rating-filter">
-    <h4 class="rating-filter-title">Sort by imdb rating</h4>
+    <h4 class="rating-filter-title" data-i18n="sortByImdb">Sort by imdb rating</h4>
     <div class="rating-process-wrapper">
       <div class="rating-min">0</div>
       <div class="rating-track" id="ratingTrack">
@@ -457,7 +457,7 @@
 
   <div class="year-filter">
     <div class="year-filter-row">
-      <div class="year-filter-label">Sort by Release date</div>
+      <div class="year-filter-label" data-i18n="sortByReleaseDate">Sort by Release date</div>
       <div class="year-filter-sign">+</div>
       <div class="year-spinner" id="yearSpinner">
         <div class="year-spinner-item year-spinner-top" id="yearSpinnerTop"></div>
@@ -574,7 +574,7 @@
         </div>
 
         <div class="designer-credit">
-          Design :
+          <span data-i18n="designLabel">Design :</span>
           <div
             style="
               display: flex;
@@ -608,7 +608,7 @@
         <div class="popular-title">
           <div class="button-wrap">
             <button>
-              <span>Popular Movies</span>
+              <span data-i18n="popularMovies">Popular Movies</span>
             </button>
             <div class="button-shadow"></div>
           </div>
@@ -641,9 +641,7 @@
         <div class="post-options-backdrop"></div>
         <div class="post-options-modal" id="postOptionsModal">
           <div class="post-options-header">
-            <span id="postOptionsTitle" class="post-options-title">
-              Post options
-            </span>
+            <span id="postOptionsTitle" class="post-options-title" data-i18n="postOptions">Post options</span>
             <button
               id="postOptionsCloseBtn"
               class="post-options-close-btn"
@@ -770,7 +768,7 @@
         </p>
 
         <a href="#siteFeatures" class="seo-features-btn">
-          <span>لیست امکانات سایت</span>
+          <span data-i18n="siteFeaturesButton">لیست امکانات سایت</span>
           <span class="seo-features-icon">↓</span>
         </a>
       </section>
@@ -791,7 +789,7 @@
       class="site-features"
       aria-label="FilmChiin features"
     >
-      <h2>لیست امکانات سایت FilmChiin</h2>
+      <h2 data-i18n="siteFeaturesTitle">لیست امکانات سایت FilmChiin</h2>
 
       <!-- 1) حساب کاربری و لیست مورد علاقه‌ها -->
       <section class="feature-accordion open">
@@ -1123,13 +1121,12 @@
         <div class="stories" role="list"></div>
         <div class="button-wrap">
           <button class="go-pagination" type="button">
-            <span
-              >go to pagination<img
-                src="/images/icons8-double-down.apng"
-                alt="down"
-                style="width: 16px; height: 16px; vertical-align: middle"
-              />
-            </span>
+            <span data-i18n="goToPagination">Go to pagination</span>
+            <img
+              src="/images/icons8-double-down.apng"
+              alt="down"
+              style="width: 16px; height: 16px; vertical-align: middle"
+            />
           </button>
           <div class="button-shadow"></div>
         </div>

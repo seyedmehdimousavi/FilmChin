@@ -1492,7 +1492,7 @@ function attachCommentsHandlers(card, movieId) {
       avatarsEl.innerHTML = latest
         .map((n) => `<div class="avatar">${escapeHtml(initials(n))}</div>`)
         .join("");
-    if (countEl) countEl.textContent = `${(arr || []).length} comments`;
+    if (countEl) countEl.textContent = `${(arr || []).length} ${uiText("comments")}`;
     if (commentsList) {
       commentsList.innerHTML = (arr || [])
         .map(
@@ -1611,6 +1611,29 @@ document.addEventListener("DOMContentLoaded", () => {
     en: {
       languageLabel: "Language / زبان",
       themePaletteTitle: "Site color theme",
+      searchPlaceholder: "Search...",
+      favoriteMovies: "Favorite movies",
+      logout: "Logout",
+      tabAll: "All",
+      tabCollections: "Collections",
+      tabSeries: "Series",
+      tabMovies: "Movies",
+      genres: "Genres",
+      homepageManager: "Homepage Manager",
+      animations: "Animations",
+      tabs: "Tabs",
+      subTabGenres: "Sub-tab genres",
+      backToTopButton: "Back to Top Button",
+      floatingSummaryPanel: "Floating Summary Panel",
+      collapsePosts: "Collapse posts",
+      links: "Links",
+      sortByImdb: "Sort by IMDb rating",
+      sortByReleaseDate: "Sort by release date",
+      goToPagination: "Go to pagination",
+      postOptions: "Post options",
+      episodeWord: "episodes",
+      less: "Less",
+      moreInfo: "More Info",
       messageToAdmin: "Message to admin",
       messageToAdminPlaceholder: "Message to admin",
       writeReplyPlaceholder: "Write a reply...",
@@ -1618,10 +1641,62 @@ document.addEventListener("DOMContentLoaded", () => {
       conversation: "Conversation",
       popularMovies: "Popular movies",
       versionExample: "e.g. 1.3.3",
+      numberOfMovies: "Number of movies",
+      collection: "Collection",
+      series: "Series",
+      synopsis: "Synopsis",
+      more: "More",
+      director: "Director",
+      product: "Product",
+      stars: "Stars",
+      release: "Release",
+      genre: "Genre",
+      goToFile: "Go to file",
+      goToPage: "Go to page",
+      comments: "comments",
+      commentsTitle: "Comments",
+      yourName: "Your name",
+      close: "close",
+      writeComment: "Write a comment...",
+      send: "Send",
+      designLabel: "Design :",
+      siteFeaturesButton: "Site features",
+      siteFeaturesTitle: "FilmChiin site features",
+      adminPostManagement: "Post Management",
+      adminMessages: "Admin Messages",
+      adminUnpublishedComments: "Unpublished Comments",
+      adminLinksInSidemenu: "Links in sidemenu",
+      adminSearchReleasedMovies: "Search in released movies",
+      adminReleasedMovies: "Released Movies",
+      adminUsersAdmins: "Users & Admins",
+      adminSearchMoviesPlaceholder: "Search movies...",
     },
     fa: {
       languageLabel: "زبان / Language",
       themePaletteTitle: "قالب رنگی سایت",
+      searchPlaceholder: "جستجو...",
+      favoriteMovies: "فیلم‌های مورد علاقه",
+      logout: "خروج",
+      tabAll: "همه",
+      tabCollections: "کالکشن‌ها",
+      tabSeries: "سریال‌ها",
+      tabMovies: "فیلم‌ها",
+      genres: "ژانرها",
+      homepageManager: "مدیریت صفحه اصلی",
+      animations: "انیمیشن‌ها",
+      tabs: "تب‌ها",
+      subTabGenres: "زیرتب ژانرها",
+      backToTopButton: "دکمه بازگشت به بالا",
+      floatingSummaryPanel: "پنل شناور خلاصه",
+      collapsePosts: "جمع‌کردن پست‌ها",
+      links: "لینک‌ها",
+      sortByImdb: "مرتب‌سازی بر اساس امتیاز IMDb",
+      sortByReleaseDate: "مرتب‌سازی بر اساس تاریخ انتشار",
+      goToPagination: "رفتن به صفحه‌بندی",
+      postOptions: "گزینه‌های پست",
+      episodeWord: "اپیزود",
+      less: "کمتر",
+      moreInfo: "اطلاعات بیشتر",
       messageToAdmin: "پیام به ادمین",
       messageToAdminPlaceholder: "پیام به ادمین",
       writeReplyPlaceholder: "بنویس...",
@@ -1629,7 +1704,41 @@ document.addEventListener("DOMContentLoaded", () => {
       conversation: "گفت‌وگو",
       popularMovies: "فیلم‌های پرطرفدار",
       versionExample: "مثلاً 1.3.3",
+      numberOfMovies: "تعداد فیلم‌ها",
+      collection: "کالکشن",
+      series: "سریال",
+      synopsis: "خلاصه",
+      more: "بیشتر",
+      director: "کارگردان",
+      product: "محصول",
+      stars: "بازیگران",
+      release: "انتشار",
+      genre: "ژانر",
+      goToFile: "رفتن به فایل",
+      goToPage: "رفتن به صفحه",
+      comments: "نظر",
+      commentsTitle: "نظرات",
+      yourName: "نام شما",
+      close: "بستن",
+      writeComment: "نظر خود را بنویسید...",
+      send: "ارسال",
+      designLabel: "طراحی :",
+      siteFeaturesButton: "لیست امکانات سایت",
+      siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
+      adminPostManagement: "مدیریت پست‌ها",
+      adminMessages: "پیام مدیریت",
+      adminUnpublishedComments: "کامنت‌های منتشرنشده",
+      adminLinksInSidemenu: "لینک‌های ساید منو",
+      adminSearchReleasedMovies: "جستجو در فیلم‌های منتشر شده",
+      adminReleasedMovies: "فیلم‌های منتشر شده",
+      adminUsersAdmins: "کاربران و ادمین‌ها",
+      adminSearchMoviesPlaceholder: "جستجوی فیلم...",
     },
+  };
+
+  const uiText = (key) => {
+    const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
+    return languageMap[lang]?.[key] || languageMap.en[key] || key;
   };
 
   function applyLanguage(lang) {
@@ -1654,6 +1763,10 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.classList.toggle("active", active);
       if (active && languageIndicator) languageIndicator.style.transform = `translateX(${idx * 100}%)`;
     });
+
+    if (typeof renderPagedMovies === "function") {
+      renderPagedMovies(true);
+    }
   }
 
   languageButtons.forEach((btn) => {
@@ -2242,31 +2355,31 @@ document.addEventListener("DOMContentLoaded", () => {
       bgSoft: "#e5f0ff",
     },
     green: {
-      accentRgb: "0, 172, 193",
-      accentDark: "#00838f",
-      accent: "#00acc1",
-      accentLight: "#26c6da",
-      accentContrast: "#006064",
-      bgDay: "#f0fbfc",
-      bgSoft: "#ddf5f8",
+      accentRgb: "46, 157, 87",
+      accentDark: "#227a43",
+      accent: "#2e9d57",
+      accentLight: "#45b36e",
+      accentContrast: "#195b32",
+      bgDay: "#f1faf4",
+      bgSoft: "#e1f3e7",
     },
     yellow: {
-      accentRgb: "94, 96, 206",
-      accentDark: "#4345a3",
-      accent: "#5e60ce",
-      accentLight: "#7476dd",
-      accentContrast: "#31338e",
-      bgDay: "#f4f5ff",
-      bgSoft: "#e8e9ff",
+      accentRgb: "197, 163, 23",
+      accentDark: "#9f8010",
+      accent: "#c5a317",
+      accentLight: "#d6b63e",
+      accentContrast: "#6b5505",
+      bgDay: "#fdf9ec",
+      bgSoft: "#f8efcf",
     },
     red: {
-      accentRgb: "58, 134, 255",
-      accentDark: "#2d6fd1",
-      accent: "#3a86ff",
-      accentLight: "#69a4ff",
-      accentContrast: "#1f4fa3",
-      bgDay: "#f2f7ff",
-      bgSoft: "#e4eeff",
+      accentRgb: "200, 70, 70",
+      accentDark: "#9b2d2d",
+      accent: "#c84646",
+      accentLight: "#dc6666",
+      accentContrast: "#6e2020",
+      bgDay: "#fcf2f2",
+      bgSoft: "#f6e0e0",
     },
     purple: {
       accentRgb: "123, 97, 255",
@@ -2304,12 +2417,12 @@ document.addEventListener("DOMContentLoaded", () => {
     rootStyle.setProperty("--theme-bg-soft", selectedTheme.bgSoft);
 
     const goPageColors = {
-      blue: "#7c4dff",
-      green: "#d97706",
-      yellow: "#0ea5e9",
-      red: "#10b981",
-      purple: "#f59e0b",
-      teal: "#ef4444",
+      blue: "#1e88e5",
+      green: "#2e9d57",
+      yellow: "#c5a317",
+      red: "#c84646",
+      purple: "#6f4dbb",
+      teal: "#188a94",
     };
     rootStyle.setProperty("--go-page-bg", goPageColors[themeName] || "#7c4dff");
 
@@ -3334,7 +3447,7 @@ function setTabInUrl(type) {
   const pageItems = filtered.slice(start, start + PAGE_SIZE);
 
   moviesGrid.innerHTML = "";
-  movieCount.innerText = `Number of movies: ${filtered.length}`;
+  movieCount.innerText = `${uiText("numberOfMovies")}: ${filtered.length}`;
 
   for (const m of pageItems) {
     const cover = escapeHtml(
@@ -3356,7 +3469,7 @@ function setTabInUrl(type) {
         ? `<span class="collection-badge ${
             m.type === "collection" ? "badge-collection" : "badge-serial"
           }">
-         ${m.type === "collection" ? "Collection" : "Series"}
+         ${m.type === "collection" ? uiText("collection") : uiText("series")}
          <span class="badge-count anim-left-right">0</span>
        </span>`
         : "";
@@ -3375,24 +3488,24 @@ function setTabInUrl(type) {
     ${badgeHtml}
   </div>
 
-  <span class="field-label anim-vertical"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
+  <span class="field-label anim-vertical"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> ${uiText("synopsis")}: </span>
   <div class="field-quote anim-left-right synopsis-quote">
     <div class="quote-text anim-horizontal">${synopsis}</div>
     <div class="button-wrap">
-          <button class="quote-toggle-btn"><span>More</span></button>
+          <button class="quote-toggle-btn"><span>${uiText("more")}</span></button>
           <div class="button-shadow"></div>
           </div>
   </div>
 
-  <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span>
+  <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> ${uiText("director")}: </span>
   <div class="field-quote anim-left-right director-field">${director}</div>
 
-  <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
+  <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> ${uiText("product")}: </span>
   <div class="field-quote anim-horizontal">
     ${renderChips(m.product || "-")}
   </div>
 
-  <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
+  <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> ${uiText("stars")}: </span>
   <div class="field-quote anim-left-right stars-field">${stars}</div>
 
   <span class="field-label anim-vertical">
@@ -3403,10 +3516,10 @@ function setTabInUrl(type) {
     <span class="chip imdb-chip anim-horizontal">${imdb}</span>
   </div>
 
-  <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span>
+  <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> ${uiText("release")}: </span>
   <div class="field-quote anim-left-right">${release_info}</div>
 
-  <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span>
+  <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> ${uiText("genre")}: </span>
   <div class="field-quote genre-grid anim-horizontal">${renderChips(
     m.genre || "-"
   )}</div>
@@ -3419,38 +3532,38 @@ function setTabInUrl(type) {
       <div class="button-wrap">
         <button class="go-btn anim-vertical" data-link="${escapeHtml(
           m.link || "#"
-        )}"><span>Go to file</span></button>
+        )}"><span>${uiText("goToFile")}</span></button>
         <div class="button-shadow"></div>
       </div>
       <div class="button-wrap">
         <button class="go-page-btn anim-vertical" data-url="/movie/${encodeURIComponent(
           makeMovieSlug(m.title || "")
-        )}"><span>Go to page</span></button>
+        )}"><span>${uiText("goToPage")}</span></button>
         <div class="button-shadow"></div>
       </div>
     </div>
 
   <div class="comment-summary anim-horizontal">
     <div class="avatars"></div>
-    <div class="comments-count">0 comments</div>
+    <div class="comments-count">0 ${uiText("comments")}</div>
     <div class="enter-comments"><img src="/images/icons8-comment.apng" style="width:22px;height:22px;"></div>
   </div>
 
   <div class="comments-panel" aria-hidden="true">
     <div class="comments-panel-inner">
-      <div class="comments-panel-header"><div class="comments-title">Comments</div></div>
+      <div class="comments-panel-header"><div class="comments-title">${uiText("commentsTitle")}</div></div>
       <div class="comments-list"></div>
       <div class="comment-input-row">
         <div class="name-comments-close">
-          <input class="comment-name" placeholder="Your name" maxlength="60" />
+          <input class="comment-name" placeholder="${uiText("yourName")}" maxlength="60" />
           <div class="button-wrap">
-          <button class="comments-close"><span>close</span></button>
+          <button class="comments-close"><span>${uiText("close")}</span></button>
           <div class="button-shadow"></div>
           </div>
         </div>
-        <textarea class="comment-text" placeholder="Write a comment..." rows="2"></textarea>
+        <textarea class="comment-text" placeholder="${uiText("writeComment")}" rows="2"></textarea>
         <div class="button-wrap">
-        <button class="comment-send"><span>Send</span></button>
+        <button class="comment-send"><span>${uiText("send")}</span></button>
         <div class="button-shaddow"></div>
         </div>
       </div>
@@ -3476,7 +3589,7 @@ function setTabInUrl(type) {
 
       if (goBtnLabel) {
         goBtnLabel.textContent =
-          inCollapsedMode && !isExpanded ? "File" : "Go to file";
+          uiText("goToFile");
       }
 
       if (collapseBar) {
@@ -3843,12 +3956,12 @@ function setTabInUrl(type) {
           quote.style.overflow = "hidden";
           quote.style.maxHeight = "120px";
           quote.classList.add("collapsed");
-          btn.textContent = "More";
+          btn.textContent = uiText("more");
         } else {
           textEl.innerHTML = makeSynopsisHtml(fullText);
           quote.style.maxHeight = "1000px";
           quote.classList.remove("collapsed");
-          btn.textContent = "Less";
+          btn.textContent = uiText("less");
         }
       }
 
@@ -4126,7 +4239,7 @@ searchInput?.addEventListener("keydown", (e) => {
                       ? "badge-collection"
                       : "badge-serial"
                   }">
-                   ${m.type === "collection" ? "Collection" : "Series"}
+                   ${m.type === "collection" ? uiText("collection") : uiText("series")}
                  </span>`
                 : ""
             }
@@ -4471,7 +4584,7 @@ searchInput?.addEventListener("keydown", (e) => {
       <img src="${escapeHtml(m.dCover || "")}" alt="${escapeHtml(m.dTitle || "")}">
       <h3>${escapeHtml(m.dTitle || "")}</h3>
       <div class="button-wrap">
-        <button class="more-info"><span>More Info</span></button>
+        <button class="more-info"><span>${uiText("moreInfo")}</span></button>
         <div class="button-shadow"></div>
       </div>`;
     
@@ -4548,7 +4661,7 @@ function openMovieModal(m, startIdx = 0) {
       const title = escapeHtml(data.title || "-");
       // ... بقیه کدهای رندر کارت دقیقاً مثل نسخه خودتان ...
       const badgeHtml = data.type && data.type !== "single" ? `<span class="collection-badge ${data.type === "collection" ? "badge-collection" : "badge-serial"}">
-           ${data.type === "collection" ? "Collection" : "Series"} <span class="badge-count">${allEpisodes.length}</span></span>` : "";
+           ${data.type === "collection" ? uiText("collection") : uiText("series")} <span class="badge-count">${allEpisodes.length}</span></span>` : "";
 
       return `
       <div class="movie-card expanded no-reveal">
@@ -4558,19 +4671,19 @@ function openMovieModal(m, startIdx = 0) {
         </div>
         <div class="movie-info">
           <div class="movie-title"><span class="movie-name">${title}</span>${badgeHtml}</div>
-          <span class="field-label">Synopsis:</span>
+          <span class="field-label">${uiText("synopsis")}: </span>
           <div class="field-quote synopsis-quote"><div class="quote-text">${escapeHtml(data.synopsis || "-")}</div>
-            <div class="button-wrap"><button class="quote-toggle-btn"><span>More</span></button></div>
+            <div class="button-wrap"><button class="quote-toggle-btn"><span>${uiText("more")}</span></button></div>
           </div>
-          <span class="field-label">Director:</span><div class="field-quote director-field">${renderChips(data.director || "-", "names")}</div>
-          <span class="field-label">Product:</span><div class="field-quote product-field">${renderChips(data.product || "-")}</div>
-          <span class="field-label">Stars:</span><div class="field-quote stars-field">${renderChips(data.stars || "-", "names")}</div>
+          <span class="field-label">${uiText("director")}: </span><div class="field-quote director-field">${renderChips(data.director || "-", "names")}</div>
+          <span class="field-label">${uiText("product")}: </span><div class="field-quote product-field">${renderChips(data.product || "-")}</div>
+          <span class="field-label">${uiText("stars")}: </span><div class="field-quote stars-field">${renderChips(data.stars || "-", "names")}</div>
           <span class="field-label">IMDB:</span><div class="field-quote"><span class="chip imdb-chip">${escapeHtml(data.imdb || "-")}</span></div>
-          <span class="field-label">Release:</span><div class="field-quote release-field">${escapeHtml(data.release_info || "-")}</div>
-          <span class="field-label">Genre:</span><div class="field-quote genre-grid">${renderChips(data.genre || "-")}</div>
+          <span class="field-label">${uiText("release")}: </span><div class="field-quote release-field">${escapeHtml(data.release_info || "-")}</div>
+          <span class="field-label">${uiText("genre")}: </span><div class="field-quote genre-grid">${renderChips(data.genre || "-")}</div>
           <div class="episodes-container" data-movie-id="${data.id}"><div class="episodes-list"></div></div>
-          <div class="button-wrap"><button class="go-btn" data-link="${escapeHtml(data.link || "#")}"><span>Go to file</span></button><div class="button-shadow"></div></div>
-          <div class="button-wrap"><button class="close-btn"><span>Close</span></button><div class="button-shadow"></div></div>
+          <div class="button-wrap"><button class="go-btn" data-link="${escapeHtml(data.link || "#")}"><span>${uiText("goToFile")}</span></button><div class="button-shadow"></div></div>
+          <div class="button-wrap"><button class="close-btn"><span>${uiText("close")}</span></button><div class="button-shadow"></div></div>
         </div>
       </div>`;
     }
@@ -4616,7 +4729,7 @@ function openMovieModal(m, startIdx = 0) {
           </div>`).join("");
 
         const badgeCount = content.querySelector(".badge-count");
-        if (badgeCount) badgeCount.textContent = allEpisodes.length + " episodes";
+        if (badgeCount) badgeCount.textContent = `${allEpisodes.length} ${uiText("episodeWord")}`;
 
         const cards = listEl.querySelectorAll(".episode-card");
         cards.forEach((cardEl, idx) => {
@@ -4656,12 +4769,12 @@ function openMovieModal(m, startIdx = 0) {
           quote.style.overflow = "hidden";
           quote.style.maxHeight = "120px";
           quote.classList.add("collapsed");
-          btn.textContent = "More";
+          btn.textContent = uiText("more");
         } else {
           textEl.innerHTML = makeSynopsisHtml(fullText);
           quote.style.maxHeight = "1000px";
           quote.classList.remove("collapsed");
-          btn.textContent = "Less";
+          btn.textContent = uiText("less");
         }
       }
 
