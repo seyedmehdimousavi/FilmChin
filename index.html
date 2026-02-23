@@ -174,7 +174,7 @@
               <!-- ✅ NEW: Favorite movies button -->
               <div class="button-wrap">
                 <button id="favoriteMoviesBtn" class="profile-favorites">
-                  <span>Favorite movies</span>
+                  <span data-i18n="favoriteMovies">Favorite movies</span>
                 </button>
                 <div class="button-shadow"></div>
               </div>
@@ -183,14 +183,14 @@
 
               <div class="button-wrap">
                 <button id="logoutBtn" class="profile-logout">
-                  <span>Logout</span>
+                  <span data-i18n="logout">Logout</span>
                 </button>
                 <div class="button-shadow"></div>
               </div>
             </div>
           </div>
 
-          <input id="search" type="text" placeholder="Search..." dir="auto" />
+          <input id="search" type="text" placeholder="Search..." dir="auto" data-i18n-placeholder="searchPlaceholder" />
 
           <div class="button-wrap">
             <button
@@ -272,22 +272,22 @@
           <div class="tab-indicator"></div>
 
           <a href="?tab=all" data-type="all" class="tab-link">
-            <span>All</span>
+            <span data-i18n="tabAll">All</span>
             <span class="count">0</span>
           </a>
 
           <a href="?tab=collection" data-type="collection" class="tab-link">
-            <span>Collections</span>
+            <span data-i18n="tabCollections">Collections</span>
             <span class="count">0</span>
           </a>
 
           <a href="?tab=series" data-type="series" class="tab-link">
-            <span>Series</span>
+            <span data-i18n="tabSeries">Series</span>
             <span class="count">0</span>
           </a>
 
           <a href="?tab=single" data-type="single" class="tab-link">
-            <span>Movies</span>
+            <span data-i18n="tabMovies">Movies</span>
             <span class="count">0</span>
           </a>
         </div>
@@ -304,7 +304,7 @@
     <div class="sidemenu-accordion-header">
       <div class="sidemenu-header-content">
         <i class="bi bi-gear"></i>
-        <span>Homepage Manager</span>
+        <span data-i18n="homepageManager">Homepage Manager</span>
       </div>
        <span class="feature-icon sidemenu-arrow"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
@@ -315,7 +315,7 @@
         <div id="homepageManagerSubmenu" class="homepage-manager-submenu">
           
           <div class="toggle-row">
-            <span>Animations</span>
+            <span data-i18n="animations">Animations</span>
             <label class="switch">
               <input type="checkbox" id="toggleReduceAnimations" checked />
               <span class="slider"></span>
@@ -323,7 +323,7 @@
           </div>
 
           <div class="toggle-row">
-            <span>Tabs</span>
+            <span data-i18n="tabs">Tabs</span>
             <label class="switch">
               <input type="checkbox" id="toggleTabs" checked />
               <span class="slider"></span>
@@ -331,7 +331,7 @@
           </div>
 
           <div class="toggle-row">
-            <span>Sub-tab genres</span>
+            <span data-i18n="subTabGenres">Sub-tab genres</span>
             <label class="switch">
               <input type="checkbox" id="toggleSubTabGenres" checked />
               <span class="slider"></span>
@@ -339,7 +339,7 @@
           </div>
 
           <div class="toggle-row">
-            <span>Popular movies</span>
+            <span data-i18n="popularMovies">Popular movies</span>
             <label class="switch">
               <input type="checkbox" id="togglePopularMovies" checked />
               <span class="slider"></span>
@@ -347,7 +347,7 @@
           </div>
 
           <div class="toggle-row">
-            <span>Back to Top Button</span>
+            <span data-i18n="backToTopButton">Back to Top Button</span>
             <label class="switch">
               <input type="checkbox" id="toggleBackToTop" checked />
               <span class="slider"></span>
@@ -355,7 +355,7 @@
           </div>
 
           <div class="toggle-row">
-            <span>Floating Summary Panel</span>
+            <span data-i18n="floatingSummaryPanel">Floating Summary Panel</span>
             <label class="switch">
               <input type="checkbox" id="toggleFloatingPanel" checked />
               <span class="slider"></span>
@@ -363,7 +363,7 @@
           </div>
 
           <div class="toggle-row">
-            <span>Collapse posts</span>
+            <span data-i18n="collapsePosts">Collapse posts</span>
             <label class="switch">
               <input type="checkbox" id="toggleCollapsePosts" />
               <span class="slider"></span>
@@ -403,7 +403,7 @@
     <div class="sidemenu-accordion-header">
       <div class="sidemenu-header-content">
         <i class="bi bi-list"></i>
-        <span>Genres</span>
+        <span data-i18n="genres">Genres</span>
       </div>
        <span class="feature-icon sidemenu-arrow"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
@@ -420,7 +420,7 @@
     <div class="sidemenu-accordion-header">
       <div class="sidemenu-header-content">
         <i class="bi bi-link-45deg"></i>
-        <span>Links</span>
+        <span data-i18n="links">Links</span>
       </div>
        <span class="feature-icon sidemenu-arrow"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
@@ -434,7 +434,7 @@
   </div>
 
   <div id="ratingFilter" class="rating-filter">
-    <h4 class="rating-filter-title">Sort by imdb rating</h4>
+    <h4 class="rating-filter-title" data-i18n="sortByImdb">Sort by imdb rating</h4>
     <div class="rating-process-wrapper">
       <div class="rating-min">0</div>
       <div class="rating-track" id="ratingTrack">
@@ -457,7 +457,7 @@
 
   <div class="year-filter">
     <div class="year-filter-row">
-      <div class="year-filter-label">Sort by Release date</div>
+      <div class="year-filter-label" data-i18n="sortByReleaseDate">Sort by Release date</div>
       <div class="year-filter-sign">+</div>
       <div class="year-spinner" id="yearSpinner">
         <div class="year-spinner-item year-spinner-top" id="yearSpinnerTop"></div>
@@ -574,7 +574,7 @@
         </div>
 
         <div class="designer-credit">
-          Design :
+          <span data-i18n="designLabel">Design :</span>
           <div
             style="
               display: flex;
@@ -608,7 +608,7 @@
         <div class="popular-title">
           <div class="button-wrap">
             <button>
-              <span>Popular Movies</span>
+              <span data-i18n="popularMovies">Popular Movies</span>
             </button>
             <div class="button-shadow"></div>
           </div>
@@ -641,9 +641,7 @@
         <div class="post-options-backdrop"></div>
         <div class="post-options-modal" id="postOptionsModal">
           <div class="post-options-header">
-            <span id="postOptionsTitle" class="post-options-title">
-              Post options
-            </span>
+            <span id="postOptionsTitle" class="post-options-title" data-i18n="postOptions">Post options</span>
             <button
               id="postOptionsCloseBtn"
               class="post-options-close-btn"
@@ -751,7 +749,7 @@
       
       <!-- SEO intro text + features button -->
       <section class="seo-intro" aria-label="About FilmChiin movies">
-        <h1>دانلود فیلم و سریال های برتر با FilmChiin</h1>
+        <h1 data-i18n="seoIntroTitle">دانلود فیلم و سریال های برتر با FilmChiin</h1>
         <p>
           FilmChiin (فیلمچین) یک آرشیو شخصی از فیلم‌ها و سریال‌های برتر(دوبله فارسی و بدون سانسور)است که فایل‌ها
           به‌صورت امن از طریق ربات تلگرام ارائه می‌شود.
@@ -770,7 +768,7 @@
         </p>
 
         <a href="#siteFeatures" class="seo-features-btn">
-          <span>لیست امکانات سایت</span>
+          <span data-i18n="siteFeaturesButton">لیست امکانات سایت</span>
           <span class="seo-features-icon">↓</span>
         </a>
       </section>
@@ -791,18 +789,18 @@
       class="site-features"
       aria-label="FilmChiin features"
     >
-      <h2>لیست امکانات سایت FilmChiin</h2>
+      <h2 data-i18n="siteFeaturesTitle">لیست امکانات سایت FilmChiin</h2>
 
       <!-- 1) حساب کاربری و لیست مورد علاقه‌ها -->
       <section class="feature-accordion open">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title">ایجاد حساب کاربری</span>
+          <span class="feature-title" data-i18n="featureTitle1">ایجاد حساب کاربری</span>
           <span class="feature-icon"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p>
+          <p data-i18n-html="featureDesc1">
             با ساخت حساب کاربری به قابلیت های بیشتری دسترسی دارید می‌توانید برای
             خودتان یک لیست اختصاصی از فیلم‌های مورد علاقه بسازید. میتوانید از چت
             با ادمین استفاده کنید.
@@ -813,13 +811,13 @@
       <!-- 2) جست‌وجوی لحظه‌ای و پیشرفته -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title">جست‌وجوی لحظه‌ای و پیشرفته</span>
+          <span class="feature-title" data-i18n="featureTitle2">جست‌وجوی لحظه‌ای و پیشرفته</span>
           <span class="feature-icon"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p>
+          <p data-i18n-html="featureDesc2">
             جست‌وجوی سایت کاملاً لحظه‌ای است؛ با تایپ هر عبارت، نتایج بلافاصله
             فیلتر می‌شوند. عبارت جست‌وجوشده در عنوان، خلاصه، بازیگران و سایر
             فیلدها هایلایت می‌شود تا سریع‌تر مورد دلخواهتان را داخل کارت‌ها پیدا
@@ -831,13 +829,13 @@
 
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title">شخصی سازی چیدمان صفحه</span>
+          <span class="feature-title" data-i18n="featureTitle3">شخصی سازی چیدمان صفحه</span>
           <span class="feature-icon"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p>
+          <p data-i18n-html="featureDesc3">
             از طریق گزینه های موجود در SideMenu میتوانید چیدمان صفحه اصلی را
             مطابق با سلیقه ی خود مرتب کنید.
           </p>
@@ -855,7 +853,7 @@
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p>
+          <p data-i18n-html="featureDesc4">
             صفحه اصلی بر اساس نوع محتوا (فیلم سینمایی، کالکشن، سریال) با تب‌ها
             تفکیک شده است. علاوه بر آن، در هر تب می‌توانید فقط با یک کلیک روی
             ژانرها، لیست را بر اساس ژانر فیلتر کنید و فقط همان دسته فیلم‌ها را
@@ -867,13 +865,13 @@
       <!-- 4) چیدمان و مرتب‌سازی بر اساس امتیاز -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title">مرتب‌سازی بر اساس امتیاز IMDb</span>
+          <span class="feature-title" data-i18n="featureTitle4">مرتب‌سازی بر اساس امتیاز IMDb</span>
           <span class="feature-icon"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p>
+          <p data-i18n-html="featureDesc5">
             می‌توانید صفحه اصلی را بر اساس فیلترهای مختلف تنظیم کنید و حداقل
             امتیاز IMDb را مشخص کنید تا فقط عناوینی با امتیاز بالاتر نمایش داده
             شوند. این فیلترها در لحظه روی تعداد نتایج و محتوای صفحه تأثیر
@@ -884,13 +882,13 @@
 
 <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title">مرتب‌سازی بر اساس سال انتشار</span>
+          <span class="feature-title" data-i18n="featureTitle5">مرتب‌سازی بر اساس سال انتشار</span>
           <span class="feature-icon"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p>
+          <p data-i18n-html="featureDesc6">
             می‌توانید صفحه اصلی را با استفاده از فیلتر سال انتشار در sideMenu به گونه ای مرتب کنید که فیلم های با تاریخ انتشار سال تایین شده(و پست های بعدی با سال انتشار بالاتر) در صفحه اصلی قرار گیرند.
           </p>
         </div>
@@ -900,13 +898,13 @@
       <!-- 5) نمایش آمار دقیق فیلم‌ها -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title">آمار دقیق تعداد فیلم‌ها در هر لحظه</span>
+          <span class="feature-title" data-i18n="featureTitle6">آمار دقیق تعداد فیلم‌ها در هر لحظه</span>
           <span class="feature-icon"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p>
+          <p data-i18n-html="featureDesc7">
             در بالای صفحه اصلی، تعداد فیلم‌های در حال نمایش با توجه به فیلترها و
             جست‌وجوی فعلی نمایش داده می‌شود. این آمار بعد از هر تغییر در
             جست‌وجو، ژانر، تب‌ها یا فیلتر IMDb به‌صورت لحظه‌ای به‌روزرسانی
@@ -918,13 +916,13 @@
       <!-- 6) لیست قسمت‌های سریال و کالکشن -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title">لیست قسمت‌های سریال وکالکشن</span>
+          <span class="feature-title" data-i18n="featureTitle7">لیست قسمت‌های سریال وکالکشن</span>
           <span class="feature-icon"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p>
+          <p data-i18n-html="featureDesc8">
             برای سریال‌ها و کالکشن‌ها، تمام قسمت‌ها در قالب کارت‌های کوچک داخل
             همان پست نمایش داده می‌شوند. با انتخاب هر قسمت، کاور، عنوان، خلاصه،
             اطلاعات و لینک Go to file همان قسمت فعال می‌شود و نیازی به باز کردن
@@ -936,13 +934,13 @@
       <!-- 7) دسترسی به فایل با یک کلیک از طریق ربات -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title">دسترسی به فایل فقط با یک کلیک</span>
+          <span class="feature-title" data-i18n="featureTitle8">دسترسی به فایل فقط با یک کلیک</span>
           <span class="feature-icon"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p>
+          <p data-i18n-html="featureDesc9">
             با فشردن دکمه <strong>Go to file</strong> بات
             <code>@Filmchinbot</code>فایل فیلم یا قسمت سریال را برای شما ارسال
             می‌کند؛ بدون نیاز به جوین شدن در کانال.
@@ -953,13 +951,13 @@
       <!-- 8) سیستم کامنت‌ها -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title">کامنت و نمایش گفت‌وگو در همان پست</span>
+          <span class="feature-title" data-i18n="featureTitle9">کامنت و نمایش گفت‌وگو در همان پست</span>
           <span class="feature-icon"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p>
+          <p data-i18n-html="featureDesc10">
             برای هر پست می‌توانید کامنت بگذارید و همه نظرات در همان کارت فیلم با
             طراحی اختصاصی و آواتارها نمایش داده می‌شوند. تعداد کامنت‌ها نیز کنار
             آیکون مربوطه نشان داده می‌شود.
@@ -978,7 +976,7 @@
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p>
+          <p data-i18n-html="featureDesc11">
             بخش فیلم‌های پرطرفدار بر اساس آمار کلیک‌ها ساخته می‌شود و امکان
             مشاهده اطلاعات کامل و رفتن به فایل را در همان مودال فراهم می‌کند.
             دکمه شناور، لیست فیلم‌های موجود در صفحه فعلی را نشان می‌دهد تا
@@ -990,7 +988,7 @@
       <!-- 10) اشتراک و کپی لینک فیلم -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title">کپی یا اشتراک لینک هر فیلم</span>
+          <span class="feature-title" data-i18n="featureTitle10">کپی یا اشتراک لینک هر فیلم</span>
           <span class="feature-icon"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
           /></span>
@@ -1008,7 +1006,7 @@
       <!-- 11) طراحی liquid glass و تجربه کاربری -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title">طراحی Liquid Glass واکنش‌گرا</span>
+          <span class="feature-title" data-i18n="featureTitle11">طراحی Liquid Glass واکنش‌گرا</span>
           <span class="feature-icon"
             ><img src="/images/icons8-double-left.apng" alt="toggle"
           /></span>
@@ -1123,13 +1121,12 @@
         <div class="stories" role="list"></div>
         <div class="button-wrap">
           <button class="go-pagination" type="button">
-            <span
-              >go to pagination<img
-                src="/images/icons8-double-down.apng"
-                alt="down"
-                style="width: 16px; height: 16px; vertical-align: middle"
-              />
-            </span>
+            <span data-i18n="goToPagination">Go to pagination</span>
+            <img
+              src="/images/icons8-double-down.apng"
+              alt="down"
+              style="width: 16px; height: 16px; vertical-align: middle"
+            />
           </button>
           <div class="button-shadow"></div>
         </div>

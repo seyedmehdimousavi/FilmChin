@@ -1492,7 +1492,7 @@ function attachCommentsHandlers(card, movieId) {
       avatarsEl.innerHTML = latest
         .map((n) => `<div class="avatar">${escapeHtml(initials(n))}</div>`)
         .join("");
-    if (countEl) countEl.textContent = `${(arr || []).length} comments`;
+    if (countEl) countEl.textContent = `${(arr || []).length} ${uiText("comments")}`;
     if (commentsList) {
       commentsList.innerHTML = (arr || [])
         .map(
@@ -1611,6 +1611,29 @@ document.addEventListener("DOMContentLoaded", () => {
     en: {
       languageLabel: "Language / زبان",
       themePaletteTitle: "Site color theme",
+      searchPlaceholder: "Search...",
+      favoriteMovies: "Favorite movies",
+      logout: "Logout",
+      tabAll: "All",
+      tabCollections: "Collections",
+      tabSeries: "Series",
+      tabMovies: "Movies",
+      genres: "Genres",
+      homepageManager: "Homepage Manager",
+      animations: "Animations",
+      tabs: "Tabs",
+      subTabGenres: "Sub-tab genres",
+      backToTopButton: "Back to Top Button",
+      floatingSummaryPanel: "Floating Summary Panel",
+      collapsePosts: "Collapse posts",
+      links: "Links",
+      sortByImdb: "Sort by IMDb rating",
+      sortByReleaseDate: "Sort by release date",
+      goToPagination: "Go to pagination",
+      postOptions: "Post options",
+      episodeWord: "episodes",
+      less: "Less",
+      moreInfo: "More Info",
       messageToAdmin: "Message to admin",
       messageToAdminPlaceholder: "Message to admin",
       writeReplyPlaceholder: "Write a reply...",
@@ -1618,10 +1641,92 @@ document.addEventListener("DOMContentLoaded", () => {
       conversation: "Conversation",
       popularMovies: "Popular movies",
       versionExample: "e.g. 1.3.3",
+      numberOfMovies: "Number of movies",
+      collection: "Collection",
+      series: "Series",
+      synopsis: "Synopsis",
+      more: "More",
+      director: "Director",
+      product: "Product",
+      stars: "Stars",
+      release: "Release",
+      genre: "Genre",
+      goToFile: "Go to file",
+      goToPage: "Go to page",
+      comments: "comments",
+      commentsTitle: "Comments",
+      yourName: "Your name",
+      close: "close",
+      writeComment: "Write a comment...",
+      send: "Send",
+      designLabel: "Design :",
+      siteFeaturesButton: "Site features",
+      siteFeaturesTitle: "FilmChiin site features",
+      adminPostManagement: "Post Management",
+      adminMessages: "Admin Messages",
+      adminUnpublishedComments: "Unpublished Comments",
+      adminLinksInSidemenu: "Links in sidemenu",
+      adminSearchReleasedMovies: "Search in released movies",
+      adminReleasedMovies: "Released Movies",
+      adminUsersAdmins: "Users & Admins",
+      adminSearchMoviesPlaceholder: "Search movies...",
+      seoIntroTitle: "Download top movies and series with FilmChiin",
+      seoIntroP1: "FilmChiin is a personal archive of top movies and series (Persian dub and uncensored) delivered securely via Telegram bot.",
+      seoIntroP2: "You can filter titles by <strong>genre</strong>, <strong>country (Product)</strong>, or <strong>IMDb</strong> rating, and receive files directly from <code>@Filmchinbot</code> using <strong>Go to file</strong>.",
+      seoIntroP3: "This list updates daily and includes movies, collections, and multi-episode series. Each title displays release year, director, cast, and genre.",
+      featureTitle1: "Create account",
+      featureDesc1: "By creating an account, you unlock extra capabilities: build a personal favorites list and chat with admin.",
+      featureTitle2: "Instant and advanced search",
+      featureDesc2: "Search is fully instant. As you type, results filter immediately and matched text is highlighted in title, synopsis, cast, and other fields.",
+      featureTitle3: "Customize homepage layout",
+      featureDesc3: "Use SideMenu options to arrange homepage layout based on your preference.",
+      featureTitle4: "Type and genre tabs",
+      featureDesc4: "Homepage is separated by content type (movie, collection, series). You can also filter each tab by genres with one click.",
+      featureTitle5: "Sort by IMDb rating",
+      featureDesc5: "Sort visible list by IMDb score and quickly focus on higher-rated titles.",
+      featureTitle6: "Sort by release year",
+      featureDesc6: "Use release filter to prioritize newer/older titles based on your preference.",
+      featureTitle7: "Episode list for collections/series",
+      featureDesc7: "For collections and series, all episodes are shown in small cards in the same post and selecting an episode updates card info instantly.",
+      featureTitle8: "One-click file access",
+      featureDesc8: "With <strong>Go to file</strong>, <code>@Filmchinbot</code> sends movie/episode file directly without needing channel join.",
+      featureTitle9: "Comments in each post",
+      featureDesc9: "Each post supports comments with custom UI and avatars; comment count is shown near the comment icon.",
+      featureTitle10: "Popular movies and page list",
+      featureDesc10: "Popular section is built from click stats and the floating panel lists current-page posts for quick navigation.",
+      featureTitle11: "Responsive Liquid Glass design",
+      featureDesc11: "Parts of UI use a Liquid Glass-inspired design with smooth animations and balanced transparency on mobile/desktop.",
+      similarByActorsTitle: "Other movies with similar cast",
+      bySameDirectorTitle: "Other movies by this director",
+      noSimilarActors: "No similar-cast movies found.",
+      noDirectorMovies: "No other movies found for this director.",
     },
     fa: {
       languageLabel: "زبان / Language",
       themePaletteTitle: "قالب رنگی سایت",
+      searchPlaceholder: "جستجو...",
+      favoriteMovies: "فیلم‌های مورد علاقه",
+      logout: "خروج",
+      tabAll: "همه",
+      tabCollections: "کالکشن‌ها",
+      tabSeries: "سریال‌ها",
+      tabMovies: "فیلم‌ها",
+      genres: "ژانرها",
+      homepageManager: "مدیریت صفحه اصلی",
+      animations: "انیمیشن‌ها",
+      tabs: "تب‌ها",
+      subTabGenres: "زیرتب ژانرها",
+      backToTopButton: "دکمه بازگشت به بالا",
+      floatingSummaryPanel: "پنل شناور خلاصه",
+      collapsePosts: "جمع‌کردن پست‌ها",
+      links: "لینک‌ها",
+      sortByImdb: "مرتب‌سازی بر اساس امتیاز IMDb",
+      sortByReleaseDate: "مرتب‌سازی بر اساس تاریخ انتشار",
+      goToPagination: "رفتن به صفحه‌بندی",
+      postOptions: "گزینه‌های پست",
+      episodeWord: "اپیزود",
+      less: "کمتر",
+      moreInfo: "اطلاعات بیشتر",
       messageToAdmin: "پیام به ادمین",
       messageToAdminPlaceholder: "پیام به ادمین",
       writeReplyPlaceholder: "بنویس...",
@@ -1629,7 +1734,71 @@ document.addEventListener("DOMContentLoaded", () => {
       conversation: "گفت‌وگو",
       popularMovies: "فیلم‌های پرطرفدار",
       versionExample: "مثلاً 1.3.3",
+      numberOfMovies: "تعداد فیلم‌ها",
+      collection: "کالکشن",
+      series: "سریال",
+      synopsis: "خلاصه",
+      more: "بیشتر",
+      director: "کارگردان",
+      product: "محصول",
+      stars: "بازیگران",
+      release: "انتشار",
+      genre: "ژانر",
+      goToFile: "رفتن به فایل",
+      goToPage: "رفتن به صفحه",
+      comments: "نظر",
+      commentsTitle: "نظرات",
+      yourName: "نام شما",
+      close: "بستن",
+      writeComment: "نظر خود را بنویسید...",
+      send: "ارسال",
+      designLabel: "طراحی :",
+      siteFeaturesButton: "لیست امکانات سایت",
+      siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
+      adminPostManagement: "مدیریت پست‌ها",
+      adminMessages: "پیام مدیریت",
+      adminUnpublishedComments: "کامنت‌های منتشرنشده",
+      adminLinksInSidemenu: "لینک‌های ساید منو",
+      adminSearchReleasedMovies: "جستجو در فیلم‌های منتشر شده",
+      adminReleasedMovies: "فیلم‌های منتشر شده",
+      adminUsersAdmins: "کاربران و ادمین‌ها",
+      adminSearchMoviesPlaceholder: "جستجوی فیلم...",
+      seoIntroTitle: "دانلود فیلم و سریال های برتر با FilmChiin",
+      seoIntroP1: "FilmChiin (فیلمچین) یک آرشیو شخصی از فیلم‌ها و سریال‌های برتر(دوبله فارسی و بدون سانسور)است که فایل‌ها به‌صورت امن از طریق ربات تلگرام ارائه می‌شود.",
+      seoIntroP2: "می‌توانید عناوین را بر اساس <strong>ژانر</strong>، <strong>کشور سازنده (Product)</strong>، یا امتیاز <strong>IMDb</strong> فیلتر کنید و با دکمه <strong>Go to file</strong> فایل را مستقیماً از ربات <code>@Filmchinbot</code> دریافت کنید.",
+      seoIntroP3: "این لیست هر روز به‌روزرسانی می‌شود و شامل فیلم‌های سینمایی، کالکشن‌ها و سریال‌های چند قسمتی است. برای هر عنوان، اطلاعاتی مثل سال انتشار، کارگردان، بازیگران و ژانر نمایش داده می‌شود.",
+      featureTitle1: "ساخت حساب کاربری",
+      featureDesc1: "با ساخت حساب کاربری به قابلیت های بیشتری دسترسی دارید می‌توانید برای خودتان یک لیست اختصاصی از فیلم‌های مورد علاقه بسازید. میتوانید از چت با ادمین استفاده کنید.",
+      featureTitle2: "جست‌وجوی لحظه‌ای و پیشرفته",
+      featureDesc2: "جست‌وجوی سایت کاملاً لحظه‌ای است؛ با تایپ هر عبارت، نتایج بلافاصله فیلتر می‌شوند. عبارت جست‌وجوشده در عنوان، خلاصه، بازیگران و سایر فیلدها هایلایت می‌شود.",
+      featureTitle3: "شخصی سازی چیدمان صفحه",
+      featureDesc3: "از طریق گزینه های موجود در SideMenu میتوانید چیدمان صفحه اصلی را مطابق با سلیقه ی خود مرتب کنید.",
+      featureTitle4: "فیلترفیلم هاوژانرها در تب‌های جداگانه",
+      featureDesc4: "صفحه اصلی بر اساس نوع محتوا (فیلم سینمایی، کالکشن، سریال) با تب‌ها تفکیک شده است. علاوه بر آن، در هر تب می‌توانید با یک کلیک ژانر را فیلتر کنید.",
+      featureTitle5: "مرتب‌سازی بر اساس امتیاز IMDb",
+      featureDesc5: "لیست قابل مشاهده را می‌توانید بر اساس امتیاز IMDb مرتب کنید تا سریع‌تر به عناوین با امتیاز بالاتر برسید.",
+      featureTitle6: "مرتب‌سازی بر اساس سال انتشار",
+      featureDesc6: "با فیلتر سال انتشار می‌توانید عناوین جدیدتر یا قدیمی‌تر را بر اساس نیاز خود ببینید.",
+      featureTitle7: "لیست قسمت‌های سریال وکالکشن",
+      featureDesc7: "برای سریال‌ها و کالکشن‌ها، تمام قسمت‌ها در قالب کارت‌های کوچک داخل همان پست نمایش داده می‌شوند و با انتخاب هر قسمت اطلاعات کارت فوراً آپدیت می‌شود.",
+      featureTitle8: "دسترسی به فایل فقط با یک کلیک",
+      featureDesc8: "با فشردن دکمه <strong>Go to file</strong> بات <code>@Filmchinbot</code> فایل فیلم یا قسمت سریال را برای شما ارسال می‌کند؛ بدون نیاز به جوین شدن در کانال.",
+      featureTitle9: "کامنت و نمایش گفت‌وگو در همان پست",
+      featureDesc9: "برای هر پست می‌توانید کامنت بگذارید و همه نظرات در همان کارت فیلم با طراحی اختصاصی و آواتارها نمایش داده می‌شوند.",
+      featureTitle10: "فیلم‌های پرطرفدارولیست فیلم‌های صفحه",
+      featureDesc10: "بخش فیلم‌های پرطرفدار بر اساس آمار کلیک‌ها ساخته می‌شود و دکمه شناور لیست فیلم‌های صفحه فعلی را نشان می‌دهد.",
+      featureTitle11: "طراحی Liquid Glass واکنش‌گرا",
+      featureDesc11: "بخش هایی از سایت با الهام از طراحی Liquid Glass ساخته شده است؛ کارت‌ها، دکمه‌ها و پنل‌ها تجربه کاربری روان و چشم‌نواز ایجاد می‌کنند.",
+      similarByActorsTitle: "فیلم‌های دیگر با بازیگران مشابه",
+      bySameDirectorTitle: "فیلم‌های دیگر این کارگردان",
+      noSimilarActors: "فیلم مشابه بر اساس بازیگران پیدا نشد.",
+      noDirectorMovies: "فیلم دیگری از این کارگردان پیدا نشد.",
     },
+  };
+
+  const uiText = (key) => {
+    const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
+    return languageMap[lang]?.[key] || languageMap.en[key] || key;
   };
 
   function applyLanguage(lang) {
@@ -1649,11 +1818,44 @@ document.addEventListener("DOMContentLoaded", () => {
       el.setAttribute("placeholder", languageMap[nextLang][key] || languageMap.en[key] || "");
     });
 
+    document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+      const key = el.getAttribute("data-i18n-html");
+      if (!key) return;
+      el.innerHTML = languageMap[nextLang][key] || languageMap.en[key] || "";
+    });
+
+    const seoIntro = document.querySelector(".seo-intro");
+    if (seoIntro) {
+      const seoP = seoIntro.querySelectorAll("p");
+      if (seoP[0]) seoP[0].innerHTML = languageMap[nextLang].seoIntroP1 || languageMap.en.seoIntroP1;
+      if (seoP[1]) seoP[1].innerHTML = languageMap[nextLang].seoIntroP2 || languageMap.en.seoIntroP2;
+      if (seoP[2]) seoP[2].textContent = languageMap[nextLang].seoIntroP3 || languageMap.en.seoIntroP3;
+    }
+
+    const featureTitles = document.querySelectorAll("#siteFeatures .feature-title");
+    featureTitles.forEach((el, idx) => {
+      const key = `featureTitle${idx + 1}`;
+      if (languageMap[nextLang][key] || languageMap.en[key]) {
+        el.textContent = languageMap[nextLang][key] || languageMap.en[key];
+      }
+    });
+    const featureDesc = document.querySelectorAll("#siteFeatures .feature-accordion-body p");
+    featureDesc.forEach((el, idx) => {
+      const key = `featureDesc${idx + 1}`;
+      if (languageMap[nextLang][key] || languageMap.en[key]) {
+        el.innerHTML = languageMap[nextLang][key] || languageMap.en[key];
+      }
+    });
+
     languageButtons.forEach((btn, idx) => {
       const active = btn.dataset.lang === nextLang;
       btn.classList.toggle("active", active);
       if (active && languageIndicator) languageIndicator.style.transform = `translateX(${idx * 100}%)`;
     });
+
+    if (typeof renderPagedMovies === "function") {
+      renderPagedMovies(true);
+    }
   }
 
   languageButtons.forEach((btn) => {
@@ -2242,31 +2444,31 @@ document.addEventListener("DOMContentLoaded", () => {
       bgSoft: "#e5f0ff",
     },
     green: {
-      accentRgb: "0, 172, 193",
-      accentDark: "#00838f",
-      accent: "#00acc1",
-      accentLight: "#26c6da",
-      accentContrast: "#006064",
-      bgDay: "#f0fbfc",
-      bgSoft: "#ddf5f8",
+      accentRgb: "46, 157, 87",
+      accentDark: "#227a43",
+      accent: "#2e9d57",
+      accentLight: "#45b36e",
+      accentContrast: "#195b32",
+      bgDay: "#f1faf4",
+      bgSoft: "#e1f3e7",
     },
     yellow: {
-      accentRgb: "94, 96, 206",
-      accentDark: "#4345a3",
-      accent: "#5e60ce",
-      accentLight: "#7476dd",
-      accentContrast: "#31338e",
-      bgDay: "#f4f5ff",
-      bgSoft: "#e8e9ff",
+      accentRgb: "197, 163, 23",
+      accentDark: "#9f8010",
+      accent: "#c5a317",
+      accentLight: "#d6b63e",
+      accentContrast: "#6b5505",
+      bgDay: "#fdf9ec",
+      bgSoft: "#f8efcf",
     },
     red: {
-      accentRgb: "58, 134, 255",
-      accentDark: "#2d6fd1",
-      accent: "#3a86ff",
-      accentLight: "#69a4ff",
-      accentContrast: "#1f4fa3",
-      bgDay: "#f2f7ff",
-      bgSoft: "#e4eeff",
+      accentRgb: "200, 70, 70",
+      accentDark: "#9b2d2d",
+      accent: "#c84646",
+      accentLight: "#dc6666",
+      accentContrast: "#6e2020",
+      bgDay: "#fcf2f2",
+      bgSoft: "#f6e0e0",
     },
     purple: {
       accentRgb: "123, 97, 255",
@@ -2304,12 +2506,12 @@ document.addEventListener("DOMContentLoaded", () => {
     rootStyle.setProperty("--theme-bg-soft", selectedTheme.bgSoft);
 
     const goPageColors = {
-      blue: "#7c4dff",
-      green: "#d97706",
-      yellow: "#0ea5e9",
-      red: "#10b981",
-      purple: "#f59e0b",
-      teal: "#ef4444",
+      blue: "#1e88e5",
+      green: "#2e9d57",
+      yellow: "#c5a317",
+      red: "#c84646",
+      purple: "#6f4dbb",
+      teal: "#188a94",
     };
     rootStyle.setProperty("--go-page-bg", goPageColors[themeName] || "#7c4dff");
 
@@ -3334,7 +3536,7 @@ function setTabInUrl(type) {
   const pageItems = filtered.slice(start, start + PAGE_SIZE);
 
   moviesGrid.innerHTML = "";
-  movieCount.innerText = `Number of movies: ${filtered.length}`;
+  movieCount.innerText = `${uiText("numberOfMovies")}: ${filtered.length}`;
 
   for (const m of pageItems) {
     const cover = escapeHtml(
@@ -3356,7 +3558,7 @@ function setTabInUrl(type) {
         ? `<span class="collection-badge ${
             m.type === "collection" ? "badge-collection" : "badge-serial"
           }">
-         ${m.type === "collection" ? "Collection" : "Series"}
+         ${m.type === "collection" ? uiText("collection") : uiText("series")}
          <span class="badge-count anim-left-right">0</span>
        </span>`
         : "";
@@ -3375,24 +3577,24 @@ function setTabInUrl(type) {
     ${badgeHtml}
   </div>
 
-  <span class="field-label anim-vertical"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
+  <span class="field-label anim-vertical"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> ${uiText("synopsis")}: </span>
   <div class="field-quote anim-left-right synopsis-quote">
     <div class="quote-text anim-horizontal">${synopsis}</div>
     <div class="button-wrap">
-          <button class="quote-toggle-btn"><span>More</span></button>
+          <button class="quote-toggle-btn"><span>${uiText("more")}</span></button>
           <div class="button-shadow"></div>
           </div>
   </div>
 
-  <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span>
+  <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> ${uiText("director")}: </span>
   <div class="field-quote anim-left-right director-field">${director}</div>
 
-  <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span>
+  <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> ${uiText("product")}: </span>
   <div class="field-quote anim-horizontal">
     ${renderChips(m.product || "-")}
   </div>
 
-  <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span>
+  <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> ${uiText("stars")}: </span>
   <div class="field-quote anim-left-right stars-field">${stars}</div>
 
   <span class="field-label anim-vertical">
@@ -3403,10 +3605,10 @@ function setTabInUrl(type) {
     <span class="chip imdb-chip anim-horizontal">${imdb}</span>
   </div>
 
-  <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span>
+  <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> ${uiText("release")}: </span>
   <div class="field-quote anim-left-right">${release_info}</div>
 
-  <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span>
+  <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> ${uiText("genre")}: </span>
   <div class="field-quote genre-grid anim-horizontal">${renderChips(
     m.genre || "-"
   )}</div>
@@ -3419,38 +3621,38 @@ function setTabInUrl(type) {
       <div class="button-wrap">
         <button class="go-btn anim-vertical" data-link="${escapeHtml(
           m.link || "#"
-        )}"><span>Go to file</span></button>
+        )}"><span>${uiText("goToFile")}</span></button>
         <div class="button-shadow"></div>
       </div>
       <div class="button-wrap">
         <button class="go-page-btn anim-vertical" data-url="/movie/${encodeURIComponent(
           makeMovieSlug(m.title || "")
-        )}"><span>Go to page</span></button>
+        )}"><span>${uiText("goToPage")}</span></button>
         <div class="button-shadow"></div>
       </div>
     </div>
 
   <div class="comment-summary anim-horizontal">
     <div class="avatars"></div>
-    <div class="comments-count">0 comments</div>
+    <div class="comments-count">0 ${uiText("comments")}</div>
     <div class="enter-comments"><img src="/images/icons8-comment.apng" style="width:22px;height:22px;"></div>
   </div>
 
   <div class="comments-panel" aria-hidden="true">
     <div class="comments-panel-inner">
-      <div class="comments-panel-header"><div class="comments-title">Comments</div></div>
+      <div class="comments-panel-header"><div class="comments-title">${uiText("commentsTitle")}</div></div>
       <div class="comments-list"></div>
       <div class="comment-input-row">
         <div class="name-comments-close">
-          <input class="comment-name" placeholder="Your name" maxlength="60" />
+          <input class="comment-name" placeholder="${uiText("yourName")}" maxlength="60" />
           <div class="button-wrap">
-          <button class="comments-close"><span>close</span></button>
+          <button class="comments-close"><span>${uiText("close")}</span></button>
           <div class="button-shadow"></div>
           </div>
         </div>
-        <textarea class="comment-text" placeholder="Write a comment..." rows="2"></textarea>
+        <textarea class="comment-text" placeholder="${uiText("writeComment")}" rows="2"></textarea>
         <div class="button-wrap">
-        <button class="comment-send"><span>Send</span></button>
+        <button class="comment-send"><span>${uiText("send")}</span></button>
         <div class="button-shaddow"></div>
         </div>
       </div>
@@ -3476,7 +3678,7 @@ function setTabInUrl(type) {
 
       if (goBtnLabel) {
         goBtnLabel.textContent =
-          inCollapsedMode && !isExpanded ? "File" : "Go to file";
+          uiText("goToFile");
       }
 
       if (collapseBar) {
@@ -3843,12 +4045,12 @@ function setTabInUrl(type) {
           quote.style.overflow = "hidden";
           quote.style.maxHeight = "120px";
           quote.classList.add("collapsed");
-          btn.textContent = "More";
+          btn.textContent = uiText("more");
         } else {
           textEl.innerHTML = makeSynopsisHtml(fullText);
           quote.style.maxHeight = "1000px";
           quote.classList.remove("collapsed");
-          btn.textContent = "Less";
+          btn.textContent = uiText("less");
         }
       }
 
@@ -4126,7 +4328,7 @@ searchInput?.addEventListener("keydown", (e) => {
                       ? "badge-collection"
                       : "badge-serial"
                   }">
-                   ${m.type === "collection" ? "Collection" : "Series"}
+                   ${m.type === "collection" ? uiText("collection") : uiText("series")}
                  </span>`
                 : ""
             }
@@ -4471,7 +4673,7 @@ searchInput?.addEventListener("keydown", (e) => {
       <img src="${escapeHtml(m.dCover || "")}" alt="${escapeHtml(m.dTitle || "")}">
       <h3>${escapeHtml(m.dTitle || "")}</h3>
       <div class="button-wrap">
-        <button class="more-info"><span>More Info</span></button>
+        <button class="more-info"><span>${uiText("moreInfo")}</span></button>
         <div class="button-shadow"></div>
       </div>`;
     
@@ -4548,7 +4750,7 @@ function openMovieModal(m, startIdx = 0) {
       const title = escapeHtml(data.title || "-");
       // ... بقیه کدهای رندر کارت دقیقاً مثل نسخه خودتان ...
       const badgeHtml = data.type && data.type !== "single" ? `<span class="collection-badge ${data.type === "collection" ? "badge-collection" : "badge-serial"}">
-           ${data.type === "collection" ? "Collection" : "Series"} <span class="badge-count">${allEpisodes.length}</span></span>` : "";
+           ${data.type === "collection" ? uiText("collection") : uiText("series")} <span class="badge-count">${allEpisodes.length}</span></span>` : "";
 
       return `
       <div class="movie-card expanded no-reveal">
@@ -4558,19 +4760,19 @@ function openMovieModal(m, startIdx = 0) {
         </div>
         <div class="movie-info">
           <div class="movie-title"><span class="movie-name">${title}</span>${badgeHtml}</div>
-          <span class="field-label">Synopsis:</span>
+          <span class="field-label">${uiText("synopsis")}: </span>
           <div class="field-quote synopsis-quote"><div class="quote-text">${escapeHtml(data.synopsis || "-")}</div>
-            <div class="button-wrap"><button class="quote-toggle-btn"><span>More</span></button></div>
+            <div class="button-wrap"><button class="quote-toggle-btn"><span>${uiText("more")}</span></button></div>
           </div>
-          <span class="field-label">Director:</span><div class="field-quote director-field">${renderChips(data.director || "-", "names")}</div>
-          <span class="field-label">Product:</span><div class="field-quote product-field">${renderChips(data.product || "-")}</div>
-          <span class="field-label">Stars:</span><div class="field-quote stars-field">${renderChips(data.stars || "-", "names")}</div>
+          <span class="field-label">${uiText("director")}: </span><div class="field-quote director-field">${renderChips(data.director || "-", "names")}</div>
+          <span class="field-label">${uiText("product")}: </span><div class="field-quote product-field">${renderChips(data.product || "-")}</div>
+          <span class="field-label">${uiText("stars")}: </span><div class="field-quote stars-field">${renderChips(data.stars || "-", "names")}</div>
           <span class="field-label">IMDB:</span><div class="field-quote"><span class="chip imdb-chip">${escapeHtml(data.imdb || "-")}</span></div>
-          <span class="field-label">Release:</span><div class="field-quote release-field">${escapeHtml(data.release_info || "-")}</div>
-          <span class="field-label">Genre:</span><div class="field-quote genre-grid">${renderChips(data.genre || "-")}</div>
+          <span class="field-label">${uiText("release")}: </span><div class="field-quote release-field">${escapeHtml(data.release_info || "-")}</div>
+          <span class="field-label">${uiText("genre")}: </span><div class="field-quote genre-grid">${renderChips(data.genre || "-")}</div>
           <div class="episodes-container" data-movie-id="${data.id}"><div class="episodes-list"></div></div>
-          <div class="button-wrap"><button class="go-btn" data-link="${escapeHtml(data.link || "#")}"><span>Go to file</span></button><div class="button-shadow"></div></div>
-          <div class="button-wrap"><button class="close-btn"><span>Close</span></button><div class="button-shadow"></div></div>
+          <div class="button-wrap"><button class="go-btn" data-link="${escapeHtml(data.link || "#")}"><span>${uiText("goToFile")}</span></button><div class="button-shadow"></div></div>
+          <div class="button-wrap"><button class="close-btn"><span>${uiText("close")}</span></button><div class="button-shadow"></div></div>
         </div>
       </div>`;
     }
@@ -4616,7 +4818,7 @@ function openMovieModal(m, startIdx = 0) {
           </div>`).join("");
 
         const badgeCount = content.querySelector(".badge-count");
-        if (badgeCount) badgeCount.textContent = allEpisodes.length + " episodes";
+        if (badgeCount) badgeCount.textContent = `${allEpisodes.length} ${uiText("episodeWord")}`;
 
         const cards = listEl.querySelectorAll(".episode-card");
         cards.forEach((cardEl, idx) => {
@@ -4656,12 +4858,12 @@ function openMovieModal(m, startIdx = 0) {
           quote.style.overflow = "hidden";
           quote.style.maxHeight = "120px";
           quote.classList.add("collapsed");
-          btn.textContent = "More";
+          btn.textContent = uiText("more");
         } else {
           textEl.innerHTML = makeSynopsisHtml(fullText);
           quote.style.maxHeight = "1000px";
           quote.classList.remove("collapsed");
-          btn.textContent = "Less";
+          btn.textContent = uiText("less");
         }
       }
 

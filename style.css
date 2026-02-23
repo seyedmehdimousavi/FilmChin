@@ -4776,6 +4776,9 @@ min-tabs .tab-circle .badge {
   color: #512bd4;
   font-size: 0px;
 }
+html[lang="fa"] .go-top-button::before {
+  content: "بازگشت به بالا";
+}
 
 .go-top-button.active::before {
   font-size: 13px;
@@ -6949,3 +6952,7 @@ body.dark .movie-page-back {
   opacity: 1 !important;
   transform: none !important;
 }
+
+
+html[lang="fa"] .movie-count-container { display:flex; justify-content:flex-end; }
+.field-label { text-align: right; }

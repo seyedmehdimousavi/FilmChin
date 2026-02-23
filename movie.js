@@ -18,6 +18,28 @@ const movieI18n = {
     pageLoadError: "Error loading post page.",
     postPageTitle: "FilmChiin | Post page",
     postPageDesc: "Full details of this post on FilmChiin",
+    postOptions: "Post options",
+    collection: "Collection",
+    series: "Series",
+    episodes: "episodes",
+    synopsis: "Synopsis",
+    director: "Director",
+    product: "Product",
+    stars: "Stars",
+    release: "Release",
+    genre: "Genre",
+    goToFile: "Go to file",
+    comments: "comments",
+    commentsTitle: "Comments",
+    yourName: "Your name",
+    close: "close",
+    writeComment: "Write a comment...",
+    send: "Send",
+    similarByActorsTitle: "Other movies with similar cast",
+    bySameDirectorTitle: "Other movies by this director",
+    noSimilarActors: "No similar-cast movies found.",
+    noDirectorMovies: "No other movies found for this director.",
+    goToPage: "Go to page",
   },
   fa: {
     backToHome: "← بازگشت به صفحه اصلی",
@@ -28,6 +50,28 @@ const movieI18n = {
     pageLoadError: "خطا در بارگذاری صفحه پست.",
     postPageTitle: "FilmChiin | صفحه پست",
     postPageDesc: "جزئیات کامل این پست در FilmChiin",
+    postOptions: "گزینه‌های پست",
+    collection: "کالکشن",
+    series: "سریال",
+    episodes: "اپیزود",
+    synopsis: "خلاصه",
+    director: "کارگردان",
+    product: "محصول",
+    stars: "بازیگران",
+    release: "انتشار",
+    genre: "ژانر",
+    goToFile: "رفتن به فایل",
+    comments: "نظر",
+    commentsTitle: "نظرات",
+    yourName: "نام شما",
+    close: "بستن",
+    writeComment: "نظر خود را بنویسید...",
+    send: "ارسال",
+    similarByActorsTitle: "فیلم‌های دیگر با بازیگران مشابه",
+    bySameDirectorTitle: "فیلم‌های دیگر این کارگردان",
+    noSimilarActors: "فیلم مشابه بر اساس بازیگران پیدا نشد.",
+    noDirectorMovies: "فیلم دیگری از این کارگردان پیدا نشد.",
+    goToPage: "رفتن به صفحه",
   },
 };
 
@@ -239,7 +283,7 @@ function applySavedTheme() {
   s.setProperty("--theme-bg-day", selected.bgDay);
   s.setProperty("--theme-bg-soft", selected.bgSoft);
 
-  const goPageColors = { blue: "#7c4dff", green: "#d97706", yellow: "#0ea5e9", red: "#10b981", purple: "#f59e0b", teal: "#ef4444" };
+  const goPageColors = { blue: "#1e88e5", green: "#2e9d57", yellow: "#c5a317", red: "#c84646", purple: "#6f4dbb", teal: "#188a94" };
   const themeName = localStorage.getItem("colorTheme") || "blue";
   s.setProperty("--go-page-bg", goPageColors[themeName] || "#7c4dff");
 }
@@ -270,7 +314,7 @@ function openPostOptions() {
   const overlay = document.getElementById("postOptionsOverlay");
   const title = document.getElementById("postOptionsTitle");
   if (!overlay || !currentMovie) return;
-  if (title) title.textContent = currentMovie.title || "Post options";
+  if (title) title.textContent = currentMovie.title || mt("postOptions");
   overlay.classList.add("open");
   overlay.setAttribute("aria-hidden", "false");
 }
@@ -422,30 +466,57 @@ function attachCommentsHandlers(card, movieId) {
   refresh();
 }
 
-function buildSimilarMovies(current, allMovies) {
-  const currentGenres = new Set(extractHashtagTokens(current.genre || ""));
-  if (!currentGenres.size) return [];
+function normalizeNameTokens(str) {
+  return extractCommaSeparatedNames(str || "")
+    .map((n) => n.toLowerCase().replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+}
+
+function buildSimilarByActors(current, allMovies) {
+  const currentActors = normalizeNameTokens(current.stars || "");
+  const currentSet = new Set(currentActors);
+  if (!currentSet.size) return [];
 
   return allMovies
     .filter((m) => m.id !== current.id)
     .map((m) => {
-      const g = new Set(extractHashtagTokens(m.genre || ""));
+      const actors = normalizeNameTokens(m.stars || "");
+      const actorsSet = new Set(actors);
       let overlap = 0;
-      currentGenres.forEach((x) => {
-        if (g.has(x)) overlap += 1;
-      });
-      return { movie: m, overlap, total: g.size };
+      currentSet.forEach((a) => { if (actorsSet.has(a)) overlap += 1; });
+      return { movie: m, overlap, total: actorsSet.size || 999 };
     })
     .filter((x) => x.overlap > 0)
     .sort((a, b) => {
       if (b.overlap !== a.overlap) return b.overlap - a.overlap;
-      return (a.total || 0) - (b.total || 0);
+      return a.total - b.total;
     })
     .slice(0, 15)
     .map((x) => x.movie);
 }
 
-function renderSimilarMovies(container, similarMovies) {
+function buildBySameDirector(current, allMovies) {
+  const currentDirectors = new Set(normalizeNameTokens(current.director || ""));
+  if (!currentDirectors.size) return [];
+
+  return allMovies
+    .filter((m) => m.id !== current.id)
+    .map((m) => {
+      const directors = new Set(normalizeNameTokens(m.director || ""));
+      let overlap = 0;
+      currentDirectors.forEach((d) => { if (directors.has(d)) overlap += 1; });
+      return { movie: m, overlap, total: directors.size || 999 };
+    })
+    .filter((x) => x.overlap > 0)
+    .sort((a, b) => {
+      if (b.overlap !== a.overlap) return b.overlap - a.overlap;
+      return a.total - b.total;
+    })
+    .slice(0, 15)
+    .map((x) => x.movie);
+}
+
+function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
   const html = (similarMovies || [])
     .map((m) => {
       const title = escapeHtml(m.title || "-");
@@ -454,7 +525,7 @@ function renderSimilarMovies(container, similarMovies) {
       return `<div class="episode-card similar-movie-card">
         <img src="${cover}" alt="${title}" class="episode-cover">
         <div class="episode-title"><span>${title}</span></div>
-        <div class="button-wrap similar-go-wrap"><button class="go-page-btn similar-go-btn" data-url="${escapeHtml(url)}"><span>Go to page</span></button><div class="button-shadow"></div></div>
+        <div class="button-wrap similar-go-wrap"><button class="go-page-btn similar-go-btn" data-url="${escapeHtml(url)}"><span>${mt("goToPage")}</span></button><div class="button-shadow"></div></div>
       </div>`;
     })
     .join("");
@@ -462,8 +533,8 @@ function renderSimilarMovies(container, similarMovies) {
   const section = document.createElement("div");
   section.className = "similar-movies-section";
   section.innerHTML = `
-    <div class="similar-movies-title"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Similar movies:</div>
-    <div class="episodes-container similar-movies-container"><div class="episodes-list">${html || '<div class="episode-card">No similar movies found.</div>'}</div></div>
+    <div class="similar-movies-title"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> ${mt(titleKey)}</div>
+    <div class="episodes-container similar-movies-container"><div class="episodes-list">${html || '<div class="episode-card">${mt(emptyKey)}</div>'}</div></div>
   `;
   container.appendChild(section);
 
@@ -484,7 +555,7 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
 
   const badgeHtml =
     movie.type && movie.type !== "single"
-      ? `<span class="collection-badge ${movie.type === "collection" ? "badge-collection" : "badge-serial"}">${movie.type === "collection" ? "Collection" : "Series"}<span class="badge-count anim-left-right">${(episodes || []).length} episodes</span></span>`
+      ? `<span class="collection-badge ${movie.type === "collection" ? "badge-collection" : "badge-serial"}">${movie.type === "collection" ? mt("collection") : mt("series")}<span class="badge-count anim-left-right">${(episodes || []).length} ${mt("episodes")}</span></span>`
       : "";
 
   const episodesHtml = (episodes || [])
@@ -501,17 +572,17 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
     <div class="cover-container anim-vertical"><div class="cover-blur anim-vertical" style="background-image: url('${cover}');"></div><img class="cover-image anim-vertical" src="${cover}" alt="${title}"></div>
     <div class="movie-info anim-vertical">
       <div class="movie-title anim-left-right"><span class="movie-name anim-horizontal">${title}</span>${badgeHtml}</div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span><div class="field-quote anim-left-right synopsis-quote"><div class="quote-text anim-horizontal">${synopsis}</div></div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Director:</span><div class="field-quote anim-left-right director-field">${renderChips(movie.director || "-", "names")}</div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> Product:</span><div class="field-quote anim-horizontal product-field">${renderChips(movie.product || "-")}</div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> Stars:</span><div class="field-quote anim-left-right stars-field">${renderChips(movie.stars || "-", "names")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> ${mt("synopsis")}: </span><div class="field-quote anim-left-right synopsis-quote"><div class="quote-text anim-horizontal">${synopsis}</div></div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> ${mt("director")}: </span><div class="field-quote anim-left-right director-field">${renderChips(movie.director || "-", "names")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> ${mt("product")}: </span><div class="field-quote anim-horizontal product-field">${renderChips(movie.product || "-")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> ${mt("stars")}: </span><div class="field-quote anim-left-right stars-field">${renderChips(movie.stars || "-", "names")}</div>
       <span class="field-label anim-vertical"><img src="/images/icons8-imdb-48.png" class="imdb-bell" style="width:20px;height:20px;"> IMDB:</span><div class="field-quote anim-left-right"><span class="chip imdb-chip anim-horizontal">${escapeHtml(movie.imdb || "-")}</span></div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> Release:</span><div class="field-quote anim-left-right release-field">${escapeHtml(movie.release_info || "-")}</div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> Genre:</span><div class="field-quote genre-grid anim-horizontal genre-field">${renderChips(movie.genre || "-")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> ${mt("release")}: </span><div class="field-quote anim-left-right release-field">${escapeHtml(movie.release_info || "-")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> ${mt("genre")}: </span><div class="field-quote genre-grid anim-horizontal genre-field">${renderChips(movie.genre || "-")}</div>
       <div class="episodes-container anim-vertical" data-movie-id="${escapeHtml(movie.id)}"><div class="episodes-list anim-left-right">${episodesHtml}</div></div>
-      <div class="post-action-row movie-page-actions"><div class="button-wrap"><button class="go-btn anim-vertical" data-link="${escapeHtml((episodes[0] && episodes[0].link) || movie.link || "#")}"><span>Go to file</span></button><div class="button-shadow"></div></div></div>
-      <div class="comment-summary anim-horizontal"><div class="avatars"></div><div class="comments-count">0 comments</div><div class="enter-comments"><img src="/images/icons8-comment.apng" style="width:22px;height:22px;"></div></div>
-      <div class="comments-panel" aria-hidden="true"><div class="comments-panel-inner"><div class="comments-panel-header"><div class="comments-title">Comments</div></div><div class="comments-list"></div><div class="comment-input-row"><div class="name-comments-close"><input class="comment-name" placeholder="Your name" maxlength="60" /><div class="button-wrap"><button class="comments-close"><span>close</span></button><div class="button-shadow"></div></div></div><textarea class="comment-text" placeholder="Write a comment..." rows="2"></textarea><div class="button-wrap"><button class="comment-send"><span>Send</span></button><div class="button-shaddow"></div></div></div></div></div>
+      <div class="post-action-row movie-page-actions"><div class="button-wrap"><button class="go-btn anim-vertical" data-link="${escapeHtml((episodes[0] && episodes[0].link) || movie.link || "#")}"><span>${mt("goToFile")}</span></button><div class="button-shadow"></div></div></div>
+      <div class="comment-summary anim-horizontal"><div class="avatars"></div><div class="comments-count">0 ${mt("comments")}</div><div class="enter-comments"><img src="/images/icons8-comment.apng" style="width:22px;height:22px;"></div></div>
+      <div class="comments-panel" aria-hidden="true"><div class="comments-panel-inner"><div class="comments-panel-header"><div class="comments-title">${mt("commentsTitle")}</div></div><div class="comments-list"></div><div class="comment-input-row"><div class="name-comments-close"><input class="comment-name" placeholder="${mt("yourName")}" maxlength="60" /><div class="button-wrap"><button class="comments-close"><span>${mt("close")}</span></button><div class="button-shadow"></div></div></div><textarea class="comment-text" placeholder="${mt("writeComment")}" rows="2"></textarea><div class="button-wrap"><button class="comment-send"><span>${mt("send")}</span></button><div class="button-shaddow"></div></div></div></div></div>
     </div>
   </div>`;
 
@@ -570,7 +641,8 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
   });
 
   attachCommentsHandlers(card, movie.id);
-  renderSimilarMovies(container, buildSimilarMovies(movie, allMovies));
+  renderSimilarMovies(container, buildSimilarByActors(movie, allMovies), "similarByActorsTitle", "noSimilarActors");
+  renderSimilarMovies(container, buildBySameDirector(movie, allMovies), "bySameDirectorTitle", "noDirectorMovies");
 }
 
 function initFeatureAccordions() {
