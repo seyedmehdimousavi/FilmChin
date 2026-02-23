@@ -39,6 +39,10 @@ const movieI18n = {
     bySameDirectorTitle: "Other movies by this director",
     noSimilarActors: "No similar-cast movies found.",
     noDirectorMovies: "No other movies found for this director.",
+    similarByGenreTitle: "Similar movies by genre",
+    noSimilarGenre: "No similar-genre movies found.",
+    noActorsArchive: "Other movies of these actors are not available in archive.",
+    noDirectorArchive: "Other movies of this director are not available in archive.",
     goToPage: "Go to page",
   },
   fa: {
@@ -71,6 +75,10 @@ const movieI18n = {
     bySameDirectorTitle: "فیلم‌های دیگر این کارگردان",
     noSimilarActors: "فیلم مشابه بر اساس بازیگران پیدا نشد.",
     noDirectorMovies: "فیلم دیگری از این کارگردان پیدا نشد.",
+    similarByGenreTitle: "فیلم‌های مشابه بر اساس ژانر",
+    noSimilarGenre: "فیلم مشابه بر اساس ژانر پیدا نشد.",
+    noActorsArchive: "فیلم‌های دیگر این بازیگران در آرشیو موجود نیست",
+    noDirectorArchive: "فیلم‌های دیگر این کارگردان در آرشیو موجود نیست",
     goToPage: "رفتن به صفحه",
   },
 };
@@ -466,6 +474,27 @@ function attachCommentsHandlers(card, movieId) {
   refresh();
 }
 
+function buildSimilarByGenre(current, allMovies) {
+  const currentGenres = new Set(extractHashtagTokens(current.genre || ""));
+  if (!currentGenres.size) return [];
+
+  return allMovies
+    .filter((m) => m.id !== current.id)
+    .map((m) => {
+      const directors = new Set(normalizeNameTokens(m.director || ""));
+      let overlap = 0;
+      currentGenres.forEach((x) => { if (g.has(x)) overlap += 1; });
+      return { movie: m, overlap, total: g.size || 999 };
+    })
+    .filter((x) => x.overlap > 0)
+    .sort((a, b) => {
+      if (b.overlap !== a.overlap) return b.overlap - a.overlap;
+      return a.total - b.total;
+    })
+    .slice(0, 15)
+    .map((x) => x.movie);
+}
+
 function normalizeNameTokens(str) {
   return extractCommaSeparatedNames(str || "")
     .map((n) => n.toLowerCase().replace(/\s+/g, " ").trim())
@@ -533,8 +562,10 @@ function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
   const section = document.createElement("div");
   section.className = "similar-movies-section";
   section.innerHTML = `
-    <div class="similar-movies-title"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> ${mt(titleKey)}</div>
-    <div class="episodes-container similar-movies-container"><div class="episodes-list">${html || '<div class="episode-card">${mt(emptyKey)}</div>'}</div></div>
+    <div class="similar-block-card">
+      <div class="similar-movies-title"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> <strong>${mt(titleKey)}</strong></div>
+      <div class="episodes-container similar-movies-container"><div class="episodes-list">${html || `<div class="similar-empty-message"><strong>${mt(emptyKey)}</strong></div>`}</div></div>
+    </div>
   `;
   container.appendChild(section);
 
@@ -641,8 +672,9 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
   });
 
   attachCommentsHandlers(card, movie.id);
-  renderSimilarMovies(container, buildSimilarByActors(movie, allMovies), "similarByActorsTitle", "noSimilarActors");
-  renderSimilarMovies(container, buildBySameDirector(movie, allMovies), "bySameDirectorTitle", "noDirectorMovies");
+  renderSimilarMovies(container, buildSimilarByGenre(movie, allMovies), "similarByGenreTitle", "noSimilarGenre");
+  renderSimilarMovies(container, buildSimilarByActors(movie, allMovies), "similarByActorsTitle", "noActorsArchive");
+  renderSimilarMovies(container, buildBySameDirector(movie, allMovies), "bySameDirectorTitle", "noDirectorArchive");
 }
 
 function initFeatureAccordions() {
@@ -736,4 +768,17 @@ async function loadMoviePage() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", loadMoviePage);
+document.addEventListener("DOMContentLoaded", () => {
+  const backLink = document.querySelector(".movie-page-back");
+  backLink?.addEventListener("click", (e) => {
+    e.preventDefault();
+    try {
+      if (window.history.length > 1 && document.referrer && new URL(document.referrer).origin === window.location.origin) {
+        window.history.back();
+        return;
+      }
+    } catch (_) {}
+    window.location.href = "/";
+  });
+  loadMoviePage();
+});

@@ -1892,6 +1892,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const moviesGrid = document.getElementById("moviesGrid");
   const movieCount = document.getElementById("movieCount");
   const genreGrid = document.getElementById("genreGrid");
+  const pendingFocusMovieId = new URLSearchParams(window.location.search).get("focusMovieId") || localStorage.getItem("filmchin_focus_movie_id") || "";
+  let consumedPendingFocus = false;
 /**
    * اعمال هایلایت روی کارت‌های فیلم داخل moviesGrid
    * - query: متن جست‌وجو (همان چیزی که کاربر تایپ کرده یا با کلیک روی ژانر/پروداکت ست شده)
@@ -3537,6 +3539,7 @@ function setTabInUrl(type) {
 
   moviesGrid.innerHTML = "";
   movieCount.innerText = `${uiText("numberOfMovies")}: ${filtered.length}`;
+  movieCount.style.textAlign = (localStorage.getItem("siteLanguage") === "fa") ? "right" : "left";
 
   for (const m of pageItems) {
     const cover = escapeHtml(
@@ -3735,6 +3738,10 @@ function setTabInUrl(type) {
 
       // دکمه Go to page / لینک صفحه اختصاصی
       if (target.closest(".go-page-btn") || target.closest(".movie-detail-link")) {
+        const detailLink = target.closest(".movie-detail-link");
+        if (detailLink) {
+          localStorage.setItem("filmchin_focus_movie_id", String(m.id || ""));
+        }
         return;
       }
 
@@ -3790,6 +3797,7 @@ function setTabInUrl(type) {
         e.stopPropagation();
         const url = goPageBtn.dataset.url || "#";
         if (url && url !== "#") {
+          localStorage.setItem("filmchin_focus_movie_id", String(m.id || ""));
           window.location.href = url;
         }
       });
@@ -3900,8 +3908,7 @@ function setTabInUrl(type) {
         );
         if (badgeCount) {
           const totalEpisodes = (eps || []).length + 1;
-          badgeCount.textContent =
-            totalEpisodes + (totalEpisodes > 1 ? " episodes" : " episode");
+          badgeCount.textContent = `${totalEpisodes} ${uiText("episodeWord")}`;
         }
 
         if (activeIndex > 0) {
@@ -4092,6 +4099,15 @@ function setTabInUrl(type) {
 
     // آپدیت استوری‌ها
     renderStoriesForPage(pageItems);
+
+    if (!consumedPendingFocus && pendingFocusMovieId) {
+      const targetCard = moviesGrid.querySelector(`.movie-card[data-movie-id="${pendingFocusMovieId}"]`);
+      if (targetCard) {
+        consumedPendingFocus = true;
+        localStorage.removeItem("filmchin_focus_movie_id");
+        setTimeout(() => targetCard.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+      }
+    }
 
     // اسکیما برای فیلم‌ها (Structured Data برای سئو)
     // از کل لیست فیلترشده استفاده می‌کنیم تا گوگل تصویر بهتری از آرشیو بگیرد

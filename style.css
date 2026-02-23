@@ -6956,3 +6956,33 @@ body.dark .movie-page-back {
 
 html[lang="fa"] .movie-count-container { display:flex; justify-content:flex-end; }
 .field-label { text-align: right; }
+
+
+/* Movie page recommendation blocks */
+.similar-block-card {
+  border: 1px solid rgba(0,0,0,.14);
+  border-radius: 14px;
+  padding: 10px;
+  margin: 10px 0 14px;
+  background: rgba(255,255,255,.7);
+}
+body.dark .similar-block-card {
+  background: rgba(30,30,30,.6);
+  border-color: rgba(255,255,255,.12);
+}
+.similar-empty-message {
+  width: 100%;
+  padding: 14px;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* EN text alignment for SEO and Features */
+html[lang="en"] .seo-intro h1,
+html[lang="en"] .seo-intro p,
+html[lang="en"] .site-features h2,
+html[lang="en"] .site-features .feature-title,
+html[lang="en"] .site-features .feature-accordion-body p {
+  text-align: left;
+  direction: ltr;
+}
