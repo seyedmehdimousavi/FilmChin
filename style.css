@@ -6963,8 +6963,9 @@ html[lang="fa"] .movie-count-container { display:flex; justify-content:flex-end;
 html[lang="fa"] .movie-card .field-label,
 html[lang="fa"] .movie-modal-content .field-label {
   display: flex;
-  flex-direction: row-reverse;
-  justify-content: flex-end;
+  width: 100%;
+  direction: rtl;
+  justify-content: flex-start;
   align-items: center;
   gap: 6px;
   text-align: right;
@@ -6993,6 +6994,12 @@ html[lang="fa"] .movie-modal-content .genre-grid {
 html[lang="fa"] .movie-card .genre-grid .genre-chip-mini,
 html[lang="fa"] .movie-modal-content .genre-grid .genre-chip-mini {
   direction: rtl;
+}
+
+html[lang="fa"] .movie-card .field-quote.genre-grid,
+html[lang="fa"] .movie-modal-content .field-quote.genre-grid {
+  display: flex;
+  justify-content: flex-end;
 }
 
 html[lang="fa"] .movie-card .comment-summary,
@@ -7034,4 +7041,8 @@ html[lang="en"] .site-features .feature-title,
 html[lang="en"] .site-features .feature-accordion-body p {
   text-align: left;
   direction: ltr;
+}
+
+html[lang="en"] .site-features .feature-accordion-header {
+  justify-content: flex-start;
 }
