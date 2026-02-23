@@ -152,6 +152,22 @@ function extractHashtagTokens(str) {
   return (str.match(/#[^\s,،]+/g) || []).map((tag) => tag.trim()).filter(Boolean);
 }
 
+function isEnglishHashtag(tag) {
+  const clean = String(tag || "").replace(/^#+/, "");
+  return /^[A-Za-z]/.test(clean);
+}
+
+function isPersianHashtag(tag) {
+  const clean = String(tag || "").replace(/^#+/, "");
+  return /[\u0600-\u06FF]/.test(clean) && !/^[A-Za-z]/.test(clean);
+}
+
+function filterHashtagsByLanguage(tags) {
+  const lang = pageLang === "fa" ? "fa" : "en";
+  if (lang === "fa") return tags.filter(isPersianHashtag);
+  return tags.filter(isEnglishHashtag);
+}
+
 function extractCommaSeparatedNames(str) {
   if (!str) return [];
   return str
@@ -180,7 +196,9 @@ function renderChips(str, mode = "hashtags") {
 
   const tags = extractHashtagTokens(str);
   if (tags.length) {
-    return tags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join("");
+    const filteredTags = filterHashtagsByLanguage(tags);
+    if (!filteredTags.length) return '<span class="chip">-</span>';
+    return filteredTags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join("");
   }
 
   return String(str)
@@ -235,7 +253,17 @@ function buildSynopsisSegments(rawText) {
 }
 
 function makeSynopsisHtml(rawText) {
-  return buildSynopsisSegments(rawText)
+  const lang = pageLang === "fa" ? "fa" : "en";
+  const segments = buildSynopsisSegments(rawText).filter((seg) => {
+    if (lang === "en") return true;
+    return seg.dir !== "en";
+  });
+
+  if (!segments.length) {
+    return `<span class="synopsis-segment synopsis-fa" dir="rtl">-</span>`;
+  }
+
+  return segments
     .map((seg) => `<span class="synopsis-segment synopsis-${seg.dir}" dir="${seg.dir === "fa" ? "rtl" : "ltr"}">${escapeHtml(seg.text)}</span>`)
     .join("");
 }
@@ -481,7 +509,7 @@ function buildSimilarByGenre(current, allMovies) {
   return allMovies
     .filter((m) => m.id !== current.id)
     .map((m) => {
-      const directors = new Set(normalizeNameTokens(m.director || ""));
+      const g = new Set(extractHashtagTokens(m.genre || ""));
       let overlap = 0;
       currentGenres.forEach((x) => { if (g.has(x)) overlap += 1; });
       return { movie: m, overlap, total: g.size || 999 };

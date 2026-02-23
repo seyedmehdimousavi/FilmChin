@@ -3251,7 +3251,8 @@ function setTabInUrl(type) {
     englishGenres.sort((a, b) => b[1] - a[1]);
     persianGenres.sort((a, b) => b[1] - a[1]);
 
-    const finalGenres = [...englishGenres, ...persianGenres];
+    const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
+    const finalGenres = lang === "fa" ? persianGenres : englishGenres;
 
     // ساخت ژانرها
     container.innerHTML = "";
@@ -3311,6 +3312,22 @@ function setTabInUrl(type) {
     return (str.match(/#[^\s,،]+/g) || []).map((tag) => tag.trim()).filter(Boolean);
   }
 
+  function isEnglishHashtag(tag) {
+    const clean = String(tag || "").replace(/^#+/, "");
+    return /^[A-Za-z]/.test(clean);
+  }
+
+  function isPersianHashtag(tag) {
+    const clean = String(tag || "").replace(/^#+/, "");
+    return /[\u0600-\u06FF]/.test(clean) && !/^[A-Za-z]/.test(clean);
+  }
+
+  function filterHashtagsByLanguage(tags) {
+    const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
+    if (lang === "fa") return tags.filter(isPersianHashtag);
+    return tags.filter(isEnglishHashtag);
+  }
+
   function extractCommaSeparatedNames(str) {
     if (!str) return [];
     return str
@@ -3366,7 +3383,17 @@ function setTabInUrl(type) {
   }
 
   function makeSynopsisHtml(rawText) {
-    return buildSynopsisSegments(rawText)
+    const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
+    const segments = buildSynopsisSegments(rawText).filter((seg) => {
+      if (lang === "en") return true;
+      return seg.dir !== "en";
+    });
+
+    if (!segments.length) {
+      return `<span class="synopsis-segment synopsis-fa" dir="rtl">-</span>`;
+    }
+
+    return segments
       .map(
         (seg) =>
           `<span class="synopsis-segment synopsis-${seg.dir}" dir="${
@@ -3387,7 +3414,9 @@ function setTabInUrl(type) {
 
     const tags = extractHashtagTokens(str);
     if (tags.length) {
-      return tags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join("");
+      const filteredTags = filterHashtagsByLanguage(tags);
+      if (!filteredTags.length) return "-";
+      return filteredTags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join("");
     }
 
     return str
