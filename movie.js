@@ -35,6 +35,11 @@ const movieI18n = {
     close: "close",
     writeComment: "Write a comment...",
     send: "Send",
+    similarByActorsTitle: "Other movies with similar cast",
+    bySameDirectorTitle: "Other movies by this director",
+    noSimilarActors: "No similar-cast movies found.",
+    noDirectorMovies: "No other movies found for this director.",
+    goToPage: "Go to page",
   },
   fa: {
     backToHome: "← بازگشت به صفحه اصلی",
@@ -62,6 +67,11 @@ const movieI18n = {
     close: "بستن",
     writeComment: "نظر خود را بنویسید...",
     send: "ارسال",
+    similarByActorsTitle: "فیلم‌های دیگر با بازیگران مشابه",
+    bySameDirectorTitle: "فیلم‌های دیگر این کارگردان",
+    noSimilarActors: "فیلم مشابه بر اساس بازیگران پیدا نشد.",
+    noDirectorMovies: "فیلم دیگری از این کارگردان پیدا نشد.",
+    goToPage: "رفتن به صفحه",
   },
 };
 
@@ -456,30 +466,57 @@ function attachCommentsHandlers(card, movieId) {
   refresh();
 }
 
-function buildSimilarMovies(current, allMovies) {
-  const currentGenres = new Set(extractHashtagTokens(current.genre || ""));
-  if (!currentGenres.size) return [];
+function normalizeNameTokens(str) {
+  return extractCommaSeparatedNames(str || "")
+    .map((n) => n.toLowerCase().replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+}
+
+function buildSimilarByActors(current, allMovies) {
+  const currentActors = normalizeNameTokens(current.stars || "");
+  const currentSet = new Set(currentActors);
+  if (!currentSet.size) return [];
 
   return allMovies
     .filter((m) => m.id !== current.id)
     .map((m) => {
-      const g = new Set(extractHashtagTokens(m.genre || ""));
+      const actors = normalizeNameTokens(m.stars || "");
+      const actorsSet = new Set(actors);
       let overlap = 0;
-      currentGenres.forEach((x) => {
-        if (g.has(x)) overlap += 1;
-      });
-      return { movie: m, overlap, total: g.size };
+      currentSet.forEach((a) => { if (actorsSet.has(a)) overlap += 1; });
+      return { movie: m, overlap, total: actorsSet.size || 999 };
     })
     .filter((x) => x.overlap > 0)
     .sort((a, b) => {
       if (b.overlap !== a.overlap) return b.overlap - a.overlap;
-      return (a.total || 0) - (b.total || 0);
+      return a.total - b.total;
     })
     .slice(0, 15)
     .map((x) => x.movie);
 }
 
-function renderSimilarMovies(container, similarMovies) {
+function buildBySameDirector(current, allMovies) {
+  const currentDirectors = new Set(normalizeNameTokens(current.director || ""));
+  if (!currentDirectors.size) return [];
+
+  return allMovies
+    .filter((m) => m.id !== current.id)
+    .map((m) => {
+      const directors = new Set(normalizeNameTokens(m.director || ""));
+      let overlap = 0;
+      currentDirectors.forEach((d) => { if (directors.has(d)) overlap += 1; });
+      return { movie: m, overlap, total: directors.size || 999 };
+    })
+    .filter((x) => x.overlap > 0)
+    .sort((a, b) => {
+      if (b.overlap !== a.overlap) return b.overlap - a.overlap;
+      return a.total - b.total;
+    })
+    .slice(0, 15)
+    .map((x) => x.movie);
+}
+
+function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
   const html = (similarMovies || [])
     .map((m) => {
       const title = escapeHtml(m.title || "-");
@@ -488,7 +525,7 @@ function renderSimilarMovies(container, similarMovies) {
       return `<div class="episode-card similar-movie-card">
         <img src="${cover}" alt="${title}" class="episode-cover">
         <div class="episode-title"><span>${title}</span></div>
-        <div class="button-wrap similar-go-wrap"><button class="go-page-btn similar-go-btn" data-url="${escapeHtml(url)}"><span>Go to page</span></button><div class="button-shadow"></div></div>
+        <div class="button-wrap similar-go-wrap"><button class="go-page-btn similar-go-btn" data-url="${escapeHtml(url)}"><span>${mt("goToPage")}</span></button><div class="button-shadow"></div></div>
       </div>`;
     })
     .join("");
@@ -496,8 +533,8 @@ function renderSimilarMovies(container, similarMovies) {
   const section = document.createElement("div");
   section.className = "similar-movies-section";
   section.innerHTML = `
-    <div class="similar-movies-title"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> Similar movies:</div>
-    <div class="episodes-container similar-movies-container"><div class="episodes-list">${html || '<div class="episode-card">No similar movies found.</div>'}</div></div>
+    <div class="similar-movies-title"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> ${mt(titleKey)}</div>
+    <div class="episodes-container similar-movies-container"><div class="episodes-list">${html || '<div class="episode-card">${mt(emptyKey)}</div>'}</div></div>
   `;
   container.appendChild(section);
 
@@ -604,7 +641,8 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
   });
 
   attachCommentsHandlers(card, movie.id);
-  renderSimilarMovies(container, buildSimilarMovies(movie, allMovies));
+  renderSimilarMovies(container, buildSimilarByActors(movie, allMovies), "similarByActorsTitle", "noSimilarActors");
+  renderSimilarMovies(container, buildBySameDirector(movie, allMovies), "bySameDirectorTitle", "noDirectorMovies");
 }
 
 function initFeatureAccordions() {

@@ -1670,6 +1670,36 @@ document.addEventListener("DOMContentLoaded", () => {
       adminReleasedMovies: "Released Movies",
       adminUsersAdmins: "Users & Admins",
       adminSearchMoviesPlaceholder: "Search movies...",
+      seoIntroTitle: "Download top movies and series with FilmChiin",
+      seoIntroP1: "FilmChiin is a personal archive of top movies and series (Persian dub and uncensored) delivered securely via Telegram bot.",
+      seoIntroP2: "You can filter titles by <strong>genre</strong>, <strong>country (Product)</strong>, or <strong>IMDb</strong> rating, and receive files directly from <code>@Filmchinbot</code> using <strong>Go to file</strong>.",
+      seoIntroP3: "This list updates daily and includes movies, collections, and multi-episode series. Each title displays release year, director, cast, and genre.",
+      featureTitle1: "Create account",
+      featureDesc1: "By creating an account, you unlock extra capabilities: build a personal favorites list and chat with admin.",
+      featureTitle2: "Instant and advanced search",
+      featureDesc2: "Search is fully instant. As you type, results filter immediately and matched text is highlighted in title, synopsis, cast, and other fields.",
+      featureTitle3: "Customize homepage layout",
+      featureDesc3: "Use SideMenu options to arrange homepage layout based on your preference.",
+      featureTitle4: "Type and genre tabs",
+      featureDesc4: "Homepage is separated by content type (movie, collection, series). You can also filter each tab by genres with one click.",
+      featureTitle5: "Sort by IMDb rating",
+      featureDesc5: "Sort visible list by IMDb score and quickly focus on higher-rated titles.",
+      featureTitle6: "Sort by release year",
+      featureDesc6: "Use release filter to prioritize newer/older titles based on your preference.",
+      featureTitle7: "Episode list for collections/series",
+      featureDesc7: "For collections and series, all episodes are shown in small cards in the same post and selecting an episode updates card info instantly.",
+      featureTitle8: "One-click file access",
+      featureDesc8: "With <strong>Go to file</strong>, <code>@Filmchinbot</code> sends movie/episode file directly without needing channel join.",
+      featureTitle9: "Comments in each post",
+      featureDesc9: "Each post supports comments with custom UI and avatars; comment count is shown near the comment icon.",
+      featureTitle10: "Popular movies and page list",
+      featureDesc10: "Popular section is built from click stats and the floating panel lists current-page posts for quick navigation.",
+      featureTitle11: "Responsive Liquid Glass design",
+      featureDesc11: "Parts of UI use a Liquid Glass-inspired design with smooth animations and balanced transparency on mobile/desktop.",
+      similarByActorsTitle: "Other movies with similar cast",
+      bySameDirectorTitle: "Other movies by this director",
+      noSimilarActors: "No similar-cast movies found.",
+      noDirectorMovies: "No other movies found for this director.",
     },
     fa: {
       languageLabel: "زبان / Language",
@@ -1733,6 +1763,36 @@ document.addEventListener("DOMContentLoaded", () => {
       adminReleasedMovies: "فیلم‌های منتشر شده",
       adminUsersAdmins: "کاربران و ادمین‌ها",
       adminSearchMoviesPlaceholder: "جستجوی فیلم...",
+      seoIntroTitle: "دانلود فیلم و سریال های برتر با FilmChiin",
+      seoIntroP1: "FilmChiin (فیلمچین) یک آرشیو شخصی از فیلم‌ها و سریال‌های برتر(دوبله فارسی و بدون سانسور)است که فایل‌ها به‌صورت امن از طریق ربات تلگرام ارائه می‌شود.",
+      seoIntroP2: "می‌توانید عناوین را بر اساس <strong>ژانر</strong>، <strong>کشور سازنده (Product)</strong>، یا امتیاز <strong>IMDb</strong> فیلتر کنید و با دکمه <strong>Go to file</strong> فایل را مستقیماً از ربات <code>@Filmchinbot</code> دریافت کنید.",
+      seoIntroP3: "این لیست هر روز به‌روزرسانی می‌شود و شامل فیلم‌های سینمایی، کالکشن‌ها و سریال‌های چند قسمتی است. برای هر عنوان، اطلاعاتی مثل سال انتشار، کارگردان، بازیگران و ژانر نمایش داده می‌شود.",
+      featureTitle1: "ساخت حساب کاربری",
+      featureDesc1: "با ساخت حساب کاربری به قابلیت های بیشتری دسترسی دارید می‌توانید برای خودتان یک لیست اختصاصی از فیلم‌های مورد علاقه بسازید. میتوانید از چت با ادمین استفاده کنید.",
+      featureTitle2: "جست‌وجوی لحظه‌ای و پیشرفته",
+      featureDesc2: "جست‌وجوی سایت کاملاً لحظه‌ای است؛ با تایپ هر عبارت، نتایج بلافاصله فیلتر می‌شوند. عبارت جست‌وجوشده در عنوان، خلاصه، بازیگران و سایر فیلدها هایلایت می‌شود.",
+      featureTitle3: "شخصی سازی چیدمان صفحه",
+      featureDesc3: "از طریق گزینه های موجود در SideMenu میتوانید چیدمان صفحه اصلی را مطابق با سلیقه ی خود مرتب کنید.",
+      featureTitle4: "فیلترفیلم هاوژانرها در تب‌های جداگانه",
+      featureDesc4: "صفحه اصلی بر اساس نوع محتوا (فیلم سینمایی، کالکشن، سریال) با تب‌ها تفکیک شده است. علاوه بر آن، در هر تب می‌توانید با یک کلیک ژانر را فیلتر کنید.",
+      featureTitle5: "مرتب‌سازی بر اساس امتیاز IMDb",
+      featureDesc5: "لیست قابل مشاهده را می‌توانید بر اساس امتیاز IMDb مرتب کنید تا سریع‌تر به عناوین با امتیاز بالاتر برسید.",
+      featureTitle6: "مرتب‌سازی بر اساس سال انتشار",
+      featureDesc6: "با فیلتر سال انتشار می‌توانید عناوین جدیدتر یا قدیمی‌تر را بر اساس نیاز خود ببینید.",
+      featureTitle7: "لیست قسمت‌های سریال وکالکشن",
+      featureDesc7: "برای سریال‌ها و کالکشن‌ها، تمام قسمت‌ها در قالب کارت‌های کوچک داخل همان پست نمایش داده می‌شوند و با انتخاب هر قسمت اطلاعات کارت فوراً آپدیت می‌شود.",
+      featureTitle8: "دسترسی به فایل فقط با یک کلیک",
+      featureDesc8: "با فشردن دکمه <strong>Go to file</strong> بات <code>@Filmchinbot</code> فایل فیلم یا قسمت سریال را برای شما ارسال می‌کند؛ بدون نیاز به جوین شدن در کانال.",
+      featureTitle9: "کامنت و نمایش گفت‌وگو در همان پست",
+      featureDesc9: "برای هر پست می‌توانید کامنت بگذارید و همه نظرات در همان کارت فیلم با طراحی اختصاصی و آواتارها نمایش داده می‌شوند.",
+      featureTitle10: "فیلم‌های پرطرفدارولیست فیلم‌های صفحه",
+      featureDesc10: "بخش فیلم‌های پرطرفدار بر اساس آمار کلیک‌ها ساخته می‌شود و دکمه شناور لیست فیلم‌های صفحه فعلی را نشان می‌دهد.",
+      featureTitle11: "طراحی Liquid Glass واکنش‌گرا",
+      featureDesc11: "بخش هایی از سایت با الهام از طراحی Liquid Glass ساخته شده است؛ کارت‌ها، دکمه‌ها و پنل‌ها تجربه کاربری روان و چشم‌نواز ایجاد می‌کنند.",
+      similarByActorsTitle: "فیلم‌های دیگر با بازیگران مشابه",
+      bySameDirectorTitle: "فیلم‌های دیگر این کارگردان",
+      noSimilarActors: "فیلم مشابه بر اساس بازیگران پیدا نشد.",
+      noDirectorMovies: "فیلم دیگری از این کارگردان پیدا نشد.",
     },
   };
 
@@ -1756,6 +1816,35 @@ document.addEventListener("DOMContentLoaded", () => {
       const key = el.getAttribute("data-i18n-placeholder");
       if (!key) return;
       el.setAttribute("placeholder", languageMap[nextLang][key] || languageMap.en[key] || "");
+    });
+
+    document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+      const key = el.getAttribute("data-i18n-html");
+      if (!key) return;
+      el.innerHTML = languageMap[nextLang][key] || languageMap.en[key] || "";
+    });
+
+    const seoIntro = document.querySelector(".seo-intro");
+    if (seoIntro) {
+      const seoP = seoIntro.querySelectorAll("p");
+      if (seoP[0]) seoP[0].innerHTML = languageMap[nextLang].seoIntroP1 || languageMap.en.seoIntroP1;
+      if (seoP[1]) seoP[1].innerHTML = languageMap[nextLang].seoIntroP2 || languageMap.en.seoIntroP2;
+      if (seoP[2]) seoP[2].textContent = languageMap[nextLang].seoIntroP3 || languageMap.en.seoIntroP3;
+    }
+
+    const featureTitles = document.querySelectorAll("#siteFeatures .feature-title");
+    featureTitles.forEach((el, idx) => {
+      const key = `featureTitle${idx + 1}`;
+      if (languageMap[nextLang][key] || languageMap.en[key]) {
+        el.textContent = languageMap[nextLang][key] || languageMap.en[key];
+      }
+    });
+    const featureDesc = document.querySelectorAll("#siteFeatures .feature-accordion-body p");
+    featureDesc.forEach((el, idx) => {
+      const key = `featureDesc${idx + 1}`;
+      if (languageMap[nextLang][key] || languageMap.en[key]) {
+        el.innerHTML = languageMap[nextLang][key] || languageMap.en[key];
+      }
     });
 
     languageButtons.forEach((btn, idx) => {
