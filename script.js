@@ -3414,9 +3414,9 @@ function setTabInUrl(type) {
 
     const tags = extractHashtagTokens(str);
     if (tags.length) {
-      const filteredTags = filterHashtagsByLanguage(tags);
-      if (!filteredTags.length) return "-";
-      return filteredTags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join("");
+      const visibleTags = mode === "genre" ? filterHashtagsByLanguage(tags) : tags;
+      if (!visibleTags.length) return "-";
+      return visibleTags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join("");
     }
 
     return str
@@ -3642,7 +3642,8 @@ function setTabInUrl(type) {
 
   <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> ${uiText("genre")}: </span>
   <div class="field-quote genre-grid anim-horizontal">${renderChips(
-    m.genre || "-"
+    m.genre || "-",
+    "genre"
   )}</div>
 
   <div class="episodes-container anim-vertical" data-movie-id="${m.id}">
@@ -3971,7 +3972,8 @@ function setTabInUrl(type) {
             card.querySelectorAll(".field-quote")[5].textContent =
               ep.release_info || m.release_info;
             card.querySelectorAll(".field-quote")[6].innerHTML = renderChips(
-              ep.genre || m.genre || "-"
+              ep.genre || m.genre || "-",
+              "genre"
             );
           }
 
@@ -4043,7 +4045,7 @@ function setTabInUrl(type) {
               card.querySelectorAll(".field-quote")[5].textContent =
                 ep.release_info || m.release_info;
               card.querySelectorAll(".field-quote")[6].innerHTML =
-                renderChips(ep.genre || m.genre || "-");
+                renderChips(ep.genre || m.genre || "-", "genre");
               goBtn.dataset.link = ep.link;
             }
 
@@ -4814,7 +4816,7 @@ function openMovieModal(m, startIdx = 0) {
           <span class="field-label">${uiText("stars")}: </span><div class="field-quote stars-field">${renderChips(data.stars || "-", "names")}</div>
           <span class="field-label">IMDB:</span><div class="field-quote"><span class="chip imdb-chip">${escapeHtml(data.imdb || "-")}</span></div>
           <span class="field-label">${uiText("release")}: </span><div class="field-quote release-field">${escapeHtml(data.release_info || "-")}</div>
-          <span class="field-label">${uiText("genre")}: </span><div class="field-quote genre-grid">${renderChips(data.genre || "-")}</div>
+          <span class="field-label">${uiText("genre")}: </span><div class="field-quote genre-grid">${renderChips(data.genre || "-", "genre")}</div>
           <div class="episodes-container" data-movie-id="${data.id}"><div class="episodes-list"></div></div>
           <div class="button-wrap"><button class="go-btn" data-link="${escapeHtml(data.link || "#")}"><span>${uiText("goToFile")}</span></button><div class="button-shadow"></div></div>
           <div class="button-wrap"><button class="close-btn"><span>${uiText("close")}</span></button><div class="button-shadow"></div></div>
@@ -4832,7 +4834,7 @@ function openMovieModal(m, startIdx = 0) {
       content.querySelector(".stars-field").innerHTML = renderChips(ep.stars || "-", "names");
       content.querySelector(".imdb-chip").textContent = ep.imdb || "-";
       content.querySelector(".release-field").textContent = ep.release_info || "-";
-      content.querySelector(".genre-grid").innerHTML = renderChips(ep.genre || "-");
+      content.querySelector(".genre-grid").innerHTML = renderChips(ep.genre || "-", "genre");
       content.querySelector(".go-btn").dataset.link = ep.link || "#";
       initModalSynopsisToggle(content);
     }
