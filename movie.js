@@ -481,7 +481,7 @@ function buildSimilarByGenre(current, allMovies) {
   return allMovies
     .filter((m) => m.id !== current.id)
     .map((m) => {
-      const g = new Set(extractHashtagTokens(m.genre || ""));
+      const directors = new Set(normalizeNameTokens(m.director || ""));
       let overlap = 0;
       currentGenres.forEach((x) => { if (g.has(x)) overlap += 1; });
       return { movie: m, overlap, total: g.size || 999 };
