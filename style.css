@@ -6974,8 +6974,8 @@ html[lang="fa"] .movie-card .field-quote,
 html[lang="fa"] .movie-modal-content .field-quote {
   border-left: 0;
   border-right: 4px solid rgba(var(--theme-accent-rgb), 0.9);
-  text-align: left;
-  direction: ltr;
+  text-align: right;
+  direction: rtl;
 }
 
 html[lang="fa"] body.dark .movie-card .field-quote,
@@ -6988,6 +6988,11 @@ html[lang="fa"] .movie-modal-content .genre-grid {
   justify-content: flex-end;
   direction: rtl;
   text-align: right;
+}
+
+html[lang="fa"] .movie-card .genre-grid .genre-chip-mini,
+html[lang="fa"] .movie-modal-content .genre-grid .genre-chip-mini {
+  direction: rtl;
 }
 
 html[lang="fa"] .movie-card .comment-summary,

@@ -79,7 +79,7 @@ const movieI18n = {
     noSimilarGenre: "فیلم مشابه بر اساس ژانر پیدا نشد.",
     noActorsArchive: "فیلم‌های دیگر این بازیگران در آرشیو موجود نیست",
     noDirectorArchive: "فیلم‌های دیگر این کارگردان در آرشیو موجود نیست",
-    goToPage: "رفتن به صفحه",
+    goToPage: "صفحه فیلم",
   },
 };
 

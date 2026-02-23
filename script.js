@@ -1745,7 +1745,7 @@ document.addEventListener("DOMContentLoaded", () => {
       release: "انتشار",
       genre: "ژانر",
       goToFile: "دریافت فایل",
-      goToPage: "رفتن به صفحه",
+      goToPage: "صفحه فیلم",
       comments: "نظر",
       commentsTitle: "نظرات",
       yourName: "نام شما",
