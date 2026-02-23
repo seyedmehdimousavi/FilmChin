@@ -6958,6 +6958,55 @@ html[lang="fa"] .movie-count-container { display:flex; justify-content:flex-end;
 .field-label { text-align: right; }
 
 
+
+/* ===== Persian post layout adjustments ===== */
+html[lang="fa"] .movie-card .field-label,
+html[lang="fa"] .movie-modal-content .field-label {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  text-align: right;
+}
+
+html[lang="fa"] .movie-card .field-quote,
+html[lang="fa"] .movie-modal-content .field-quote {
+  border-left: 0;
+  border-right: 4px solid rgba(var(--theme-accent-rgb), 0.9);
+  text-align: right;
+  direction: rtl;
+}
+
+html[lang="fa"] body.dark .movie-card .field-quote,
+html[lang="fa"] body.dark .movie-modal-content .field-quote {
+  border-right: 4px solid rgba(var(--theme-accent-rgb), 0.7);
+}
+
+html[lang="fa"] .movie-card .genre-grid,
+html[lang="fa"] .movie-modal-content .genre-grid {
+  justify-content: flex-end;
+  direction: rtl;
+  text-align: right;
+}
+
+html[lang="fa"] .movie-card .genre-grid .genre-chip-mini,
+html[lang="fa"] .movie-modal-content .genre-grid .genre-chip-mini {
+  direction: rtl;
+}
+
+html[lang="fa"] .movie-card .comment-summary,
+html[lang="fa"] .movie-modal-content .comment-summary {
+  direction: rtl;
+}
+
+html[lang="fa"] .movie-card .comments-count,
+html[lang="fa"] .movie-modal-content .comments-count {
+  text-align: right;
+  padding-left: 0;
+  padding-right: 8px;
+}
+
 /* Movie page recommendation blocks */
 .similar-block-card {
   border: 1px solid rgba(0,0,0,.14);
