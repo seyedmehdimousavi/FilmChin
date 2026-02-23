@@ -1744,7 +1744,7 @@ document.addEventListener("DOMContentLoaded", () => {
       stars: "بازیگران",
       release: "انتشار",
       genre: "ژانر",
-      goToFile: "رفتن به فایل",
+      goToFile: "دریافت فایل",
       goToPage: "رفتن به صفحه",
       comments: "نظر",
       commentsTitle: "نظرات",

@@ -64,7 +64,7 @@ const movieI18n = {
     stars: "بازیگران",
     release: "انتشار",
     genre: "ژانر",
-    goToFile: "رفتن به فایل",
+    goToFile: "دریافت فایل",
     comments: "نظر",
     commentsTitle: "نظرات",
     yourName: "نام شما",
