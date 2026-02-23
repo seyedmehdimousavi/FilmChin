@@ -152,6 +152,22 @@ function extractHashtagTokens(str) {
   return (str.match(/#[^\s,،]+/g) || []).map((tag) => tag.trim()).filter(Boolean);
 }
 
+function isEnglishHashtag(tag) {
+  const clean = String(tag || "").replace(/^#+/, "");
+  return /^[A-Za-z]/.test(clean);
+}
+
+function isPersianHashtag(tag) {
+  const clean = String(tag || "").replace(/^#+/, "");
+  return /[\u0600-\u06FF]/.test(clean) && !/^[A-Za-z]/.test(clean);
+}
+
+function filterHashtagsByLanguage(tags) {
+  const lang = pageLang === "fa" ? "fa" : "en";
+  if (lang === "fa") return tags.filter(isPersianHashtag);
+  return tags.filter(isEnglishHashtag);
+}
+
 function extractCommaSeparatedNames(str) {
   if (!str) return [];
   return str
@@ -180,7 +196,9 @@ function renderChips(str, mode = "hashtags") {
 
   const tags = extractHashtagTokens(str);
   if (tags.length) {
-    return tags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join("");
+    const visibleTags = mode === "genre" ? filterHashtagsByLanguage(tags) : tags;
+    if (!visibleTags.length) return '<span class="chip">-</span>';
+    return visibleTags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join("");
   }
 
   return String(str)
@@ -235,7 +253,17 @@ function buildSynopsisSegments(rawText) {
 }
 
 function makeSynopsisHtml(rawText) {
-  return buildSynopsisSegments(rawText)
+  const lang = pageLang === "fa" ? "fa" : "en";
+  const segments = buildSynopsisSegments(rawText).filter((seg) => {
+    if (lang === "en") return true;
+    return seg.dir !== "en";
+  });
+
+  if (!segments.length) {
+    return `<span class="synopsis-segment synopsis-fa" dir="rtl">-</span>`;
+  }
+
+  return segments
     .map((seg) => `<span class="synopsis-segment synopsis-${seg.dir}" dir="${seg.dir === "fa" ? "rtl" : "ltr"}">${escapeHtml(seg.text)}</span>`)
     .join("");
 }
@@ -481,7 +509,7 @@ function buildSimilarByGenre(current, allMovies) {
   return allMovies
     .filter((m) => m.id !== current.id)
     .map((m) => {
-      const directors = new Set(normalizeNameTokens(m.director || ""));
+      const g = new Set(extractHashtagTokens(m.genre || ""));
       let overlap = 0;
       currentGenres.forEach((x) => { if (g.has(x)) overlap += 1; });
       return { movie: m, overlap, total: g.size || 999 };
@@ -609,7 +637,7 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
       <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> ${mt("stars")}: </span><div class="field-quote anim-left-right stars-field">${renderChips(movie.stars || "-", "names")}</div>
       <span class="field-label anim-vertical"><img src="/images/icons8-imdb-48.png" class="imdb-bell" style="width:20px;height:20px;"> IMDB:</span><div class="field-quote anim-left-right"><span class="chip imdb-chip anim-horizontal">${escapeHtml(movie.imdb || "-")}</span></div>
       <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> ${mt("release")}: </span><div class="field-quote anim-left-right release-field">${escapeHtml(movie.release_info || "-")}</div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> ${mt("genre")}: </span><div class="field-quote genre-grid anim-horizontal genre-field">${renderChips(movie.genre || "-")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> ${mt("genre")}: </span><div class="field-quote genre-grid anim-horizontal genre-field">${renderChips(movie.genre || "-", "genre")}</div>
       <div class="episodes-container anim-vertical" data-movie-id="${escapeHtml(movie.id)}"><div class="episodes-list anim-left-right">${episodesHtml}</div></div>
       <div class="post-action-row movie-page-actions"><div class="button-wrap"><button class="go-btn anim-vertical" data-link="${escapeHtml((episodes[0] && episodes[0].link) || movie.link || "#")}"><span>${mt("goToFile")}</span></button><div class="button-shadow"></div></div></div>
       <div class="comment-summary anim-horizontal"><div class="avatars"></div><div class="comments-count">0 ${mt("comments")}</div><div class="enter-comments"><img src="/images/icons8-comment.apng" style="width:22px;height:22px;"></div></div>
@@ -655,7 +683,7 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
         if (starsFieldEl) starsFieldEl.innerHTML = renderChips(ep.stars || movie.stars || "-", "names");
         if (imdbChipEl) imdbChipEl.textContent = ep.imdb || movie.imdb || "-";
         if (releaseFieldEl) releaseFieldEl.textContent = ep.release_info || movie.release_info || "-";
-        if (genreFieldEl) genreFieldEl.innerHTML = renderChips(ep.genre || movie.genre || "-");
+        if (genreFieldEl) genreFieldEl.innerHTML = renderChips(ep.genre || movie.genre || "-", "genre");
         if (coverImgEl) coverImgEl.src = ep.cover || movie.cover || "";
         if (coverBlurEl) coverBlurEl.style.backgroundImage = `url('${ep.cover || movie.cover || ""}')`;
       } else if (movie.type === "serial") {
