@@ -44,6 +44,14 @@ const movieI18n = {
     noActorsArchive: "Other movies of these actors are not available in archive.",
     noDirectorArchive: "Other movies of this director are not available in archive.",
     goToPage: "Go to page",
+    postOptionAddFavorite: "Add to favorite",
+    postOptionFavoriteStatusAdd: "Add to your favorites",
+    postOptionFavoriteStatusIn: "In favorites",
+    postOptionLoginRequired: "Login required",
+    postOptionCopyLink: "Copy link",
+    postOptionCopyLinkSub: "Copy movie link ( /movie/slug )",
+    postOptionShareLink: "Share link",
+    postOptionShareLinkSub: "Share movie link with other apps",
   },
   fa: {
     backToHome: "← بازگشت به صفحه اصلی",
@@ -80,6 +88,14 @@ const movieI18n = {
     noActorsArchive: "فیلم‌های دیگر این بازیگران در آرشیو موجود نیست",
     noDirectorArchive: "فیلم‌های دیگر این کارگردان در آرشیو موجود نیست",
     goToPage: "صفحه فیلم",
+    postOptionAddFavorite: "افزودن به علاقه‌مندی",
+    postOptionFavoriteStatusAdd: "افزودن به علاقه‌مندی‌ها",
+    postOptionFavoriteStatusIn: "در علاقه‌مندی‌ها",
+    postOptionLoginRequired: "نیاز به ورود",
+    postOptionCopyLink: "کپی لینک",
+    postOptionCopyLinkSub: "کپی لینک فیلم ( /movie/slug )",
+    postOptionShareLink: "اشتراک لینک",
+    postOptionShareLinkSub: "اشتراک لینک فیلم با سایر برنامه‌ها",
   },
 };
 
@@ -94,6 +110,73 @@ function applyMovieStaticTranslations() {
     if (!key) return;
     el.textContent = mt(key);
   });
+}
+
+const movieFeatureI18n = {
+  en: {
+    siteFeaturesTitle: "FilmChiin site features",
+    featureTitle1: "Create account", featureTitle2: "Instant and advanced search", featureTitle3: "Customize homepage layout", featureTitle4: "Type and genre tabs", featureTitle5: "Sort by IMDb rating", featureTitle6: "Sort by release year", featureTitle7: "Episode list for collections/series", featureTitle8: "One-click file access", featureTitle9: "Comments in each post", featureTitle10: "Popular movies and page list", featureTitle11: "Responsive Liquid Glass design",
+    featureDesc1: "By creating an account, you unlock extra capabilities: build a personal favorites list and chat with admin.",
+    featureDesc2: "Search is fully instant. As you type, results filter immediately and matched text is highlighted in title, synopsis, cast, and other fields.",
+    featureDesc3: "Use SideMenu options to arrange homepage layout based on your preference.",
+    featureDesc4: "Homepage is separated by content type (movie, collection, series). You can also filter each tab by genres with one click.",
+    featureDesc5: "Sort visible list by IMDb score and quickly focus on higher-rated titles.",
+    featureDesc6: "Use release filter to prioritize newer/older titles based on your preference.",
+    featureDesc7: "For collections and series, all episodes are shown in small cards in the same post and selecting an episode updates card info instantly.",
+    featureDesc8: "With <strong>Go to file</strong>, <code>@Filmchinbot</code> sends movie/episode file directly without needing channel join.",
+    featureDesc9: "Each post supports comments with custom UI and avatars; comment count is shown near the comment icon.",
+    featureDesc10: "Popular section is built from click stats and the floating panel lists current-page posts for quick navigation.",
+    featureDesc11: "Parts of UI use a Liquid Glass-inspired design with smooth animations and balanced transparency on mobile/desktop.",
+  },
+  fa: {
+    siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
+    featureTitle1: "ساخت حساب کاربری", featureTitle2: "جست‌وجوی لحظه‌ای و پیشرفته", featureTitle3: "شخصی سازی چیدمان صفحه", featureTitle4: "فیلترفیلم هاوژانرها در تب‌های جداگانه", featureTitle5: "مرتب‌سازی بر اساس امتیاز IMDb", featureTitle6: "مرتب‌سازی بر اساس سال انتشار", featureTitle7: "لیست قسمت‌های سریال وکالکشن", featureTitle8: "دسترسی به فایل فقط با یک کلیک", featureTitle9: "کامنت و نمایش گفت‌وگو در همان پست", featureTitle10: "فیلم‌های پرطرفدارولیست فیلم‌های صفحه", featureTitle11: "طراحی Liquid Glass واکنش‌گرا",
+    featureDesc1: "با ساخت حساب کاربری به قابلیت های بیشتری دسترسی دارید می‌توانید برای خودتان یک لیست اختصاصی از فیلم‌های مورد علاقه بسازید. میتوانید از چت با ادمین استفاده کنید.",
+    featureDesc2: "جست‌وجوی سایت کاملاً لحظه‌ای است؛ با تایپ هر عبارت، نتایج بلافاصله فیلتر می‌شوند. عبارت جست‌وجوشده در عنوان، خلاصه، بازیگران و سایر فیلدها هایلایت می‌شود.",
+    featureDesc3: "از طریق گزینه های موجود در SideMenu میتوانید چیدمان صفحه اصلی را مطابق با سلیقه ی خود مرتب کنید.",
+    featureDesc4: "صفحه اصلی بر اساس نوع محتوا (فیلم سینمایی، کالکشن، سریال) با تب‌ها تفکیک شده است. علاوه بر آن، در هر تب می‌توانید با یک کلیک ژانر را فیلتر کنید.",
+    featureDesc5: "لیست قابل مشاهده را می‌توانید بر اساس امتیاز IMDb مرتب کنید تا سریع‌تر به عناوین با امتیاز بالاتر برسید.",
+    featureDesc6: "با فیلتر سال انتشار می‌توانید عناوین جدیدتر یا قدیمی‌تر را بر اساس نیاز خود ببینید.",
+    featureDesc7: "برای سریال‌ها و کالکشن‌ها، تمام قسمت‌ها در قالب کارت‌های کوچک داخل همان پست نمایش داده می‌شوند و با انتخاب هر قسمت اطلاعات کارت فوراً آپدیت می‌شود.",
+    featureDesc8: "با فشردن دکمه <strong>Go to file</strong> بات <code>@Filmchinbot</code> فایل فیلم یا قسمت سریال را برای شما ارسال می‌کند؛ بدون نیاز به جوین شدن در کانال.",
+    featureDesc9: "برای هر پست می‌توانید کامنت بگذارید و همه نظرات در همان کارت فیلم با طراحی اختصاصی و آواتارها نمایش داده می‌شوند.",
+    featureDesc10: "بخش فیلم‌های پرطرفدار بر اساس آمار کلیک‌ها ساخته می‌شود و دکمه شناور لیست فیلم‌های صفحه فعلی را نشان می‌دهد.",
+    featureDesc11: "بخش هایی از سایت با الهام از طراحی Liquid Glass ساخته شده است؛ کارت‌ها، دکمه‌ها و پنل‌ها تجربه کاربری روان و چشم‌نواز ایجاد می‌کنند.",
+  },
+};
+
+function applyMovieFeatureTranslations() {
+  const root = document.getElementById("movieFeaturesMount");
+  if (!root) return;
+  const map = movieFeatureI18n[pageLang] || movieFeatureI18n.en;
+  const title = root.querySelector("h2[data-i18n='siteFeaturesTitle']");
+  if (title) title.textContent = map.siteFeaturesTitle;
+  root.querySelectorAll(".feature-title").forEach((el, idx) => {
+    const key = `featureTitle${idx + 1}`;
+    if (map[key]) el.textContent = map[key];
+  });
+  root.querySelectorAll(".feature-accordion-body p").forEach((el, idx) => {
+    const key = `featureDesc${idx + 1}`;
+    if (map[key]) el.innerHTML = map[key];
+  });
+}
+
+function applyMoviePostOptionsTranslations() {
+  const setText = (id, key) => { const el = document.getElementById(id); if (el) el.textContent = mt(key); };
+  setText("postOptionsTitle", "postOptions");
+  const closeBtn = document.getElementById("postOptionsCloseBtn");
+  if (closeBtn) closeBtn.setAttribute("aria-label", mt("close"));
+  const favTitle = document.querySelector("#postOptionFavorite .post-option-title");
+  if (favTitle) favTitle.textContent = mt("postOptionAddFavorite");
+  setText("postOptionFavoriteStatus", "postOptionFavoriteStatusAdd");
+  const copyTitle = document.querySelector("#postOptionCopyLink .post-option-title");
+  if (copyTitle) copyTitle.textContent = mt("postOptionCopyLink");
+  const copySub = document.querySelector("#postOptionCopyLink .post-option-subtitle");
+  if (copySub) copySub.textContent = mt("postOptionCopyLinkSub");
+  const shareTitle = document.querySelector("#postOptionShareLink .post-option-title");
+  if (shareTitle) shareTitle.textContent = mt("postOptionShareLink");
+  const shareSub = document.querySelector("#postOptionShareLink .post-option-subtitle");
+  if (shareSub) shareSub.textContent = mt("postOptionShareLinkSub");
 }
 
 function escapeHtml(value) {
@@ -384,12 +467,12 @@ function syncFavoriteOptionUi() {
   if (!btn || !statusEl || !currentMovie) return;
   if (!currentUser) {
     btn.classList.remove("favorite-active");
-    statusEl.textContent = "Login required";
+    statusEl.textContent = mt("postOptionLoginRequired");
     return;
   }
   const isFavorite = favoriteMovieIds.has(currentMovie.id);
   btn.classList.toggle("favorite-active", isFavorite);
-  statusEl.textContent = isFavorite ? "In favorites" : "Add to your favorites";
+  statusEl.textContent = isFavorite ? mt("postOptionFavoriteStatusIn") : mt("postOptionFavoriteStatusAdd");
 }
 
 async function toggleFavoriteCurrentMovie() {
@@ -737,6 +820,7 @@ async function hydrateSharedSectionsFromHome() {
   if (banner) document.getElementById("movieBannerMount").innerHTML = banner.outerHTML;
   if (features) {
     document.getElementById("movieFeaturesMount").innerHTML = features.outerHTML;
+    applyMovieFeatureTranslations();
     initFeatureAccordions();
   }
 }
@@ -746,6 +830,8 @@ async function loadMoviePage() {
   const cardContainer = document.getElementById("moviePageCard");
 
   try {
+    applyMovieStaticTranslations();
+    applyMoviePostOptionsTranslations();
     applySavedTheme();
     try {
       await hydrateSharedSectionsFromHome();
@@ -800,12 +886,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const backLink = document.querySelector(".movie-page-back");
   backLink?.addEventListener("click", (e) => {
     e.preventDefault();
-    try {
-      if (window.history.length > 1 && document.referrer && new URL(document.referrer).origin === window.location.origin) {
-        window.history.back();
-        return;
-      }
-    } catch (_) {}
+    if (window.history.length > 1) {
+      window.history.back();
+      return;
+    }
     window.location.href = "/";
   });
   loadMoviePage();

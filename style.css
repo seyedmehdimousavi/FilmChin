@@ -6927,11 +6927,11 @@ body.dark .movie-page-back {
 
 
 .post-action-row .button-wrap:first-child {
-  flex: 7;
+  flex: 6;
 }
 
 .post-action-row .button-wrap:last-child {
-  flex: 3;
+  flex: 4;
 }
 
 .movie-page-actions .button-wrap {
@@ -6975,6 +6975,12 @@ html[lang="fa"] .movie-card .field-quote,
 html[lang="fa"] .movie-modal-content .field-quote {
   border-left: 0;
   border-right: 4px solid rgba(var(--theme-accent-rgb), 0.9);
+  text-align: left;
+  direction: ltr;
+}
+
+html[lang="fa"] .movie-card .synopsis-quote,
+html[lang="fa"] .movie-modal-content .synopsis-quote {
   text-align: right;
   direction: rtl;
 }
@@ -7000,6 +7006,14 @@ html[lang="fa"] .movie-card .field-quote.genre-grid,
 html[lang="fa"] .movie-modal-content .field-quote.genre-grid {
   display: flex;
   justify-content: flex-end;
+}
+
+html[lang="en"] .site-features .feature-title {
+  order: 2;
+}
+
+html[lang="en"] .site-features .feature-icon {
+  order: 1;
 }
 
 html[lang="fa"] .movie-card .comment-summary,
