@@ -190,7 +190,12 @@
             </div>
           </div>
 
-          <input id="search" type="text" placeholder="Search..." dir="auto" data-i18n-placeholder="searchPlaceholder" />
+          <div class="search-input-wrap">
+            <input id="search" type="text" placeholder="Search..." dir="auto" data-i18n-placeholder="searchPlaceholder" />
+            <div id="searchSuggestion" class="search-suggestion" aria-hidden="true">
+              <span class="typed-part"></span><span class="suggestion-part" role="button" tabindex="0"></span>
+            </div>
+          </div>
 
           <div class="button-wrap">
             <button
