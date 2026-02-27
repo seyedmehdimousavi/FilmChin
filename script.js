@@ -1605,6 +1605,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileMenu = document.getElementById("profileMenu");
 
   const searchInput = document.getElementById("search");
+  const searchSuggestion = document.getElementById("searchSuggestion");
+  const searchSuggestionTypedPart = searchSuggestion?.querySelector(".typed-part");
+  const searchSuggestionPart = searchSuggestion?.querySelector(".suggestion-part");
   const languageIndicator = document.getElementById("languageIndicator");
   const languageButtons = document.querySelectorAll(".language-option");
   const languageMap = {
@@ -1871,10 +1874,88 @@ document.addEventListener("DOMContentLoaded", () => {
   applyLanguage(localStorage.getItem("siteLanguage") || "en");
 
   if (searchInput) {
+    const getSearchSuggestionSuffix = (typedValue) => {
+      const typed = (typedValue || "").trim();
+      if (!typed || !Array.isArray(movies) || !movies.length) return "";
+
+      const q = typed.toLowerCase();
+      let bestSuffix = "";
+
+      for (const movie of movies) {
+        const candidateFields = [
+          movie?.title,
+          movie?.name,
+          movie?.stars,
+          movie?.director,
+          movie?.genre,
+          movie?.product,
+          movie?.synopsis,
+        ];
+
+        for (const field of candidateFields) {
+          if (typeof field !== "string") continue;
+          const source = field.trim();
+          if (!source) continue;
+
+          const idx = source.toLowerCase().indexOf(q);
+          if (idx < 0) continue;
+
+          const tail = source.slice(idx + typed.length);
+          const nextWord = tail.match(/^[\s\-–_.,،:;()\[\]{}]*([^\s\-–_.,،:;()\[\]{}]+)/);
+          if (!nextWord || !nextWord[1]) continue;
+
+          const prefixSpace = /^\s/.test(tail) ? " " : "";
+          const suffix = `${prefixSpace}${nextWord[1]}`;
+
+          if (!bestSuffix || suffix.length < bestSuffix.length) {
+            bestSuffix = suffix;
+          }
+        }
+      }
+
+      return bestSuffix;
+    };
+
+    const updateSearchSuggestion = () => {
+      if (!searchSuggestion || !searchSuggestionTypedPart || !searchSuggestionPart) return;
+
+      const typed = searchInput.value || "";
+      const suffix = getSearchSuggestionSuffix(typed);
+
+      searchSuggestionTypedPart.textContent = typed;
+      searchSuggestionPart.textContent = suffix;
+
+      const showSuggestion = typed.trim() && suffix;
+      searchSuggestion.style.display = showSuggestion ? "flex" : "none";
+      searchSuggestion.setAttribute("aria-hidden", showSuggestion ? "false" : "true");
+      searchSuggestionPart.tabIndex = showSuggestion ? 0 : -1;
+    };
+
+    const applySuggestionToSearch = () => {
+      if (!searchSuggestionPart || !searchSuggestionPart.textContent) return;
+      searchInput.value = `${searchInput.value}${searchSuggestionPart.textContent}`;
+      searchInput.focus();
+      searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+    };
+
     searchInput.addEventListener("input", () => {
       currentPage = 1;
       renderPagedMovies(true);
+      updateSearchSuggestion();
     });
+
+    if (searchSuggestionPart) {
+      searchSuggestionPart.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+      });
+      searchSuggestionPart.addEventListener("click", applySuggestionToSearch);
+      searchSuggestionPart.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          applySuggestionToSearch();
+        }
+      });
+    }
 
     const urlSearchValue = new URLSearchParams(window.location.search).get("search");
     const pendingSearch = localStorage.getItem("filmchin_pending_search");
@@ -1886,6 +1967,8 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         searchInput.dispatchEvent(new Event("input", { bubbles: true }));
       }, 0);
+    } else {
+      updateSearchSuggestion();
     }
   }
 
