@@ -1713,6 +1713,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchGhostText = document.getElementById("searchGhostText");
   const searchGhostTyped = searchGhostText?.querySelector(".search-ghost-typed") || null;
   const searchGhostHint = document.getElementById("searchGhostHint");
+  const episodeMatches = new Map();
   const languageIndicator = document.getElementById("languageIndicator");
   const languageButtons = document.querySelectorAll(".language-option");
   const languageMap = {
@@ -3414,8 +3415,6 @@ function setTabInUrl(type) {
       container.appendChild(chip);
     });
   }
-
-  const episodeMatches = new Map();
 
   function setSearchFromChip(rawValue) {
     const searchEl = document.getElementById("search");
