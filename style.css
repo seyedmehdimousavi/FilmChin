@@ -161,6 +161,38 @@ Body.dark .main-header {
   width: 44px;
   height: 44px;
 }
+
+.search-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+.search-ghost-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  font-size: 1rem;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.search-ghost-typed {
+  opacity: 0;
+}
+.search-ghost-hint {
+  color: rgba(120, 120, 120, 0.6);
+  pointer-events: auto;
+  cursor: pointer;
+}
+body.dark .search-ghost-hint {
+  color: rgba(230, 230, 230, 0.45);
+}
+
 .search-bar input {
   border: 0;
   width: inherit;
@@ -1011,6 +1043,10 @@ Body.dark .page-bubble.active {
     min-height: 44px;
     padding: 6px;
   }
+  .search-input-wrap {
+    height: 36px;
+  }
+  .search-ghost-text,
   .search-bar input {
     padding: 8px;
     height: 36px;
