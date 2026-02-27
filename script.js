@@ -757,52 +757,149 @@ function escapeRegExp(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function makeHighlightHtml(text, query) {
-  const source = text || "";
-  const q = (query || "").trim();
-  if (!q) return escapeHtml(source);
+function normalizeSearchText(input) {
+  return String(input || "")
+    .toLowerCase()
+    .replace(/[\u064B-\u065F\u0670]/g, "")
+    .replace(/[يى]/g, "ی")
+    .replace(/[ك]/g, "ک")
+    .replace(/\u200c/g, " ")
+    .replace(/[^0-9a-z\u0600-\u06FF\s]/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-  const pattern = new RegExp(escapeRegExp(q), "gi");
-  let result = "";
-  let lastIndex = 0;
-  let match;
+function tokenizeSearchQuery(query) {
+  return normalizeSearchText(query).split(" ").filter(Boolean);
+}
 
-  while ((match = pattern.exec(source)) !== null) {
-    result += escapeHtml(source.slice(lastIndex, match.index));
-    result += `<mark class="search-highlight">${escapeHtml(match[0])}</mark>`;
-    lastIndex = pattern.lastIndex;
+function levenshteinDistance(a, b) {
+  if (a === b) return 0;
+  if (!a) return b.length;
+  if (!b) return a.length;
+
+  const prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let corner = prev[0];
+    prev[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const upper = prev[j];
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      prev[j] = Math.min(prev[j] + 1, prev[j - 1] + 1, corner + cost);
+      corner = upper;
+    }
   }
+  return prev[b.length];
+}
 
-  result += escapeHtml(source.slice(lastIndex));
-  return result;
+function tokenRoughMatch(token, word) {
+  if (!token || !word) return false;
+  if (word.includes(token) || token.includes(word)) return true;
+  if (token.length <= 2 || word.length <= 2) return false;
+  if (Math.abs(token.length - word.length) > 1) return false;
+  return levenshteinDistance(token, word) <= 1;
+}
+
+function buildSearchHaystack(item) {
+  return normalizeSearchText(
+    Object.values(item || {})
+      .filter((val) => typeof val === "string")
+      .join(" ")
+  );
+}
+
+function matchesSearchTokens(haystack, tokens) {
+  if (!tokens.length) return true;
+  if (!haystack) return false;
+  const words = haystack.split(" ").filter(Boolean);
+  return tokens.every((token) => words.some((word) => tokenRoughMatch(token, word)));
 }
 
 /**
  * متن ساده را به HTML امن + هایلایت تبدیل می‌کند.
  * - text: متن خام
- * - query: عبارت جست‌وجو (case-insensitive)
+ * - query: عبارت جست‌وجو (چندکلمه‌ای)
  */
 function makeHighlightHtml(text, query) {
   const source = text || "";
-  const q = (query || "").trim();
-  if (!q) return escapeHtml(source);
+  const tokens = String(query || "")
+    .trim()
+    .split(/\s+/)
+    .filter((token) => token.length >= 2);
+  if (!tokens.length) return escapeHtml(source);
 
-  const pattern = new RegExp(escapeRegExp(q), "gi");
-  let result = "";
-  let lastIndex = 0;
-  let match;
+  const ranges = [];
+  tokens.forEach((token) => {
+    const pattern = new RegExp(escapeRegExp(token), "gi");
+    let match;
+    while ((match = pattern.exec(source)) !== null) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  });
 
-  while ((match = pattern.exec(source)) !== null) {
-    // تکه قبل از تطبیق
-    result += escapeHtml(source.slice(lastIndex, match.index));
-    // خود تطبیق هایلایت‌شده
-    result += `<mark class="search-highlight">${escapeHtml(match[0])}</mark>`;
-    lastIndex = pattern.lastIndex;
+  if (!ranges.length) return escapeHtml(source);
+
+  ranges.sort((a, b) => a[0] - b[0]);
+  const merged = [ranges[0]];
+  for (let i = 1; i < ranges.length; i++) {
+    const [start, end] = ranges[i];
+    const last = merged[merged.length - 1];
+    if (start <= last[1]) {
+      last[1] = Math.max(last[1], end);
+    } else {
+      merged.push([start, end]);
+    }
   }
 
-  // تکه باقی‌مانده
+  let result = "";
+  let lastIndex = 0;
+  merged.forEach(([start, end]) => {
+    result += escapeHtml(source.slice(lastIndex, start));
+    result += `<mark class="search-highlight">${escapeHtml(source.slice(start, end))}</mark>`;
+    lastIndex = end;
+  });
+
   result += escapeHtml(source.slice(lastIndex));
   return result;
+}
+
+function findSearchSuggestionPrefix(query, list) {
+  const rawQuery = String(query || "");
+  if (!rawQuery.trim()) return "";
+
+  const parts = rawQuery.split(/\s+/).filter(Boolean);
+  const activeToken = parts[parts.length - 1] || "";
+  const normalizedToken = normalizeSearchText(activeToken);
+  if (!normalizedToken || normalizedToken.length < 1) return "";
+
+  const corpus = [];
+  (list || []).forEach((item) => {
+    Object.values(item || {}).forEach((val) => {
+      if (typeof val === "string" && val.trim()) corpus.push(val);
+    });
+  });
+
+  if (episodesByMovie instanceof Map) {
+    episodesByMovie.forEach((eps) => {
+      (eps || []).forEach((ep) => {
+        Object.values(ep || {}).forEach((val) => {
+          if (typeof val === "string" && val.trim()) corpus.push(val);
+        });
+      });
+    });
+  }
+
+  for (const text of corpus) {
+    const words = normalizeSearchText(text).split(" ").filter(Boolean);
+    const suggestionWord = words.find(
+      (word) => word.startsWith(normalizedToken) && word.length > normalizedToken.length
+    );
+    if (suggestionWord) {
+      return suggestionWord.slice(normalizedToken.length);
+    }
+  }
+
+  return "";
 }
 
 // ساخت slug از عنوان فیلم برای تطبیق با آدرس /movie/slug
@@ -1605,6 +1702,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileMenu = document.getElementById("profileMenu");
 
   const searchInput = document.getElementById("search");
+  const searchGhostText = document.getElementById("searchGhostText");
+  const searchGhostTyped = searchGhostText?.querySelector(".search-ghost-typed") || null;
+  const searchGhostHint = document.getElementById("searchGhostHint");
   const languageIndicator = document.getElementById("languageIndicator");
   const languageButtons = document.querySelectorAll(".language-option");
   const languageMap = {
@@ -1870,10 +1970,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
   applyLanguage(localStorage.getItem("siteLanguage") || "en");
 
+  function updateSearchGhostSuggestion() {
+    if (!searchInput || !searchGhostText || !searchGhostTyped || !searchGhostHint) return;
+
+    const rawQuery = searchInput.value || "";
+    const tail = findSearchSuggestionPrefix(rawQuery, movies);
+
+    if (!rawQuery.trim() || !tail) {
+      searchGhostText.style.display = "none";
+      searchGhostTyped.textContent = "";
+      searchGhostHint.textContent = "";
+      return;
+    }
+
+    searchGhostText.style.display = "flex";
+    searchGhostTyped.textContent = rawQuery;
+    searchGhostHint.textContent = tail;
+  }
+
   if (searchInput) {
     searchInput.addEventListener("input", () => {
       currentPage = 1;
       renderPagedMovies(true);
+      updateSearchGhostSuggestion();
     });
 
     const urlSearchValue = new URLSearchParams(window.location.search).get("search");
@@ -1887,7 +2006,27 @@ document.addEventListener("DOMContentLoaded", () => {
         searchInput.dispatchEvent(new Event("input", { bubbles: true }));
       }, 0);
     }
+
+    searchGhostHint?.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      const suffix = searchGhostHint.textContent || "";
+      if (!suffix) return;
+      searchInput.value = `${searchInput.value}${suffix}`;
+      searchInput.focus();
+      searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+      updateSearchGhostSuggestion();
+    });
+
+    searchInput.addEventListener("focus", updateSearchGhostSuggestion);
+    searchInput.addEventListener("blur", () => {
+      setTimeout(() => {
+        if (!searchInput.value.trim() && searchGhostText) searchGhostText.style.display = "none";
+      }, 80);
+    });
+
+    updateSearchGhostSuggestion();
   }
+
 
   const moviesGrid = document.getElementById("moviesGrid");
   const movieCount = document.getElementById("movieCount");
@@ -2313,33 +2452,10 @@ document.addEventListener("DOMContentLoaded", () => {
         await fetchMovies();
       }
 
-      const q = (searchInput?.value || "").toLowerCase();
+      const searchTerm = (searchInput?.value || "").trim();
 
       // کپی از منطق فیلتر در renderPagedMovies
-      let filtered = movies.filter((m) => {
-        const movieMatch = Object.values(m).some(
-          (val) => typeof val === "string" && val.toLowerCase().includes(q)
-        );
-
-        let episodeMatch = false;
-        if (!movieMatch && (m.type === "collection" || m.type === "serial")) {
-          const eps = episodesByMovie.get(m.id) || [];
-          for (let idx = 0; idx < eps.length; idx++) {
-            const ep = eps[idx];
-            if (
-              Object.values(ep).some(
-                (val) =>
-                  typeof val === "string" && val.toLowerCase().includes(q)
-              )
-            ) {
-              episodeMatch = true;
-              break;
-            }
-          }
-        }
-
-        return movieMatch || episodeMatch;
-      });
+      let filtered = runSearchFilter(searchTerm);
 
       if (currentTypeFilter !== "all") {
         filtered = filtered.filter((m) => {
@@ -2865,6 +2981,7 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInput.addEventListener("input", () => {
       currentPage = 1;
       renderPagedMovies();
+      updateSearchGhostSuggestion();
     });
     // قرار بده نزدیک ابتدای اسکریپت
     const imdbSlider =
@@ -2932,6 +3049,7 @@ renderPagedMovies(true);
     searchCloseBtn.addEventListener("click", () => {
       searchInput.value = "";
       searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+      updateSearchGhostSuggestion();
     });
   }
 
@@ -3293,6 +3411,31 @@ function setTabInUrl(type) {
 
   const episodeMatches = new Map();
 
+  function runSearchFilter(rawQuery) {
+    const tokens = tokenizeSearchQuery(rawQuery);
+    episodeMatches.clear();
+
+    return movies.filter((m) => {
+      const movieMatch = matchesSearchTokens(buildSearchHaystack(m), tokens);
+
+      let episodeMatch = false;
+      if (!movieMatch && (m.type === "collection" || m.type === "serial")) {
+        const eps = episodesByMovie.get(m.id) || [];
+        for (let idx = 0; idx < eps.length; idx++) {
+          if (matchesSearchTokens(buildSearchHaystack(eps[idx]), tokens)) {
+            episodeMatches.set(m.id, idx + 1);
+            episodeMatch = true;
+            break;
+          }
+        }
+      } else if (movieMatch) {
+        episodeMatches.delete(m.id);
+      }
+
+      return movieMatch || episodeMatch;
+    });
+  }
+
   function setSearchFromChip(rawValue) {
     const searchEl = document.getElementById("search");
     if (!searchEl) return;
@@ -3436,39 +3579,9 @@ function setTabInUrl(type) {
 
   // مقدار خام برای جست‌وجو (برای هایلایت)
   const searchTerm = (searchInput?.value || "").trim();
-  // مقدار lowercase برای فیلتر کردن
-  const q = searchTerm.toLowerCase();
 
-  // هر بار سرچ جدید انجام میشه، مقادیر قبلی پاک بشن
-  episodeMatches.clear();
-
-  // 1. فیلتر سرچ
-  let filtered = movies.filter((m) => {
-    const movieMatch = Object.values(m).some(
-      (val) => typeof val === "string" && val.toLowerCase().includes(q)
-    );
-
-    let episodeMatch = false;
-    if (!movieMatch && (m.type === "collection" || m.type === "serial")) {
-      const eps = episodesByMovie.get(m.id) || [];
-      for (let idx = 0; idx < eps.length; idx++) {
-        const ep = eps[idx];
-        if (
-          Object.values(ep).some(
-            (val) => typeof val === "string" && val.toLowerCase().includes(q)
-          )
-        ) {
-          episodeMatches.set(m.id, idx + 1);
-          episodeMatch = true;
-          break;
-        }
-      }
-    } else if (movieMatch) {
-      episodeMatches.delete(m.id);
-    }
-
-    return movieMatch || episodeMatch;
-  });
+  // 1. فیلتر سرچ (توکنی + تحمل غلط املایی)
+  let filtered = runSearchFilter(searchTerm);
 
   // 2. فیلتر نوع
   if (currentTypeFilter !== "all") {

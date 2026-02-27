@@ -172,6 +172,47 @@ Body.dark .main-header {
   color: inherit;
   height: 40px;
 }
+
+.search-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-wrap #search {
+  position: relative;
+  z-index: 2;
+}
+
+.search-ghost-text {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 1rem;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+body.dark .search-ghost-text {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.search-ghost-typed {
+  opacity: 0;
+}
+
+.search-ghost-hint {
+  pointer-events: auto;
+  color: inherit;
+  cursor: pointer;
+}
 .menu-btn,
 .icon-btn,
 .icon-inside {
@@ -1014,6 +1055,9 @@ Body.dark .page-bubble.active {
   .search-bar input {
     padding: 8px;
     height: 36px;
+    font-size: 0.95rem;
+  }
+  .search-ghost-text {
     font-size: 0.95rem;
   }
   .menu-btn,
