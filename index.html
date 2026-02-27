@@ -190,7 +190,12 @@
             </div>
           </div>
 
-          <input id="search" type="text" placeholder="Search..." dir="auto" data-i18n-placeholder="searchPlaceholder" />
+          <div class="search-input-wrap">
+            <div id="searchGhostText" class="search-ghost-text" aria-hidden="true">
+              <span class="search-ghost-typed"></span><button id="searchGhostHint" type="button" class="search-ghost-hint"></button>
+            </div>
+            <input id="search" type="text" placeholder="Search..." dir="auto" data-i18n-placeholder="searchPlaceholder" autocomplete="off" />
+          </div>
 
           <div class="button-wrap">
             <button
