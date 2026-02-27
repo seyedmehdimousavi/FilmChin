@@ -180,7 +180,7 @@ Body.dark .main-header {
 .search-input-wrap input {
   width: 100%;
   position: relative;
-  z-index: 2;
+  z-index: 1;
 }
 .search-suggestion {
   position: absolute;
@@ -193,7 +193,7 @@ Body.dark .main-header {
   white-space: nowrap;
   overflow: hidden;
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
 }
 .search-suggestion .typed-part {
   visibility: hidden;
@@ -202,6 +202,7 @@ Body.dark .main-header {
   color: rgba(110, 110, 110, 0.65);
   pointer-events: auto;
   cursor: pointer;
+  user-select: none;
 }
 body.dark .search-suggestion .suggestion-part {
   color: rgba(220, 220, 220, 0.45);
