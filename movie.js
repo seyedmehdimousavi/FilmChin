@@ -222,6 +222,16 @@ function makeMovieSlug(title) {
     .replace(/^-|-$/g, "");
 }
 
+function makeActorSlug(name) {
+  if (!name) return "";
+  return String(name)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9ا-ی]+/gi, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 function parseSlug() {
   const pathname = window.location.pathname || "";
   if (pathname.startsWith("/movie/")) {
@@ -268,6 +278,11 @@ function buildSearchChip(value, className) {
   return `<a class="${className}" dir="auto" href="${buildHomeSearchHref(value)}">${safeValue}</a>`;
 }
 
+function buildActorChip(value) {
+  const safeValue = escapeHtml(value);
+  return `<a class="person-chip actor-chip" dir="auto" href="/actor/${encodeURIComponent(makeActorSlug(value))}">${safeValue}</a>`;
+}
+
 function renderChips(str, mode = "hashtags") {
   if (!str || str === "-") return '<span class="chip">-</span>';
 
@@ -275,6 +290,12 @@ function renderChips(str, mode = "hashtags") {
     const names = extractCommaSeparatedNames(str);
     if (!names.length) return `<span class="chip">${escapeHtml(str)}</span>`;
     return names.map((name) => buildSearchChip(name, "person-chip")).join(' <span class="chip-separator">,</span> ');
+  }
+
+  if (mode === "actors") {
+    const names = extractCommaSeparatedNames(str);
+    if (!names.length) return `<span class="chip">${escapeHtml(str)}</span>`;
+    return names.map((name) => buildActorChip(name)).join(' <span class="chip-separator">,</span> ');
   }
 
   const tags = extractHashtagTokens(str);
@@ -717,7 +738,7 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
       <span class="field-label anim-vertical"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> ${mt("synopsis")}: </span><div class="field-quote anim-left-right synopsis-quote"><div class="quote-text anim-horizontal">${synopsis}</div></div>
       <span class="field-label anim-vertical"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> ${mt("director")}: </span><div class="field-quote anim-left-right director-field">${renderChips(movie.director || "-", "names")}</div>
       <span class="field-label anim-vertical"><img src="/images/icons8-location.apng" style="width:20px;height:20px;"> ${mt("product")}: </span><div class="field-quote anim-horizontal product-field">${renderChips(movie.product || "-")}</div>
-      <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> ${mt("stars")}: </span><div class="field-quote anim-left-right stars-field">${renderChips(movie.stars || "-", "names")}</div>
+      <span class="field-label anim-vertical"><img src="/images/icons8-star.apng" style="width:20px;height:20px;"> ${mt("stars")}: </span><div class="field-quote anim-left-right stars-field">${renderChips(movie.stars || "-", "actors")}</div>
       <span class="field-label anim-vertical"><img src="/images/icons8-imdb-48.png" class="imdb-bell" style="width:20px;height:20px;"> IMDB:</span><div class="field-quote anim-left-right"><span class="chip imdb-chip anim-horizontal">${escapeHtml(movie.imdb || "-")}</span></div>
       <span class="field-label anim-vertical"><img src="/images/icons8-calendar.apng" style="width:20px;height:20px;"> ${mt("release")}: </span><div class="field-quote anim-left-right release-field">${escapeHtml(movie.release_info || "-")}</div>
       <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> ${mt("genre")}: </span><div class="field-quote genre-grid anim-horizontal genre-field">${renderChips(movie.genre || "-", "genre")}</div>
@@ -763,7 +784,7 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
         if (quoteTextEl) quoteTextEl.innerHTML = makeSynopsisHtml(ep.synopsis || movie.synopsis || "-");
         if (directorFieldEl) directorFieldEl.innerHTML = renderChips(ep.director || movie.director || "-", "names");
         if (productFieldEl) productFieldEl.innerHTML = renderChips(ep.product || movie.product || "-");
-        if (starsFieldEl) starsFieldEl.innerHTML = renderChips(ep.stars || movie.stars || "-", "names");
+        if (starsFieldEl) starsFieldEl.innerHTML = renderChips(ep.stars || movie.stars || "-", "actors");
         if (imdbChipEl) imdbChipEl.textContent = ep.imdb || movie.imdb || "-";
         if (releaseFieldEl) releaseFieldEl.textContent = ep.release_info || movie.release_info || "-";
         if (genreFieldEl) genreFieldEl.innerHTML = renderChips(ep.genre || movie.genre || "-", "genre");
