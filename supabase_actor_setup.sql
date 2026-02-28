@@ -28,13 +28,15 @@ execute procedure public.set_updated_at_actors();
 alter table public.actors enable row level security;
 
 -- Public read for site pages
-create policy if not exists "actors_public_read"
+drop policy if exists "actors_public_read" on public.actors;
+create policy "actors_public_read"
 on public.actors
 for select
 using (true);
 
 -- Authenticated admin write (adapt if you use custom admin checks)
-create policy if not exists "actors_admin_write"
+drop policy if exists "actors_admin_write" on public.actors;
+create policy "actors_admin_write"
 on public.actors
 for all
 using (auth.role() = 'authenticated')
@@ -46,24 +48,28 @@ values ('actor-profiles', 'actor-profiles', true)
 on conflict (id) do nothing;
 
 -- Public read access to actor profile files
-create policy if not exists "actor_profiles_public_read"
+drop policy if exists "actor_profiles_public_read" on storage.objects;
+create policy "actor_profiles_public_read"
 on storage.objects
 for select
 using (bucket_id = 'actor-profiles');
 
 -- Authenticated upload/update/delete in actor-profiles bucket
-create policy if not exists "actor_profiles_auth_insert"
+drop policy if exists "actor_profiles_auth_insert" on storage.objects;
+create policy "actor_profiles_auth_insert"
 on storage.objects
 for insert
 with check (bucket_id = 'actor-profiles' and auth.role() = 'authenticated');
 
-create policy if not exists "actor_profiles_auth_update"
+drop policy if exists "actor_profiles_auth_update" on storage.objects;
+create policy "actor_profiles_auth_update"
 on storage.objects
 for update
 using (bucket_id = 'actor-profiles' and auth.role() = 'authenticated')
 with check (bucket_id = 'actor-profiles' and auth.role() = 'authenticated');
 
-create policy if not exists "actor_profiles_auth_delete"
+drop policy if exists "actor_profiles_auth_delete" on storage.objects;
+create policy "actor_profiles_auth_delete"
 on storage.objects
 for delete
 using (bucket_id = 'actor-profiles' and auth.role() = 'authenticated');
