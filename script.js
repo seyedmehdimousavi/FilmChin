@@ -823,6 +823,20 @@ function makeMovieSlug(title) {
   );
 }
 
+function makeActorSlug(name) {
+  if (!name) return "";
+  return String(name)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9ا-ی]+/gi, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function buildActorHref(name) {
+  return `/actor/${encodeURIComponent(makeActorSlug(name))}`;
+}
+
 function buildTelegramBotUrlFromChannelLink(rawLink) {
   const trimmed = (rawLink || "").trim();
   if (!trimmed || trimmed === "#") return trimmed;
@@ -3390,6 +3404,11 @@ function setTabInUrl(type) {
     return `<span class="${className}" dir="auto" onclick="(function(){window.__filmchinSetSearchFromChip && window.__filmchinSetSearchFromChip(decodeURIComponent('${encodedValue}'));})();">${safeValue}</span>`;
   }
 
+  function buildActorChip(value) {
+    const safeValue = escapeHtml(value);
+    return `<a class="person-chip actor-chip" dir="auto" href="${buildActorHref(value)}">${safeValue}</a>`;
+  }
+
   function extractHashtagTokens(str) {
     if (!str) return [];
     return (str.match(/#[^\s,،]+/g) || []).map((tag) => tag.trim()).filter(Boolean);
@@ -3493,6 +3512,12 @@ function setTabInUrl(type) {
       const names = extractCommaSeparatedNames(str);
       if (!names.length) return escapeHtml(str);
       return names.map((name) => buildSearchChip(name, "person-chip")).join(" <span class=\"chip-separator\">,</span> ");
+    }
+
+    if (mode === "actors") {
+      const names = extractCommaSeparatedNames(str);
+      if (!names.length) return escapeHtml(str);
+      return names.map((name) => buildActorChip(name)).join(" <span class=\"chip-separator\">,</span> ");
     }
 
     const tags = extractHashtagTokens(str);
@@ -3660,7 +3685,7 @@ function setTabInUrl(type) {
     const title = escapeHtml(m.title || "-");
     const synopsis = makeSynopsisHtml(m.synopsis || "-");
     const director = renderChips(m.director || "-", "names");
-    const stars = renderChips(m.stars || "-", "names");
+    const stars = renderChips(m.stars || "-", "actors");
     const imdb = escapeHtml(m.imdb || "-");
     const release_info = escapeHtml(m.release_info || "-");
 
@@ -4896,7 +4921,7 @@ function openMovieModal(m, startIdx = 0) {
           </div>
           <span class="field-label">${uiText("director")}: </span><div class="field-quote director-field">${renderChips(data.director || "-", "names")}</div>
           <span class="field-label">${uiText("product")}: </span><div class="field-quote product-field">${renderChips(data.product || "-")}</div>
-          <span class="field-label">${uiText("stars")}: </span><div class="field-quote stars-field">${renderChips(data.stars || "-", "names")}</div>
+          <span class="field-label">${uiText("stars")}: </span><div class="field-quote stars-field">${renderChips(data.stars || "-", "actors")}</div>
           <span class="field-label">IMDB:</span><div class="field-quote"><span class="chip imdb-chip">${escapeHtml(data.imdb || "-")}</span></div>
           <span class="field-label">${uiText("release")}: </span><div class="field-quote release-field">${escapeHtml(data.release_info || "-")}</div>
           <span class="field-label">${uiText("genre")}: </span><div class="field-quote genre-grid">${renderChips(data.genre || "-", "genre")}</div>
@@ -4914,7 +4939,7 @@ function openMovieModal(m, startIdx = 0) {
       content.querySelector(".quote-text").textContent = ep.synopsis || "-";
       content.querySelector(".director-field").innerHTML = renderChips(ep.director || "-", "names");
       content.querySelector(".product-field").innerHTML = renderChips(ep.product || "-");
-      content.querySelector(".stars-field").innerHTML = renderChips(ep.stars || "-", "names");
+      content.querySelector(".stars-field").innerHTML = renderChips(ep.stars || "-", "actors");
       content.querySelector(".imdb-chip").textContent = ep.imdb || "-";
       content.querySelector(".release-field").textContent = ep.release_info || "-";
       content.querySelector(".genre-grid").innerHTML = renderChips(ep.genre || "-", "genre");
@@ -6502,6 +6527,122 @@ function openMovieModal(m, startIdx = 0) {
     });
   }
 
+  function normalizeActorNamesFromMovies(movieRows) {
+    const unique = new Map();
+    (movieRows || []).forEach((m) => {
+      extractCommaSeparatedNames(m.stars || "").forEach((rawName) => {
+        const name = rawName.trim();
+        const slug = makeActorSlug(name);
+        if (name && slug && !unique.has(slug)) unique.set(slug, { name, slug });
+      });
+    });
+    return Array.from(unique.values());
+  }
+
+  async function syncActorsFromMovies() {
+    const { data: movieRows } = await db.from("movies").select("stars");
+    const actors = normalizeActorNamesFromMovies(movieRows || []);
+    if (!actors.length) return;
+    await db.from("actors").upsert(actors, { onConflict: "slug" });
+  }
+
+  async function initAdminActorsPanel() {
+    const section = document.getElementById("admin-actors-section");
+    if (!section) return;
+
+    const listEl = document.getElementById("adminActorsGrid");
+    const searchEl = document.getElementById("adminActorsSearch");
+    const paginationEl = document.getElementById("adminActorsPagination");
+    let actorPage = 1;
+    const pageSize = 9;
+
+    await syncActorsFromMovies();
+
+    async function loadActors(page = 1) {
+      actorPage = page;
+      const q = (searchEl?.value || "").trim();
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+
+      let query = db.from("actors").select("id,name,slug,profile_url", { count: "exact" }).order("name", { ascending: true });
+      if (q) query = query.ilike("name", `%${q}%`);
+
+      const { data, count, error } = await query.range(from, to);
+      if (error) {
+        console.error("loadActors error", error);
+        return;
+      }
+
+      listEl.innerHTML = (data || [])
+        .map((a) => `
+          <article class="admin-actor-card" data-id="${a.id}">
+            <div class="admin-actor-photo">${a.profile_url ? `<img src="${escapeHtml(a.profile_url)}" alt="${escapeHtml(a.name)}" />` : '<img src="/images/icons8-user-96.png" alt="profile" class="admin-actor-photo-fallback" />'}</div>
+            <div class="admin-actor-name" dir="auto">${escapeHtml(a.name)}</div>
+            <div class="button-wrap">
+              <button class="admin-submit actor-upload-btn" type="button" data-id="${a.id}"><span>انتخاب عکس</span></button>
+              <div class="button-shadow"></div>
+            </div>
+            <input class="actor-upload-input" type="file" accept="image/*" hidden />
+          </article>
+        `)
+        .join("");
+
+      const totalPages = Math.max(1, Math.ceil((count || 0) / pageSize));
+      paginationEl.innerHTML = Array.from({ length: totalPages }, (_, i) => {
+        const n = i + 1;
+        return `<button class="admin-page-btn ${n === actorPage ? "active" : ""}" data-page="${n}">${n}</button>`;
+      }).join("");
+    }
+
+    searchEl?.addEventListener("input", () => loadActors(1));
+
+    paginationEl?.addEventListener("click", (e) => {
+      const btn = e.target.closest(".admin-page-btn");
+      if (!btn) return;
+      const p = Number(btn.dataset.page || 1);
+      loadActors(p);
+    });
+
+    listEl?.addEventListener("click", (e) => {
+      const card = e.target.closest(".admin-actor-card");
+      if (!card) return;
+      const uploadBtn = e.target.closest(".actor-upload-btn");
+      if (!uploadBtn) return;
+      card.querySelector(".actor-upload-input")?.click();
+    });
+
+    listEl?.addEventListener("change", async (e) => {
+      const input = e.target.closest(".actor-upload-input");
+      if (!input || !input.files?.[0]) return;
+      const card = input.closest(".admin-actor-card");
+      const actorId = card?.dataset.id;
+      if (!actorId) return;
+
+      const file = input.files[0];
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const path = `public/${Date.now()}_${actorId}.${ext}`;
+      const { error: uploadErr } = await db.storage.from("actor-profiles").upload(path, file, { upsert: true });
+      if (uploadErr) {
+        console.error(uploadErr);
+        showToast("خطا در آپلود عکس بازیگر");
+        return;
+      }
+
+      const { data: pub } = db.storage.from("actor-profiles").getPublicUrl(path);
+      const publicUrl = pub?.publicUrl || "";
+      const { error: upErr } = await db.from("actors").update({ profile_url: publicUrl }).eq("id", actorId);
+      if (upErr) {
+        console.error(upErr);
+        showToast("خطا در ذخیره عکس بازیگر");
+        return;
+      }
+      showToast("عکس بازیگر ذخیره شد ✅");
+      loadActors(actorPage);
+    });
+
+    await loadActors(1);
+  }
+
   // -------------show upload toast
   function showUploadToast(message) {
     const container = document.getElementById("toast-container");
@@ -6586,7 +6727,7 @@ function openMovieModal(m, startIdx = 0) {
     const tabButtons = document.querySelectorAll(".admin-tabs .tab-btn");
 
     const sections = {
-      posts: [".send_post", ".released_movies", "#popular-movies-section"],
+      posts: [".send_post", ".released_movies", "#popular-movies-section", "#admin-actors-section"],
       messages: [".admin_messages", "#usersMessages"],
       comments: ["#unapproved-comments-section"],
       links: ["#social-links-section"],
@@ -8413,4 +8554,5 @@ initSideMenuAccordions();
   }
 
   fetchSocialLinks();
+  initAdminActorsPanel();
 });

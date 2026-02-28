@@ -7095,3 +7095,123 @@ html[lang="en"] .site-features .feature-accordion-body p {
 html[lang="en"] .site-features .feature-accordion-header {
   justify-content: flex-start;
 }
+
+/* Actor page */
+.actor-page-body {
+  background: var(--bg-day);
+}
+body.dark.actor-page-body {
+  background: var(--bg-night);
+}
+.actor-profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 0 14px;
+}
+.actor-avatar-wrap {
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(var(--theme-accent-rgb), 0.35);
+  background: rgba(var(--theme-accent-rgb), 0.08);
+  display: grid;
+  place-items: center;
+}
+.actor-avatar,
+.actor-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.actor-avatar-fallback {
+  display: grid;
+  place-items: center;
+}
+.actor-avatar-fallback img {
+  width: 68px;
+  height: 68px;
+  opacity: 0.75;
+}
+.actor-name,
+.actor-movies-title {
+  text-align: center;
+}
+.actor-movies-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.actor-post-card {
+  width: 100%;
+}
+.actor-post-actions .button-wrap {
+  max-width: 220px;
+}
+
+/* Admin actors */
+.admin-actors-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.admin-actor-card {
+  border: 1px solid rgba(var(--theme-accent-rgb), 0.22);
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.7);
+}
+body.dark .admin-actor-card {
+  background: rgba(30, 36, 40, 0.6);
+}
+.admin-actor-photo {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(var(--theme-accent-rgb), 0.08);
+}
+.admin-actor-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.admin-actor-name {
+  font-weight: 700;
+  text-align: center;
+}
+
+/* fix admin chat overlay flash */
+#adminThreadOverlay {
+  display: none;
+}
+#adminThreadOverlay[aria-hidden="false"] {
+  display: grid;
+}
+
+/* movie page background + similar cards padding */
+.movie-page-body {
+  background: var(--bg-day);
+  color: #222;
+}
+body.dark .movie-page-body {
+  background: var(--bg-night);
+  color: #e6eef6;
+}
+.similar-movies-container .episodes-list {
+  padding: 8px;
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .admin-actors-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

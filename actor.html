@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FilmChiin | Actor page</title>
+    <meta name="description" content="View actor profile and related posts on FilmChiin" />
+    <link rel="stylesheet" href="/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script defer src="/actor.js"></script>
+  </head>
+  <body class="index-body movie-page-body actor-page-body">
+    <header class="main-header movie-page-header-only">
+      <div id="movieBannerMount" class="site-banner"></div>
+    </header>
+
+    <main class="movie-page-container actor-page-container">
+      <a class="movie-page-back" href="/" data-i18n="backToHome">← Back to homepage</a>
+      <section id="actorPageStatus" class="movie-page-status" data-i18n="loading">Loading...</section>
+
+      <section id="actorHeader" class="actor-profile-card" hidden>
+        <div class="actor-avatar-wrap">
+          <img id="actorAvatar" class="actor-avatar" src="/images/icons8-user-96.png" alt="actor" />
+          <div id="actorAvatarFallback" class="actor-avatar-fallback" hidden>
+            <img src="/images/icons8-user-96.png" alt="profile" />
+          </div>
+        </div>
+        <h1 id="actorName" class="actor-name">-</h1>
+      </section>
+
+      <section id="actorMoviesBlock" class="actor-movies-block" hidden>
+        <h2 class="actor-movies-title" data-i18n="actorMovies">Actor movies</h2>
+        <div id="actorMoviesList" class="actor-movies-list"></div>
+      </section>
+    </main>
+
+    <div id="movieFeaturesMount"></div>
+  </body>
+</html>

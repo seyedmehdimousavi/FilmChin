@@ -1,6 +1,8 @@
 {
   "rewrites": [
     { "source": "/movie/:slug", "destination": "/movie.html?slug=:slug" },
-    { "source": "/movie/:slug/", "destination": "/movie.html?slug=:slug" }
+    { "source": "/movie/:slug/", "destination": "/movie.html?slug=:slug" },
+    { "source": "/actor/:slug", "destination": "/actor.html?slug=:slug" },
+    { "source": "/actor/:slug/", "destination": "/actor.html?slug=:slug" }
   ]
 }
