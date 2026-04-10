@@ -7215,3 +7215,123 @@ body.dark .movie-page-body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* ===== Header layout refresh ===== */
+.header-profile-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.header .search-bar {
+  width: auto;
+  flex: 1;
+  max-width: 720px;
+}
+
+.header .theme-switch {
+  flex: 0 0 auto;
+}
+
+/* ===== Bottom mobile dock ===== */
+.mobile-bottom-dock {
+  position: fixed;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  width: min(92vw, 340px);
+  z-index: 13000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22);
+}
+body.dark .mobile-bottom-dock {
+  background: rgba(15, 20, 26, 0.8);
+}
+.dock-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(var(--theme-accent-rgb), 0.12);
+  color: var(--theme-accent-dark);
+}
+body.dark .dock-btn {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+}
+.dock-btn img {
+  width: 24px;
+  height: 24px;
+}
+.dock-btn i {
+  font-size: 1.2rem;
+}
+
+/* ===== Actor chip with avatar ===== */
+.person-chip.actor-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.actor-chip-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 18px;
+  border: 1px solid rgba(var(--theme-accent-rgb), 0.5);
+}
+.actor-chip-avatar-fallback {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--theme-accent-rgb), 0.2);
+  color: var(--theme-accent-dark);
+  font-size: 10px;
+}
+
+/* ===== Movie page dynamic hero background ===== */
+.movie-page-body {
+  position: relative;
+  background-size: cover;
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+.movie-page-body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.74);
+  pointer-events: none;
+  z-index: -1;
+}
+body.dark .movie-page-body::before {
+  background: rgba(0, 0, 0, 0.58);
+}
+
+@media (max-width: 900px) {
+  .header {
+    gap: 8px;
+  }
+  .header .search-bar {
+    min-height: 48px;
+    height: 48px;
+  }
+  body {
+    padding-bottom: 90px;
+  }
+}

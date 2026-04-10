@@ -26,7 +26,7 @@
 
     <meta
       name="keywords"
-      content="دانلود فیلم,دانلود سریال,فیلم جدید,سریال جدید,دانلود کالکشن,آرشیو فیلم,فیلم خارجی,فیلم ،بدون سانسور، دوبله فارسی,FilmChiin,فیلمچین"
+      content="دانلود فیلم,دانلود فیلم فلان,دانلود سریال,فیلم جدید,سریال جدید,آرشیو فیلم,فیلم خارجی,دانلود کالکشن,FilmChiin,فیلمچین"
     />
 
     <!-- Robots -->
@@ -85,6 +85,25 @@
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://filmchiin.ir/" />
+    <script id="seoPaginationLinks">
+      (function(){
+        try {
+          const u = new URL(window.location.href);
+          const p = Math.max(1, parseInt(u.searchParams.get("page") || "1", 10));
+          const head = document.head;
+          if (p > 1) {
+            const prev = document.createElement("link");
+            prev.rel = "prev";
+            prev.href = p === 2 ? `${u.origin}/` : `${u.origin}/?page=${p-1}`;
+            head.appendChild(prev);
+          }
+          const next = document.createElement("link");
+          next.rel = "next";
+          next.href = `${u.origin}/?page=${p+1}`;
+          head.appendChild(next);
+        } catch(e){}
+      })();
+    </script>
 
     <!-- Bootstrap Icons -->
     <link
@@ -149,54 +168,27 @@
         </div>
       </div>
       <div class="header">
-        <div class="search-bar">
-          <div class="button-wrap">
-            <button id="menuBtn" class="menu-btn" aria-label="menu">
-              <img
-                width="96"
-                height="96"
-                src="/images/icons8-menu-64.png"
-                alt="menu--v2"
-                style="display: flex; align-items: center"
-              />
-            </button>
-            <div class="button-shadow"></div>
-          </div>
-          <div id="profileMenu" class="profile-menu hidden">
-            <div class="profile-bubble">
-              <div class="profile-username" id="profileUsername">UserName</div>
+        <div id="profileMenu" class="profile-menu hidden">
+          <div class="profile-bubble">
+            <div class="profile-username" id="profileUsername">UserName</div>
 
-              <div class="button-wrap">
-                <button class="profile-edit"><span>Edit Profile</span></button>
-                <div class="button-shadow"></div>
-              </div>
+            <div class="button-wrap">
+              <button class="profile-edit"><span>Edit Profile</span></button>
+              <div class="button-shadow"></div>
+            </div>
 
-              <!-- ✅ NEW: Favorite movies button -->
-              <div class="button-wrap">
-                <button id="favoriteMoviesBtn" class="profile-favorites">
-                  <span data-i18n="favoriteMovies">Favorite movies</span>
-                </button>
-                <div class="button-shadow"></div>
-              </div>
+            <hr class="profile-divider" />
 
-              <hr class="profile-divider" />
-
-              <div class="button-wrap">
-                <button id="logoutBtn" class="profile-logout">
-                  <span data-i18n="logout">Logout</span>
-                </button>
-                <div class="button-shadow"></div>
-              </div>
+            <div class="button-wrap">
+              <button id="logoutBtn" class="profile-logout">
+                <span data-i18n="logout">Logout</span>
+              </button>
+              <div class="button-shadow"></div>
             </div>
           </div>
+        </div>
 
-          <div class="search-input-wrap">
-            <input id="search" type="text" placeholder="Search..." dir="auto" data-i18n-placeholder="searchPlaceholder" />
-            <div id="searchSuggestion" class="search-suggestion" aria-hidden="true">
-              <span class="typed-part"></span><span class="suggestion-part" role="button" tabindex="0"></span>
-            </div>
-          </div>
-
+        <div class="header-profile-wrap">
           <div class="button-wrap">
             <button
               id="profileBtn"
@@ -205,21 +197,21 @@
               aria-label="profile"
             >
               <img src="/images/icons8-user-96.png" alt="user" />
-              <span id="commentBadge" class="badge" style="display: none"
-                >!</span
-              >
+              <span id="commentBadge" class="badge" style="display: none">!</span>
             </button>
             <div class="button-shadow"></div>
           </div>
+        </div>
 
-          <button
-            id="searchCloseBtn"
-            class="close-btn"
-            style="display: none"
-            aria-label="close"
-          >
-            ✕
-          </button>
+        <div class="search-bar">
+          <div class="search-input-wrap">
+            <input id="search" type="text" placeholder="Search..." dir="auto" data-i18n-placeholder="searchPlaceholder" />
+            <div id="searchSuggestion" class="search-suggestion" aria-hidden="true">
+              <span class="typed-part"></span><span class="suggestion-part" role="button" tabindex="0"></span>
+            </div>
+          </div>
+
+          <button id="searchCloseBtn" class="close-btn" style="display: none" aria-label="close">✕</button>
         </div>
 
         <label class="theme-switch" id="themeSwitchLabel">
@@ -1118,6 +1110,27 @@
         </form>
       </div>
     </div>
+
+    <nav class="mobile-bottom-dock" aria-label="quick actions">
+      <div class="button-wrap">
+        <button id="bottomMenuBtn" class="dock-btn" aria-label="menu">
+          <img src="/images/icons8-menu-64.png" alt="menu" />
+        </button>
+        <div class="button-shadow"></div>
+      </div>
+      <div class="button-wrap">
+        <button id="bottomFavoritesBtn" class="dock-btn" aria-label="favorite movies">
+          <img src="/images/icons8-heart-50.png" alt="favorites" />
+        </button>
+        <div class="button-shadow"></div>
+      </div>
+      <div class="button-wrap">
+        <button id="bottomSearchBtn" class="dock-btn" aria-label="focus search">
+          <i class="bi bi-search"></i>
+        </button>
+        <div class="button-shadow"></div>
+      </div>
+    </nav>
 
     <!-- کانتینر شناور -->
     <div class="floating-wrapper">
