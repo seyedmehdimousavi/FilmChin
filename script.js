@@ -164,6 +164,7 @@ let editingMovie = null;
 const PAGE_SIZE = 10;
 let currentPage = 1;
 let episodesByMovie = new Map();
+let actorAvatarMap = new Map();
 let imdbMinRating = null;
 // ===== Year filter global state =====
 let yearMinFilter = null;      // حداقل سالی که از اسپینر انتخاب شده
@@ -1607,7 +1608,7 @@ function attachCommentsHandlers(card, movieId) {
 document.addEventListener("DOMContentLoaded", () => {
   // Element references
   const themeToggle = document.getElementById("themeToggle");
-  const menuBtn = document.getElementById("menuBtn");
+  const menuBtn = document.getElementById("menuBtn") || document.getElementById("bottomMenuBtn");
   const sideMenu = document.getElementById("sideMenu");
   const menuOverlay = document.getElementById("menuOverlay");
 
@@ -2051,7 +2052,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const favoritesNextBtn = document.getElementById("favoritesNext");
   const favoritesCloseBtn = document.getElementById("favoritesCloseBtn");
 
-  const favoriteMoviesBtn = document.getElementById("favoriteMoviesBtn");
+  const favoriteMoviesBtn = document.getElementById("favoriteMoviesBtn") || document.getElementById("bottomFavoritesBtn");
   // ===================== Post Options (card click) =====================
 
   function updatePostOptionsFavoriteUI(isFavorite) {
@@ -2690,6 +2691,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Fetch data
 
+  async function fetchActorAvatars() {
+    try {
+      const { data, error } = await db.from("actors").select("name,slug,profile_url");
+      if (error || !Array.isArray(data)) return;
+      actorAvatarMap = new Map();
+      data.forEach((row) => {
+        const key = String(row.slug || makeActorSlug(row.name || "")).trim();
+        if (!key) return;
+        actorAvatarMap.set(key, row.profile_url || "");
+      });
+    } catch (e) {
+      console.warn("fetchActorAvatars error", e);
+    }
+  }
+
   async function fetchMovies() {
     try {
       // 🚀 مرتب‌سازی هوشمند: 
@@ -2710,6 +2726,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // دریافت اپیزودها از دیتابیس
       await fetchEpisodes();
+      await fetchActorAvatars();
 
       // صفحه فعلی را از پارامترهای URL (مثل ?page=2) بخوان
       currentPage = getPageFromUrl();
@@ -3015,6 +3032,7 @@ renderPagedMovies(true);
   }
 
   const searchCloseBtn = document.getElementById("searchCloseBtn");
+  const bottomSearchBtn = document.getElementById("bottomSearchBtn");
 
   if (searchInput && profileBtn && searchCloseBtn) {
     const toggleSearchDecor = () => {
@@ -3029,6 +3047,12 @@ renderPagedMovies(true);
     searchCloseBtn.addEventListener("click", () => {
       searchInput.value = "";
       searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    bottomSearchBtn?.addEventListener("click", () => {
+      searchInput.scrollIntoView({ behavior: "smooth", block: "center" });
+      searchInput.focus();
+      searchInput.click();
     });
   }
 
@@ -3404,9 +3428,20 @@ function setTabInUrl(type) {
     return `<span class="${className}" dir="auto" onclick="(function(){window.__filmchinSetSearchFromChip && window.__filmchinSetSearchFromChip(decodeURIComponent('${encodedValue}'));})();">${safeValue}</span>`;
   }
 
+
+
+  function getActorAvatarHtml(name) {
+    const actorAvatar = actorAvatarMap.get(makeActorSlug(name));
+    if (actorAvatar) {
+      return `<img class="actor-chip-avatar" src="${escapeHtml(actorAvatar)}" alt="${escapeHtml(name)}">`;
+    }
+    return `<span class="actor-chip-avatar-fallback"><i class="bi bi-person"></i></span>`;
+  }
+
   function buildActorChip(value) {
     const safeValue = escapeHtml(value);
-    return `<a class="person-chip actor-chip" dir="auto" href="${buildActorHref(value)}">${safeValue}</a>`;
+    const avatar = getActorAvatarHtml(value);
+    return `<a class="person-chip actor-chip" dir="auto" href="${buildActorHref(value)}">${avatar}<span>${safeValue}</span></a>`;
   }
 
   function extractHashtagTokens(str) {
@@ -7423,7 +7458,7 @@ function appendPendingChatMessage({ text = null, imageUrl = null } = {}) {
     const unread = !!data?.unread_for_user;
 
     const chatBubbleBadge = document.getElementById("chatBubbleBadge");
-    const menuBtn = document.getElementById("menuBtn");
+    const menuBtn = document.getElementById("menuBtn") || document.getElementById("bottomMenuBtn");
     let chatMenuBadgeEl = menuBtn?.querySelector(".chat-menu-badge");
 
     if (unread) {

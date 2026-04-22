@@ -6,6 +6,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentMovie = null;
 let currentUser = null;
 let favoriteMovieIds = new Set();
+let actorAvatarMap = new Map();
 
 const pageLang = localStorage.getItem("siteLanguage") || "en";
 const movieI18n = {
@@ -240,6 +241,16 @@ function parseSlug() {
   return (new URLSearchParams(window.location.search).get("slug") || "").trim();
 }
 
+function applyMovieHeroBackground(coverUrl) {
+  const body = document.body;
+  if (!body) return;
+  if (!coverUrl) {
+    body.style.removeProperty("--movie-hero-url");
+    return;
+  }
+  body.style.setProperty("--movie-hero-url", `url("${coverUrl}")`);
+}
+
 function extractHashtagTokens(str) {
   if (!str) return [];
   return (str.match(/#[^\s,،]+/g) || []).map((tag) => tag.trim()).filter(Boolean);
@@ -278,9 +289,33 @@ function buildSearchChip(value, className) {
   return `<a class="${className}" dir="auto" href="${buildHomeSearchHref(value)}">${safeValue}</a>`;
 }
 
+function getActorAvatarHtml(name) {
+  const actorAvatar = actorAvatarMap.get(makeActorSlug(name));
+  if (actorAvatar) {
+    return `<img class="actor-chip-avatar" src="${escapeHtml(actorAvatar)}" alt="${escapeHtml(name)}">`;
+  }
+  return `<span class="actor-chip-avatar-fallback"><i class="bi bi-person"></i></span>`;
+}
+
 function buildActorChip(value) {
   const safeValue = escapeHtml(value);
-  return `<a class="person-chip actor-chip" dir="auto" href="/actor/${encodeURIComponent(makeActorSlug(value))}">${safeValue}</a>`;
+  const avatar = getActorAvatarHtml(value);
+  return `<a class="person-chip actor-chip" dir="auto" href="/actor/${encodeURIComponent(makeActorSlug(value))}">${avatar}<span>${safeValue}</span></a>`;
+}
+
+async function fetchActorAvatars() {
+  try {
+    const { data, error } = await db.from("actors").select("name,slug,profile_url");
+    if (error || !Array.isArray(data)) return;
+    actorAvatarMap = new Map();
+    data.forEach((row) => {
+      const key = String(row.slug || makeActorSlug(row.name || "")).trim();
+      if (!key) return;
+      actorAvatarMap.set(key, row.profile_url || "");
+    });
+  } catch (e) {
+    console.warn("fetchActorAvatars error", e);
+  }
 }
 
 function renderChips(str, mode = "hashtags") {
@@ -863,6 +898,7 @@ async function loadMoviePage() {
     const slug = parseSlug();
     if (!slug) return (status.textContent = mt("missingSlug"));
 
+    await fetchActorAvatars();
     const { data: movies, error } = await db.from("movies").select("*");
     if (error || !Array.isArray(movies)) return (status.textContent = mt("fetchError"));
 
@@ -870,6 +906,7 @@ async function loadMoviePage() {
     if (!movie) return (status.textContent = mt("notFound"));
 
     currentMovie = movie;
+    applyMovieHeroBackground(movie.cover || "");
 
     const { data: items } = await db.from("movie_items").select("*").eq("movie_id", movie.id).order("order_index", { ascending: true });
     const episodes = (movie.type === "collection" || movie.type === "serial")
