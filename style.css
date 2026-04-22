@@ -2658,10 +2658,13 @@ body.dark .year-spinner-center {
 .go-pagination {
   width: 100%;
   cursor: pointer;
+  display: flex;
+  align-items: center;
   text-align: center;
+  justify-content: center;
 }
-.go-pagination span {
-  padding: 7px;
+.go-pagination p {
+  margin: 5px;
 }
 .story-title {
   display: block;
@@ -6798,9 +6801,6 @@ body.dark .language-option {
 
 .go-page-btn {
   width: 100%;
-  min-height: 56px;
-  border-radius: 14px;
-  border: 0;
   cursor: pointer;
   text-decoration: none;
   display: flex;
