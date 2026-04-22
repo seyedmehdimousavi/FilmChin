@@ -245,10 +245,10 @@ function applyMovieHeroBackground(coverUrl) {
   const body = document.body;
   if (!body) return;
   if (!coverUrl) {
-    body.style.removeProperty("background-image");
+    body.style.removeProperty("--movie-hero-url");
     return;
   }
-  body.style.backgroundImage = `url('${coverUrl}')`;
+  body.style.setProperty("--movie-hero-url", `url("${coverUrl}")`);
 }
 
 function extractHashtagTokens(str) {

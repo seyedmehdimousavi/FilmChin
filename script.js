@@ -3050,6 +3050,7 @@ renderPagedMovies(true);
     });
 
     bottomSearchBtn?.addEventListener("click", () => {
+      searchInput.scrollIntoView({ behavior: "smooth", block: "center" });
       searchInput.focus();
       searchInput.click();
     });
