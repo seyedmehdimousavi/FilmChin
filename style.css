@@ -13,11 +13,27 @@
   --bg-day: var(--theme-bg-day);
   --bg-night: #1a2026;
   --post-day: linear-gradient(135deg, #fff, #fafafa); /* سفید → خاکستری ملایم */
-  --post-night: linear-gradient(180deg, #212a33, #37424f); /* آبی تیره → خاکستری آبی روشن‌تر */
+  --post-night: linear-gradient(
+    180deg,
+    #212a33,
+    #37424f
+  ); /* آبی تیره → خاکستری آبی روشن‌تر */
 
-  --btn-day: linear-gradient(135deg, var(--theme-accent-dark), var(--theme-accent));
-  --btn-night: linear-gradient(135deg, var(--theme-accent-light), var(--theme-accent-contrast));
-  --accent-gradient: linear-gradient(135deg, var(--theme-accent-dark), var(--theme-accent-light));
+  --btn-day: linear-gradient(
+    135deg,
+    var(--theme-accent-dark),
+    var(--theme-accent)
+  );
+  --btn-night: linear-gradient(
+    135deg,
+    var(--theme-accent-light),
+    var(--theme-accent-contrast)
+  );
+  --accent-gradient: linear-gradient(
+    135deg,
+    var(--theme-accent-dark),
+    var(--theme-accent-light)
+  );
   --accent-soft-bg: rgba(var(--theme-accent-rgb), 0.08);
   --accent-soft-bg-2: rgba(var(--theme-accent-rgb), 0.06);
   --accent-soft-chip: rgba(var(--theme-accent-rgb), 0.15);
@@ -1161,7 +1177,11 @@ Body.dark #loginModal .close-btn:hover {
   transition: background 0.3s ease;
 }
 #loginModal .login-btn:hover {
-  background: linear-gradient(135deg, var(--theme-accent-contrast), var(--theme-accent-dark));
+  background: linear-gradient(
+    135deg,
+    var(--theme-accent-contrast),
+    var(--theme-accent-dark)
+  );
 }
 
 /* انیمیشن ظاهر شدن */
@@ -1944,7 +1964,7 @@ Body.admin-body.dark h2 {
     box-shadow 0.2s;
   flex: 0 0 auto; /* جلوگیری از کشیده شدن */
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.58);
-  padding: 0.2rem;
+  padding: 0px 0.2rem 10px;
 }
 .episode-card .episode-title {
   margin-top: 4px;
@@ -2572,7 +2592,7 @@ body.dark .year-spinner-center {
    ========================= */
 .floating-btn-container {
   position: fixed;
-  bottom: 120px;
+  bottom: 90px;
   right: 20px;
 }
 .floating-btn {
@@ -4761,8 +4781,7 @@ min-tabs .tab-circle .badge {
 }
 .go-top-container {
   position: fixed;
-  position: fixed;
-  bottom: 120px;
+  bottom: 150px;
   right: 20px;
 }
 .go-top-button {
@@ -6768,7 +6787,7 @@ body.dark .language-option {
 }
 
 .post-action-row {
-  display: flex;
+  /* display: flex; */
   gap: 10px;
   align-items: stretch;
 }
@@ -6857,7 +6876,6 @@ body.dark .go-page-btn {
   flex-direction: row !important;
 }
 
-
 .movie-card.no-reveal .anim-horizontal,
 .movie-card.no-reveal .anim-vertical,
 .movie-card.no-reveal .anim-left-right {
@@ -6884,7 +6902,7 @@ body.dark .go-page-btn {
 }
 
 .similar-go-wrap {
-  width: 100%;
+  /* width: 100%; */
 }
 
 .similar-go-btn {
@@ -6929,7 +6947,6 @@ body.dark .movie-page-back {
   direction: ltr;
 }
 
-
 .similar-movies-section {
   margin-top: 14px;
 }
@@ -6955,7 +6972,6 @@ body.dark .movie-page-back {
   font-size: 0.76rem;
 }
 
-
 .post-action-row .button-wrap:first-child {
   flex: 6;
 }
@@ -6968,13 +6984,11 @@ body.dark .movie-page-back {
   flex: 1;
 }
 
-
 .quote-text {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
-
 
 .similar-movies-container .episodes-list,
 .similar-movies-container .episode-card,
@@ -6983,11 +6997,13 @@ body.dark .movie-page-back {
   transform: none !important;
 }
 
-
-html[lang="fa"] .movie-count-container { display:flex; justify-content:flex-end; }
-.field-label { text-align: right; }
-
-
+html[lang="fa"] .movie-count-container {
+  display: flex;
+  justify-content: flex-end;
+}
+.field-label {
+  text-align: right;
+}
 
 /* ===== Persian post layout adjustments ===== */
 html[lang="fa"] .movie-card .field-label,
@@ -7060,15 +7076,15 @@ html[lang="fa"] .movie-modal-content .comments-count {
 
 /* Movie page recommendation blocks */
 .similar-block-card {
-  border: 1px solid rgba(0,0,0,.14);
+  border: 1px solid rgba(0, 0, 0, 0.14);
   border-radius: 14px;
   padding: 10px;
   margin: 10px 0 14px;
-  background: rgba(255,255,255,.7);
+  background: rgba(255, 255, 255, 0.7);
 }
 body.dark .similar-block-card {
-  background: rgba(30,30,30,.6);
-  border-color: rgba(255,255,255,.12);
+  background: rgba(30, 30, 30, 0.6);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 .similar-empty-message {
   width: 100%;
@@ -7145,6 +7161,11 @@ body.dark.actor-page-body {
 }
 .actor-post-actions .button-wrap {
   max-width: 220px;
+}
+.actor-post-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Admin actors */
@@ -7280,6 +7301,7 @@ body.dark .dock-btn {
   padding: 3px 8px;
   font-size: 11px;
   font-weight: 700;
+  margin: 5px 0px 0px;
   line-height: 1;
 }
 .actor-chip-avatar {
