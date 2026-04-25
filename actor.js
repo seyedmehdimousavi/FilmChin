@@ -13,6 +13,7 @@ const i18n = {
     actorNotFound: "No posts found for this actor.",
     actorMovies: "Actor movies",
     goToPage: "Go to page",
+    episodes: "Episodes",
   },
   fa: {
     backToHome: "← بازگشت به صفحه اصلی",
@@ -21,6 +22,7 @@ const i18n = {
     actorNotFound: "پستی برای این بازیگر پیدا نشد.",
     actorMovies: "فیلم‌های بازیگر",
     goToPage: "صفحه فیلم",
+    episodes: "اپیزودها",
   },
 };
 
@@ -98,7 +100,18 @@ async function hydrateBannerFromHome() {
   if (banner) document.getElementById("movieBannerMount").innerHTML = banner.outerHTML;
 }
 
-function renderActorPosts(posts) {
+function buildActorEpisodesMap(items) {
+  const map = new Map();
+  (items || []).forEach((item) => {
+    const key = String(item.movie_id || "");
+    if (!key) return;
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(item);
+  });
+  return map;
+}
+
+function renderActorPosts(posts, episodesMap = new Map()) {
   const container = document.getElementById("actorMoviesList");
   container.innerHTML = posts
     .map((m) => {
@@ -106,6 +119,23 @@ function renderActorPosts(posts) {
       const title = escapeHtml(m.title || "-");
       const synopsis = escapeHtml(m.synopsis || "-");
       const url = `/movie/${encodeURIComponent(String(m.title || "").toLowerCase().trim().replace(/[^a-z0-9\u0600-\u06FF]+/gi, "-").replace(/-+/g, "-").replace(/^-|-$/g, ""))}`;
+      const movieEpisodes = episodesMap.get(String(m.id)) || [];
+      const showEpisodes = m.type === "collection" && movieEpisodes.length > 0;
+      const episodesHtml = showEpisodes
+        ? `<div class="actor-episodes-block">
+            <span class="field-label"><img src="/images/icons8-video.apng" style="width:20px;height:20px;"> ${t("episodes")}:</span>
+            <div class="episodes-container actor-episodes-container">
+              <div class="episodes-list actor-episodes-list">
+                ${movieEpisodes.map((ep, idx) => {
+                  const epTitle = escapeHtml(ep.title || `Episode ${idx + 1}`);
+                  const epCover = escapeHtml(ep.cover || m.cover || "https://via.placeholder.com/120x80?text=No+Cover");
+                  const scrollable = epTitle.length > 16 ? "scrollable" : "";
+                  return `<div class="episode-card actor-episode-card"><img src="${epCover}" alt="${epTitle}" class="episode-cover"><span class="episode-title ${scrollable}"><span>${epTitle}</span></span></div>`;
+                }).join("")}
+              </div>
+            </div>
+          </div>`
+        : "";
       return `
       <article class="movie-card no-reveal actor-post-card">
         <div class="cover-container"><div class="cover-blur" style="background-image:url('${cover}')"></div><img class="cover-image" src="${cover}" alt="${title}"></div>
@@ -113,6 +143,7 @@ function renderActorPosts(posts) {
           <div class="movie-title"><a class="movie-name movie-detail-link" href="${url}">${title}</a></div>
           <span class="field-label"><img src="/images/icons8-note.apng" style="width:20px;height:20px;"> Synopsis:</span>
           <div class="field-quote synopsis-quote"><div class="quote-text">${synopsis}</div></div>
+          ${episodesHtml}
           <div class="post-action-row movie-page-actions actor-post-actions">
             <div class="button-wrap">
               <button class="go-page-btn actor-go-page-btn" data-url="${url}"><span>${t("goToPage")}</span></button>
@@ -156,7 +187,7 @@ async function loadActorPage() {
     return;
   }
 
-  const { data: movies, error } = await db.from("movies").select("id,title,cover,synopsis,stars,created_at").order("created_at", { ascending: false });
+  const { data: movies, error } = await db.from("movies").select("id,title,cover,synopsis,stars,type,created_at").order("created_at", { ascending: false });
   if (error || !Array.isArray(movies)) {
     status.textContent = t("actorNotFound");
     return;
@@ -186,7 +217,18 @@ async function loadActorPage() {
     actorAvatarFallback.hidden = false;
   }
 
-  renderActorPosts(posts);
+  const collectionIds = posts.filter((m) => m.type === "collection").map((m) => m.id);
+  let episodesMap = new Map();
+  if (collectionIds.length) {
+    const { data: movieItems } = await db
+      .from("movie_items")
+      .select("movie_id,title,cover,order_index")
+      .in("movie_id", collectionIds)
+      .order("order_index", { ascending: true });
+    episodesMap = buildActorEpisodesMap(movieItems || []);
+  }
+
+  renderActorPosts(posts, episodesMap);
   status.hidden = true;
   actorHeader.hidden = false;
   actorMoviesBlock.hidden = false;
