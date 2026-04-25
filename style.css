@@ -292,6 +292,27 @@ Body.dark .side-menu {
   background: rgba(48, 56, 65, 0.95);
   color: #fff;
 }
+@media (min-width: 1200px) {
+  body.desktop-sidemenu .menu-overlay,
+  body.desktop-sidemenu .menu-btn {
+    display: none !important;
+  }
+  body.desktop-sidemenu .side-menu {
+    transform: none;
+    transition: none;
+    z-index: 1000;
+    border-right: 1px solid rgba(var(--theme-accent-rgb), 0.16);
+  }
+  body.desktop-sidemenu .main-header {
+    left: 300px;
+    width: calc(100% - 300px);
+  }
+  body.desktop-sidemenu .container,
+  body.desktop-sidemenu .seo-intro,
+  body.desktop-sidemenu .site-features {
+    margin-left: 320px;
+  }
+}
 .genre-grid {
   display: flex;
   flex-wrap: wrap;
@@ -7166,6 +7187,19 @@ body.dark.actor-page-body {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.actor-episodes-block {
+  margin-top: 10px;
+}
+.actor-episodes-container {
+  margin-top: 8px;
+}
+.actor-episodes-list {
+  gap: 8px;
+}
+.actor-episode-card {
+  min-width: 128px;
+  cursor: default;
 }
 
 /* Admin actors */

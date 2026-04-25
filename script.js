@@ -2668,7 +2668,20 @@ document.addEventListener("DOMContentLoaded", () => {
   applyThemeSmooth(savedTheme === "dark");
   // Side menu
   if (menuBtn && sideMenu && menuOverlay) {
+    const isDesktopSidebar = () => window.matchMedia("(min-width: 1200px)").matches;
+    const syncDesktopSidebar = () => {
+      if (isDesktopSidebar()) {
+        document.body.classList.add("desktop-sidemenu");
+        sideMenu.classList.remove("active");
+        menuOverlay.classList.remove("active");
+        document.body.classList.remove("no-scroll", "menu-open");
+      } else {
+        document.body.classList.remove("desktop-sidemenu");
+      }
+    };
+
     const openMenu = () => {
+      if (isDesktopSidebar()) return;
       sideMenu.classList.add("active");
       menuOverlay.classList.add("active");
       document.body.classList.add("no-scroll", "menu-open");
@@ -2687,6 +2700,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const clickedMenuBtn = menuBtn.contains(e.target);
       if (!clickedInsideMenu && !clickedMenuBtn) closeMenu();
     });
+
+    syncDesktopSidebar();
+    window.addEventListener("resize", syncDesktopSidebar);
   }
 
   // Fetch data
