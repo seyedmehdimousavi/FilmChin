@@ -3413,6 +3413,7 @@ function setTabInUrl(type) {
   }
 
   const episodeMatches = new Map();
+  let smartSearchHint = "";
 
   function setSearchFromChip(rawValue) {
     const searchEl = document.getElementById("search");
@@ -3426,6 +3427,131 @@ function setTabInUrl(type) {
     const safeValue = escapeHtml(value);
     const encodedValue = encodeURIComponent(value);
     return `<span class="${className}" dir="auto" onclick="(function(){window.__filmchinSetSearchFromChip && window.__filmchinSetSearchFromChip(decodeURIComponent('${encodedValue}'));})();">${safeValue}</span>`;
+  }
+
+  function normalizeSearchText(value) {
+    return String(value || "")
+      .toLowerCase()
+      .replace(/[أإآ]/g, "ا")
+      .replace(/ي/g, "ی")
+      .replace(/ك/g, "ک")
+      .replace(/[^\w\u0600-\u06FF\s]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function tokenizeSearchText(value) {
+    const normalized = normalizeSearchText(value);
+    if (!normalized) return [];
+    return normalized.split(" ").filter(Boolean);
+  }
+
+  function levenshteinDistance(a, b) {
+    const s = normalizeSearchText(a);
+    const t = normalizeSearchText(b);
+    const m = s.length;
+    const n = t.length;
+    if (!m) return n;
+    if (!n) return m;
+
+    const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        const cost = s[i - 1] === t[j - 1] ? 0 : 1;
+        dp[i][j] = Math.min(
+          dp[i - 1][j] + 1,
+          dp[i][j - 1] + 1,
+          dp[i - 1][j - 1] + cost
+        );
+      }
+    }
+    return dp[m][n];
+  }
+
+  function getBestTitleSuggestion(queryText) {
+    const q = normalizeSearchText(queryText);
+    if (!q || !Array.isArray(movies) || !movies.length) return "";
+
+    let bestTitle = "";
+    let bestDistance = Infinity;
+    for (const movie of movies) {
+      const title = String(movie?.title || movie?.name || "").trim();
+      if (!title) continue;
+      const distance = levenshteinDistance(q, title);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestTitle = title;
+      }
+    }
+
+    const dynamicThreshold = Math.max(2, Math.floor(q.length * 0.4));
+    if (bestDistance <= dynamicThreshold) return bestTitle;
+    return "";
+  }
+
+  function smartSearchScore(movie, qTokens, qNormalized) {
+    const title = normalizeSearchText(movie?.title || movie?.name || "");
+    const synopsis = normalizeSearchText(movie?.synopsis || "");
+    const genre = normalizeSearchText(movie?.genre || "");
+    const stars = normalizeSearchText(movie?.stars || "");
+    const director = normalizeSearchText(movie?.director || "");
+    const product = normalizeSearchText(movie?.product || "");
+    const type = normalizeSearchText(movie?.type || "");
+
+    const merged = `${title} ${synopsis} ${genre} ${stars} ${director} ${product} ${type}`.trim();
+    if (!merged) return 0;
+
+    let score = 0;
+    for (const token of qTokens) {
+      if (!token) continue;
+      if (title.includes(token)) score += 4;
+      else if (genre.includes(token) || stars.includes(token) || director.includes(token)) score += 2.5;
+      else if (synopsis.includes(token) || product.includes(token) || type.includes(token)) score += 1.5;
+    }
+
+    if (title.includes(qNormalized)) score += 8;
+    if ((movie?.title || "").toLowerCase() === qNormalized) score += 10;
+    return score;
+  }
+
+  function getSmartSearchResults(queryText) {
+    const qNormalized = normalizeSearchText(queryText);
+    const qTokens = tokenizeSearchText(queryText);
+    if (!qNormalized || !qTokens.length) return [];
+
+    const scored = [];
+    for (const movie of movies) {
+      let score = smartSearchScore(movie, qTokens, qNormalized);
+      if ((movie?.type === "collection" || movie?.type === "serial") && score < 1.5) {
+        const eps = episodesByMovie.get(movie.id) || [];
+        for (let idx = 0; idx < eps.length; idx++) {
+          const ep = eps[idx];
+          const epText = normalizeSearchText(
+            `${ep?.title || ""} ${ep?.synopsis || ""} ${ep?.file_name || ""} ${ep?.director || ""} ${ep?.stars || ""}`
+          );
+          if (!epText) continue;
+
+          let epTokenHits = 0;
+          qTokens.forEach((token) => {
+            if (epText.includes(token)) epTokenHits += 1;
+          });
+
+          if (epTokenHits > 0) {
+            score += epTokenHits * 1.2;
+            episodeMatches.set(movie.id, idx + 1);
+            break;
+          }
+        }
+      }
+
+      if (score > 0) scored.push({ movie, score });
+    }
+
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, 80).map((item) => item.movie);
   }
 
 
@@ -3613,6 +3739,28 @@ function setTabInUrl(type) {
     return movieMatch || episodeMatch;
   });
 
+  if (q) {
+    const hasExactTitleMatch = movies.some((m) =>
+      normalizeSearchText(m?.title || m?.name || "").includes(normalizeSearchText(searchTerm))
+    );
+    const bestTitleSuggestion = hasExactTitleMatch ? "" : getBestTitleSuggestion(searchTerm);
+
+    if (!filtered.length) {
+      filtered = getSmartSearchResults(searchTerm);
+      if (filtered.length) {
+        smartSearchHint = "نتیجه با جست‌وجوی هوشمند نمایش داده شد.";
+      } else if (bestTitleSuggestion) {
+        smartSearchHint = `منظورتان «${bestTitleSuggestion}» بود؟`;
+      } else {
+        smartSearchHint = "";
+      }
+    } else {
+      smartSearchHint = bestTitleSuggestion ? `منظورتان «${bestTitleSuggestion}» بود؟` : "";
+    }
+  } else {
+    smartSearchHint = "";
+  }
+
   // 2. فیلتر نوع
   if (currentTypeFilter !== "all") {
     filtered = filtered.filter((m) => {
@@ -3710,7 +3858,11 @@ function setTabInUrl(type) {
   const pageItems = filtered.slice(start, start + PAGE_SIZE);
 
   moviesGrid.innerHTML = "";
-  movieCount.innerText = `${uiText("numberOfMovies")}: ${filtered.length}`;
+  movieCount.innerHTML = `${uiText("numberOfMovies")}: ${filtered.length}${
+    smartSearchHint
+      ? `<div style="margin-top:6px;font-size:12px;opacity:.9">${escapeHtml(smartSearchHint)}</div>`
+      : ""
+  }`;
   movieCount.style.textAlign = (localStorage.getItem("siteLanguage") === "fa") ? "right" : "left";
 
   for (const m of pageItems) {
