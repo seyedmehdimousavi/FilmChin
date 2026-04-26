@@ -158,6 +158,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 // -------------------- App state --------------------
 let currentUser = null;
 let movies = [];
+let moviesTotalCount = 0;
 let messages = [];
 let editingMovie = null;
 
@@ -165,6 +166,8 @@ const PAGE_SIZE = 10;
 let currentPage = 1;
 let episodesByMovie = new Map();
 let actorAvatarMap = new Map();
+const moviesPageCache = new Map();
+let usingServerPagination = true;
 let imdbMinRating = null;
 // ===== Year filter global state =====
 let yearMinFilter = null;      // حداقل سالی که از اسپینر انتخاب شده
@@ -1010,6 +1013,39 @@ function finishPostProgress(success = true) {
 }
 
 // -------------------- Upload file with real progress via XHR --------------------
+
+async function compressImageIfNeeded(file, quality = 0.8) {
+  if (!(file instanceof File)) return file;
+  const isImage = /^image\//i.test(file.type || "");
+  const maxSizeBytes = 400 * 1024;
+  if (!isImage || file.size <= maxSizeBytes) return file;
+
+  try {
+    const imageBitmap = await createImageBitmap(file);
+    const canvas = document.createElement("canvas");
+    canvas.width = imageBitmap.width;
+    canvas.height = imageBitmap.height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(imageBitmap, 0, 0);
+
+    const targetType = file.type === "image/png" ? "image/jpeg" : file.type;
+    const blob = await new Promise((resolve) =>
+      canvas.toBlob(resolve, targetType, quality)
+    );
+    if (!blob || blob.size >= file.size) return file;
+
+    const ext = targetType.includes("jpeg") ? "jpg" : (file.name.split(".").pop() || "img");
+    const baseName = file.name.replace(/\.[^/.]+$/, "");
+    return new File([blob], `${baseName}-q80.${ext}`, {
+      type: targetType,
+      lastModified: Date.now(),
+    });
+  } catch (err) {
+    console.warn("compressImageIfNeeded error:", err);
+    return file;
+  }
+}
 
 async function uploadWithProgress(file, path) {
   return new Promise(async (resolve, reject) => {
@@ -2722,30 +2758,72 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  async function fetchMovies() {
-    try {
-      // 🚀 مرتب‌سازی هوشمند: 
-      // ۱. ابتدا بر اساس آخرین تغییرات (updated_at) تا پست‌های بروز شده صدرنشین شوند
-      // ۲. سپس بر اساس زمان ساخت (created_at) برای حفظ نظم پست‌های جدید ادیت نشده
-      const { data, error } = await db
-        .from("movies")
-        .select("*")
-        .order("updated_at", { ascending: false, nullsFirst: false })
-        .order("created_at", { ascending: false });
+  function shouldUseServerPagination() {
+    const hasSearch = Boolean((searchInput?.value || "").trim());
+    const hasExtraFilters =
+      currentTypeFilter !== "all" ||
+      Boolean(currentTabGenre) ||
+      imdbMinRating !== null ||
+      typeof yearMinFilter === "number";
+    return !hasSearch && !hasExtraFilters;
+  }
 
-      if (error) {
-        console.error("fetch movies error", error);
-        movies = [];
+  async function fetchMoviesPage(page = 1) {
+    const safePage = Number.isFinite(page) && page > 0 ? page : 1;
+    const cacheKey = `page-${safePage}`;
+    if (moviesPageCache.has(cacheKey)) {
+      const cached = moviesPageCache.get(cacheKey);
+      movies = cached.items.slice();
+      moviesTotalCount = cached.totalCount;
+      return;
+    }
+
+    const from = (safePage - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    const { data, error, count } = await db
+      .from("movies")
+      .select("*", { count: "exact" })
+      .order("updated_at", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false })
+      .range(from, to);
+
+    if (error) throw error;
+
+    const items = data || [];
+    const totalCount = Number.isFinite(count) ? count : items.length;
+    moviesPageCache.set(cacheKey, { items, totalCount });
+    movies = items.slice();
+    moviesTotalCount = totalCount;
+  }
+
+  async function fetchMovies(forceFull = false) {
+    try {
+      currentPage = getPageFromUrl();
+      usingServerPagination = !forceFull && shouldUseServerPagination();
+
+      if (usingServerPagination) {
+        await fetchMoviesPage(currentPage);
       } else {
-        movies = data || [];
+        // 🚀 مرتب‌سازی هوشمند:
+        // ۱. ابتدا بر اساس آخرین تغییرات (updated_at) تا پست‌های بروز شده صدرنشین شوند
+        // ۲. سپس بر اساس زمان ساخت (created_at) برای حفظ نظم پست‌های جدید ادیت نشده
+        const { data, error } = await db
+          .from("movies")
+          .select("*")
+          .order("updated_at", { ascending: false, nullsFirst: false })
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("fetch movies error", error);
+          movies = [];
+        } else {
+          movies = data || [];
+          moviesTotalCount = movies.length;
+        }
       }
 
-      // دریافت اپیزودها از دیتابیس
-      await fetchEpisodes();
+      await fetchEpisodes(usingServerPagination ? movies.map((m) => m.id) : null);
       await fetchActorAvatars();
-
-      // صفحه فعلی را از پارامترهای URL (مثل ?page=2) بخوان
-      currentPage = getPageFromUrl();
 
       // رندر فیلم‌ها در صفحه و نمایش کارت‌های پست
       await renderPagedMovies(); 
@@ -2770,6 +2848,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       console.error("fetchMovies catch", err);
       movies = [];
+      moviesTotalCount = 0;
     }
 }
 
@@ -2793,13 +2872,23 @@ document.addEventListener("DOMContentLoaded", () => {
       messages = [];
     }
   }
-  async function fetchEpisodes() {
+  async function fetchEpisodes(movieIds = null) {
     try {
-      const { data, error } = await db
+      let query = db
         .from("movie_items")
         .select("*")
         .order("movie_id", { ascending: true })
         .order("order_index", { ascending: true });
+
+      if (Array.isArray(movieIds)) {
+        if (!movieIds.length) {
+          episodesByMovie.clear();
+          return;
+        }
+        query = query.in("movie_id", movieIds);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error("fetch episodes error", error);
@@ -2922,7 +3011,7 @@ document.addEventListener("DOMContentLoaded", () => {
       a.textContent = label;
       a.href = `?page=${page}`;
 
-      a.addEventListener("click", (e) => {
+      a.addEventListener("click", async (e) => {
         // اجازه بده تب جدید / میان‌کلیک رفتار خودش رو داشته باشه
         if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) {
           return;
@@ -2949,7 +3038,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // ست کردن صفحه فعلی و رندر
         currentPage = targetPage;
-        renderPagedMovies(true);
+        if (shouldUseServerPagination()) {
+          usingServerPagination = true;
+          await fetchMoviesPage(currentPage);
+          await fetchEpisodes(movies.map((m) => m.id));
+          await renderPagedMovies(true);
+        } else {
+          await renderPagedMovies(true);
+        }
 
         // اسکرول نرم به بالای لیست
         const cont = document.querySelector(".container");
@@ -3149,10 +3245,15 @@ function setTabInUrl(type) {
   }
 
   /* =============== FILTER MOVIES BY TYPE =============== */
-  function filterByType(type) {
+  async function filterByType(type) {
     currentTypeFilter = type;
     currentPage = 1;
-    renderPagedMovies();
+    if (shouldUseServerPagination()) {
+      moviesPageCache.clear();
+      await fetchMovies();
+    } else {
+      await fetchMovies(true);
+    }
     setTimeout(moveTabIndicator, 60);
   }
 
@@ -3188,7 +3289,7 @@ function setTabInUrl(type) {
 
   /* =============== CLICK HANDLER =============== */
   document.querySelectorAll(".tab-link").forEach((link) => {
-    link.addEventListener("click", (e) => {
+    link.addEventListener("click", async (e) => {
       const type = link.dataset.type;
 
       if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) {
@@ -3210,7 +3311,7 @@ function setTabInUrl(type) {
       updateDynamicTitle();
       setTabInUrl(type);
 
-      filterByType(type);
+      await filterByType(type);
     });
   });
 
@@ -3226,14 +3327,20 @@ function setTabInUrl(type) {
   });
 
   /* =============== BACK/FORWARD SUPPORT =============== */
-  window.addEventListener("popstate", () => {
+  window.addEventListener("popstate", async () => {
     const typeFromUrl = getTabFromUrl();
     currentTypeFilter = typeFromUrl;
     applyActiveTab(typeFromUrl);
 
     currentPage = getPageFromUrl();
-
-    renderPagedMovies(true);
+    if (shouldUseServerPagination()) {
+      usingServerPagination = true;
+      await fetchMoviesPage(currentPage);
+      await fetchEpisodes(movies.map((m) => m.id));
+      await renderPagedMovies(true);
+      return;
+    }
+    await renderPagedMovies(true);
   });
 
   // -------------------- تشخیص جهت اسکرول --------------------
@@ -3719,6 +3826,17 @@ function setTabInUrl(type) {
   async function renderPagedMovies(skipScroll) {
   if (!moviesGrid || !movieCount) return;
 
+  const eligibleForServerPagination = shouldUseServerPagination();
+  if (usingServerPagination && !eligibleForServerPagination) {
+    await fetchMovies(true);
+    return;
+  }
+  if (!usingServerPagination && eligibleForServerPagination) {
+    moviesPageCache.clear();
+    await fetchMovies();
+    return;
+  }
+
   // مقدار خام برای جست‌وجو (برای هایلایت)
   const searchTerm = (searchInput?.value || "").trim();
   // مقدار lowercase برای فیلتر کردن
@@ -3858,10 +3976,15 @@ function setTabInUrl(type) {
     });
   }
 
-  if (typeof updateTypeCounts === "function") updateTypeCounts();
+  if (typeof updateTypeCounts === "function" && !usingServerPagination) {
+    updateTypeCounts();
+  }
   
 
-  const totalPages = computeTotalPages(filtered.length);
+  const totalItemsForPagination = usingServerPagination
+    ? moviesTotalCount
+    : filtered.length;
+  const totalPages = computeTotalPages(totalItemsForPagination);
 
   // صفحه در محدوده معتبر
   if (currentPage > totalPages) currentPage = totalPages;
@@ -3871,10 +3994,12 @@ function setTabInUrl(type) {
   setPageInUrl(currentPage);
 
   const start = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = filtered.slice(start, start + PAGE_SIZE);
+  const pageItems = usingServerPagination
+    ? filtered
+    : filtered.slice(start, start + PAGE_SIZE);
 
   moviesGrid.innerHTML = "";
-  movieCount.innerHTML = `${uiText("numberOfMovies")}: ${filtered.length}${
+  movieCount.innerHTML = `${uiText("numberOfMovies")}: ${totalItemsForPagination}${
     smartSearchHint
       ? `<div style="margin-top:6px;font-size:12px;opacity:.9">${escapeHtml(smartSearchHint)}</div>`
       : ""
@@ -4429,7 +4554,7 @@ function setTabInUrl(type) {
     applySearchHighlightsInGrid(searchTerm);
 
     // صفحه‌بندی
-    renderPagination(filtered.length);
+  renderPagination(totalItemsForPagination);
 
     // ژانرهای بالای صفحه
     buildTabGenres(filtered);
@@ -6240,8 +6365,9 @@ function openMovieModal(m, startIdx = 0) {
 
         if (coverFile) {
           try {
-            const filename = `public/${Date.now()}_${coverFile.name}`;
-            await uploadWithProgress(coverFile, filename);
+            const optimizedCoverFile = await compressImageIfNeeded(coverFile, 0.8);
+            const filename = `public/${Date.now()}_${optimizedCoverFile.name}`;
+            await uploadWithProgress(optimizedCoverFile, filename);
             const { data: publicUrl } = db.storage.from("covers").getPublicUrl(filename);
             coverUrl = publicUrl.publicUrl;
             completePart();
@@ -6261,8 +6387,9 @@ function openMovieModal(m, startIdx = 0) {
 
             if (file) {
               try {
-                const filename = `public/items/${Date.now()}_${i}_${file.name}`;
-                await uploadWithProgress(file, filename);
+                const optimizedItemFile = await compressImageIfNeeded(file, 0.8);
+                const filename = `public/items/${Date.now()}_${i}_${optimizedItemFile.name}`;
+                await uploadWithProgress(optimizedItemFile, filename);
                 const { data: publicUrl } = db.storage.from("covers").getPublicUrl(filename);
                 if (items[i]) items[i].cover = publicUrl.publicUrl;
                 completePart();
