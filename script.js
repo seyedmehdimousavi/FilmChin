@@ -167,6 +167,7 @@ let currentPage = 1;
 let episodesByMovie = new Map();
 let actorAvatarMap = new Map();
 const moviesPageCache = new Map();
+let moviesStats = [];
 let usingServerPagination = true;
 let imdbMinRating = null;
 // ===== Year filter global state =====
@@ -2761,16 +2762,39 @@ document.addEventListener("DOMContentLoaded", () => {
   function shouldUseServerPagination() {
     const hasSearch = Boolean((searchInput?.value || "").trim());
     const hasExtraFilters =
-      currentTypeFilter !== "all" ||
       Boolean(currentTabGenre) ||
       imdbMinRating !== null ||
       typeof yearMinFilter === "number";
     return !hasSearch && !hasExtraFilters;
   }
 
-  async function fetchMoviesPage(page = 1) {
+  function mapTabTypeToDbType(type) {
+    if (type === "series") return "serial";
+    if (type === "collection") return "collection";
+    if (type === "single") return "single";
+    return null;
+  }
+
+  async function fetchMovieStats() {
+    const { data, error } = await db.from("movies").select("type,genre");
+    if (error) {
+      console.error("fetchMovieStats error", error);
+      moviesStats = [];
+      return;
+    }
+    moviesStats = Array.isArray(data) ? data : [];
+  }
+
+  async function prefetchTabFirstPages() {
+    if (!usingServerPagination) return;
+    const tabs = ["collection", "series", "single"];
+    await Promise.allSettled(tabs.map((tab) => fetchMoviesPage(1, tab)));
+  }
+
+  async function fetchMoviesPage(page = 1, type = currentTypeFilter) {
     const safePage = Number.isFinite(page) && page > 0 ? page : 1;
-    const cacheKey = `page-${safePage}`;
+    const safeType = type || "all";
+    const cacheKey = `type-${safeType}:page-${safePage}`;
     if (moviesPageCache.has(cacheKey)) {
       const cached = moviesPageCache.get(cacheKey);
       movies = cached.items.slice();
@@ -2780,12 +2804,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const from = (safePage - 1) * PAGE_SIZE;
     const to = from + PAGE_SIZE - 1;
-    const { data, error, count } = await db
+    let query = db
       .from("movies")
       .select("*", { count: "exact" })
       .order("updated_at", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false })
       .range(from, to);
+    const dbType = mapTabTypeToDbType(safeType);
+    if (dbType) query = query.eq("type", dbType);
+    const { data, error, count } = await query;
 
     if (error) throw error;
 
@@ -2800,9 +2827,10 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       currentPage = getPageFromUrl();
       usingServerPagination = !forceFull && shouldUseServerPagination();
+      await fetchMovieStats();
 
       if (usingServerPagination) {
-        await fetchMoviesPage(currentPage);
+        await fetchMoviesPage(currentPage, currentTypeFilter);
       } else {
         // 🚀 مرتب‌سازی هوشمند:
         // ۱. ابتدا بر اساس آخرین تغییرات (updated_at) تا پست‌های بروز شده صدرنشین شوند
@@ -2836,6 +2864,10 @@ document.addEventListener("DOMContentLoaded", () => {
       // ساخت و بروزرسانی گرید ژانرها در سایدبار یا بخش فیلترها
       if (typeof buildGenreGrid === "function") {
         buildGenreGrid();
+      }
+
+      if (usingServerPagination) {
+        prefetchTabFirstPages();
       }
 
       // اگر در صفحه مدیریت (Admin) هستیم، لیست مدیریت را بروزرسانی کن
@@ -3040,7 +3072,7 @@ document.addEventListener("DOMContentLoaded", () => {
         currentPage = targetPage;
         if (shouldUseServerPagination()) {
           usingServerPagination = true;
-          await fetchMoviesPage(currentPage);
+          await fetchMoviesPage(currentPage, currentTypeFilter);
           await fetchEpisodes(movies.map((m) => m.id));
           await renderPagedMovies(true);
         } else {
@@ -3216,16 +3248,17 @@ function setTabInUrl(type) {
 
   /* =============== UPDATE COUNTS =============== */
   function updateTypeCounts() {
-    if (!Array.isArray(movies)) return;
+    const source = Array.isArray(moviesStats) && moviesStats.length ? moviesStats : movies;
+    if (!Array.isArray(source)) return;
 
-    const all = movies.length;
-    const collections = movies.filter(
+    const all = source.length;
+    const collections = source.filter(
       (m) => (m.type || "").toLowerCase() === "collection"
     ).length;
-    const serials = movies.filter(
+    const serials = source.filter(
       (m) => (m.type || "").toLowerCase() === "serial"
     ).length;
-    const singles = movies.filter(
+    const singles = source.filter(
       (m) => (m.type || "").toLowerCase() === "single"
     ).length;
 
@@ -3335,7 +3368,7 @@ function setTabInUrl(type) {
     currentPage = getPageFromUrl();
     if (shouldUseServerPagination()) {
       usingServerPagination = true;
-      await fetchMoviesPage(currentPage);
+      await fetchMoviesPage(currentPage, currentTypeFilter);
       await fetchEpisodes(movies.map((m) => m.id));
       await renderPagedMovies(true);
       return;
@@ -3442,18 +3475,19 @@ function setTabInUrl(type) {
     ) {
       baseMovies = filteredMovies;
     } else {
-      // در غیر این صورت → از کل movies بر اساس تب فعال
-      baseMovies = movies;
+      const statsSource =
+        Array.isArray(moviesStats) && moviesStats.length ? moviesStats : movies;
+      baseMovies = statsSource;
       if (currentTypeFilter === "collection") {
-        baseMovies = movies.filter(
+        baseMovies = statsSource.filter(
           (m) => (m.type || "").toLowerCase() === "collection"
         );
       } else if (currentTypeFilter === "series") {
-        baseMovies = movies.filter(
+        baseMovies = statsSource.filter(
           (m) => (m.type || "").toLowerCase() === "serial"
         );
       } else if (currentTypeFilter === "single") {
-        baseMovies = movies.filter(
+        baseMovies = statsSource.filter(
           (m) => (m.type || "").toLowerCase() === "single"
         );
       }
@@ -3976,7 +4010,7 @@ function setTabInUrl(type) {
     });
   }
 
-  if (typeof updateTypeCounts === "function" && !usingServerPagination) {
+  if (typeof updateTypeCounts === "function") {
     updateTypeCounts();
   }
   
