@@ -5,14 +5,20 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>FilmChiin | Actor page</title>
     <meta name="description" content="View actor profile and related posts on FilmChiin" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
     <link rel="stylesheet" href="/style.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script defer src="/actor.js"></script>
+    <script defer src="/script.js"></script>
   </head>
   <body class="index-body movie-page-body actor-page-body">
-    <header class="main-header movie-page-header-only">
-      <div id="movieBannerMount" class="site-banner"></div>
-    </header>
+    <div id="sharedHeaderMount"></div>
+    <div id="sharedMenuOverlayMount"></div>
+    <div id="sharedSideMenuMount"></div>
+    <div id="sharedTabGenresMount"></div>
 
     <main class="movie-page-container actor-page-container">
       <a class="movie-page-back" href="/" data-i18n="backToHome">← Back to homepage</a>
@@ -35,5 +41,8 @@
     </main>
 
     <div id="movieFeaturesMount"></div>
+    <div id="sharedBottomDockMount"></div>
+    <div id="sharedFloatingMount"></div>
+    <div id="sharedGoTopMount"></div>
   </body>
 </html>

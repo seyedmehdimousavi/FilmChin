@@ -92,12 +92,66 @@ function applySavedTheme() {
   s.setProperty("--theme-bg-soft", selected.bgSoft);
 }
 
-async function hydrateBannerFromHome() {
-  const resp = await fetch("/");
-  const html = await resp.text();
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  const banner = doc.querySelector("#site-banner .banner-content");
-  if (banner) document.getElementById("movieBannerMount").innerHTML = banner.outerHTML;
+function applyInnerPageHeaderOffset() {
+  const header = document.querySelector(".main-header");
+  if (!header) return;
+  const offset = Math.max(0, Math.ceil(header.getBoundingClientRect().height));
+  document.documentElement.style.setProperty("--inner-header-offset", `${offset + 12}px`);
+}
+
+function disableHomeOnlyUiOnInnerPages() {
+  document.querySelectorAll(".movie-type-tabs .tab-link").forEach((link) => {
+    link.classList.add("is-disabled");
+    link.setAttribute("aria-disabled", "true");
+    link.addEventListener("click", (e) => e.preventDefault());
+  });
+  const tabGenres = document.querySelector(".tab-genres-wrapper");
+  if (tabGenres) {
+    tabGenres.classList.add("is-disabled");
+    tabGenres.setAttribute("aria-disabled", "true");
+  }
+  document.getElementById("storyToggle")?.classList.add("is-disabled");
+  document.getElementById("storyPanel")?.classList.add("is-disabled");
+}
+
+function bindGlobalInnerSearchRedirect() {
+  const searchInput = document.getElementById("search");
+  if (!searchInput) return;
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    const q = (searchInput.value || "").trim();
+    if (!q) return;
+    e.preventDefault();
+    localStorage.setItem("filmchin_pending_search", q);
+    window.location.href = `/?search=${encodeURIComponent(q)}`;
+  });
+}
+
+function hydrateSharedSectionsFromHomeSync() {
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", "/", false);
+  xhr.send(null);
+  if (xhr.status < 200 || xhr.status >= 300 || !xhr.responseText) return;
+  const doc = new DOMParser().parseFromString(xhr.responseText, "text/html");
+  const header = doc.querySelector(".main-header");
+  const menuOverlay = doc.querySelector("#menuOverlay");
+  const sideMenu = doc.querySelector("#sideMenu");
+  const tabGenres = doc.querySelector(".tab-genres-wrapper");
+  const bottomDock = doc.querySelector(".mobile-bottom-dock");
+  const floating = doc.querySelector(".floating-btn-container");
+  const goTop = doc.querySelector(".go-top-container");
+  const features = doc.querySelector("#siteFeatures");
+  if (header) document.getElementById("sharedHeaderMount").innerHTML = header.outerHTML;
+  if (menuOverlay) document.getElementById("sharedMenuOverlayMount").innerHTML = menuOverlay.outerHTML;
+  if (sideMenu) document.getElementById("sharedSideMenuMount").innerHTML = sideMenu.outerHTML;
+  if (tabGenres) document.getElementById("sharedTabGenresMount").innerHTML = tabGenres.outerHTML;
+  if (bottomDock) document.getElementById("sharedBottomDockMount").innerHTML = bottomDock.outerHTML;
+  if (floating) document.getElementById("sharedFloatingMount").innerHTML = floating.outerHTML;
+  if (goTop) document.getElementById("sharedGoTopMount").innerHTML = goTop.outerHTML;
+  if (features) document.getElementById("movieFeaturesMount").innerHTML = features.outerHTML;
+  disableHomeOnlyUiOnInnerPages();
+  bindGlobalInnerSearchRedirect();
+  applyInnerPageHeaderOffset();
 }
 
 function buildActorEpisodesMap(items) {
@@ -179,8 +233,6 @@ async function loadActorPage() {
   });
 
   applySavedTheme();
-  try { await hydrateBannerFromHome(); } catch (e) { console.error(e); }
-
   const slug = parseActorSlug();
   if (!slug) {
     status.textContent = t("actorMissing");
@@ -243,3 +295,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   loadActorPage();
 });
+
+try {
+  hydrateSharedSectionsFromHomeSync();
+} catch (e) {
+  console.error("hydrateSharedSectionsFromHomeSync error:", e);
+}

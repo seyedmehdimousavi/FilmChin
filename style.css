@@ -4246,6 +4246,9 @@ body.dark .version-chip {
 }
 
 .theme-palette-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-weight: bold;
   margin-bottom: 8px;
 }
@@ -5787,6 +5790,17 @@ body.dark .homepage-manager-submenu {
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
+.toggle-row-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.is-disabled {
+  pointer-events: none !important;
+  opacity: 0.5;
+}
+
 .language-row {
   display: flex;
   justify-content: space-between;
@@ -6883,6 +6897,10 @@ body.dark .go-page-btn {
 .movie-page-body {
   background: inherit;
   color: inherit;
+}
+
+.movie-page-body .movie-page-container {
+  margin-top: var(--inner-header-offset, 196px);
 }
 
 .post-action-row {
