@@ -867,10 +867,48 @@ function initFeatureAccordions() {
   });
 }
 
-async function hydrateSharedSectionsFromHome() {
-  const resp = await fetch("/");
-  const html = await resp.text();
-  const doc = new DOMParser().parseFromString(html, "text/html");
+function applyInnerPageHeaderOffset() {
+  const header = document.querySelector(".main-header");
+  if (!header) return;
+  const offset = Math.max(0, Math.ceil(header.getBoundingClientRect().height));
+  document.documentElement.style.setProperty("--inner-header-offset", `${offset + 12}px`);
+}
+
+function disableHomeOnlyUiOnInnerPages() {
+  const tabLinks = document.querySelectorAll(".movie-type-tabs .tab-link");
+  tabLinks.forEach((link) => {
+    link.classList.add("is-disabled");
+    link.setAttribute("aria-disabled", "true");
+    link.addEventListener("click", (e) => e.preventDefault());
+  });
+  const tabGenresWrapper = document.querySelector(".tab-genres-wrapper");
+  if (tabGenresWrapper) {
+    tabGenresWrapper.classList.add("is-disabled");
+    tabGenresWrapper.setAttribute("aria-disabled", "true");
+  }
+  document.getElementById("storyToggle")?.classList.add("is-disabled");
+  document.getElementById("storyPanel")?.classList.add("is-disabled");
+}
+
+function bindGlobalInnerSearchRedirect() {
+  const searchInput = document.getElementById("search");
+  if (!searchInput) return;
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    const q = (searchInput.value || "").trim();
+    if (!q) return;
+    e.preventDefault();
+    localStorage.setItem("filmchin_pending_search", q);
+    window.location.href = `/?search=${encodeURIComponent(q)}`;
+  });
+}
+
+function hydrateSharedSectionsFromHomeSync() {
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", "/", false);
+  xhr.send(null);
+  if (xhr.status < 200 || xhr.status >= 300 || !xhr.responseText) return;
+  const doc = new DOMParser().parseFromString(xhr.responseText, "text/html");
   const header = doc.querySelector(".main-header");
   const menuOverlay = doc.querySelector("#menuOverlay");
   const sideMenu = doc.querySelector("#sideMenu");
@@ -891,96 +929,9 @@ async function hydrateSharedSectionsFromHome() {
     applyMovieFeatureTranslations();
     initFeatureAccordions();
   }
-  initSharedShellForInnerPages();
-}
-
-function initSharedShellForInnerPages() {
-  const sideMenu = document.getElementById("sideMenu");
-  const menuOverlay = document.getElementById("menuOverlay");
-  const menuBtn = document.getElementById("menuBtn") || document.getElementById("bottomMenuBtn");
-  const closeMenu = () => {
-    sideMenu?.classList.remove("active");
-    menuOverlay?.classList.remove("active");
-    document.body.classList.remove("no-scroll", "menu-open");
-  };
-  menuBtn?.addEventListener("click", () => {
-    sideMenu?.classList.add("active");
-    menuOverlay?.classList.add("active");
-    document.body.classList.add("no-scroll", "menu-open");
-  });
-  menuOverlay?.addEventListener("click", closeMenu);
-
-  const searchInput = document.getElementById("search");
-  const searchCloseBtn = document.getElementById("searchCloseBtn");
-  const searchAndGoHome = () => {
-    const q = (searchInput?.value || "").trim();
-    if (!q) return;
-    localStorage.setItem("filmchin_pending_search", q);
-    window.location.href = `/?search=${encodeURIComponent(q)}`;
-  };
-  searchInput?.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      searchAndGoHome();
-    }
-  });
-  searchCloseBtn?.addEventListener("click", () => {
-    if (!searchInput) return;
-    searchInput.value = "";
-    searchInput.focus();
-  });
-  document.getElementById("bottomSearchBtn")?.addEventListener("click", () => {
-    searchInput?.focus();
-  });
-
-  const tabLinks = document.querySelectorAll(".movie-type-tabs .tab-link");
-  tabLinks.forEach((link) => {
-    link.classList.add("is-disabled");
-    link.setAttribute("aria-disabled", "true");
-    link.addEventListener("click", (e) => e.preventDefault());
-  });
-  const tabGenresWrapper = document.querySelector(".tab-genres-wrapper");
-  if (tabGenresWrapper) {
-    tabGenresWrapper.classList.add("is-disabled");
-    tabGenresWrapper.setAttribute("aria-disabled", "true");
-  }
-
-  const storyToggle = document.getElementById("storyToggle");
-  const storyPanel = document.getElementById("storyPanel");
-  storyToggle?.classList.add("is-disabled");
-  storyPanel?.classList.add("is-disabled");
-
-  const goTopBtn = document.getElementById("goTopBtn");
-  goTopBtn?.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-
-  hydrateGlobalGenresInSideMenu();
-}
-
-async function hydrateGlobalGenresInSideMenu() {
-  const genreGrid = document.getElementById("genreGrid");
-  if (!genreGrid) return;
-  const { data, error } = await db.from("movies").select("genre");
-  if (error || !Array.isArray(data)) return;
-  const counts = new Map();
-  data.forEach((row) => {
-    (row.genre || "").split(" ").map((g) => g.trim()).filter(Boolean).forEach((g) => {
-      counts.set(g, (counts.get(g) || 0) + 1);
-    });
-  });
-  genreGrid.innerHTML = "";
-  [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0])).forEach(([genre, count]) => {
-    const chip = document.createElement("div");
-    chip.className = "genre-chip";
-    chip.textContent = `${genre} (${count})`;
-    chip.setAttribute("dir", "auto");
-    chip.addEventListener("click", () => {
-      localStorage.setItem("filmchin_pending_search", genre);
-      window.location.href = `/?search=${encodeURIComponent(genre)}`;
-    });
-    genreGrid.appendChild(chip);
-  });
+  disableHomeOnlyUiOnInnerPages();
+  bindGlobalInnerSearchRedirect();
+  applyInnerPageHeaderOffset();
 }
 
 async function loadMoviePage() {
@@ -991,12 +942,6 @@ async function loadMoviePage() {
     applyMovieStaticTranslations();
     applyMoviePostOptionsTranslations();
     applySavedTheme();
-    try {
-      await hydrateSharedSectionsFromHome();
-    } catch (err) {
-      console.error("hydrateSharedSectionsFromHome error:", err);
-    }
-
     const slug = parseSlug();
     if (!slug) return (status.textContent = mt("missingSlug"));
 
@@ -1054,3 +999,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   loadMoviePage();
 });
+
+try {
+  hydrateSharedSectionsFromHomeSync();
+} catch (err) {
+  console.error("hydrateSharedSectionsFromHomeSync error:", err);
+}

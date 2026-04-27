@@ -6899,6 +6899,10 @@ body.dark .go-page-btn {
   color: inherit;
 }
 
+.movie-page-body .movie-page-container {
+  margin-top: var(--inner-header-offset, 196px);
+}
+
 .post-action-row {
   flex-wrap: nowrap;
 }
