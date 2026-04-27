@@ -2987,18 +2987,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // Genre grid
   function buildGenreGrid() {
     if (!genreGrid) return;
-    const genreSet = new Set();
-    (movies || []).forEach((m) => {
-      if (m.genre)
-        m.genre.split(" ").forEach((g) => {
-          if (g.trim() !== "") genreSet.add(g);
-        });
+    const genreCounts = {};
+    const source = Array.isArray(moviesStats) && moviesStats.length ? moviesStats : (movies || []);
+    source.forEach((m) => {
+      if (!m.genre) return;
+      m.genre.split(" ").forEach((g) => {
+        const genre = g.trim();
+        if (!genre) return;
+        genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+      });
     });
     genreGrid.innerHTML = "";
-    [...genreSet].sort().forEach((g) => {
+    Object.entries(genreCounts).sort((a, b) => a[0].localeCompare(b[0])).forEach(([g, count]) => {
       const div = document.createElement("div");
       div.className = "genre-chip";
-      div.textContent = g;
+      div.textContent = `${g} (${count})`;
 
       // 👇 این خط اضافه شد
       div.setAttribute("dir", "auto");
@@ -8578,11 +8581,11 @@ return `
   function handleDelta(dy) {
     accumulatedDelta += dy;
     while (accumulatedDelta <= -STEP_PX) {
-      changeYear("up");
+      changeYear("down");
       accumulatedDelta += STEP_PX;
     }
     while (accumulatedDelta >= STEP_PX) {
-      changeYear("down");
+      changeYear("up");
       accumulatedDelta -= STEP_PX;
     }
   }

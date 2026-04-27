@@ -871,14 +871,116 @@ async function hydrateSharedSectionsFromHome() {
   const resp = await fetch("/");
   const html = await resp.text();
   const doc = new DOMParser().parseFromString(html, "text/html");
-  const banner = doc.querySelector("#site-banner .banner-content");
+  const header = doc.querySelector(".main-header");
+  const menuOverlay = doc.querySelector("#menuOverlay");
+  const sideMenu = doc.querySelector("#sideMenu");
+  const tabGenres = doc.querySelector(".tab-genres-wrapper");
+  const bottomDock = doc.querySelector(".mobile-bottom-dock");
+  const floating = doc.querySelector(".floating-btn-container");
+  const goTop = doc.querySelector(".go-top-container");
   const features = doc.querySelector("#siteFeatures");
-  if (banner) document.getElementById("movieBannerMount").innerHTML = banner.outerHTML;
+  if (header) document.getElementById("sharedHeaderMount").innerHTML = header.outerHTML;
+  if (menuOverlay) document.getElementById("sharedMenuOverlayMount").innerHTML = menuOverlay.outerHTML;
+  if (sideMenu) document.getElementById("sharedSideMenuMount").innerHTML = sideMenu.outerHTML;
+  if (tabGenres) document.getElementById("sharedTabGenresMount").innerHTML = tabGenres.outerHTML;
+  if (bottomDock) document.getElementById("sharedBottomDockMount").innerHTML = bottomDock.outerHTML;
+  if (floating) document.getElementById("sharedFloatingMount").innerHTML = floating.outerHTML;
+  if (goTop) document.getElementById("sharedGoTopMount").innerHTML = goTop.outerHTML;
   if (features) {
     document.getElementById("movieFeaturesMount").innerHTML = features.outerHTML;
     applyMovieFeatureTranslations();
     initFeatureAccordions();
   }
+  initSharedShellForInnerPages();
+}
+
+function initSharedShellForInnerPages() {
+  const sideMenu = document.getElementById("sideMenu");
+  const menuOverlay = document.getElementById("menuOverlay");
+  const menuBtn = document.getElementById("menuBtn") || document.getElementById("bottomMenuBtn");
+  const closeMenu = () => {
+    sideMenu?.classList.remove("active");
+    menuOverlay?.classList.remove("active");
+    document.body.classList.remove("no-scroll", "menu-open");
+  };
+  menuBtn?.addEventListener("click", () => {
+    sideMenu?.classList.add("active");
+    menuOverlay?.classList.add("active");
+    document.body.classList.add("no-scroll", "menu-open");
+  });
+  menuOverlay?.addEventListener("click", closeMenu);
+
+  const searchInput = document.getElementById("search");
+  const searchCloseBtn = document.getElementById("searchCloseBtn");
+  const searchAndGoHome = () => {
+    const q = (searchInput?.value || "").trim();
+    if (!q) return;
+    localStorage.setItem("filmchin_pending_search", q);
+    window.location.href = `/?search=${encodeURIComponent(q)}`;
+  };
+  searchInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      searchAndGoHome();
+    }
+  });
+  searchCloseBtn?.addEventListener("click", () => {
+    if (!searchInput) return;
+    searchInput.value = "";
+    searchInput.focus();
+  });
+  document.getElementById("bottomSearchBtn")?.addEventListener("click", () => {
+    searchInput?.focus();
+  });
+
+  const tabLinks = document.querySelectorAll(".movie-type-tabs .tab-link");
+  tabLinks.forEach((link) => {
+    link.classList.add("is-disabled");
+    link.setAttribute("aria-disabled", "true");
+    link.addEventListener("click", (e) => e.preventDefault());
+  });
+  const tabGenresWrapper = document.querySelector(".tab-genres-wrapper");
+  if (tabGenresWrapper) {
+    tabGenresWrapper.classList.add("is-disabled");
+    tabGenresWrapper.setAttribute("aria-disabled", "true");
+  }
+
+  const storyToggle = document.getElementById("storyToggle");
+  const storyPanel = document.getElementById("storyPanel");
+  storyToggle?.classList.add("is-disabled");
+  storyPanel?.classList.add("is-disabled");
+
+  const goTopBtn = document.getElementById("goTopBtn");
+  goTopBtn?.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  hydrateGlobalGenresInSideMenu();
+}
+
+async function hydrateGlobalGenresInSideMenu() {
+  const genreGrid = document.getElementById("genreGrid");
+  if (!genreGrid) return;
+  const { data, error } = await db.from("movies").select("genre");
+  if (error || !Array.isArray(data)) return;
+  const counts = new Map();
+  data.forEach((row) => {
+    (row.genre || "").split(" ").map((g) => g.trim()).filter(Boolean).forEach((g) => {
+      counts.set(g, (counts.get(g) || 0) + 1);
+    });
+  });
+  genreGrid.innerHTML = "";
+  [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0])).forEach(([genre, count]) => {
+    const chip = document.createElement("div");
+    chip.className = "genre-chip";
+    chip.textContent = `${genre} (${count})`;
+    chip.setAttribute("dir", "auto");
+    chip.addEventListener("click", () => {
+      localStorage.setItem("filmchin_pending_search", genre);
+      window.location.href = `/?search=${encodeURIComponent(genre)}`;
+    });
+    genreGrid.appendChild(chip);
+  });
 }
 
 async function loadMoviePage() {
