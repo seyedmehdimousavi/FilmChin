@@ -929,7 +929,6 @@ function hydrateSharedSectionsFromHomeSync() {
     applyMovieFeatureTranslations();
     initFeatureAccordions();
   }
-  disableHomeOnlyUiOnInnerPages();
   bindGlobalInnerSearchRedirect();
   applyInnerPageHeaderOffset();
 }

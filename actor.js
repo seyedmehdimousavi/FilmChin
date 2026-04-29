@@ -149,7 +149,6 @@ function hydrateSharedSectionsFromHomeSync() {
   if (floating) document.getElementById("sharedFloatingMount").innerHTML = floating.outerHTML;
   if (goTop) document.getElementById("sharedGoTopMount").innerHTML = goTop.outerHTML;
   if (features) document.getElementById("movieFeaturesMount").innerHTML = features.outerHTML;
-  disableHomeOnlyUiOnInnerPages();
   bindGlobalInnerSearchRedirect();
   applyInnerPageHeaderOffset();
 }

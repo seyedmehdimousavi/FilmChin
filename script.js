@@ -1715,6 +1715,13 @@ document.addEventListener("DOMContentLoaded", () => {
       writeComment: "Write a comment...",
       send: "Send",
       designLabel: "Design :",
+      dockMenu: "Menu",
+      dockFavorites: "Favorites",
+      dockSearch: "Search",
+      supportWalletsTitle: "Support Wallets",
+      supportWalletsNote: "Small helps make big changes.",
+      walletNotSet: "Wallet not set.",
+      copied: "Copied",
       siteFeaturesButton: "Site features",
       siteFeaturesTitle: "FilmChiin site features",
       adminPostManagement: "Post Management",
@@ -1808,6 +1815,13 @@ document.addEventListener("DOMContentLoaded", () => {
       writeComment: "نظر خود را بنویسید...",
       send: "ارسال",
       designLabel: "طراحی :",
+      dockMenu: "منو",
+      dockFavorites: "موردعلاقه‌ها",
+      dockSearch: "جستجو",
+      supportWalletsTitle: "کیف‌پول‌های حمایت",
+      supportWalletsNote: "کمک‌های کوچک تغییرات بزرگی ایجاد می‌کنند.",
+      walletNotSet: "کیف پولی ثبت نشده است.",
+      copied: "کپی شد",
       siteFeaturesButton: "لیست امکانات سایت",
       siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
       adminPostManagement: "مدیریت پست‌ها",
@@ -5252,6 +5266,24 @@ searchInput?.addEventListener("keydown", (e) => {
     clearInterval(autoSlide);
     autoSlide = setInterval(() => slideTo(currentIndex + 1), 4000);
   }
+  let dragStartX = 0;
+  let dragDeltaX = 0;
+  let isDragging = false;
+  windowEl.style.touchAction = 'pan-y';
+  const onStart = (x) => { isDragging = true; dragStartX = x; dragDeltaX = 0; track.style.transition = 'none'; clearInterval(autoSlide); };
+  const onMove = (x) => { if (!isDragging) return; dragDeltaX = x - dragStartX; track.style.transform = `translateX(-${itemWidth * currentIndex - dragDeltaX}px)`; };
+  const onEnd = () => {
+    if (!isDragging) return; isDragging = false;
+    if (Math.abs(dragDeltaX) > itemWidth * 0.2) slideTo(dragDeltaX < 0 ? currentIndex + 1 : currentIndex - 1);
+    else slideTo(currentIndex);
+    dragDeltaX = 0;
+  };
+  windowEl.addEventListener('touchstart', (e) => onStart(e.touches[0].clientX), { passive: true });
+  windowEl.addEventListener('touchmove', (e) => onMove(e.touches[0].clientX), { passive: true });
+  windowEl.addEventListener('touchend', onEnd);
+  windowEl.addEventListener('mousedown', (e) => onStart(e.clientX));
+  window.addEventListener('mousemove', (e) => onMove(e.clientX));
+  window.addEventListener('mouseup', onEnd);
   resetAutoSlide();
 }
 
@@ -8923,3 +8955,71 @@ initSideMenuAccordions();
   fetchSocialLinks();
   initAdminActorsPanel();
 });
+
+async function fetchWallets() {
+  const { data, error } = await db.from('wallets').select('*').order('created_at', { ascending: false });
+  if (error) return [];
+  return data || [];
+}
+
+async function renderWalletSheet() {
+  const list = document.getElementById('walletSheetList');
+  if (!list) return;
+  const wallets = await fetchWallets();
+  list.innerHTML = wallets.map(w => `<div class="wallet-sheet-item" data-address="${escapeHtml(w.address || '')}"><strong>${escapeHtml(w.name || '')}</strong><div>${escapeHtml(w.address || '')}</div></div>`).join('') || `<p>${escapeHtml(t('walletNotSet'))}</p>`;
+  list.querySelectorAll('.wallet-sheet-item').forEach((el) => {
+    el.addEventListener('click', async () => {
+      const addr = el.dataset.address || '';
+      if (!addr) return;
+      await navigator.clipboard.writeText(addr);
+      document.getElementById('walletSheet')?.classList.remove('active');
+      showToast(t('copied'));
+    });
+  });
+}
+
+function initWalletSupportUi() {
+  const btn = document.getElementById('supportWalletBtn');
+  const sheet = document.getElementById('walletSheet');
+  if (!btn || !sheet) return;
+  btn.addEventListener('click', async () => { await renderWalletSheet(); sheet.classList.add('active'); });
+  btn.addEventListener('keydown', async (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    await renderWalletSheet();
+    sheet.classList.add('active');
+  });
+  sheet.querySelector('.wallet-sheet-backdrop')?.addEventListener('click', () => sheet.classList.remove('active'));
+}
+
+async function initWalletAdminCrud() {
+  const form = document.getElementById('addWalletForm');
+  const listEl = document.getElementById('walletList');
+  if (!form || !listEl) return;
+  const render = async () => {
+    const wallets = await fetchWallets();
+    listEl.innerHTML = wallets.map(w => `<div class="social-item"><b>${escapeHtml(w.name || '')}</b><p>${escapeHtml(w.address || '')}</p><button data-id="${w.id}" class="wallet-edit">Edit</button><button data-id="${w.id}" class="wallet-del">Delete</button></div>`).join('');
+  };
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('walletName').value.trim();
+    const address = document.getElementById('walletAddress').value.trim();
+    if (!name || !address) return;
+    await db.from('wallets').insert([{ name, address }]);
+    form.reset();
+    render();
+  });
+  listEl.addEventListener('click', async (e) => {
+    const del = e.target.closest('.wallet-del');
+    const edit = e.target.closest('.wallet-edit');
+    if (del) { await db.from('wallets').delete().eq('id', del.dataset.id); render(); }
+    if (edit) {
+      const name = prompt('Wallet name:');
+      const address = prompt('Wallet address:');
+      if (name && address) { await db.from('wallets').update({ name, address }).eq('id', edit.dataset.id); render(); }
+    }
+  });
+  render();
+}
+
+document.addEventListener('DOMContentLoaded', () => { initWalletSupportUi(); initWalletAdminCrud(); });
