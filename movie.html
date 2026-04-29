@@ -26,21 +26,919 @@
     <script defer src="/script.js"></script>
   </head>
   <body class="index-body movie-page-body">
-    <div id="sharedHeaderMount"></div>
-    <div id="sharedMenuOverlayMount"></div>
-    <div id="sharedSideMenuMount"></div>
-    <div id="sharedTabGenresMount"></div>
+    <header class="main-header">
+      <!-- 🔹 بنر بالای سایت -->
+      <div id="site-banner" class="site-banner">
+        <div class="banner-content split-text-container">
+          <span class="banner-logo text-part left">
+            <img src="/images/banner-icon.png" alt="banner-logo" />
+          </span>
+          <span class="banner-text text-part right">filmchiin.ir</span>
+        </div>
+      </div>
+      <div class="header">
+        <div id="profileMenu" class="profile-menu hidden">
+          <div class="profile-bubble">
+            <div class="profile-username" id="profileUsername">UserName</div>
 
-    <main class="movie-page-container">
-      <a class="movie-page-back" href="/" data-i18n="backToHome">← Back to homepage</a>
-      <section id="moviePageStatus" class="movie-page-status" data-i18n="loading">Loading...</section>
-      <section id="moviePageCard" class="movie-page-single" hidden></section>
-    </main>
+            <div class="button-wrap">
+              <button class="profile-edit"><span>Edit Profile</span></button>
+              <div class="button-shadow"></div>
+            </div>
 
-    <div id="movieFeaturesMount"></div>
-    <div id="sharedBottomDockMount"></div>
-    <div id="sharedFloatingMount"></div>
-    <div id="sharedGoTopMount"></div>
+            <hr class="profile-divider" />
+
+            <div class="button-wrap">
+              <button id="logoutBtn" class="profile-logout">
+                <span data-i18n="logout">Logout</span>
+              </button>
+              <div class="button-shadow"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-profile-wrap">
+          <div class="button-wrap">
+            <button
+              id="profileBtn"
+              class="icon-inside"
+              style="display: flex; align-items: center"
+              aria-label="profile"
+            >
+              <img src="/images/icons8-user-96.png" alt="user" />
+              <span id="commentBadge" class="badge" style="display: none"
+                >!</span
+              >
+            </button>
+            <div class="button-shadow"></div>
+          </div>
+        </div>
+
+        <div class="search-bar">
+          <div class="search-input-wrap">
+            <input
+              id="search"
+              type="text"
+              placeholder="Search..."
+              dir="auto"
+              data-i18n-placeholder="searchPlaceholder"
+            />
+            <div
+              id="searchSuggestion"
+              class="search-suggestion"
+              aria-hidden="true"
+            >
+              <span class="typed-part"></span
+              ><span class="suggestion-part" role="button" tabindex="0"></span>
+            </div>
+          </div>
+
+          <button
+            id="searchCloseBtn"
+            class="close-btn"
+            style="display: none"
+            aria-label="close"
+          >
+            ✕
+          </button>
+        </div>
+
+        <label class="theme-switch" id="themeSwitchLabel">
+          <input
+            class="theme-switch__checkbox"
+            type="checkbox"
+            id="themeSwitchCheckbox"
+          />
+          <div class="theme-switch__container">
+            <div class="theme-switch__clouds"></div>
+            <div class="theme-switch__stars-container">
+              <svg
+                fill="none"
+                viewBox="0 0 144 55"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill="currentColor"
+                  d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z"
+                  clip-rule="evenodd"
+                  fill-rule="evenodd"
+                ></path>
+              </svg>
+            </div>
+            <div class="theme-switch__circle-container">
+              <div class="theme-switch__sun-moon-container">
+                <div class="theme-switch__moon">
+                  <div class="theme-switch__spot"></div>
+                  <div class="theme-switch__spot"></div>
+                  <div class="theme-switch__spot"></div>
+                </div>
+              </div>
+            </div>
+            <div class="theme-switch__shooting-star"></div>
+            <div class="theme-switch__shooting-star-2"></div>
+            <div class="theme-switch__meteor"></div>
+            <div class="theme-switch__stars-cluster">
+              <div class="star"></div>
+              <div class="star"></div>
+              <div class="star"></div>
+              <div class="star"></div>
+              <div class="star"></div>
+            </div>
+            <div class="theme-switch__aurora"></div>
+            <div class="theme-switch__comets">
+              <div class="comet"></div>
+              <div class="comet"></div>
+            </div>
+          </div>
+        </label>
+      </div>
+      <section class="movie-type-tabs">
+        <div class="tabs-container">
+          <!-- اندیکاتور دقیقا قبل از لینک‌ها -->
+          <div class="tab-indicator"></div>
+
+          <a href="?tab=all" data-type="all" class="tab-link">
+            <span data-i18n="tabAll">All</span>
+            <span class="count">0</span>
+          </a>
+
+          <a href="?tab=collection" data-type="collection" class="tab-link">
+            <span data-i18n="tabCollections">Collections</span>
+            <span class="count">0</span>
+          </a>
+
+          <a href="?tab=series" data-type="series" class="tab-link">
+            <span data-i18n="tabSeries">Series</span>
+            <span class="count">0</span>
+          </a>
+
+          <a href="?tab=single" data-type="single" class="tab-link">
+            <span data-i18n="tabMovies">Movies</span>
+            <span class="count">0</span>
+          </a>
+        </div>
+      </section>
+    </header>
+
+    <div id="menuOverlay" class="menu-overlay"></div>
+
+    <nav id="sideMenu" class="side-menu" aria-hidden="true">
+      <div class="menu-section">
+        <div class="sidemenu-accordion" id="acc-homepage">
+          <div class="sidemenu-accordion-header">
+            <div class="sidemenu-header-content">
+              <i class="bi bi-gear"></i>
+              <span data-i18n="homepageManager">Homepage Manager</span>
+            </div>
+            <span class="feature-icon sidemenu-arrow"
+              ><img src="/images/icons8-double-left.apng" alt="toggle"
+            /></span>
+          </div>
+          <div class="sidemenu-accordion-body">
+            <div class="sidemenu-content-inner">
+              <div id="homepageManagerSubmenu" class="homepage-manager-submenu">
+                <div class="toggle-row">
+                  <div class="toggle-row-label"><i class="bi bi-stars"></i><span data-i18n="animations">Animations</span></div>
+                  <label class="switch">
+                    <input
+                      type="checkbox"
+                      id="toggleReduceAnimations"
+                      checked
+                    />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-row">
+                  <div class="toggle-row-label"><i class="bi bi-columns-gap"></i><span data-i18n="tabs">Tabs</span></div>
+                  <label class="switch">
+                    <input type="checkbox" id="toggleTabs" checked />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-row">
+                  <div class="toggle-row-label"><i class="bi bi-tags"></i><span data-i18n="subTabGenres">Sub-tab genres</span></div>
+                  <label class="switch">
+                    <input type="checkbox" id="toggleSubTabGenres" checked />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-row">
+                  <div class="toggle-row-label"><i class="bi bi-fire"></i><span data-i18n="popularMovies">Popular movies</span></div>
+                  <label class="switch">
+                    <input type="checkbox" id="togglePopularMovies" checked />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-row">
+                  <div class="toggle-row-label"><i class="bi bi-arrow-up-circle"></i><span data-i18n="backToTopButton">Back to Top Button</span></div>
+                  <label class="switch">
+                    <input type="checkbox" id="toggleBackToTop" checked />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-row">
+                  <div class="toggle-row-label"><i class="bi bi-collection-play"></i><span data-i18n="floatingSummaryPanel"
+                    >Floating Summary Panel</span
+                  ></div>
+                  <label class="switch">
+                    <input type="checkbox" id="toggleFloatingPanel" checked />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-row">
+                  <div class="toggle-row-label"><i class="bi bi-arrows-collapse"></i><span data-i18n="collapsePosts">Collapse posts</span></div>
+                  <label class="switch">
+                    <input type="checkbox" id="toggleCollapsePosts" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="language-row" id="languageSwitchRow">
+                  <div class="language-row-label">
+                    <i class="bi bi-translate"></i>
+                    <span data-i18n="languageLabel">Language / زبان</span>
+                  </div>
+                  <div
+                    class="language-capsule"
+                    role="tablist"
+                    aria-label="Language switch"
+                  >
+                    <div
+                      id="languageIndicator"
+                      class="language-indicator"
+                    ></div>
+                    <div
+                      id="langEnBtn"
+                      class="language-option active"
+                      data-lang="en"
+                      role="button"
+                      tabindex="0"
+                    >
+                      EN
+                    </div>
+                    <div
+                      id="langFaBtn"
+                      class="language-option"
+                      data-lang="fa"
+                      role="button"
+                      tabindex="0"
+                    >
+                      FA
+                    </div>
+                  </div>
+                </div>
+
+                <div class="theme-palette" id="themePalette">
+                  <div
+                    class="theme-palette-title"
+                    data-i18n="themePaletteTitle"
+                  ><i class="bi bi-palette2"></i>
+                    Site color theme
+                  </div>
+                  <div
+                    class="theme-palette-options"
+                    role="radiogroup"
+                    aria-label="Select theme color"
+                  >
+                    <button
+                      class="theme-palette-dot active"
+                      type="button"
+                      data-theme-color="blue"
+                      aria-label="Azure"
+                      style="background: #1e88e5"
+                    ></button>
+                    <button
+                      class="theme-palette-dot"
+                      type="button"
+                      data-theme-color="green"
+                      aria-label="Green"
+                      style="background: #2e9d57"
+                    ></button>
+                    <button
+                      class="theme-palette-dot"
+                      type="button"
+                      data-theme-color="yellow"
+                      aria-label="Yellow"
+                      style="background: #c5a317"
+                    ></button>
+                    <button
+                      class="theme-palette-dot"
+                      type="button"
+                      data-theme-color="red"
+                      aria-label="Red"
+                      style="background: #c84646"
+                    ></button>
+                    <button
+                      class="theme-palette-dot"
+                      type="button"
+                      data-theme-color="purple"
+                      aria-label="Purple"
+                      style="background: #6f4dbb"
+                    ></button>
+                    <button
+                      class="theme-palette-dot"
+                      type="button"
+                      data-theme-color="teal"
+                      aria-label="Teal"
+                      style="background: #188a94"
+                    ></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidemenu-accordion" id="acc-genre">
+          <div class="sidemenu-accordion-header">
+            <div class="sidemenu-header-content">
+              <i class="bi bi-list"></i>
+              <span data-i18n="genres">Genres</span>
+            </div>
+            <span class="feature-icon sidemenu-arrow"
+              ><img src="/images/icons8-double-left.apng" alt="toggle"
+            /></span>
+          </div>
+          <div class="sidemenu-accordion-body">
+            <div class="sidemenu-content-inner">
+              <div id="genreGrid" class="genre-grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidemenu-accordion" id="acc-links">
+          <div class="sidemenu-accordion-header">
+            <div class="sidemenu-header-content">
+              <i class="bi bi-link-45deg"></i>
+              <span data-i18n="links">Links</span>
+            </div>
+            <span class="feature-icon sidemenu-arrow"
+              ><img src="/images/icons8-double-left.apng" alt="toggle"
+            /></span>
+          </div>
+          <div class="sidemenu-accordion-body">
+            <div class="sidemenu-content-inner">
+              <div id="socialGrid" class="social-grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="ratingFilter" class="rating-filter">
+          <h4 class="rating-filter-title" data-i18n="sortByImdb">
+            Sort by imdb rating
+          </h4>
+          <div class="rating-process-wrapper">
+            <div class="rating-min">0</div>
+            <div class="rating-track" id="ratingTrack">
+              <div class="rating-track-fill" id="ratingFill"></div>
+              <div
+                class="rating-knob"
+                id="ratingKnob"
+                role="slider"
+                tabindex="0"
+              >
+                <div class="rating-bubble" id="ratingBubble">
+                  Rating &gt; <span id="ratingBubbleValue">0.0</span>
+                </div>
+              </div>
+            </div>
+            <div class="rating-max">10</div>
+          </div>
+          <div class="rating-controls button-wrap">
+            <button id="applyRatingFilter" class="apply-imdb small">
+              <span>Apply</span>
+            </button>
+            <div class="button-shadow"></div>
+          </div>
+        </div>
+
+        <div class="year-filter">
+          <div class="year-filter-row">
+            <div class="year-filter-label" data-i18n="sortByReleaseDate">
+              Sort by Release date
+            </div>
+            <div class="year-filter-sign">+</div>
+            <div class="year-spinner" id="yearSpinner">
+              <div
+                class="year-spinner-item year-spinner-top"
+                id="yearSpinnerTop"
+              ></div>
+              <div
+                class="year-spinner-item year-spinner-center"
+                id="yearSpinnerCenter"
+              ></div>
+              <div
+                class="year-spinner-item year-spinner-bottom"
+                id="yearSpinnerBottom"
+              ></div>
+            </div>
+          </div>
+          <div class="year-apply-wrap button-wrap">
+            <button id="applyYearFilter" class="apply-imdb small">
+              <span>Apply</span>
+            </button>
+            <div class="button-shadow"></div>
+          </div>
+        </div>
+      </div>
+
+      <section class="side-menu-bottom">
+        <!--  to admin bubble -->
+        <div id="chatBubble" class="chat-bubble">
+          <div class="chat-bubble-header">
+            <span class="chat-bubble-title" data-i18n="messageToAdmin"
+              >Message to admin</span
+            >
+            <span id="chatBubbleBadge" class="badge" style="display: none"
+              >!</span
+            >
+          </div>
+
+          <!-- ردیف جمع‌شده (کالپس) -->
+          <div class="chat-input-row" id="chatInputRow">
+            <input
+              id="chatInput"
+              type="text"
+              placeholder="Message to admin"
+              data-i18n-placeholder="messageToAdminPlaceholder"
+            />
+            <div class="chat-actions">
+              <div class="button-wrap">
+                <button
+                  id="chatAttachBtn"
+                  class="chat-icon-btn"
+                  aria-label="attach"
+                >
+                  <img src="/images/icons8-attach-60.png" alt="attach" />
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+              <input id="chatAttachFile" type="file" accept="image/*" hidden />
+              <div class="button-wrap">
+                <button
+                  id="chatSendBtn"
+                  class="chat-icon-btn disabled"
+                  aria-label="send"
+                >
+                  <img src="/images/icons8-send-90.png" alt="send" />
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- نمای تمام‌صفحه در سایدمنو -->
+          <div id="chatOverlay" class="chat-overlay" aria-hidden="true">
+            <div class="chat-overlay-header">
+              <div class="button-wrap">
+                <button
+                  id="userChatBackBtn"
+                  class="chat-back-btn"
+                  aria-label="back"
+                >
+                  <span>close</span>
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+
+              <img
+                id="chatAdminAvatar"
+                class="chat-admin-avatar"
+                src="/images/Admin-logo.png"
+                alt="admin"
+              />
+              <div class="chat-overlay-title" data-i18n="messageToAdmin">
+                Message to admin
+              </div>
+            </div>
+
+            <div id="chatMessagesList" class="chat-messages-list"></div>
+
+            <!-- کامپوزر پایین -->
+            <div class="chat-composer">
+              <input
+                id="overlayInput"
+                type="text"
+                placeholder="Write a reply..."
+                data-i18n-placeholder="writeReplyPlaceholder"
+              />
+              <div class="button-wrap">
+                <button
+                  id="overlayAttachBtn"
+                  class="chat-icon-btn"
+                  aria-label="attach"
+                >
+                  <img src="/images/icons8-attach-60.png" alt="attach" />
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+              <input
+                id="overlayAttachFile"
+                type="file"
+                accept="image/*"
+                hidden
+              />
+              <div class="button-wrap">
+                <button
+                  id="overlaySendBtn"
+                  class="chat-icon-btn disabled"
+                  aria-label="send"
+                >
+                  <img src="/images/icons8-send-90.png" alt="send" />
+                </button>
+                <div class="button-shadow"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="designer-credit">
+          <span data-i18n="designLabel">Design :</span>
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 4px;
+            "
+          >
+            <a
+              href="tg://resolve?domain=SeyedMahdiMousavi"
+              target="_blank"
+              class="designer-bubble"
+              >Mehdi</a
+            >
+            <div id="supportWalletBtn" class="designer-bubble support-bubble" role="button" tabindex="0">Support</div>
+            <div id="appVersion" class="genre-chip version-chip">v1.0.0</div>
+          </div>
+        </div>
+      </section>
+    </nav>
+
+    <section class="movie-type-tabs">
+        <div class="tabs-container">
+          <!-- اندیکاتور دقیقا قبل از لینک‌ها -->
+          <div class="tab-indicator"></div>
+
+          <a href="?tab=all" data-type="all" class="tab-link">
+            <span data-i18n="tabAll">All</span>
+            <span class="count">0</span>
+          </a>
+
+          <a href="?tab=collection" data-type="collection" class="tab-link">
+            <span data-i18n="tabCollections">Collections</span>
+            <span class="count">0</span>
+          </a>
+
+          <a href="?tab=series" data-type="series" class="tab-link">
+            <span data-i18n="tabSeries">Series</span>
+            <span class="count">0</span>
+          </a>
+
+          <a href="?tab=single" data-type="single" class="tab-link">
+            <span data-i18n="tabMovies">Movies</span>
+            <span class="count">0</span>
+          </a>
+        </div>
+      </section>
+
+    <div class="tab-genres-wrapper">
+      <div class="tab-genres-list"></div>
+    </div>
+
+    <footer
+      id="siteFeatures"
+      class="site-features"
+      aria-label="FilmChiin features"
+    >
+      <h2 data-i18n="siteFeaturesTitle">لیست امکانات سایت FilmChiin</h2>
+
+      <!-- 1) حساب کاربری و لیست مورد علاقه‌ها -->
+      <section class="feature-accordion open">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title" data-i18n="featureTitle1"
+            >ایجاد حساب کاربری</span
+          >
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p data-i18n-html="featureDesc1">
+            با ساخت حساب کاربری به قابلیت های بیشتری دسترسی دارید می‌توانید برای
+            خودتان یک لیست اختصاصی از فیلم‌های مورد علاقه بسازید. میتوانید از چت
+            با ادمین استفاده کنید.
+          </p>
+        </div>
+      </section>
+
+      <!-- 2) جست‌وجوی لحظه‌ای و پیشرفته -->
+      <section class="feature-accordion">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title" data-i18n="featureTitle2"
+            >جست‌وجوی لحظه‌ای و پیشرفته</span
+          >
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p data-i18n-html="featureDesc2">
+            جست‌وجوی سایت کاملاً لحظه‌ای است؛ با تایپ هر عبارت، نتایج بلافاصله
+            فیلتر می‌شوند. عبارت جست‌وجوشده در عنوان، خلاصه، بازیگران و سایر
+            فیلدها هایلایت می‌شود تا سریع‌تر مورد دلخواهتان را داخل کارت‌ها پیدا
+            کنید. در جست‌وجوهای انجام‌شده از طریق ژانر و Product نیز عبارت
+            انتخاب‌شده هایلایت می‌شود.
+          </p>
+        </div>
+      </section>
+
+      <section class="feature-accordion">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title" data-i18n="featureTitle3"
+            >شخصی سازی چیدمان صفحه</span
+          >
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p data-i18n-html="featureDesc3">
+            از طریق گزینه های موجود در SideMenu میتوانید چیدمان صفحه اصلی را
+            مطابق با سلیقه ی خود مرتب کنید.
+          </p>
+        </div>
+      </section>
+
+      <!-- 3) فیلتر نوع و ژانر -->
+      <section class="feature-accordion">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title"
+            >فیلترفیلم هاوژانرها در تب‌های جداگانه</span
+          >
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p data-i18n-html="featureDesc4">
+            صفحه اصلی بر اساس نوع محتوا (فیلم سینمایی، کالکشن، سریال) با تب‌ها
+            تفکیک شده است. علاوه بر آن، در هر تب می‌توانید فقط با یک کلیک روی
+            ژانرها، لیست را بر اساس ژانر فیلتر کنید و فقط همان دسته فیلم‌ها را
+            ببینید.
+          </p>
+        </div>
+      </section>
+
+      <!-- 4) چیدمان و مرتب‌سازی بر اساس امتیاز -->
+      <section class="feature-accordion">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title" data-i18n="featureTitle4"
+            >مرتب‌سازی بر اساس امتیاز IMDb</span
+          >
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p data-i18n-html="featureDesc5">
+            می‌توانید صفحه اصلی را بر اساس فیلترهای مختلف تنظیم کنید و حداقل
+            امتیاز IMDb را مشخص کنید تا فقط عناوینی با امتیاز بالاتر نمایش داده
+            شوند. این فیلترها در لحظه روی تعداد نتایج و محتوای صفحه تأثیر
+            می‌گذارند.
+          </p>
+        </div>
+      </section>
+
+      <section class="feature-accordion">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title" data-i18n="featureTitle5"
+            >مرتب‌سازی بر اساس سال انتشار</span
+          >
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p data-i18n-html="featureDesc6">
+            می‌توانید صفحه اصلی را با استفاده از فیلتر سال انتشار در sideMenu به
+            گونه ای مرتب کنید که فیلم های با تاریخ انتشار سال تایین شده(و پست
+            های بعدی با سال انتشار بالاتر) در صفحه اصلی قرار گیرند.
+          </p>
+        </div>
+      </section>
+
+      <!-- 5) نمایش آمار دقیق فیلم‌ها -->
+      <section class="feature-accordion">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title" data-i18n="featureTitle6"
+            >آمار دقیق تعداد فیلم‌ها در هر لحظه</span
+          >
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p data-i18n-html="featureDesc7">
+            در بالای صفحه اصلی، تعداد فیلم‌های در حال نمایش با توجه به فیلترها و
+            جست‌وجوی فعلی نمایش داده می‌شود. این آمار بعد از هر تغییر در
+            جست‌وجو، ژانر، تب‌ها یا فیلتر IMDb به‌صورت لحظه‌ای به‌روزرسانی
+            می‌شود.
+          </p>
+        </div>
+      </section>
+
+      <!-- 6) لیست قسمت‌های سریال و کالکشن -->
+      <section class="feature-accordion">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title" data-i18n="featureTitle7"
+            >لیست قسمت‌های سریال وکالکشن</span
+          >
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p data-i18n-html="featureDesc8">
+            برای سریال‌ها و کالکشن‌ها، تمام قسمت‌ها در قالب کارت‌های کوچک داخل
+            همان پست نمایش داده می‌شوند. با انتخاب هر قسمت، کاور، عنوان، خلاصه،
+            اطلاعات و لینک Go to file همان قسمت فعال می‌شود و نیازی به باز کردن
+            صفحه جداگانه نیست.
+          </p>
+        </div>
+      </section>
+
+      <!-- 7) دسترسی به فایل با یک کلیک از طریق ربات -->
+      <section class="feature-accordion">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title" data-i18n="featureTitle8"
+            >دسترسی به فایل فقط با یک کلیک</span
+          >
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p data-i18n-html="featureDesc9">
+            با فشردن دکمه <strong>Go to file</strong> بات
+            <code>@Filmchinbot</code>فایل فیلم یا قسمت سریال را برای شما ارسال
+            می‌کند؛ بدون نیاز به جوین شدن در کانال.
+          </p>
+        </div>
+      </section>
+
+      <!-- 8) سیستم کامنت‌ها -->
+      <section class="feature-accordion">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title" data-i18n="featureTitle9"
+            >کامنت و نمایش گفت‌وگو در همان پست</span
+          >
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p data-i18n-html="featureDesc10">
+            برای هر پست می‌توانید کامنت بگذارید و همه نظرات در همان کارت فیلم با
+            طراحی اختصاصی و آواتارها نمایش داده می‌شوند. تعداد کامنت‌ها نیز کنار
+            آیکون مربوطه نشان داده می‌شود.
+          </p>
+        </div>
+      </section>
+
+      <!-- 9) فیلم‌های پرطرفدار و لیست صفحه -->
+      <section class="feature-accordion">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title"
+            >فیلم‌های پرطرفدارولیست فیلم‌های صفحه</span
+          >
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p data-i18n-html="featureDesc11">
+            بخش فیلم‌های پرطرفدار بر اساس آمار کلیک‌ها ساخته می‌شود و امکان
+            مشاهده اطلاعات کامل و رفتن به فایل را در همان مودال فراهم می‌کند.
+            دکمه شناور، لیست فیلم‌های موجود در صفحه فعلی را نشان می‌دهد تا
+            سریع‌تر به پست مورد نظر بروید.
+          </p>
+        </div>
+      </section>
+
+      <!-- 10) اشتراک و کپی لینک فیلم -->
+      <section class="feature-accordion">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title" data-i18n="featureTitle10"
+            >کپی یا اشتراک لینک هر فیلم</span
+          >
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p>
+            برای هر پست، دکمه‌هایی برای <strong>کپی </strong> و
+            <strong>اشتراک لینک</strong> وجود دارد. با باز شدن لینک، یک
+            مودال،اطلاعات فیلم را نمایش می‌دهد و از همان‌جا می‌توانید دکمه Go to
+            file را بزنید.
+          </p>
+        </div>
+      </section>
+
+      <!-- 11) طراحی liquid glass و تجربه کاربری -->
+      <section class="feature-accordion">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title" data-i18n="featureTitle11"
+            >طراحی Liquid Glass واکنش‌گرا</span
+          >
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p>
+            بخش هایی از سایت با الهام از طراحی Liquid Glass ساخته شده است؛
+            کارت‌ها، دکمه‌ها و پنل‌ها دارای حاشیه‌های گرد، شفافیت کنترل‌شده و
+            انیمیشن‌های ملایم هستند تا در موبایل و دسکتاپ تجربه کاربری روان و
+            چشم‌نواز داشته باشید.
+          </p>
+        </div>
+      </section>
+    </footer>
+
+    <nav class="mobile-bottom-dock" aria-label="quick actions">
+      <div id="walletSheet" class="wallet-sheet" aria-hidden="true">
+        <div class="wallet-sheet-backdrop"></div>
+        <div class="wallet-sheet-panel">
+          <h3 data-i18n="supportWalletsTitle">Support Wallets</h3>
+          <p class="wallet-sheet-note" data-i18n="supportWalletsNote">Small helps make big changes.</p>
+          <div id="walletSheetList" class="wallet-sheet-list"></div>
+        </div>
+      </div>
+      <div>
+        <div id="bottomMenuBtn" class="dock-btn" role="button" tabindex="0" aria-label="menu">
+          <img src="/images/icons8-menu-64.png" alt="menu" />
+          <span data-i18n="dockMenu">منو</span>
+        </div>
+      </div>
+      <div>
+        <div
+          id="bottomFavoritesBtn"
+          class="dock-btn"
+          role="button"
+          tabindex="0"
+          aria-label="favorite movies"
+        >
+          <img src="/images/icons8-heart-50.png" alt="favorites" />
+          <span data-i18n="dockFavorites">موردعلاقه‌ها</span>
+        </div>
+      </div>
+      <div>
+        <div id="bottomSearchBtn" class="dock-btn" role="button" tabindex="0" aria-label="focus search">
+          <i class="bi bi-search"></i>
+          <span data-i18n="dockSearch">جستجو</span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="floating-btn-container">
+      <div class="button-wrap">
+        <button
+          id="storyToggle"
+          class="floating-btn"
+          aria-label="toggle stories"
+        >
+          <img
+            id="storyToggleIcon"
+            src="/images/icons8-double-left.apng"
+            alt="toggle"
+          />
+        </button>
+        <div class="button-shadow"></div>
+      </div>
+    </div>
+
+    <div class="go-top-container">
+      <div class="button-wrap">
+        <button class="go-top-button" id="goTopBtn">
+          <span>
+            <svg viewBox="0 0 384 512" class="svgIcon">
+              <path
+                d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"
+              ></path>
+            </svg>
+          </span>
+        </button>
+        <div class="button-shadow"></div>
+      </div>
+    </div>
 
     <div id="postOptionsOverlay" class="post-options-overlay" aria-hidden="true">
       <div class="post-options-backdrop"></div>

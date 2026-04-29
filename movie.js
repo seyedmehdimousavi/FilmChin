@@ -903,36 +903,6 @@ function bindGlobalInnerSearchRedirect() {
   });
 }
 
-function hydrateSharedSectionsFromHomeSync() {
-  const xhr = new XMLHttpRequest();
-  xhr.open("GET", "/", false);
-  xhr.send(null);
-  if (xhr.status < 200 || xhr.status >= 300 || !xhr.responseText) return;
-  const doc = new DOMParser().parseFromString(xhr.responseText, "text/html");
-  const header = doc.querySelector(".main-header");
-  const menuOverlay = doc.querySelector("#menuOverlay");
-  const sideMenu = doc.querySelector("#sideMenu");
-  const tabGenres = doc.querySelector(".tab-genres-wrapper");
-  const bottomDock = doc.querySelector(".mobile-bottom-dock");
-  const floating = doc.querySelector(".floating-btn-container");
-  const goTop = doc.querySelector(".go-top-container");
-  const features = doc.querySelector("#siteFeatures");
-  if (header) document.getElementById("sharedHeaderMount").innerHTML = header.outerHTML;
-  if (menuOverlay) document.getElementById("sharedMenuOverlayMount").innerHTML = menuOverlay.outerHTML;
-  if (sideMenu) document.getElementById("sharedSideMenuMount").innerHTML = sideMenu.outerHTML;
-  if (tabGenres) document.getElementById("sharedTabGenresMount").innerHTML = tabGenres.outerHTML;
-  if (bottomDock) document.getElementById("sharedBottomDockMount").innerHTML = bottomDock.outerHTML;
-  if (floating) document.getElementById("sharedFloatingMount").innerHTML = floating.outerHTML;
-  if (goTop) document.getElementById("sharedGoTopMount").innerHTML = goTop.outerHTML;
-  if (features) {
-    document.getElementById("movieFeaturesMount").innerHTML = features.outerHTML;
-    applyMovieFeatureTranslations();
-    initFeatureAccordions();
-  }
-  bindGlobalInnerSearchRedirect();
-  applyInnerPageHeaderOffset();
-}
-
 async function loadMoviePage() {
   const status = document.getElementById("moviePageStatus");
   const cardContainer = document.getElementById("moviePageCard");
@@ -996,11 +966,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     window.location.href = "/";
   });
+  disableHomeOnlyUiOnInnerPages();
+  applyInnerPageHeaderOffset();
+  bindGlobalInnerSearchRedirect();
   loadMoviePage();
 });
 
-try {
-  hydrateSharedSectionsFromHomeSync();
-} catch (err) {
-  console.error("hydrateSharedSectionsFromHomeSync error:", err);
-}
