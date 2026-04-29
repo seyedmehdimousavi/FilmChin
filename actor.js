@@ -136,6 +136,7 @@ function hydrateSharedSectionsFromHomeSync() {
   const header = doc.querySelector(".main-header");
   const menuOverlay = doc.querySelector("#menuOverlay");
   const sideMenu = doc.querySelector("#sideMenu");
+  const tabs = doc.querySelector(".movie-type-tabs");
   const tabGenres = doc.querySelector(".tab-genres-wrapper");
   const bottomDock = doc.querySelector(".mobile-bottom-dock");
   const floating = doc.querySelector(".floating-btn-container");
@@ -144,6 +145,7 @@ function hydrateSharedSectionsFromHomeSync() {
   if (header) document.getElementById("sharedHeaderMount").innerHTML = header.outerHTML;
   if (menuOverlay) document.getElementById("sharedMenuOverlayMount").innerHTML = menuOverlay.outerHTML;
   if (sideMenu) document.getElementById("sharedSideMenuMount").innerHTML = sideMenu.outerHTML;
+  if (tabs) document.getElementById("sharedTabsMount").innerHTML = tabs.outerHTML;
   if (tabGenres) document.getElementById("sharedTabGenresMount").innerHTML = tabGenres.outerHTML;
   if (bottomDock) document.getElementById("sharedBottomDockMount").innerHTML = bottomDock.outerHTML;
   if (floating) document.getElementById("sharedFloatingMount").innerHTML = floating.outerHTML;
@@ -151,6 +153,7 @@ function hydrateSharedSectionsFromHomeSync() {
   if (features) document.getElementById("movieFeaturesMount").innerHTML = features.outerHTML;
   bindGlobalInnerSearchRedirect();
   applyInnerPageHeaderOffset();
+  disableHomeOnlyUiOnInnerPages();
 }
 
 function buildActorEpisodesMap(items) {
