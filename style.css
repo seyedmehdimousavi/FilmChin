@@ -7417,15 +7417,18 @@ body.dark .movie-page-body::before {
 
 .index-body {
   background-image: linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,.5)), url('/images/space-swirl.svg');
-  background-size: cover;
-  background-attachment: fixed;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: scroll;
 }
 body.dark.index-body {
   background-image: linear-gradient(rgba(10,12,16,.5), rgba(10,12,16,.5)), url('/images/space-swirl.svg');
 }
-.dock-btn {display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center}
+.dock-btn {display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center;cursor:pointer}
 .dock-btn span{font-size:11px}
-.support-bubble{border:0;cursor:pointer}
+.support-bubble{cursor:pointer;user-select:none}
+.wallet-sheet-note{margin:0 0 10px;opacity:.8;font-size:13px}
 .wallet-sheet{position:fixed;inset:0;display:none;z-index:1400000}
 .wallet-sheet.active{display:block}
 .wallet-sheet-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.35)}

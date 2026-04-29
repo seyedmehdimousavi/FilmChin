@@ -707,7 +707,7 @@
               class="designer-bubble"
               >Mehdi</a
             >
-            <button id="supportWalletBtn" class="designer-bubble support-bubble" type="button">Support</button>
+            <div id="supportWalletBtn" class="designer-bubble support-bubble" role="button" tabindex="0">Support</div>
             <div id="appVersion" class="genre-chip version-chip">v1.0.0</div>
           </div>
         </div>
@@ -1268,31 +1268,34 @@
       <div id="walletSheet" class="wallet-sheet" aria-hidden="true">
         <div class="wallet-sheet-backdrop"></div>
         <div class="wallet-sheet-panel">
-          <h3>Support Wallets</h3>
+          <h3 data-i18n="supportWalletsTitle">Support Wallets</h3>
+          <p class="wallet-sheet-note" data-i18n="supportWalletsNote">Small helps make big changes.</p>
           <div id="walletSheetList" class="wallet-sheet-list"></div>
         </div>
       </div>
       <div>
-        <button id="bottomMenuBtn" class="dock-btn" aria-label="menu">
+        <div id="bottomMenuBtn" class="dock-btn" role="button" tabindex="0" aria-label="menu">
           <img src="/images/icons8-menu-64.png" alt="menu" />
-          <span>منو</span>
-        </button>
+          <span data-i18n="dockMenu">منو</span>
+        </div>
       </div>
       <div>
-        <button
+        <div
           id="bottomFavoritesBtn"
           class="dock-btn"
+          role="button"
+          tabindex="0"
           aria-label="favorite movies"
         >
           <img src="/images/icons8-heart-50.png" alt="favorites" />
-          <span>موردعلاقه‌ها</span>
-        </button>
+          <span data-i18n="dockFavorites">موردعلاقه‌ها</span>
+        </div>
       </div>
       <div>
-        <button id="bottomSearchBtn" class="dock-btn" aria-label="focus search">
+        <div id="bottomSearchBtn" class="dock-btn" role="button" tabindex="0" aria-label="focus search">
           <i class="bi bi-search"></i>
-          <span>جستجو</span>
-        </button>
+          <span data-i18n="dockSearch">جستجو</span>
+        </div>
       </div>
     </nav>
 

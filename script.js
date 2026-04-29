@@ -1715,6 +1715,13 @@ document.addEventListener("DOMContentLoaded", () => {
       writeComment: "Write a comment...",
       send: "Send",
       designLabel: "Design :",
+      dockMenu: "Menu",
+      dockFavorites: "Favorites",
+      dockSearch: "Search",
+      supportWalletsTitle: "Support Wallets",
+      supportWalletsNote: "Small helps make big changes.",
+      walletNotSet: "Wallet not set.",
+      copied: "Copied",
       siteFeaturesButton: "Site features",
       siteFeaturesTitle: "FilmChiin site features",
       adminPostManagement: "Post Management",
@@ -1808,6 +1815,13 @@ document.addEventListener("DOMContentLoaded", () => {
       writeComment: "نظر خود را بنویسید...",
       send: "ارسال",
       designLabel: "طراحی :",
+      dockMenu: "منو",
+      dockFavorites: "موردعلاقه‌ها",
+      dockSearch: "جستجو",
+      supportWalletsTitle: "کیف‌پول‌های حمایت",
+      supportWalletsNote: "کمک‌های کوچک تغییرات بزرگی ایجاد می‌کنند.",
+      walletNotSet: "کیف پولی ثبت نشده است.",
+      copied: "کپی شد",
       siteFeaturesButton: "لیست امکانات سایت",
       siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
       adminPostManagement: "مدیریت پست‌ها",
@@ -8952,14 +8966,14 @@ async function renderWalletSheet() {
   const list = document.getElementById('walletSheetList');
   if (!list) return;
   const wallets = await fetchWallets();
-  list.innerHTML = wallets.map(w => `<div class="wallet-sheet-item" data-address="${escapeHtml(w.address || '')}"><strong>${escapeHtml(w.name || '')}</strong><div>${escapeHtml(w.address || '')}</div></div>`).join('') || '<p>Wallet not set.</p>';
+  list.innerHTML = wallets.map(w => `<div class="wallet-sheet-item" data-address="${escapeHtml(w.address || '')}"><strong>${escapeHtml(w.name || '')}</strong><div>${escapeHtml(w.address || '')}</div></div>`).join('') || `<p>${escapeHtml(t('walletNotSet'))}</p>`;
   list.querySelectorAll('.wallet-sheet-item').forEach((el) => {
     el.addEventListener('click', async () => {
       const addr = el.dataset.address || '';
       if (!addr) return;
       await navigator.clipboard.writeText(addr);
       document.getElementById('walletSheet')?.classList.remove('active');
-      showToast('Copied');
+      showToast(t('copied'));
     });
   });
 }
@@ -8969,6 +8983,12 @@ function initWalletSupportUi() {
   const sheet = document.getElementById('walletSheet');
   if (!btn || !sheet) return;
   btn.addEventListener('click', async () => { await renderWalletSheet(); sheet.classList.add('active'); });
+  btn.addEventListener('keydown', async (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    await renderWalletSheet();
+    sheet.classList.add('active');
+  });
   sheet.querySelector('.wallet-sheet-backdrop')?.addEventListener('click', () => sheet.classList.remove('active'));
 }
 
