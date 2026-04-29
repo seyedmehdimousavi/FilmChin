@@ -7414,3 +7414,23 @@ body.dark .movie-page-body::before {
     padding-bottom: 90px;
   }
 }
+
+.index-body {
+  background-image: linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,.5)), url('/images/space-swirl.svg');
+  background-size: cover;
+  background-attachment: fixed;
+}
+body.dark.index-body {
+  background-image: linear-gradient(rgba(10,12,16,.5), rgba(10,12,16,.5)), url('/images/space-swirl.svg');
+}
+.dock-btn {display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center}
+.dock-btn span{font-size:11px}
+.support-bubble{border:0;cursor:pointer}
+.wallet-sheet{position:fixed;inset:0;display:none;z-index:1400000}
+.wallet-sheet.active{display:block}
+.wallet-sheet-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.35)}
+.wallet-sheet-panel{position:absolute;left:0;right:0;bottom:0;background:var(--bg-day);border-radius:16px 16px 0 0;padding:16px;max-height:70vh;overflow:auto;animation:sheetUp .25s ease}
+body.dark .wallet-sheet-panel{background:#25303a;color:#fff}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.wallet-sheet-item{padding:12px;border:1px solid rgba(0,0,0,.1);border-radius:12px;margin-bottom:8px;cursor:pointer}
+.wallet-sheet-item strong{display:block;margin-bottom:4px}
