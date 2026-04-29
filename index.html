@@ -707,6 +707,7 @@
               class="designer-bubble"
               >Mehdi</a
             >
+            <button id="supportWalletBtn" class="designer-bubble support-bubble" type="button">Support</button>
             <div id="appVersion" class="genre-chip version-chip">v1.0.0</div>
           </div>
         </div>
@@ -1264,9 +1265,17 @@
     </div>
 
     <nav class="mobile-bottom-dock" aria-label="quick actions">
+      <div id="walletSheet" class="wallet-sheet" aria-hidden="true">
+        <div class="wallet-sheet-backdrop"></div>
+        <div class="wallet-sheet-panel">
+          <h3>Support Wallets</h3>
+          <div id="walletSheetList" class="wallet-sheet-list"></div>
+        </div>
+      </div>
       <div>
         <button id="bottomMenuBtn" class="dock-btn" aria-label="menu">
           <img src="/images/icons8-menu-64.png" alt="menu" />
+          <span>منو</span>
         </button>
       </div>
       <div>
@@ -1276,11 +1285,13 @@
           aria-label="favorite movies"
         >
           <img src="/images/icons8-heart-50.png" alt="favorites" />
+          <span>موردعلاقه‌ها</span>
         </button>
       </div>
       <div>
         <button id="bottomSearchBtn" class="dock-btn" aria-label="focus search">
           <i class="bi bi-search"></i>
+          <span>جستجو</span>
         </button>
       </div>
     </nav>
