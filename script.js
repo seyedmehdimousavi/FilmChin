@@ -5316,6 +5316,65 @@ async function initSupportSheet() {
   panel?.addEventListener("click", (e) => e.stopPropagation());
 }
 
+async function initWalletAdminPanel() {
+  const nameEl = document.getElementById("walletNameInput");
+  const addressEl = document.getElementById("walletAddressInput");
+  const saveBtn = document.getElementById("walletSaveBtn");
+  const listEl = document.getElementById("walletsList");
+  const editIdEl = document.getElementById("walletEditId");
+  if (!nameEl || !addressEl || !saveBtn || !listEl || !editIdEl) return;
+
+  const render = async () => {
+    const { data, error } = await db.from("wallets").select("*").order("created_at", { ascending: false });
+    if (error) return;
+    listEl.innerHTML = (data || []).map((w) => `
+      <div class="wallet-admin-row" data-id="${w.id}">
+        <div><strong>${escapeHtml(w.name)}</strong></div>
+        <div class="wallet-admin-address">${escapeHtml(w.address)}</div>
+        <div class="wallet-admin-actions">
+          <button class="wallet-edit-btn" data-id="${w.id}">Edit</button>
+          <button class="wallet-del-btn" data-id="${w.id}">Delete</button>
+        </div>
+      </div>
+    `).join("");
+  };
+
+  saveBtn.onclick = async () => {
+    const name = nameEl.value.trim();
+    const address = addressEl.value.trim();
+    if (!name || !address) return;
+    const id = editIdEl.value.trim();
+    if (id) await db.from("wallets").update({ name, address }).eq("id", id);
+    else await db.from("wallets").insert([{ name, address }]);
+    nameEl.value = "";
+    addressEl.value = "";
+    editIdEl.value = "";
+    saveBtn.textContent = "Save wallet";
+    render();
+  };
+
+  listEl.onclick = async (e) => {
+    const editBtn = e.target.closest(".wallet-edit-btn");
+    const delBtn = e.target.closest(".wallet-del-btn");
+    if (editBtn) {
+      const id = editBtn.dataset.id;
+      const { data } = await db.from("wallets").select("*").eq("id", id).single();
+      if (!data) return;
+      nameEl.value = data.name || "";
+      addressEl.value = data.address || "";
+      editIdEl.value = data.id;
+      saveBtn.textContent = "Update wallet";
+    }
+    if (delBtn) {
+      const id = delBtn.dataset.id;
+      await db.from("wallets").delete().eq("id", id);
+      render();
+    }
+  };
+
+  render();
+}
+
   // مودال
 
 function openMovieModal(m, startIdx = 0) {
@@ -8983,5 +9042,6 @@ initSideMenuAccordions();
 
   fetchSocialLinks();
   initSupportSheet();
+  initWalletAdminPanel();
   initAdminActorsPanel();
 });

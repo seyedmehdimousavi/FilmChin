@@ -7407,3 +7407,8 @@ body.dark .movie-page-body::before {
 .support-sheet-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45)}
 .support-sheet-panel{position:absolute;left:0;right:0;bottom:0;background:var(--card-bg,#fff);border-radius:18px 18px 0 0;padding:16px;max-height:70vh;overflow:auto}
 .support-wallet-row{padding:10px;border:1px solid rgba(255,255,255,.2);border-radius:10px;margin-top:8px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.toggle-row span i,.theme-palette-title i{margin-inline-end:6px;opacity:.9}
+.admin-wallet-form{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.wallet-admin-row{padding:10px;border:1px solid rgba(255,255,255,.2);border-radius:10px;margin-top:8px}
+.wallet-admin-address{font-size:12px;opacity:.85;word-break:break-all;margin:6px 0}
+.wallet-admin-actions{display:flex;gap:8px}
