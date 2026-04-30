@@ -707,6 +707,7 @@
               class="designer-bubble"
               >Mehdi</a
             >
+            <div id="supportChip" class="genre-chip version-chip support-chip">Support</div>
             <div id="appVersion" class="genre-chip version-chip">v1.0.0</div>
           </div>
         </div>
@@ -1264,29 +1265,40 @@
     </div>
 
     <nav class="mobile-bottom-dock" aria-label="quick actions">
-      <div class="button-wrap">
-        <button id="bottomMenuBtn" class="dock-btn" aria-label="menu">
+      <div class="button-wrap dock-item-wrap">
+        <button id="bottomMenuBtn" class="dock-btn no-btn-bg" aria-label="menu">
           <img src="/images/icons8-menu-64.png" alt="menu" />
         </button>
+        <span class="dock-label" data-i18n="menu">Menu</span>
         <div class="button-shadow"></div>
       </div>
-      <div class="button-wrap">
+      <div class="button-wrap dock-item-wrap">
         <button
           id="bottomFavoritesBtn"
-          class="dock-btn"
+          class="dock-btn no-btn-bg"
           aria-label="favorite movies"
         >
           <img src="/images/icons8-heart-50.png" alt="favorites" />
         </button>
+        <span class="dock-label" data-i18n="favorites">Favorites</span>
         <div class="button-shadow"></div>
       </div>
-      <div class="button-wrap">
-        <button id="bottomSearchBtn" class="dock-btn" aria-label="focus search">
+      <div class="button-wrap dock-item-wrap">
+        <button id="bottomSearchBtn" class="dock-btn no-btn-bg" aria-label="focus search">
           <i class="bi bi-search"></i>
         </button>
+        <span class="dock-label" data-i18n="search">Search</span>
         <div class="button-shadow"></div>
       </div>
     </nav>
+    <div id="supportSheet" class="support-sheet" aria-hidden="true">
+      <div class="support-sheet-backdrop"></div>
+      <div class="support-sheet-panel">
+        <h3 data-i18n="support">Support</h3>
+        <p data-i18n="supportHint">Small helps make big changes.</p>
+        <div id="supportWalletList"></div>
+      </div>
+    </div>
 
     <!-- کانتینر شناور -->
     <div class="floating-wrapper">
