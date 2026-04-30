@@ -2337,11 +2337,31 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!Array.isArray(favoritesRaw)) return [];
     return favoritesRaw
       .map((fav) => {
-        const movie = (movies || []).find((m) => m.id === fav.movie_id);
+        const movie = (movies || []).find((m) => String(m.id) === String(fav.movie_id));
         if (!movie) return null;
         return { fav, movie };
       })
       .filter(Boolean);
+  }
+
+
+
+  async function hydrateMissingFavoriteMovies() {
+    const missingIds = (favoritesRaw || [])
+      .map((f) => String(f.movie_id))
+      .filter((id) => !(movies || []).some((m) => String(m.id) === id));
+    if (!missingIds.length) return;
+
+    const { data, error } = await db.from("movies").select("*").in("id", missingIds);
+    if (error) {
+      console.error("hydrateMissingFavoriteMovies error:", error);
+      return;
+    }
+    if (!Array.isArray(data) || !data.length) return;
+
+    const merged = new Map((movies || []).map((m) => [String(m.id), m]));
+    data.forEach((m) => merged.set(String(m.id), m));
+    movies = Array.from(merged.values());
   }
 
   function renderFavoritesGrid() {
@@ -2429,6 +2449,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!favoritesLoaded) {
       await loadFavoritesForCurrentUser();
     }
+    await hydrateMissingFavoriteMovies();
 
     favoritesPage = 1;
     renderFavoritesGrid();
@@ -2509,7 +2530,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
-      const index = filtered.findIndex((m) => m.id === movieId);
+      const index = filtered.findIndex((m) => String(m.id) === String(movieId));
       if (index === -1) {
         showToast("این فیلم در لیست فعلی پیدا نشد", "error");
         return;
@@ -2797,7 +2818,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function prefetchTabFirstPages() {
     if (!usingServerPagination) return;
-    const tabs = ["collection", "series", "single"];
+    const tabs = ["all", "collection", "series", "single"];
     await Promise.allSettled(tabs.map((tab) => fetchMoviesPage(1, tab)));
   }
 
@@ -3008,10 +3029,24 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
     genreGrid.innerHTML = "";
-    Object.entries(genreCounts).sort((a, b) => b[1] - a[1]).forEach(([g, count]) => {
+    const genreEntries = Object.entries(genreCounts);
+    const englishGenres = genreEntries.filter(([g]) => {
+      const clean = g.startsWith("#") ? g.slice(1) : g;
+      return /^[A-Za-z]/.test(clean);
+    });
+    const persianGenres = genreEntries.filter(([g]) => {
+      const clean = g.startsWith("#") ? g.slice(1) : g;
+      return !/^[A-Za-z]/.test(clean);
+    });
+    const orderedGenres = [
+      ...englishGenres.sort((a, b) => b[1] - a[1]),
+      ...persianGenres.sort((a, b) => b[1] - a[1]),
+    ];
+
+    orderedGenres.forEach(([g, count]) => {
       const div = document.createElement("div");
       div.className = "genre-chip";
-      div.innerHTML = `${escapeHtml(g)} <span class="count">(${count})</span>`;
+      div.innerHTML = `${escapeHtml(g)} <span class="count">${count}</span>`;
 
       // 👇 این خط اضافه شد
       div.setAttribute("dir", "auto");
@@ -3295,7 +3330,6 @@ function setTabInUrl(type) {
     currentTypeFilter = type;
     currentPage = 1;
     if (shouldUseServerPagination()) {
-      moviesPageCache.clear();
       await fetchMovies();
     } else {
       await fetchMovies(true);
