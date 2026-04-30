@@ -7376,12 +7376,14 @@ body.dark .dock-btn {
   content: "";
   position: fixed;
   inset: 0;
-  background: rgba(255, 255, 255, 0.74);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.62));
+  backdrop-filter: blur(2px) saturate(110%);
   pointer-events: none;
   z-index: -1;
 }
 body.dark .movie-page-body::before {
-  background: rgba(0, 0, 0, 0.58);
+  background: linear-gradient(180deg, rgba(7, 10, 14, 0.72), rgba(7, 10, 14, 0.54));
+  backdrop-filter: blur(2px) saturate(120%);
 }
 
 @media (max-width: 900px) {
