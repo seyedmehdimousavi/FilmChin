@@ -1715,6 +1715,11 @@ document.addEventListener("DOMContentLoaded", () => {
       writeComment: "Write a comment...",
       send: "Send",
       designLabel: "Design :",
+      menu: "Menu",
+      favorites: "Favorites",
+      search: "Search",
+      support: "Support",
+      supportHint: "Small helps make big changes.",
       siteFeaturesButton: "Site features",
       siteFeaturesTitle: "FilmChiin site features",
       adminPostManagement: "Post Management",
@@ -1808,6 +1813,11 @@ document.addEventListener("DOMContentLoaded", () => {
       writeComment: "نظر خود را بنویسید...",
       send: "ارسال",
       designLabel: "طراحی :",
+      menu: "منو",
+      favorites: "علاقه‌مندی‌ها",
+      search: "جستجو",
+      support: "حمایت",
+      supportHint: "کمک‌های کوچک تغییرات بزرگی ایجاد می‌کنند.",
       siteFeaturesButton: "لیست امکانات سایت",
       siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
       adminPostManagement: "مدیریت پست‌ها",
@@ -2987,18 +2997,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // Genre grid
   function buildGenreGrid() {
     if (!genreGrid) return;
-    const genreSet = new Set();
-    (movies || []).forEach((m) => {
+    const genreCounts = {};
+    const source = Array.isArray(moviesStats) && moviesStats.length ? moviesStats : (movies || []);
+    source.forEach((m) => {
       if (m.genre)
         m.genre.split(" ").forEach((g) => {
-          if (g.trim() !== "") genreSet.add(g);
+          const name = g.trim();
+          if (!name) return;
+          genreCounts[name] = (genreCounts[name] || 0) + 1;
         });
     });
     genreGrid.innerHTML = "";
-    [...genreSet].sort().forEach((g) => {
+    Object.entries(genreCounts).sort((a, b) => b[1] - a[1]).forEach(([g, count]) => {
       const div = document.createElement("div");
       div.className = "genre-chip";
-      div.textContent = g;
+      div.innerHTML = `${escapeHtml(g)} <span class="count">(${count})</span>`;
 
       // 👇 این خط اضافه شد
       div.setAttribute("dir", "auto");
@@ -5243,6 +5256,27 @@ searchInput?.addEventListener("keydown", (e) => {
   // استفاده از onclick ساده برای جلوگیری از تداخل لیسنرها
   document.querySelector("#popular-carousel .next").onclick = () => slideTo(currentIndex + 1);
   document.querySelector("#popular-carousel .prev").onclick = () => slideTo(currentIndex - 1);
+  let touchStartX = 0;
+  let touchCurrentX = 0;
+  let dragging = false;
+  windowEl.ontouchstart = (e) => {
+    if (!e.touches?.length) return;
+    dragging = true;
+    touchStartX = e.touches[0].clientX;
+    touchCurrentX = touchStartX;
+  };
+  windowEl.ontouchmove = (e) => {
+    if (!dragging || !e.touches?.length) return;
+    touchCurrentX = e.touches[0].clientX;
+  };
+  windowEl.ontouchend = () => {
+    if (!dragging) return;
+    const delta = touchCurrentX - touchStartX;
+    dragging = false;
+    if (Math.abs(delta) < 30) return;
+    if (delta < 0) slideTo(currentIndex + 1);
+    else slideTo(currentIndex - 1);
+  };
 
   let autoSlide;
   function resetAutoSlide() {
@@ -5250,6 +5284,36 @@ searchInput?.addEventListener("keydown", (e) => {
     autoSlide = setInterval(() => slideTo(currentIndex + 1), 4000);
   }
   resetAutoSlide();
+}
+
+async function initSupportSheet() {
+  const chip = document.getElementById("supportChip");
+  const sheet = document.getElementById("supportSheet");
+  const backdrop = sheet?.querySelector(".support-sheet-backdrop");
+  const panel = sheet?.querySelector(".support-sheet-panel");
+  const listEl = document.getElementById("supportWalletList");
+  if (!chip || !sheet || !listEl) return;
+
+  const closeSheet = () => sheet.classList.remove("open");
+  chip.addEventListener("click", async () => {
+    const { data } = await db.from("wallets").select("name,address").order("created_at", { ascending: true });
+    listEl.innerHTML = "";
+    (data || []).forEach((w) => {
+      const row = document.createElement("div");
+      row.className = "support-wallet-row";
+      row.innerHTML = `<strong>${escapeHtml(w.name || "")}</strong><span>${escapeHtml(w.address || "")}</span>`;
+      row.onclick = async () => {
+        await navigator.clipboard.writeText(`${w.name}\n${w.address}`);
+        closeSheet();
+      };
+      listEl.appendChild(row);
+    });
+    sheet.classList.add("open");
+    document.getElementById("sideMenu")?.classList.remove("active");
+    document.getElementById("menuOverlay")?.classList.remove("active");
+  });
+  backdrop?.addEventListener("click", closeSheet);
+  panel?.addEventListener("click", (e) => e.stopPropagation());
 }
 
   // مودال
@@ -8578,11 +8642,11 @@ return `
   function handleDelta(dy) {
     accumulatedDelta += dy;
     while (accumulatedDelta <= -STEP_PX) {
-      changeYear("up");
+      changeYear("down");
       accumulatedDelta += STEP_PX;
     }
     while (accumulatedDelta >= STEP_PX) {
-      changeYear("down");
+      changeYear("up");
       accumulatedDelta -= STEP_PX;
     }
   }
@@ -8918,5 +8982,6 @@ initSideMenuAccordions();
   }
 
   fetchSocialLinks();
+  initSupportSheet();
   initAdminActorsPanel();
 });
