@@ -721,7 +721,7 @@ function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
       return `<div class="episode-card similar-movie-card">
         <img src="${cover}" alt="${title}" class="episode-cover">
         <div class="episode-title"><span>${title}</span></div>
-        <div class="button-wrap similar-go-wrap"><button class="go-page-btn similar-go-btn" data-url="${escapeHtml(url)}"><span>${mt("goToPage")}</span></button><div class="button-shadow"></div></div>
+        <div class="button-wrap similar-go-wrap"><a class="go-page-btn similar-go-btn" href="${escapeHtml(url)}"><span>${mt("goToPage")}</span></a><div class="button-shadow"></div></div>
       </div>`;
     })
     .join("");
@@ -737,12 +737,7 @@ function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
   container.appendChild(section);
 
   section.querySelectorAll(".similar-go-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const url = btn.dataset.url || "#";
-      if (url !== "#") window.location.href = url;
-    });
+    btn.addEventListener("click", (e) => e.stopPropagation());
   });
 }
 
