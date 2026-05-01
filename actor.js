@@ -146,7 +146,7 @@ function renderActorPosts(posts, episodesMap = new Map()) {
           ${episodesHtml}
           <div class="post-action-row movie-page-actions actor-post-actions">
             <div class="button-wrap">
-              <button class="go-page-btn actor-go-page-btn" data-url="${url}"><span>${t("goToPage")}</span></button>
+              <a class="go-page-btn actor-go-page-btn" href="${url}"><span>${t("goToPage")}</span></a>
               <div class="button-shadow"></div>
             </div>
           </div>
@@ -155,13 +155,6 @@ function renderActorPosts(posts, episodesMap = new Map()) {
     })
     .join("");
 
-  container.querySelectorAll(".actor-go-page-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      const url = btn.dataset.url || "#";
-      if (url !== "#") window.location.href = url;
-    });
-  });
 }
 
 async function loadActorPage() {

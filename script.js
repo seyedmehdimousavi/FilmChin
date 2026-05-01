@@ -677,9 +677,10 @@ function setUserProfile(avatarUrl) {
 }
 
 // کلیک روی پروفایل
-profileBtn?.addEventListener("click", async () => {
+profileBtn?.addEventListener("click", async (e) => {
   await loadAuthState();
   if (!currentUser) {
+    e.preventDefault();
     authModal.style.display = "flex";
     return;
   }
@@ -688,6 +689,7 @@ profileBtn?.addEventListener("click", async () => {
 
   if (isAdminRole) {
     if (window.location.pathname.includes("admin.html")) {
+      e.preventDefault();
       // ادمین داخل پنل → فقط حباب باز بشه
       profileMenu.classList.toggle("hidden");
     } else {
@@ -695,6 +697,7 @@ profileBtn?.addEventListener("click", async () => {
       window.location.href = "admin.html";
     }
   } else {
+    e.preventDefault();
     // کاربر عادی → همیشه حباب باز بشه
     profileMenu.classList.toggle("hidden");
   }
@@ -2748,7 +2751,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    const openMenu = () => {
+    const openMenu = (e) => {
+      e?.preventDefault?.();
       if (isDesktopSidebar()) return;
       sideMenu.classList.add("active");
       menuOverlay.classList.add("active");
@@ -3241,7 +3245,8 @@ renderPagedMovies(true);
       searchInput.dispatchEvent(new Event("input", { bubbles: true }));
     });
 
-    bottomSearchBtn?.addEventListener("click", () => {
+    bottomSearchBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
       searchInput.scrollIntoView({ behavior: "smooth", block: "center" });
       searchInput.focus();
       searchInput.click();
@@ -4175,9 +4180,9 @@ function setTabInUrl(type) {
         <div class="button-shadow"></div>
       </div>
       <div class="button-wrap">
-        <button class="go-page-btn anim-vertical" data-url="/movie/${encodeURIComponent(
+        <a class="go-page-btn anim-vertical" href="/movie/${encodeURIComponent(
           makeMovieSlug(m.title || "")
-        )}"><span>${uiText("goToPage")}</span></button>
+        )}"><span>${uiText("goToPage")}</span></a>
         <div class="button-shadow"></div>
       </div>
     </div>
@@ -4339,14 +4344,8 @@ function setTabInUrl(type) {
 // ===================== رفتار دکمه Go to file (اتصال به بات تلگرام) =====================
       const goBtn = card.querySelector(".go-btn");
       const goPageBtn = card.querySelector(".go-page-btn");
-      goPageBtn?.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const url = goPageBtn.dataset.url || "#";
-        if (url && url !== "#") {
-          localStorage.setItem("filmchin_focus_movie_id", String(m.id || ""));
-          window.location.href = url;
-        }
+      goPageBtn?.addEventListener("click", () => {
+        localStorage.setItem("filmchin_focus_movie_id", String(m.id || ""));
       });
 
       goBtn?.addEventListener("click", async () => {
