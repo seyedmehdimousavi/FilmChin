@@ -155,13 +155,6 @@ function renderActorPosts(posts, episodesMap = new Map()) {
     })
     .join("");
 
-  container.querySelectorAll(".actor-go-page-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      const url = btn.dataset.url || "#";
-      if (url !== "#") window.location.href = url;
-    });
-  });
 }
 
 async function loadActorPage() {

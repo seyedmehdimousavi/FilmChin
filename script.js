@@ -4180,7 +4180,7 @@ function setTabInUrl(type) {
         <div class="button-shadow"></div>
       </div>
       <div class="button-wrap">
-        <button class="go-page-btn anim-vertical" data-url="/movie/${encodeURIComponent(
+        <a class="go-page-btn anim-vertical" href="/movie/${encodeURIComponent(
           makeMovieSlug(m.title || "")
         )}" type="button"><span>${uiText("goToPage")}</span></button>
         <div class="button-shadow"></div>
