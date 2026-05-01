@@ -191,17 +191,18 @@
 
         <div class="header-profile-wrap">
           <div class="button-wrap">
-            <button
+            <a
               id="profileBtn"
               class="icon-inside"
               style="display: flex; align-items: center"
               aria-label="profile"
+              href="admin.html"
             >
               <img src="/images/icons8-user-96.png" alt="user" />
               <span id="commentBadge" class="badge" style="display: none"
                 >!</span
               >
-            </button>
+            </a>
             <div class="button-shadow"></div>
           </div>
         </div>
@@ -1266,7 +1267,7 @@
 
     <nav class="mobile-bottom-dock" aria-label="quick actions">
       <div class="dock-item-wrap">
-        <button id="bottomMenuBtn" class="dock-btn no-btn-bg" aria-label="menu">
+        <button id="bottomMenuBtn" class="dock-btn no-btn-bg" aria-label="menu" type="button">
           <img src="/images/icons8-menu-64.png" alt="menu" />
         </button>
         <span class="dock-label" data-i18n="menu">Menu</span>
@@ -1276,13 +1277,14 @@
           id="bottomFavoritesBtn"
           class="dock-btn no-btn-bg"
           aria-label="favorite movies"
+          type="button"
         >
           <img src="/images/icons8-heart-50.png" alt="favorites" />
         </button>
         <span class="dock-label" data-i18n="favorites">Favorites</span>
       </div>
       <div class="dock-item-wrap">
-        <button id="bottomSearchBtn" class="dock-btn no-btn-bg" aria-label="focus search">
+        <button id="bottomSearchBtn" class="dock-btn no-btn-bg" aria-label="focus search" type="button">
           <i class="bi bi-search"></i>
         </button>
         <span class="dock-label" data-i18n="search">Search</span>
