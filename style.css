@@ -7400,8 +7400,8 @@ body.dark .movie-page-body::before {
 }
 
 .index-body::before{content:"";position:fixed;inset:0;background:url('/images/space-swirl.svg') center/cover no-repeat;opacity:.5;pointer-events:none;z-index:-1}
-.dock-item-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
-.dock-label{font-size:11px;opacity:.9}
+.dock-item-wrap{display:flex;flex-direction:column;align-items:center;gap:1px}
+.dock-label{font-size:11px;opacity:.9;line-height:1;margin-top:0}
 .no-btn-bg{background:transparent!important;border:none!important;box-shadow:none!important}
 .support-chip{cursor:pointer;font-size:12px}
 .support-sheet{position:fixed;inset:0;display:none;z-index:1200}

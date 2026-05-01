@@ -4182,7 +4182,7 @@ function setTabInUrl(type) {
       <div class="button-wrap">
         <a class="go-page-btn anim-vertical" href="/movie/${encodeURIComponent(
           makeMovieSlug(m.title || "")
-        )}"><span>${uiText("goToPage")}</span></a>
+        )}" type="button"><span>${uiText("goToPage")}</span></button>
         <div class="button-shadow"></div>
       </div>
     </div>
@@ -4344,8 +4344,12 @@ function setTabInUrl(type) {
 // ===================== رفتار دکمه Go to file (اتصال به بات تلگرام) =====================
       const goBtn = card.querySelector(".go-btn");
       const goPageBtn = card.querySelector(".go-page-btn");
-      goPageBtn?.addEventListener("click", () => {
+      goPageBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         localStorage.setItem("filmchin_focus_movie_id", String(m.id || ""));
+        const url = goPageBtn.dataset.url || "#";
+        if (url && url !== "#") window.location.href = url;
       });
 
       goBtn?.addEventListener("click", async () => {

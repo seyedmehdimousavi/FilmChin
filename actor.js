@@ -146,7 +146,7 @@ function renderActorPosts(posts, episodesMap = new Map()) {
           ${episodesHtml}
           <div class="post-action-row movie-page-actions actor-post-actions">
             <div class="button-wrap">
-              <a class="go-page-btn actor-go-page-btn" href="${url}"><span>${t("goToPage")}</span></a>
+              <button class="go-page-btn actor-go-page-btn" data-url="${url}" type="button"><span>${t("goToPage")}</span></button>
               <div class="button-shadow"></div>
             </div>
           </div>
