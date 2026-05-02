@@ -7499,3 +7499,134 @@ body.dark .movie-page-body::before {
   display: flex;
   gap: 8px;
 }
+
+/* ===== 2026 Material Redesign Override ===== */
+:root {
+  --md-primary: #6750a4;
+  --md-primary-container: #eaddff;
+  --md-secondary-container: #e8def8;
+  --md-surface: #fef7ff;
+  --md-surface-2: #f3edf7;
+  --md-surface-dark: #1c1b1f;
+  --md-outline: #79747e;
+  --md-on-surface: #1d1b20;
+  --md-radius: 22px;
+  --md-elev: 0 10px 30px rgba(25, 18, 36, 0.08);
+}
+
+body.material-layout {
+  background: linear-gradient(180deg, var(--md-surface), var(--md-surface-2));
+  color: var(--md-on-surface);
+}
+body.dark.material-layout {
+  background: linear-gradient(180deg, #15131a, var(--md-surface-dark));
+  color: #f5eff7;
+}
+
+.material-layout .main-header {
+  backdrop-filter: blur(20px) saturate(140%);
+  background: color-mix(in srgb, var(--md-surface) 86%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--md-outline) 25%, transparent);
+  box-shadow: 0 2px 16px rgba(37, 28, 56, 0.12);
+}
+.material-layout .site-banner,
+.material-layout #movieBannerMount {
+  background: linear-gradient(145deg, var(--md-primary), #7f67be);
+  min-height: 54px;
+}
+.material-layout .banner-text { color: #fff; font-weight: 700; letter-spacing: .5px; }
+
+.material-layout .header,
+.material-layout .search-bar {
+  border-radius: var(--md-radius);
+}
+.material-layout .search-bar {
+  background: color-mix(in srgb, white 70%, var(--md-primary-container));
+  box-shadow: var(--md-elev);
+  border: 1px solid color-mix(in srgb, var(--md-outline) 20%, transparent);
+}
+.material-layout input,
+.material-layout textarea,
+.material-layout select {
+  border-radius: 16px !important;
+  border: 1px solid color-mix(in srgb, var(--md-outline) 32%, transparent) !important;
+  background: color-mix(in srgb, white 82%, var(--md-primary-container));
+  padding: 12px 14px !important;
+}
+body.dark.material-layout input,
+body.dark.material-layout textarea,
+body.dark.material-layout select {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+}
+
+.material-layout .post,
+.material-layout .movie-page-single,
+.material-layout .actor-profile-card,
+.material-layout .actor-movies-block,
+.material-layout .admin-section-item,
+.material-layout .post-options-modal,
+.material-layout .profile-bubble {
+  border-radius: 24px !important;
+  background: color-mix(in srgb, white 75%, var(--md-primary-container));
+  border: 1px solid color-mix(in srgb, var(--md-outline) 24%, transparent);
+  box-shadow: var(--md-elev);
+}
+body.dark.material-layout .post,
+body.dark.material-layout .movie-page-single,
+body.dark.material-layout .actor-profile-card,
+body.dark.material-layout .actor-movies-block,
+body.dark.material-layout .admin-section-item,
+body.dark.material-layout .post-options-modal,
+body.dark.material-layout .profile-bubble {
+  background: rgba(255,255,255,0.05);
+}
+
+.material-layout .button-wrap > button,
+.material-layout .menu-btn,
+.material-layout .icon-btn,
+.material-layout .icon-inside,
+.material-layout .admin-submit,
+.material-layout .tab-btn,
+.material-layout .movie-page-back {
+  border-radius: 16px !important;
+  border: none;
+  background: var(--md-primary-container);
+  color: #2f2544;
+  box-shadow: 0 4px 14px rgba(103,80,164,.22);
+}
+.material-layout .button-wrap > button:hover,
+.material-layout .admin-submit:hover,
+.material-layout .tab-btn:hover {
+  transform: translateY(-2px);
+  background: #d5c3f7;
+}
+.material-layout .tab-btn.active,
+.material-layout .admin-submit.primary,
+.material-layout .movie-page-back {
+  background: var(--md-primary);
+  color: #fff;
+}
+
+.material-layout .posts,
+.material-layout .actor-movies-list,
+.material-layout .admin-tabs,
+.material-layout .admin-form,
+.material-layout .filters,
+.material-layout .quick-filters {
+  gap: 14px !important;
+}
+
+.material-layout .badge {
+  background: #ba1a1a;
+  color: #fff;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+@media (max-width: 780px) {
+  .material-layout .main-header { border-radius: 0 0 18px 18px; }
+  .material-layout .search-bar { min-height: 52px; }
+  .material-layout .post,
+  .material-layout .admin-section-item { border-radius: 18px !important; }
+}
