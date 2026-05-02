@@ -4182,7 +4182,7 @@ function setTabInUrl(type) {
       <div class="button-wrap">
         <a class="go-page-btn anim-vertical" href="/movie/${encodeURIComponent(
           makeMovieSlug(m.title || "")
-        )}" type="button"><span>${uiText("goToPage")}</span></button>
+        )}" type="button"><span>${uiText("goToPage")}</span></a>
         <div class="button-shadow"></div>
       </div>
     </div>

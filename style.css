@@ -6811,13 +6811,17 @@ body.dark .language-option {
 }
 
 .post-action-row {
-  /* display: flex; */
+  display: flex;
   gap: 10px;
   align-items: stretch;
 }
 
 .post-action-row .button-wrap {
   flex: 1;
+}
+
+.button-wrap > a {
+  pointer-events: auto;
 }
 
 .go-page-btn {
@@ -7306,16 +7310,23 @@ body.dark .mobile-bottom-dock {
   background: rgba(15, 20, 26, 0.8);
 }
 .dock-btn {
-  border-radius: 50%;
-  border: 0;
+  all: unset;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   display: grid;
   place-items: center;
-  background: rgba(var(--theme-accent-rgb), 0.08);
+  background: #ffffff;
   color: var(--theme-accent-dark);
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 body.dark .dock-btn {
   color: #fff;
-  background: rgba(255, 255, 255, 0.14);
+  background: #1f252a;
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
 }
 .dock-btn img {
   width: 24px;
