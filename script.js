@@ -5325,13 +5325,16 @@ searchInput?.addEventListener("keydown", (e) => {
 
 async function initSupportSheet() {
   const chip = document.getElementById("supportChip");
-  const sheet = document.getElementById("supportSheet");
-  const backdrop = sheet?.querySelector(".support-sheet-backdrop");
-  const panel = sheet?.querySelector(".support-sheet-panel");
+  const dock = document.getElementById("mobileBottomDock");
+  const panel = document.getElementById("dockSupportPanel");
   const listEl = document.getElementById("supportWalletList");
-  if (!chip || !sheet || !listEl) return;
+  if (!chip || !dock || !panel || !listEl) return;
 
-  const closeSheet = () => sheet.classList.remove("open");
+  const closeSheet = () => {
+    dock.classList.remove("support-open");
+    panel.setAttribute("aria-hidden", "true");
+  };
+
   chip.addEventListener("click", async () => {
     const { data } = await db.from("wallets").select("name,address").order("created_at", { ascending: true });
     listEl.innerHTML = "";
@@ -5345,13 +5348,14 @@ async function initSupportSheet() {
       };
       listEl.appendChild(row);
     });
-    sheet.classList.add("open");
+
+    dock.classList.add("support-open");
+    panel.setAttribute("aria-hidden", "false");
     document.getElementById("sideMenu")?.classList.remove("active");
     document.getElementById("menuOverlay")?.classList.remove("active");
   });
-  backdrop?.addEventListener("click", closeSheet);
-  panel?.addEventListener("click", (e) => e.stopPropagation());
 }
+
 
 async function initWalletAdminPanel() {
   const nameEl = document.getElementById("walletNameInput");

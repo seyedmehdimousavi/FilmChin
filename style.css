@@ -147,8 +147,9 @@ Body.dark {
 }
 .header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
   padding: 12px 14px;
   gap: 5px;
   width: 100%;
@@ -545,8 +546,9 @@ Body.dark .go-btn {
   ========================= */
 .comment-summary {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
   gap: 8px;
   box-shadow: 4px rgba(0, 0, 0, 0.2);
   margin-top: 10px;
@@ -984,8 +986,9 @@ Body.dark #adminProfile textarea {
 .movie-item,
 .message-item {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
   padding: 10px;
   border-radius: 12px;
   background: var(--post-day);
@@ -2303,8 +2306,9 @@ body.dark .year-filter {
 
 .year-filter-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
   gap: 8px;
 }
 
@@ -3433,8 +3437,9 @@ body.dark .profile-bubble {
 .user-row,
 .admin-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
   padding: 8px 12px;
   margin-bottom: 6px;
   border-radius: 6px;
@@ -4294,8 +4299,9 @@ body.dark .chat-bubble {
 
 .chat-bubble-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
 }
 .chat-bubble-title {
   font-weight: bold;
@@ -4305,8 +4311,9 @@ body.dark .chat-bubble {
 .chat-input-row {
   width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
   margin-top: 8px;
 }
 
@@ -4504,8 +4511,9 @@ body.dark .msg-status-pending {
 /* گرید پروفایل‌های کاربران در پنل ادمین */
 .user-threads-grid {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
   flex-wrap: wrap;
   gap: 10px;
 }
@@ -4699,8 +4707,9 @@ body.dark .chat-composer input {
 /* گرید پروفایل‌های کاربران در پنل ادمین */
 .user-threads-grid {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
   flex-wrap: wrap;
   gap: 10px;
 }
@@ -6261,8 +6270,9 @@ body.dark .post-options-modal {
 
 .post-options-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
   margin-bottom: 8px;
 }
 
@@ -6290,8 +6300,9 @@ body.dark .post-options-modal {
 
 .post-option-item {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
   text-align: left;
   background: #f5f5f5;
 }
@@ -7297,8 +7308,9 @@ body.dark .movie-page-body {
   width: min(92vw, 340px);
   z-index: 13000;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
   padding: 10px 14px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.72);
@@ -7426,6 +7438,7 @@ body.dark .movie-page-body::before {
   z-index: -1;
 }
 .dock-item-wrap {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7448,30 +7461,31 @@ body.dark .movie-page-body::before {
   cursor: pointer;
   font-size: 12px;
 }
-.support-sheet {
-  position: fixed;
-  inset: 0;
-  display: none;
-  z-index: 1200;
+.mobile-bottom-dock {
+  overflow: hidden;
+  transition: padding 0.25s ease;
 }
-.support-sheet.open {
-  display: block;
+.dock-actions-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-.support-sheet-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+.dock-support-panel {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.2s ease;
+  padding: 0;
+  margin: 0;
 }
-.support-sheet-panel {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--card-bg, #fff);
-  border-radius: 18px 18px 0 0;
-  padding: 16px;
-  max-height: 70vh;
-  overflow: auto;
+.mobile-bottom-dock.support-open .dock-support-panel {
+  max-height: 280px;
+  opacity: 1;
+  pointer-events: auto;
+  margin-bottom: 8px;
+  padding: 10px 12px 0;
 }
 .support-wallet-row {
   padding: 10px;
