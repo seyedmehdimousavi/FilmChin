@@ -1265,15 +1265,21 @@
       </div>
     </div>
 
-    <nav class="mobile-bottom-dock" aria-label="quick actions">
-      <div class="dock-item-wrap">
+    <nav id="mobileBottomDock" class="mobile-bottom-dock" aria-label="quick actions">
+      <div id="dockSupportPanel" class="dock-support-panel" aria-hidden="true">
+        <h3 data-i18n="support">Support</h3>
+        <p data-i18n="supportHint">Small helps make big changes.</p>
+        <div id="supportWalletList"></div>
+      </div>
+      <div class="dock-actions-row">
+        <div class="dock-item-wrap">
         <button id="bottomMenuBtn" class="dock-btn no-btn-bg" aria-label="menu" type="button">
           <img src="/images/icons8-menu-64.png" alt="menu" />
-        </a>
+        </button>
         <span class="dock-label" data-i18n="menu">Menu</span>
       </div>
-      <div class="dock-item-wrap">
-        <a
+        <div class="dock-item-wrap">
+          <a
           id="bottomFavoritesBtn"
           class="dock-btn no-btn-bg"
           aria-label="favorite movies"
@@ -1283,21 +1289,14 @@
         </a>
         <span class="dock-label" data-i18n="favorites">Favorites</span>
       </div>
-      <div class="dock-item-wrap">
-        <button id="bottomSearchBtn" class="dock-btn no-btn-bg" aria-label="focus search" type="button">
+        <div class="dock-item-wrap">
+          <button id="bottomSearchBtn" class="dock-btn no-btn-bg" aria-label="focus search" type="button">
           <i class="bi bi-search"></i>
-        </a>
+        </button>
         <span class="dock-label" data-i18n="search">Search</span>
+        </div>
       </div>
     </nav>
-    <div id="supportSheet" class="support-sheet" aria-hidden="true">
-      <div class="support-sheet-backdrop"></div>
-      <div class="support-sheet-panel">
-        <h3 data-i18n="support">Support</h3>
-        <p data-i18n="supportHint">Small helps make big changes.</p>
-        <div id="supportWalletList"></div>
-      </div>
-    </div>
 
     <!-- کانتینر شناور -->
     <div class="floating-wrapper">
