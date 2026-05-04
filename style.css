@@ -7448,30 +7448,29 @@ body.dark .movie-page-body::before {
   cursor: pointer;
   font-size: 12px;
 }
-.support-sheet {
-  position: fixed;
-  inset: 0;
-  display: none;
-  z-index: 1200;
+.mobile-bottom-dock {
+  overflow: hidden;
+  transition: height 0.25s ease;
 }
-.support-sheet.open {
-  display: block;
+.dock-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 }
-.support-sheet-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+.dock-support-panel {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+  padding: 0 12px;
 }
-.support-sheet-panel {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--card-bg, #fff);
-  border-radius: 18px 18px 0 0;
-  padding: 16px;
-  max-height: 70vh;
-  overflow: auto;
+.mobile-bottom-dock.support-open .dock-support-panel {
+  max-height: 280px;
+  opacity: 1;
+  pointer-events: auto;
+  padding-top: 10px;
+  padding-bottom: 8px;
 }
 .support-wallet-row {
   padding: 10px;
