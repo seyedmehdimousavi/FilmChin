@@ -128,6 +128,10 @@ const movieFeatureI18n = {
     featureDesc9: "Each post supports comments with custom UI and avatars; comment count is shown near the comment icon.",
     featureDesc10: "Popular section is built from click stats and the floating panel lists current-page posts for quick navigation.",
     featureDesc11: "Parts of UI use a Liquid Glass-inspired design with smooth animations and balanced transparency on mobile/desktop.",
+      featureTitle12: "Site language switch",
+      featureDesc12: "From language settings, you can switch the UI between Persian and English. Core texts, headings, and feature descriptions update consistently based on your selected language.",
+      featureTitle13: "Site color theme switch",
+      featureDesc13: "With the color theme option, you can personalize the site look to match your taste. Your selected theme is applied across UI sections for a more consistent and pleasant browsing experience.",
   },
   fa: {
     siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
@@ -143,6 +147,10 @@ const movieFeatureI18n = {
     featureDesc9: "برای هر پست می‌توانید کامنت بگذارید و همه نظرات در همان کارت فیلم با طراحی اختصاصی و آواتارها نمایش داده می‌شوند.",
     featureDesc10: "بخش فیلم‌های پرطرفدار بر اساس آمار کلیک‌ها ساخته می‌شود و دکمه شناور لیست فیلم‌های صفحه فعلی را نشان می‌دهد.",
     featureDesc11: "بخش هایی از سایت با الهام از طراحی Liquid Glass ساخته شده است؛ کارت‌ها، دکمه‌ها و پنل‌ها تجربه کاربری روان و چشم‌نواز ایجاد می‌کنند.",
+      featureTitle12: "امکان تغییر زبان سایت",
+      featureDesc12: "در بخش تنظیمات زبان می‌توانید رابط کاربری سایت را بین فارسی و انگلیسی جابه‌جا کنید. تمام متن‌های اصلی، عنوان‌ها و توضیحات امکانات بر اساس زبان انتخابی شما به‌صورت یکپارچه تغییر می‌کنند.",
+      featureTitle13: "امکان تغییر تم رنگی سایت",
+      featureDesc13: "با گزینه تغییر تم رنگی، می‌توانید ظاهر سایت را متناسب با سلیقه خود شخصی‌سازی کنید. تم انتخابی روی بخش‌های مختلف رابط کاربری اعمال می‌شود تا تجربه مرور سایت هماهنگ‌تر و دلپذیرتر باشد.",
   },
 };
 
