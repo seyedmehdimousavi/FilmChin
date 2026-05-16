@@ -7302,13 +7302,15 @@ body.dark .movie-page-body {
   justify-content: space-between;
   padding: 0px 14px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22);
+  background: transparent;
+  box-shadow: none;
+  pointer-events: none;
 }
 body.dark .mobile-bottom-dock {
-  background: rgba(15, 20, 26, 0.8);
+  background: transparent;
+}
+.mobile-bottom-dock .dock-item-wrap {
+  pointer-events: auto;
 }
 .dock-btn {
   all: unset;
@@ -7318,14 +7320,16 @@ body.dark .mobile-bottom-dock {
   border: 1px solid rgba(0, 0, 0, 0.08);
   display: grid;
   place-items: center;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--theme-accent-dark);
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
 }
 body.dark .dock-btn {
   color: #fff;
-  background: #1f252a;
+  background: rgba(15, 20, 26, 0.72);
   border-color: rgba(255, 255, 255, 0.15);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
 }
@@ -7398,8 +7402,8 @@ body.dark .dock-btn {
 body.dark .movie-page-body::before {
   background: linear-gradient(
     180deg,
-    rgba(7, 10, 14, 0.72),
-    rgba(7, 10, 14, 0.54)
+    rgba(0, 0, 0, 0.78),
+    rgba(0, 0, 0, 0.62)
   );
   backdrop-filter: blur(2px) saturate(120%);
 }
@@ -7453,7 +7457,7 @@ body.dark .movie-page-body::before {
   position: fixed;
   inset: 0;
   display: none;
-  z-index: 1200;
+  z-index: 2147483000;
 }
 .support-sheet.open {
   display: block;

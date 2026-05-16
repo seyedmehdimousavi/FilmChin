@@ -4356,7 +4356,7 @@ function setTabInUrl(type) {
         e.preventDefault();
         e.stopPropagation();
         localStorage.setItem("filmchin_focus_movie_id", String(m.id || ""));
-        const url = goPageBtn.dataset.url || "#";
+        const url = goPageBtn.getAttribute("href") || goPageBtn.dataset.url || "#";
         if (url && url !== "#") window.location.href = url;
       });
 
