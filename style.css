@@ -6911,6 +6911,7 @@ body.dark .go-page-btn {
 
 /* keep actions side-by-side as requested */
 .post-action-row {
+  align-items: center;
   flex-direction: row !important;
 }
 
@@ -7299,7 +7300,7 @@ body.dark .movie-page-body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
+  padding: 0px 14px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(4px);
