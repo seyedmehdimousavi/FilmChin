@@ -678,9 +678,10 @@ function setUserProfile(avatarUrl) {
 
 // کلیک روی پروفایل
 profileBtn?.addEventListener("click", async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
   await loadAuthState();
   if (!currentUser) {
-    e.preventDefault();
     authModal.style.display = "flex";
     return;
   }
@@ -689,7 +690,6 @@ profileBtn?.addEventListener("click", async (e) => {
 
   if (isAdminRole) {
     if (window.location.pathname.includes("admin.html")) {
-      e.preventDefault();
       // ادمین داخل پنل → فقط حباب باز بشه
       profileMenu.classList.toggle("hidden");
     } else {
@@ -697,7 +697,6 @@ profileBtn?.addEventListener("click", async (e) => {
       window.location.href = "admin.html";
     }
   } else {
-    e.preventDefault();
     // کاربر عادی → همیشه حباب باز بشه
     profileMenu.classList.toggle("hidden");
   }

@@ -6825,21 +6825,71 @@ body.dark .language-option {
 }
 
 .go-page-btn {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   cursor: pointer;
   text-decoration: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--btn-day);
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(var(--theme-accent-rgb), 0.35);
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.26), transparent 48%),
+    linear-gradient(135deg, var(--theme-accent-dark), var(--theme-accent), var(--theme-accent-light));
+  box-shadow:
+    0 10px 24px rgba(var(--theme-accent-rgb), 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34);
   color: #fff;
   font-size: 17px;
   font-weight: bolder;
   margin-top: 8px;
+  transform: translateY(0);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease;
+}
+
+.go-page-btn::before {
+  content: "➜";
+  font-size: 15px;
+  opacity: 0.92;
+}
+
+.go-page-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 72%;
+  height: 100%;
+  background: linear-gradient(110deg, transparent, rgba(255, 255, 255, 0.24), transparent);
+  transform: skewX(-18deg);
+  transition: left 0.4s ease;
+}
+
+.go-page-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 14px 30px rgba(var(--theme-accent-rgb), 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  filter: saturate(1.1);
+}
+
+.go-page-btn:hover::after {
+  left: 118%;
+}
+
+.go-page-btn:active {
+  transform: translateY(0);
 }
 
 body.dark .go-page-btn {
-  background: var(--btn-night);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
 
 .go-page-btn span {

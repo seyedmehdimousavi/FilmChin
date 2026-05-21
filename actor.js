@@ -154,7 +154,14 @@ function renderActorPosts(posts, episodesMap = new Map()) {
       </article>`;
     })
     .join("");
-
+  container.querySelectorAll(".actor-go-page-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const url = btn.dataset.url || "#";
+      if (url && url !== "#") window.location.href = url;
+    });
+  });
 }
 
 async function loadActorPage() {
