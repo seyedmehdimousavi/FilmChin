@@ -745,7 +745,12 @@ function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
   container.appendChild(section);
 
   section.querySelectorAll(".similar-go-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => e.stopPropagation());
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const url = btn.dataset.url || "#";
+      if (url && url !== "#") window.location.href = url;
+    });
   });
 }
 
