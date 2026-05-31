@@ -275,6 +275,30 @@
               <div class="button-shadow"></div>
             </div>
           </form>
+
+          <section id="admin-coming-soon-section" class="admin-section-item admin-coming-soon-section">
+            <h2 data-i18n="comingSoon">Coming Soon</h2>
+            <form id="comingSoonForm" class="admin-form" enctype="multipart/form-data">
+              <input id="comingSoonTitle" type="text" placeholder="Movie title" data-i18n-placeholder="comingSoonTitlePlaceholder" />
+              <input id="comingSoonCover" type="file" accept="image/*" />
+              <input id="comingSoonEditId" type="hidden" />
+              <div class="admin-coming-soon-actions">
+                <div class="button-wrap">
+                  <button type="submit" class="admin-submit">
+                    <span data-i18n="saveComingSoon">Save Coming Soon</span>
+                  </button>
+                  <div class="button-shadow"></div>
+                </div>
+                <div class="button-wrap">
+                  <button type="button" id="comingSoonCancelEdit" class="admin-submit danger">
+                    <span data-i18n="cancel">Cancel</span>
+                  </button>
+                  <div class="button-shadow"></div>
+                </div>
+              </div>
+            </form>
+            <div id="comingSoonAdminList" class="movie-list"></div>
+          </section>
         </section>
 
         <section class="admin_messages admin-section-item-2 admin-section-item">
