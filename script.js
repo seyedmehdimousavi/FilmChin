@@ -1665,6 +1665,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchSuggestion = document.getElementById("searchSuggestion");
   const searchSuggestionTypedPart = searchSuggestion?.querySelector(".typed-part");
   const searchSuggestionPart = searchSuggestion?.querySelector(".suggestion-part");
+  const moviesGrid = document.getElementById("moviesGrid");
+  const movieCount = document.getElementById("movieCount");
+  const genreGrid = document.getElementById("genreGrid");
   const languageIndicator = document.getElementById("languageIndicator");
   const languageButtons = document.querySelectorAll(".language-option");
   const languageMap = {
@@ -1708,6 +1711,8 @@ document.addEventListener("DOMContentLoaded", () => {
       comingSoonEllipsis: "Coming Soon...",
       comingSoonTitlePlaceholder: "Movie title",
       saveComingSoon: "Save Coming Soon",
+      comingSoonList: "Coming Soon list",
+      noComingSoonMovies: "No coming soon movies yet.",
       cancel: "Cancel",
       versionExample: "e.g. 1.3.3",
       numberOfMovies: "Number of movies",
@@ -1819,6 +1824,8 @@ document.addEventListener("DOMContentLoaded", () => {
       comingSoonEllipsis: "بزودی...",
       comingSoonTitlePlaceholder: "نام فیلم",
       saveComingSoon: "ذخیره بزودی",
+      comingSoonList: "لیست بزودی",
+      noComingSoonMovies: "هنوز فیلمی برای بخش بزودی ثبت نشده است.",
       cancel: "انصراف",
       versionExample: "مثلاً 1.3.3",
       numberOfMovies: "تعداد فیلم‌ها",
@@ -2069,9 +2076,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  const moviesGrid = document.getElementById("moviesGrid");
-  const movieCount = document.getElementById("movieCount");
-  const genreGrid = document.getElementById("genreGrid");
   const pendingFocusMovieId = new URLSearchParams(window.location.search).get("focusMovieId") || localStorage.getItem("filmchin_focus_movie_id") || "";
   let consumedPendingFocus = false;
 /**
@@ -5703,13 +5707,26 @@ async function initComingSoonAdminPanel() {
   const titleEl = document.getElementById("comingSoonTitle");
   const coverEl = document.getElementById("comingSoonCover");
   const editIdEl = document.getElementById("comingSoonEditId");
+  const coverPreviewEl = document.getElementById("comingSoonCoverPreview");
   const cancelBtn = document.getElementById("comingSoonCancelEdit");
   const listEl = document.getElementById("comingSoonAdminList");
   if (!form || !titleEl || !coverEl || !editIdEl || !listEl) return;
 
+  const setCoverPreview = (src = "") => {
+    if (!coverPreviewEl) return;
+    if (src) {
+      coverPreviewEl.src = src;
+      coverPreviewEl.hidden = false;
+    } else {
+      coverPreviewEl.removeAttribute("src");
+      coverPreviewEl.hidden = true;
+    }
+  };
+
   const resetForm = () => {
     form.reset();
     editIdEl.value = "";
+    setCoverPreview("");
   };
 
   const render = async () => {
@@ -5725,7 +5742,12 @@ async function initComingSoonAdminPanel() {
       return;
     }
 
-    listEl.innerHTML = (data || []).map((m) => `
+    if (!data || data.length === 0) {
+      listEl.innerHTML = `<div class="favorites-empty">${escapeHtml(uiText("noComingSoonMovies"))}</div>`;
+      return;
+    }
+
+    listEl.innerHTML = data.map((m) => `
       <div class="movie-item coming-soon-admin-row" data-id="${escapeHtml(String(m.id))}">
         <div class="movie-top">
           <img class="movie-cover" src="${escapeHtml(m.cover || "")}" alt="${escapeHtml(m.title || "")}">
@@ -5748,6 +5770,12 @@ async function initComingSoonAdminPanel() {
       </div>
     `).join("");
   };
+
+  coverEl.addEventListener("change", () => {
+    const file = coverEl.files?.[0];
+    if (!file) return;
+    setCoverPreview(URL.createObjectURL(file));
+  });
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -5815,6 +5843,8 @@ async function initComingSoonAdminPanel() {
       if (error || !data) return;
       titleEl.value = data.title || "";
       editIdEl.value = data.id;
+      coverEl.value = "";
+      setCoverPreview(data.cover || "");
       form.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 

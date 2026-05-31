@@ -1,6 +1,6 @@
 -- Coming Soon movies table, storage folder, and policies for Supabase.
--- Run this in the Supabase SQL editor after replacing the admin email/domain
--- checks with the same admin rule you use for the rest of FilmChin.
+-- This version uses the existing public.users.role admin model used by the app.
+-- Admin writes are allowed for authenticated users whose users.role is owner/admin.
 
 create extension if not exists "pgcrypto";
 
@@ -17,6 +17,26 @@ create index if not exists coming_soon_movies_created_at_idx
 
 alter table public.coming_soon_movies enable row level security;
 
+-- Helper used by table/storage policies. SECURITY DEFINER avoids policy-recursion
+-- problems if public.users also has RLS enabled.
+create or replace function public.is_filmchin_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.users u
+    where u.id = auth.uid()
+      and u.role in ('owner', 'admin')
+  );
+$$;
+
+revoke all on function public.is_filmchin_admin() from public;
+grant execute on function public.is_filmchin_admin() to authenticated;
+
 -- Public users can read the Coming Soon list.
 drop policy if exists "Public can read coming soon movies" on public.coming_soon_movies;
 create policy "Public can read coming soon movies"
@@ -24,36 +44,28 @@ create policy "Public can read coming soon movies"
   for select
   using (true);
 
--- Admin-only writes. Replace this email list with your production admin rule.
+-- Admin-only writes based on public.users.role.
 drop policy if exists "Admins can insert coming soon movies" on public.coming_soon_movies;
 create policy "Admins can insert coming soon movies"
   on public.coming_soon_movies
   for insert
   to authenticated
-  with check (
-    auth.jwt() ->> 'email' in ('admin@example.com')
-  );
+  with check (public.is_filmchin_admin());
 
 drop policy if exists "Admins can update coming soon movies" on public.coming_soon_movies;
 create policy "Admins can update coming soon movies"
   on public.coming_soon_movies
   for update
   to authenticated
-  using (
-    auth.jwt() ->> 'email' in ('admin@example.com')
-  )
-  with check (
-    auth.jwt() ->> 'email' in ('admin@example.com')
-  );
+  using (public.is_filmchin_admin())
+  with check (public.is_filmchin_admin());
 
 drop policy if exists "Admins can delete coming soon movies" on public.coming_soon_movies;
 create policy "Admins can delete coming soon movies"
   on public.coming_soon_movies
   for delete
   to authenticated
-  using (
-    auth.jwt() ->> 'email' in ('admin@example.com')
-  );
+  using (public.is_filmchin_admin());
 
 -- Reuse the existing public covers bucket and reserve a folder for Coming Soon covers.
 insert into storage.buckets (id, name, public)
@@ -71,7 +83,6 @@ create policy "Public can read coming soon covers"
   );
 
 -- Admin-only uploads/updates/deletes for Coming Soon cover files.
--- Replace the email list with your production admin rule.
 drop policy if exists "Admins can upload coming soon covers" on storage.objects;
 create policy "Admins can upload coming soon covers"
   on storage.objects
@@ -80,7 +91,7 @@ create policy "Admins can upload coming soon covers"
   with check (
     bucket_id = 'covers'
     and name like 'public/coming-soon/%'
-    and auth.jwt() ->> 'email' in ('admin@example.com')
+    and public.is_filmchin_admin()
   );
 
 drop policy if exists "Admins can update coming soon covers" on storage.objects;
@@ -91,12 +102,12 @@ create policy "Admins can update coming soon covers"
   using (
     bucket_id = 'covers'
     and name like 'public/coming-soon/%'
-    and auth.jwt() ->> 'email' in ('admin@example.com')
+    and public.is_filmchin_admin()
   )
   with check (
     bucket_id = 'covers'
     and name like 'public/coming-soon/%'
-    and auth.jwt() ->> 'email' in ('admin@example.com')
+    and public.is_filmchin_admin()
   );
 
 drop policy if exists "Admins can delete coming soon covers" on storage.objects;
@@ -107,5 +118,5 @@ create policy "Admins can delete coming soon covers"
   using (
     bucket_id = 'covers'
     and name like 'public/coming-soon/%'
-    and auth.jwt() ->> 'email' in ('admin@example.com')
+    and public.is_filmchin_admin()
   );

@@ -281,6 +281,7 @@
             <form id="comingSoonForm" class="admin-form" enctype="multipart/form-data">
               <input id="comingSoonTitle" type="text" placeholder="Movie title" data-i18n-placeholder="comingSoonTitlePlaceholder" />
               <input id="comingSoonCover" type="file" accept="image/*" />
+              <img id="comingSoonCoverPreview" class="coming-soon-cover-preview" alt="Coming Soon cover preview" hidden />
               <input id="comingSoonEditId" type="hidden" />
               <div class="admin-coming-soon-actions">
                 <div class="button-wrap">
@@ -297,6 +298,7 @@
                 </div>
               </div>
             </form>
+            <h3 class="coming-soon-admin-list-title" data-i18n="comingSoonList">Coming Soon list</h3>
             <div id="comingSoonAdminList" class="movie-list"></div>
           </section>
         </section>

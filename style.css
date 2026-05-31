@@ -7672,3 +7672,24 @@ html:not([lang="en"]) .coming-soon-heading {
   object-fit: cover;
   border-radius: 8px;
 }
+
+
+.coming-soon-cover-preview {
+  width: 110px;
+  max-width: 45%;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+}
+
+.coming-soon-admin-list-title {
+  margin: 10px 0 14px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--theme-accent-dark);
+}
+
+body.dark .coming-soon-admin-list-title {
+  color: var(--theme-accent-light);
+}
