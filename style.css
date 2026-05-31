@@ -6084,7 +6084,8 @@ body.dark .tab-indicator {
   overflow: hidden;
 }
 
-#favoritesOverlay[aria-hidden="false"] {
+#favoritesOverlay[aria-hidden="false"],
+#comingSoonOverlay[aria-hidden="false"] {
   display: grid !important;
   grid-template-rows: auto 1fr;
 }
@@ -7564,4 +7565,110 @@ body.dark .movie-page-body::before {
 .wallet-admin-actions {
   display: flex;
   gap: 8px;
+}
+
+/* ===================== Coming Soon section ===================== */
+.coming-soon-section[hidden] {
+  display: none !important;
+}
+
+.coming-soon-heading {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 22px 0 20px;
+}
+
+html[lang="en"] .coming-soon-heading {
+  flex-direction: row-reverse;
+}
+
+html[lang="fa"] .coming-soon-heading,
+html:not([lang="en"]) .coming-soon-heading {
+  flex-direction: row;
+}
+
+.coming-soon-heading .button-wrap {
+  display: flex;
+}
+
+.coming-soon-heading button span {
+  font-weight: 700;
+}
+
+.coming-soon-poster-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.coming-soon-poster-wrap > img {
+  display: block;
+  width: 100%;
+}
+
+.coming-soon-card-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.58);
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.coming-soon-card-overlay span {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  padding: 7px 12px;
+  backdrop-filter: blur(5px);
+}
+
+.coming-soon-card-active .coming-soon-card-overlay {
+  opacity: 1;
+}
+
+.coming-soon-grid-item {
+  cursor: pointer;
+}
+
+.coming-soon-grid-item .favorite-actions .button-wrap,
+.coming-soon-grid-item .coming-soon-info-btn {
+  width: 100%;
+}
+
+.coming-soon-info-btn span {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-coming-soon-section {
+  margin-top: 22px;
+}
+
+.admin-coming-soon-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.admin-coming-soon-actions .danger span,
+.coming-soon-admin-row .btn-delete span {
+  color: #e74c3c;
+}
+
+.coming-soon-admin-row .movie-cover {
+  width: 72px;
+  height: 98px;
+  object-fit: cover;
+  border-radius: 8px;
 }
