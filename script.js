@@ -179,6 +179,9 @@ let favoriteMovieIds = new Set();
 let favoritesRaw = [];
 let favoritesLoaded = false;
 let favoritesPage = 1;
+let comingSoonMovies = [];
+let comingSoonPage = 1;
+const COMING_SOON_PAGE_SIZE = FAVORITES_PAGE_SIZE;
 
 // برای منوی گزینه‌های پست
 let currentOptionsMovie = null;
@@ -1662,6 +1665,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchSuggestion = document.getElementById("searchSuggestion");
   const searchSuggestionTypedPart = searchSuggestion?.querySelector(".typed-part");
   const searchSuggestionPart = searchSuggestion?.querySelector(".suggestion-part");
+  const moviesGrid = document.getElementById("moviesGrid");
+  const movieCount = document.getElementById("movieCount");
+  const genreGrid = document.getElementById("genreGrid");
   const languageIndicator = document.getElementById("languageIndicator");
   const languageButtons = document.querySelectorAll(".language-option");
   const languageMap = {
@@ -1697,6 +1703,17 @@ document.addEventListener("DOMContentLoaded", () => {
       usersMessages: "Users messages",
       conversation: "Conversation",
       popularMovies: "Popular movies",
+      comingSoon: "Coming Soon",
+      viewAll: "View all",
+      prev: "Prev",
+      next: "Next",
+      comingSoonText: "Coming Soon",
+      comingSoonEllipsis: "Coming Soon...",
+      comingSoonTitlePlaceholder: "Movie title",
+      saveComingSoon: "Save Coming Soon",
+      comingSoonList: "Coming Soon list",
+      noComingSoonMovies: "No coming soon movies yet.",
+      cancel: "Cancel",
       versionExample: "e.g. 1.3.3",
       numberOfMovies: "Number of movies",
       collection: "Collection",
@@ -1799,6 +1816,17 @@ document.addEventListener("DOMContentLoaded", () => {
       usersMessages: "پیام‌های کاربران",
       conversation: "گفت‌وگو",
       popularMovies: "فیلم‌های پرطرفدار",
+      comingSoon: "بزودی",
+      viewAll: "مشاهده همه",
+      prev: "قبلی",
+      next: "بعدی",
+      comingSoonText: "بزودی",
+      comingSoonEllipsis: "بزودی...",
+      comingSoonTitlePlaceholder: "نام فیلم",
+      saveComingSoon: "ذخیره بزودی",
+      comingSoonList: "لیست بزودی",
+      noComingSoonMovies: "هنوز فیلمی برای بخش بزودی ثبت نشده است.",
+      cancel: "انصراف",
       versionExample: "مثلاً 1.3.3",
       numberOfMovies: "تعداد فیلم‌ها",
       collection: "کالکشن",
@@ -1931,6 +1959,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof renderPagedMovies === "function") {
       renderPagedMovies(true);
     }
+    const comingSoonSection = document.getElementById("coming-soon-carousel");
+    if (comingSoonSection?.dataset.ready === "1" && typeof fetchComingSoonMovies === "function") {
+      fetchComingSoonMovies();
+    }
   }
 
   languageButtons.forEach((btn) => {
@@ -2044,9 +2076,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  const moviesGrid = document.getElementById("moviesGrid");
-  const movieCount = document.getElementById("movieCount");
-  const genreGrid = document.getElementById("genreGrid");
   const pendingFocusMovieId = new URLSearchParams(window.location.search).get("focusMovieId") || localStorage.getItem("filmchin_focus_movie_id") || "";
   let consumedPendingFocus = false;
 /**
@@ -2108,6 +2137,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const favoritesPrevBtn = document.getElementById("favoritesPrev");
   const favoritesNextBtn = document.getElementById("favoritesNext");
   const favoritesCloseBtn = document.getElementById("favoritesCloseBtn");
+
+  const comingSoonOverlay = document.getElementById("comingSoonOverlay");
+  const comingSoonGrid = document.getElementById("comingSoonGrid");
+  const comingSoonPageInfo = document.getElementById("comingSoonPageInfo");
+  const comingSoonPrevBtn = document.getElementById("comingSoonPrev");
+  const comingSoonNextBtn = document.getElementById("comingSoonNext");
+  const comingSoonCloseBtn = document.getElementById("comingSoonCloseBtn");
+  const comingSoonViewAllBtn = document.getElementById("comingSoonViewAll");
 
   const favoriteMoviesBtn = document.getElementById("favoriteMoviesBtn") || document.getElementById("bottomFavoritesBtn");
   // ===================== Post Options (card click) =====================
@@ -2338,6 +2375,310 @@ document.addEventListener("DOMContentLoaded", () => {
       e.target.classList.contains("post-options-backdrop")
     ) {
       closePostOptions();
+    }
+  });
+
+
+  // ===================== Coming Soon Movies =====================
+
+  const getComingSoonMessage = (ellipsis = false) =>
+    uiText(ellipsis ? "comingSoonEllipsis" : "comingSoonText");
+
+  function buildComingSoonModalMovie(movie) {
+    const message = getComingSoonMessage(true);
+    return {
+      id: `coming-soon-${movie.id}`,
+      title: movie.title || getComingSoonMessage(false),
+      cover: movie.cover || "",
+      synopsis: message,
+      director: message,
+      product: message,
+      stars: message,
+      imdb: message,
+      release_info: message,
+      genre: message,
+      link: "#",
+      type: "single",
+    };
+  }
+
+  function openComingSoonMovieModal(movie) {
+    openMovieModal(buildComingSoonModalMovie(movie));
+  }
+
+  function clearComingSoonActiveCards(except = null) {
+    document.querySelectorAll(".coming-soon-card-active").forEach((card) => {
+      if (card !== except) card.classList.remove("coming-soon-card-active");
+    });
+  }
+
+  async function fetchComingSoonMovies() {
+    try {
+      const section = document.getElementById("coming-soon-carousel");
+      const { data, error } = await db
+        .from("coming_soon_movies")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("fetchComingSoonMovies error:", error);
+        if (section) section.hidden = true;
+        return;
+      }
+
+      comingSoonMovies = data || [];
+      if (section) {
+        section.hidden = comingSoonMovies.length === 0;
+        section.dataset.ready = "1";
+      }
+      renderComingSoonCarousel(comingSoonMovies);
+      renderComingSoonGrid();
+    } catch (err) {
+      console.error("fetchComingSoonMovies unexpected error:", err);
+      const section = document.getElementById("coming-soon-carousel");
+      if (section) section.hidden = true;
+    }
+  }
+
+  function renderComingSoonCarousel(list = []) {
+    const section = document.getElementById("coming-soon-carousel");
+    const track = section?.querySelector(".carousel-track");
+    const bg = section?.querySelector(".carousel-bg");
+    const windowEl = section?.querySelector(".carousel-window");
+    if (!section || !track || !windowEl) return;
+
+    if (!list.length) {
+      section.hidden = true;
+      track.innerHTML = "";
+      if (bg) bg.style.backgroundImage = "";
+      return;
+    }
+
+    section.hidden = false;
+    track.innerHTML = "";
+
+    const processedList = list.map((m) => ({
+      ...m,
+      dCover: m.cover,
+      dTitle: m.title,
+    }));
+    const extended = processedList.length === 1
+      ? [processedList[0], processedList[0], processedList[0], processedList[0], processedList[0]]
+      : [
+          processedList[processedList.length - 2] || processedList[0],
+          processedList[processedList.length - 1],
+          ...processedList,
+          processedList[0],
+          processedList[1] || processedList[0],
+        ];
+
+    extended.forEach((m) => {
+      const item = document.createElement("div");
+      item.className = "carousel-item coming-soon-carousel-item";
+      item.innerHTML = `
+        <div class="coming-soon-poster-wrap">
+          <img src="${escapeHtml(m.dCover || "")}" alt="${escapeHtml(m.dTitle || "")}">
+          <div class="coming-soon-card-overlay"><span>${escapeHtml(getComingSoonMessage(false))}</span></div>
+        </div>
+        <h3>${escapeHtml(m.dTitle || "")}</h3>
+        <div class="button-wrap">
+          <button class="more-info" type="button"><span>${uiText("moreInfo")}</span></button>
+          <div class="button-shadow"></div>
+        </div>`;
+
+      item.addEventListener("click", (e) => {
+        if (e.target.closest(".more-info")) return;
+        e.stopPropagation();
+        const wasActive = item.classList.contains("coming-soon-card-active");
+        clearComingSoonActiveCards(item);
+        item.classList.toggle("coming-soon-card-active", !wasActive);
+      });
+
+      item.querySelector(".more-info")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openComingSoonMovieModal(m);
+      });
+      track.appendChild(item);
+    });
+
+    const items = track.querySelectorAll(".carousel-item");
+    let itemWidth = windowEl.offsetWidth / 3;
+    let currentIndex = 2;
+
+    track.style.transition = "none";
+    track.style.transform = `translateX(-${itemWidth * currentIndex}px)`;
+
+    function updateActive() {
+      items.forEach((el) => el.classList.remove("active"));
+      const middle = currentIndex + 1;
+      if (items[middle]) {
+        items[middle].classList.add("active");
+        if (bg) bg.style.backgroundImage = `url(${extended[middle].dCover || ""})`;
+      }
+    }
+    updateActive();
+
+    function slideTo(index) {
+      track.style.transition = "transform 0.5s ease";
+      track.style.transform = `translateX(-${itemWidth * index}px)`;
+      currentIndex = index;
+      resetAutoSlide();
+    }
+
+    track.ontransitionend = () => {
+      if (currentIndex <= 1) {
+        track.style.transition = "none";
+        currentIndex = processedList.length + 1;
+        track.style.transform = `translateX(-${itemWidth * currentIndex}px)`;
+      } else if (currentIndex >= processedList.length + 2) {
+        track.style.transition = "none";
+        currentIndex = 2;
+        track.style.transform = `translateX(-${itemWidth * currentIndex}px)`;
+      }
+      updateActive();
+    };
+
+    section.querySelector(".next").onclick = () => slideTo(currentIndex + 1);
+    section.querySelector(".prev").onclick = () => slideTo(currentIndex - 1);
+
+    let touchStartX = 0;
+    let touchCurrentX = 0;
+    let dragging = false;
+    windowEl.ontouchstart = (e) => {
+      if (!e.touches?.length) return;
+      dragging = true;
+      touchStartX = e.touches[0].clientX;
+      touchCurrentX = touchStartX;
+    };
+    windowEl.ontouchmove = (e) => {
+      if (!dragging || !e.touches?.length) return;
+      touchCurrentX = e.touches[0].clientX;
+    };
+    windowEl.ontouchend = () => {
+      if (!dragging) return;
+      const delta = touchCurrentX - touchStartX;
+      dragging = false;
+      if (Math.abs(delta) < 30) return;
+      if (delta < 0) slideTo(currentIndex + 1);
+      else slideTo(currentIndex - 1);
+    };
+
+    let autoSlide;
+    function resetAutoSlide() {
+      clearInterval(autoSlide);
+      autoSlide = setInterval(() => slideTo(currentIndex + 1), 4000);
+    }
+    resetAutoSlide();
+  }
+
+  function renderComingSoonGrid() {
+    if (!comingSoonGrid) return;
+
+    if (!comingSoonMovies.length) {
+      comingSoonGrid.innerHTML = `<div class="favorites-empty">${escapeHtml(getComingSoonMessage(true))}</div>`;
+      if (comingSoonPageInfo) comingSoonPageInfo.textContent = "0 / 0";
+      if (comingSoonPrevBtn) comingSoonPrevBtn.disabled = true;
+      if (comingSoonNextBtn) comingSoonNextBtn.disabled = true;
+      return;
+    }
+
+    const totalPages = Math.max(1, Math.ceil(comingSoonMovies.length / COMING_SOON_PAGE_SIZE));
+    if (comingSoonPage < 1) comingSoonPage = 1;
+    if (comingSoonPage > totalPages) comingSoonPage = totalPages;
+
+    const start = (comingSoonPage - 1) * COMING_SOON_PAGE_SIZE;
+    const slice = comingSoonMovies.slice(start, start + COMING_SOON_PAGE_SIZE);
+
+    comingSoonGrid.innerHTML = slice.map((movie) => {
+      const cover = escapeHtml(movie.cover || "https://via.placeholder.com/300x200?text=Coming+Soon");
+      const title = escapeHtml(movie.title || getComingSoonMessage(false));
+      return `
+        <div class="favorite-item coming-soon-grid-item" data-coming-soon-id="${escapeHtml(String(movie.id))}">
+          <div class="coming-soon-poster-wrap">
+            <img src="${cover}" alt="${title}" class="favorite-cover" loading="lazy" />
+            <div class="coming-soon-card-overlay"><span>${escapeHtml(getComingSoonMessage(false))}</span></div>
+          </div>
+          <div class="favorite-title" dir="auto">${title}</div>
+          <div class="favorite-actions">
+            <div class="button-wrap">
+              <button class="coming-soon-info-btn" data-coming-soon-id="${escapeHtml(String(movie.id))}" type="button">
+                <span>${uiText("moreInfo")}</span>
+              </button>
+              <div class="button-shadow"></div>
+            </div>
+          </div>
+        </div>`;
+    }).join("");
+
+    if (comingSoonPageInfo) comingSoonPageInfo.textContent = `${comingSoonPage} / ${totalPages}`;
+    if (comingSoonPrevBtn) comingSoonPrevBtn.disabled = comingSoonPage <= 1;
+    if (comingSoonNextBtn) comingSoonNextBtn.disabled = comingSoonPage >= totalPages;
+
+    comingSoonGrid.querySelectorAll(".coming-soon-grid-item").forEach((card) => {
+      card.addEventListener("click", (e) => {
+        if (e.target.closest(".coming-soon-info-btn")) return;
+        e.stopPropagation();
+        const wasActive = card.classList.contains("coming-soon-card-active");
+        clearComingSoonActiveCards(card);
+        card.classList.toggle("coming-soon-card-active", !wasActive);
+      });
+    });
+
+    comingSoonGrid.querySelectorAll(".coming-soon-info-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const movie = comingSoonMovies.find((m) => String(m.id) === String(btn.dataset.comingSoonId));
+        if (movie) openComingSoonMovieModal(movie);
+      });
+    });
+  }
+
+  function openComingSoonOverlayUI() {
+    comingSoonPage = 1;
+    renderComingSoonGrid();
+    if (!comingSoonOverlay) return;
+    comingSoonOverlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("no-scroll");
+    history.pushState({ overlay: "comingSoon" }, "");
+  }
+
+  function closeComingSoonOverlay() {
+    if (!comingSoonOverlay) return;
+    comingSoonOverlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("no-scroll");
+  }
+
+  comingSoonViewAllBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openComingSoonOverlayUI();
+  });
+
+  comingSoonCloseBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeComingSoonOverlay();
+  });
+
+  comingSoonPrevBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (comingSoonPage > 1) {
+      comingSoonPage--;
+      renderComingSoonGrid();
+    }
+  });
+
+  comingSoonNextBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    comingSoonPage++;
+    renderComingSoonGrid();
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".coming-soon-carousel-item, .coming-soon-grid-item")) {
+      clearComingSoonActiveCards();
     }
   });
 
@@ -5358,6 +5699,172 @@ async function initSupportSheet() {
   });
   backdrop?.addEventListener("click", closeSheet);
   panel?.addEventListener("click", (e) => e.stopPropagation());
+}
+
+
+async function initComingSoonAdminPanel() {
+  const form = document.getElementById("comingSoonForm");
+  const titleEl = document.getElementById("comingSoonTitle");
+  const coverEl = document.getElementById("comingSoonCover");
+  const editIdEl = document.getElementById("comingSoonEditId");
+  const coverPreviewEl = document.getElementById("comingSoonCoverPreview");
+  const cancelBtn = document.getElementById("comingSoonCancelEdit");
+  const listEl = document.getElementById("comingSoonAdminList");
+  if (!form || !titleEl || !coverEl || !editIdEl || !listEl) return;
+
+  const setCoverPreview = (src = "") => {
+    if (!coverPreviewEl) return;
+    if (src) {
+      coverPreviewEl.src = src;
+      coverPreviewEl.hidden = false;
+    } else {
+      coverPreviewEl.removeAttribute("src");
+      coverPreviewEl.hidden = true;
+    }
+  };
+
+  const resetForm = () => {
+    form.reset();
+    editIdEl.value = "";
+    setCoverPreview("");
+  };
+
+  const render = async () => {
+    const ok = await enforceAdminGuard();
+    if (!ok) return;
+    const { data, error } = await db
+      .from("coming_soon_movies")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) {
+      console.error("coming soon admin load error:", error);
+      listEl.innerHTML = "<p>Error loading coming soon movies.</p>";
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      listEl.innerHTML = `<div class="favorites-empty">${escapeHtml(uiText("noComingSoonMovies"))}</div>`;
+      return;
+    }
+
+    listEl.innerHTML = data.map((m) => `
+      <div class="movie-item coming-soon-admin-row" data-id="${escapeHtml(String(m.id))}">
+        <div class="movie-top">
+          <img class="movie-cover" src="${escapeHtml(m.cover || "")}" alt="${escapeHtml(m.title || "")}">
+          <div class="movie-info-admin">
+            <div class="movie-title-row">
+              <span class="movie-name">${escapeHtml(m.title || "")}</span>
+            </div>
+          </div>
+          <div class="movie-actions">
+            <div class="button-wrap">
+              <button class="btn-edit coming-soon-edit" data-id="${escapeHtml(String(m.id))}" type="button"><span><i class="bi bi-pencil"></i> Edit</span></button>
+              <div class="button-shadow"></div>
+            </div>
+            <div class="button-wrap">
+              <button class="btn-delete coming-soon-delete" data-id="${escapeHtml(String(m.id))}" type="button"><span><i class="bi bi-trash"></i> Delete</span></button>
+              <div class="button-shadow"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join("");
+  };
+
+  coverEl.addEventListener("change", () => {
+    const file = coverEl.files?.[0];
+    if (!file) return;
+    setCoverPreview(URL.createObjectURL(file));
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const ok = await enforceAdminGuard();
+    if (!ok) return;
+
+    const title = titleEl.value.trim();
+    const file = coverEl.files?.[0];
+    const editId = editIdEl.value.trim();
+    if (!title) {
+      showToast("Please enter movie title");
+      return;
+    }
+    if (!editId && !file) {
+      showToast("Please select cover");
+      return;
+    }
+
+    let coverUrl = "";
+    if (file) {
+      try {
+        const optimizedFile = await compressImageIfNeeded(file, 0.8);
+        const filename = `public/coming-soon/${Date.now()}_${optimizedFile.name}`;
+        await uploadWithProgress(optimizedFile, filename);
+        const { data: publicUrl } = db.storage.from("covers").getPublicUrl(filename);
+        coverUrl = publicUrl.publicUrl;
+      } catch (err) {
+        console.error("coming soon cover upload error:", err);
+        showToast("Upload cover failed");
+        return;
+      }
+    }
+
+    const payload = { title, updated_at: new Date().toISOString() };
+    if (coverUrl) payload.cover = coverUrl;
+
+    const { error } = editId
+      ? await db.from("coming_soon_movies").update(payload).eq("id", editId)
+      : await db.from("coming_soon_movies").insert([{ ...payload, cover: coverUrl }]);
+
+    if (error) {
+      console.error("coming soon save error:", error);
+      showToast("Save coming soon movie failed");
+      return;
+    }
+
+    showToast(editId ? "Coming soon movie updated ✅" : "Coming soon movie added ✅");
+    resetForm();
+    await render();
+    if (typeof fetchComingSoonMovies === "function") await fetchComingSoonMovies();
+  });
+
+  cancelBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    resetForm();
+  });
+
+  listEl.addEventListener("click", async (e) => {
+    const editBtn = e.target.closest(".coming-soon-edit");
+    const delBtn = e.target.closest(".coming-soon-delete");
+
+    if (editBtn) {
+      const id = editBtn.dataset.id;
+      const { data, error } = await db.from("coming_soon_movies").select("*").eq("id", id).single();
+      if (error || !data) return;
+      titleEl.value = data.title || "";
+      editIdEl.value = data.id;
+      coverEl.value = "";
+      setCoverPreview(data.cover || "");
+      form.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    if (delBtn) {
+      const id = delBtn.dataset.id;
+      const ok = await showDialog({ message: "Delete this coming soon movie?", type: "confirm" });
+      if (!ok) return;
+      const { error } = await db.from("coming_soon_movies").delete().eq("id", id);
+      if (error) {
+        console.error("coming soon delete error:", error);
+        showToast("Delete coming soon movie failed");
+        return;
+      }
+      showToast("Coming soon movie deleted ✅");
+      await render();
+      if (typeof fetchComingSoonMovies === "function") await fetchComingSoonMovies();
+    }
+  });
+
+  render();
 }
 
 async function initWalletAdminPanel() {
@@ -8673,6 +9180,16 @@ return `
       return;
     }
 
+    const comingSoonOverlay = document.getElementById("comingSoonOverlay");
+    if (
+      comingSoonOverlay &&
+      comingSoonOverlay.getAttribute("aria-hidden") === "false"
+    ) {
+      comingSoonOverlay.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("no-scroll");
+      return;
+    }
+
     // 6) Side menu
     const sideMenu = document.getElementById("sideMenu");
     const menuOverlay = document.getElementById("menuOverlay");
@@ -8976,6 +9493,7 @@ initSideMenuAccordions();
   fetchMovies();
   fetchPopularMovies();
   fetchPopularForIndex();
+  fetchComingSoonMovies();
   fetchMessages();
   checkUnapprovedComments();
   setInterval(checkUnapprovedComments, 30000);
@@ -9086,6 +9604,7 @@ initSideMenuAccordions();
 
   fetchSocialLinks();
   initSupportSheet();
+  initComingSoonAdminPanel();
   initWalletAdminPanel();
   initAdminActorsPanel();
 });
