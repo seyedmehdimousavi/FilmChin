@@ -181,6 +181,7 @@ let favoritesLoaded = false;
 let favoritesPage = 1;
 let comingSoonMovies = [];
 let comingSoonPage = 1;
+let comingSoonAutoSlideTimer = null;
 const COMING_SOON_PAGE_SIZE = FAVORITES_PAGE_SIZE;
 
 // برای منوی گزینه‌های پست
@@ -1956,8 +1957,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (active && languageIndicator) languageIndicator.style.transform = `translateX(${idx * 100}%)`;
     });
 
-    if (typeof renderPagedMovies === "function") {
-      renderPagedMovies(true);
+    if (typeof updateComingSoonLanguageText === "function") {
+      updateComingSoonLanguageText();
+    }
+
+    if (
+      window.__filmchinTabsReady === true &&
+      typeof refreshMoviesForCurrentActiveTab === "function"
+    ) {
+      refreshMoviesForCurrentActiveTab();
     }
     const comingSoonSection = document.getElementById("coming-soon-carousel");
     if (comingSoonSection?.dataset.ready === "1" && typeof fetchComingSoonMovies === "function") {
@@ -2447,6 +2455,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const windowEl = section?.querySelector(".carousel-window");
     if (!section || !track || !windowEl) return;
 
+    if (comingSoonAutoSlideTimer) {
+      clearInterval(comingSoonAutoSlideTimer);
+      comingSoonAutoSlideTimer = null;
+    }
+
     if (!list.length) {
       section.hidden = true;
       track.innerHTML = "";
@@ -2564,12 +2577,29 @@ document.addEventListener("DOMContentLoaded", () => {
       else slideTo(currentIndex - 1);
     };
 
-    let autoSlide;
     function resetAutoSlide() {
-      clearInterval(autoSlide);
-      autoSlide = setInterval(() => slideTo(currentIndex + 1), 4000);
+      clearInterval(comingSoonAutoSlideTimer);
+      comingSoonAutoSlideTimer = setInterval(() => slideTo(currentIndex + 1), 4000);
     }
     resetAutoSlide();
+  }
+
+  function updateComingSoonLanguageText() {
+    document
+      .querySelectorAll(
+        "#coming-soon-carousel .coming-soon-card-overlay span, #comingSoonGrid .coming-soon-card-overlay span"
+      )
+      .forEach((el) => {
+        el.textContent = getComingSoonMessage(false);
+      });
+
+    document
+      .querySelectorAll(
+        "#coming-soon-carousel .more-info span, #comingSoonGrid .coming-soon-info-btn span"
+      )
+      .forEach((el) => {
+        el.textContent = uiText("moreInfo");
+      });
   }
 
   function renderComingSoonGrid() {
@@ -3690,6 +3720,25 @@ function setTabInUrl(type) {
     setTimeout(moveTabIndicator, 60);
   }
 
+  async function refreshMoviesForCurrentActiveTab() {
+    const activeType =
+      document.querySelector(".tab-link.active")?.dataset.type ||
+      currentTypeFilter ||
+      "all";
+
+    currentTypeFilter = activeType;
+    applyActiveTab(activeType);
+    updateDynamicTitle();
+
+    if (shouldUseServerPagination()) {
+      usingServerPagination = true;
+      await fetchMoviesPage(currentPage, currentTypeFilter);
+      await fetchEpisodes(movies.map((m) => m.id));
+    }
+
+    await renderPagedMovies(true);
+  }
+
   /* =============== ACTIVATE TAB IN UI =============== */
   function applyActiveTab(type) {
     document
@@ -3753,6 +3802,7 @@ function setTabInUrl(type) {
     const type = getTabFromUrl();
     currentTypeFilter = type;
     applyActiveTab(type);
+    window.__filmchinTabsReady = true;
   })();
 
   window.addEventListener("load", () => {
