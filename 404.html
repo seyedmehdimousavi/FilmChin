@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FilmChiin | Redirecting</title>
+    <script>
+      (function () {
+        var path = window.location.pathname || "";
+        var match = path.match(/^\/(movie|actor)\/?([^/]*)\/?$/);
+        if (!match) return;
+
+        var page = match[1];
+        var slug = decodeURIComponent(match[2] || "").trim();
+        var target = "/" + page + ".html";
+        if (slug) target += "?slug=" + encodeURIComponent(slug);
+        window.location.replace(target);
+      })();
+    </script>
+  </head>
+  <body>
+    <p>Redirecting...</p>
+  </body>
+</html>

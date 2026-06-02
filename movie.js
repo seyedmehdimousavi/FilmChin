@@ -50,7 +50,7 @@ const movieI18n = {
     postOptionFavoriteStatusIn: "In favorites",
     postOptionLoginRequired: "Login required",
     postOptionCopyLink: "Copy link",
-    postOptionCopyLinkSub: "Copy movie link ( /movie/slug )",
+    postOptionCopyLinkSub: "Copy movie page link",
     postOptionShareLink: "Share link",
     postOptionShareLinkSub: "Share movie link with other apps",
   },
@@ -94,7 +94,7 @@ const movieI18n = {
     postOptionFavoriteStatusIn: "در علاقه‌مندی‌ها",
     postOptionLoginRequired: "نیاز به ورود",
     postOptionCopyLink: "کپی لینک",
-    postOptionCopyLinkSub: "کپی لینک فیلم ( /movie/slug )",
+    postOptionCopyLinkSub: "کپی لینک صفحه فیلم",
     postOptionShareLink: "اشتراک لینک",
     postOptionShareLinkSub: "اشتراک لینک فیلم با سایر برنامه‌ها",
   },
@@ -241,6 +241,16 @@ function makeActorSlug(name) {
     .replace(/^-|-$/g, "");
 }
 
+function buildMoviePageHref(title) {
+  const slug = makeMovieSlug(title || "");
+  return slug ? `/movie.html?slug=${encodeURIComponent(slug)}` : "/movie.html";
+}
+
+function buildActorPageHref(name) {
+  const slug = makeActorSlug(name || "");
+  return slug ? `/actor.html?slug=${encodeURIComponent(slug)}` : "/actor.html";
+}
+
 function parseSlug() {
   const pathname = window.location.pathname || "";
   if (pathname.startsWith("/movie/")) {
@@ -308,7 +318,7 @@ function getActorAvatarHtml(name) {
 function buildActorChip(value) {
   const safeValue = escapeHtml(value);
   const avatar = getActorAvatarHtml(value);
-  return `<a class="person-chip actor-chip" dir="auto" href="/actor/${encodeURIComponent(makeActorSlug(value))}">${avatar}<span>${safeValue}</span></a>`;
+  return `<a class="person-chip actor-chip" dir="auto" href="${buildActorPageHref(value)}">${avatar}<span>${safeValue}</span></a>`;
 }
 
 async function fetchActorAvatars() {
@@ -570,13 +580,13 @@ function bindPostOptions(slug) {
   });
 
   document.getElementById("postOptionCopyLink")?.addEventListener("click", async () => {
-    const url = `${window.location.origin}/movie/${encodeURIComponent(slug)}`;
+    const url = `${window.location.origin}/movie.html?slug=${encodeURIComponent(slug)}`;
     await navigator.clipboard.writeText(url);
     closePostOptions();
   });
 
   document.getElementById("postOptionShareLink")?.addEventListener("click", async () => {
-    const url = `${window.location.origin}/movie/${encodeURIComponent(slug)}`;
+    const url = `${window.location.origin}/movie.html?slug=${encodeURIComponent(slug)}`;
     if (navigator.share) {
       await navigator.share({ title: currentMovie?.title || "FilmChiin", url });
     } else {
@@ -724,13 +734,23 @@ function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
   const html = (similarMovies || [])
     .map((m) => {
       const title = escapeHtml(m.title || "-");
-      const cover = escapeHtml(m.cover || "https://via.placeholder.com/120x80?text=No+Cover");
-      const url = `/movie/${encodeURIComponent(makeMovieSlug(m.title || ""))}`;
-      return `<div class="episode-card similar-movie-card">
-        <img src="${cover}" alt="${title}" class="episode-cover">
-        <div class="episode-title"><span>${title}</span></div>
-        <div class="button-wrap similar-go-wrap"><button class="go-page-btn similar-go-btn" data-url="${escapeHtml(url)}" type="button"><span>${mt("goToPage")}</span></button><div class="button-shadow"></div></div>
-      </div>`;
+      const cover = escapeHtml(m.cover || "https://via.placeholder.com/300x200?text=No+Cover");
+      const url = buildMoviePageHref(m.title || "");
+      return `
+        <div class="favorite-item coming-soon-grid-item similar-movie-card" data-url="${escapeHtml(url)}">
+          <div class="coming-soon-poster-wrap">
+            <img src="${cover}" alt="${title}" class="favorite-cover" loading="lazy" />
+          </div>
+          <div class="favorite-title" dir="auto">${title}</div>
+          <div class="favorite-actions">
+            <div class="button-wrap">
+              <button class="coming-soon-info-btn similar-go-btn" data-url="${escapeHtml(url)}" type="button">
+                <span>${mt("goToPage")}</span>
+              </button>
+              <div class="button-shadow"></div>
+            </div>
+          </div>
+        </div>`;
     })
     .join("");
 
@@ -739,10 +759,24 @@ function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
   section.innerHTML = `
     <div class="similar-block-card">
       <div class="similar-movies-title"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> <strong>${mt(titleKey)}</strong></div>
-      <div class="episodes-container similar-movies-container"><div class="episodes-list">${html || `<div class="similar-empty-message"><strong>${mt(emptyKey)}</strong></div>`}</div></div>
+      <div class="favorites-grid coming-soon-grid similar-movies-container">${html || `<div class="similar-empty-message"><strong>${mt(emptyKey)}</strong></div>`}</div>
     </div>
   `;
   container.appendChild(section);
+
+  section.querySelectorAll(".similar-movie-card").forEach((card) => {
+    card.addEventListener("click", (e) => {
+      if (e.target.closest(".similar-go-btn")) return;
+      e.stopPropagation();
+      const wasActive = card.classList.contains("coming-soon-card-active");
+      section
+        .querySelectorAll(".similar-movie-card.coming-soon-card-active")
+        .forEach((item) => {
+          if (item !== card) item.classList.remove("coming-soon-card-active");
+        });
+      card.classList.toggle("coming-soon-card-active", !wasActive);
+    });
+  });
 
   section.querySelectorAll(".similar-go-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {

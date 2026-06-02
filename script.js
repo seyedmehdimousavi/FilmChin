@@ -844,8 +844,14 @@ function makeActorSlug(name) {
     .replace(/^-|-$/g, "");
 }
 
+function buildMoviePageHref(title) {
+  const slug = makeMovieSlug(title || "");
+  return slug ? `/movie.html?slug=${encodeURIComponent(slug)}` : "/movie.html";
+}
+
 function buildActorHref(name) {
-  return `/actor/${encodeURIComponent(makeActorSlug(name))}`;
+  const slug = makeActorSlug(name || "");
+  return slug ? `/actor.html?slug=${encodeURIComponent(slug)}` : "/actor.html";
 }
 
 function buildTelegramBotUrlFromChannelLink(rawLink) {
@@ -1691,6 +1697,7 @@ document.addEventListener("DOMContentLoaded", () => {
       floatingSummaryPanel: "Floating Summary Panel",
       collapsePosts: "Collapse posts",
       links: "Links",
+      sortByMenu: "Sort by...",
       sortByImdb: "Sort by IMDb rating",
       sortByReleaseDate: "Sort by release date",
       goToPagination: "Go to pagination",
@@ -1804,6 +1811,7 @@ document.addEventListener("DOMContentLoaded", () => {
       floatingSummaryPanel: "پنل شناور خلاصه",
       collapsePosts: "جمع‌کردن پست‌ها",
       links: "لینک‌ها",
+      sortByMenu: "مرتب‌سازی بر اساس...",
       sortByImdb: "مرتب‌سازی بر اساس امتیاز IMDb",
       sortByReleaseDate: "مرتب‌سازی بر اساس تاریخ انتشار",
       goToPagination: "رفتن به صفحه‌بندی",
@@ -2272,7 +2280,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const origin =
       (window.location && window.location.origin) || "https://filmchiin.ir";
-    const url = origin.replace(/\/+$/, "") + "/movie/" + slug;
+    const url = `${origin.replace(/\/+$/, "")}/movie.html?slug=${encodeURIComponent(slug)}`;
 
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -2313,7 +2321,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const origin =
       (window.location && window.location.origin) || "https://filmchiin.ir";
-    const url = origin.replace(/\/+$/, "") + "/movie/" + slug;
+    const url = `${origin.replace(/\/+$/, "")}/movie.html?slug=${encodeURIComponent(slug)}`;
 
     // Web Share API (مخصوص موبایل/مرورگرهایی که پشتیبانی می‌کنند)
     if (navigator.share) {
@@ -4523,9 +4531,7 @@ function setTabInUrl(type) {
 
 <div class="movie-info anim-vertical">
   <div class="movie-title anim-left-right">
-    <a class="movie-name anim-horizontal movie-detail-link" href="/movie/${encodeURIComponent(
-      makeMovieSlug(m.title || "")
-    )}">${title}</a>
+    <a class="movie-name anim-horizontal movie-detail-link" href="${buildMoviePageHref(m.title || "")}">${title}</a>
     ${badgeHtml}
   </div>
 
@@ -4578,9 +4584,7 @@ function setTabInUrl(type) {
         <div class="button-shadow"></div>
       </div>
       <div class="button-wrap">
-        <a class="go-page-btn anim-vertical" href="/movie/${encodeURIComponent(
-          makeMovieSlug(m.title || "")
-        )}" type="button"><span>${uiText("goToPage")}</span></a>
+        <a class="go-page-btn anim-vertical" href="${buildMoviePageHref(m.title || "")}" type="button"><span>${uiText("goToPage")}</span></a>
         <div class="button-shadow"></div>
       </div>
     </div>
@@ -7812,6 +7816,16 @@ function openMovieModal(m, startIdx = 0) {
 
   // -------------------- Admin Tabs --------------------
   function initAdminTabs() {
+    const backToSiteBtn = document.getElementById("backToSiteBtn");
+    backToSiteBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+
     const tabButtons = document.querySelectorAll(".admin-tabs .tab-btn");
 
     const sections = {

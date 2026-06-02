@@ -1,8 +1,10 @@
 {
   "rewrites": [
-    { "source": "/movie/:slug", "destination": "/movie.html?slug=:slug" },
-    { "source": "/movie/:slug/", "destination": "/movie.html?slug=:slug" },
-    { "source": "/actor/:slug", "destination": "/actor.html?slug=:slug" },
-    { "source": "/actor/:slug/", "destination": "/actor.html?slug=:slug" }
+    { "source": "/movie", "destination": "/movie.html" },
+    { "source": "/movie/", "destination": "/movie.html" },
+    { "source": "/movie/:slug*", "destination": "/movie.html?slug=:slug*" },
+    { "source": "/actor", "destination": "/actor.html" },
+    { "source": "/actor/", "destination": "/actor.html" },
+    { "source": "/actor/:slug*", "destination": "/actor.html?slug=:slug*" }
   ]
 }
