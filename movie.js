@@ -724,13 +724,23 @@ function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
   const html = (similarMovies || [])
     .map((m) => {
       const title = escapeHtml(m.title || "-");
-      const cover = escapeHtml(m.cover || "https://via.placeholder.com/120x80?text=No+Cover");
+      const cover = escapeHtml(m.cover || "https://via.placeholder.com/300x200?text=No+Cover");
       const url = `/movie/${encodeURIComponent(makeMovieSlug(m.title || ""))}`;
-      return `<div class="episode-card similar-movie-card">
-        <img src="${cover}" alt="${title}" class="episode-cover">
-        <div class="episode-title"><span>${title}</span></div>
-        <div class="button-wrap similar-go-wrap"><button class="go-page-btn similar-go-btn" data-url="${escapeHtml(url)}" type="button"><span>${mt("goToPage")}</span></button><div class="button-shadow"></div></div>
-      </div>`;
+      return `
+        <div class="favorite-item coming-soon-grid-item similar-movie-card" data-url="${escapeHtml(url)}">
+          <div class="coming-soon-poster-wrap">
+            <img src="${cover}" alt="${title}" class="favorite-cover" loading="lazy" />
+          </div>
+          <div class="favorite-title" dir="auto">${title}</div>
+          <div class="favorite-actions">
+            <div class="button-wrap">
+              <button class="coming-soon-info-btn similar-go-btn" data-url="${escapeHtml(url)}" type="button">
+                <span>${mt("goToPage")}</span>
+              </button>
+              <div class="button-shadow"></div>
+            </div>
+          </div>
+        </div>`;
     })
     .join("");
 
@@ -739,10 +749,24 @@ function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
   section.innerHTML = `
     <div class="similar-block-card">
       <div class="similar-movies-title"><img src="/images/icons8-movie.apng" style="width:20px;height:20px;"> <strong>${mt(titleKey)}</strong></div>
-      <div class="episodes-container similar-movies-container"><div class="episodes-list">${html || `<div class="similar-empty-message"><strong>${mt(emptyKey)}</strong></div>`}</div></div>
+      <div class="favorites-grid coming-soon-grid similar-movies-container">${html || `<div class="similar-empty-message"><strong>${mt(emptyKey)}</strong></div>`}</div>
     </div>
   `;
   container.appendChild(section);
+
+  section.querySelectorAll(".similar-movie-card").forEach((card) => {
+    card.addEventListener("click", (e) => {
+      if (e.target.closest(".similar-go-btn")) return;
+      e.stopPropagation();
+      const wasActive = card.classList.contains("coming-soon-card-active");
+      section
+        .querySelectorAll(".similar-movie-card.coming-soon-card-active")
+        .forEach((item) => {
+          if (item !== card) item.classList.remove("coming-soon-card-active");
+        });
+      card.classList.toggle("coming-soon-card-active", !wasActive);
+    });
+  });
 
   section.querySelectorAll(".similar-go-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
