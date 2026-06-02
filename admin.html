@@ -431,6 +431,31 @@
               <div class="button-shadow"></div>
             </div>
           </div>
+
+          <section id="admin-wallets-section" class="admin-section-item links-tab-extra">
+            <h2>Wallets</h2>
+            <div class="admin-wallet-form">
+              <input id="walletNameInput" type="text" placeholder="Wallet name (e.g. TON)" />
+              <input id="walletAddressInput" type="text" placeholder="Wallet address" />
+              <button id="walletSaveBtn" type="button">Save wallet</button>
+              <input id="walletEditId" type="hidden" />
+            </div>
+            <div id="walletsList" class="movie-list"></div>
+          </section>
+
+          <div class="admin-theme-palette-wrap links-tab-extra">
+            <div class="theme-palette" id="themePalette">
+              <div class="theme-palette-title" data-i18n="themePaletteTitle">Site color theme</div>
+              <div class="theme-palette-options" role="radiogroup" aria-label="Select theme color">
+                <button class="theme-palette-dot active" type="button" data-theme-color="blue" aria-label="Azure" style="background:#1e88e5"></button>
+                <button class="theme-palette-dot" type="button" data-theme-color="green" aria-label="Green" style="background:#2e9d57"></button>
+                <button class="theme-palette-dot" type="button" data-theme-color="yellow" aria-label="Yellow" style="background:#c5a317"></button>
+                <button class="theme-palette-dot" type="button" data-theme-color="red" aria-label="Red" style="background:#c84646"></button>
+                <button class="theme-palette-dot" type="button" data-theme-color="purple" aria-label="Purple" style="background:#6f4dbb"></button>
+                <button class="theme-palette-dot" type="button" data-theme-color="teal" aria-label="Teal" style="background:#188a94"></button>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section
@@ -459,16 +484,6 @@
           <h2 data-i18n="popularMovies">Popular movies</h2>
           <div id="popularMoviesList" class="movie-list"></div>
         </section>
-        <section id="admin-wallets-section" class="admin-section-item">
-          <h2>Wallets</h2>
-          <div class="admin-wallet-form">
-            <input id="walletNameInput" type="text" placeholder="Wallet name (e.g. TON)" />
-            <input id="walletAddressInput" type="text" placeholder="Wallet address" />
-            <button id="walletSaveBtn" type="button">Save wallet</button>
-            <input id="walletEditId" type="hidden" />
-          </div>
-          <div id="walletsList" class="movie-list"></div>
-        </section>
 
         <section id="admin-actors-section" class="admin-section-item">
           <h2>بازیگر ها</h2>
@@ -479,20 +494,6 @@
           <div id="adminActorsGrid" class="admin-actors-grid"></div>
           <div id="adminActorsPagination" class="pagination-container"></div>
         </section>
-
-        <div class="admin-theme-palette-wrap">
-        <div class="theme-palette" id="themePalette">
-          <div class="theme-palette-title" data-i18n="themePaletteTitle">Site color theme</div>
-          <div class="theme-palette-options" role="radiogroup" aria-label="Select theme color">
-            <button class="theme-palette-dot active" type="button" data-theme-color="blue" aria-label="Azure" style="background:#1e88e5"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="green" aria-label="Green" style="background:#2e9d57"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="yellow" aria-label="Yellow" style="background:#c5a317"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="red" aria-label="Red" style="background:#c84646"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="purple" aria-label="Purple" style="background:#6f4dbb"></button>
-            <button class="theme-palette-dot" type="button" data-theme-color="teal" aria-label="Teal" style="background:#188a94"></button>
-          </div>
-        </div>
-      </div>
 
         <section
           id="analytics"

@@ -523,61 +523,76 @@
           </div>
         </div>
 
-        <div id="ratingFilter" class="rating-filter">
-          <h4 class="rating-filter-title" data-i18n="sortByImdb">
-            Sort by imdb rating
-          </h4>
-          <div class="rating-process-wrapper">
-            <div class="rating-min">0</div>
-            <div class="rating-track" id="ratingTrack">
-              <div class="rating-track-fill" id="ratingFill"></div>
-              <div
-                class="rating-knob"
-                id="ratingKnob"
-                role="slider"
-                tabindex="0"
-              >
-                <div class="rating-bubble" id="ratingBubble">
-                  Rating &gt; <span id="ratingBubbleValue">0.0</span>
+        <div class="sidemenu-accordion" id="acc-sort-by">
+          <div class="sidemenu-accordion-header">
+            <div class="sidemenu-header-content">
+              <i class="bi bi-sort-down"></i>
+              <span data-i18n="sortByMenu">Sort by...</span>
+            </div>
+            <span class="feature-icon sidemenu-arrow"
+              ><img src="/images/icons8-double-left.apng" alt="toggle"
+            /></span>
+          </div>
+          <div class="sidemenu-accordion-body">
+            <div class="sidemenu-content-inner">
+              <div id="ratingFilter" class="rating-filter">
+                <h4 class="rating-filter-title" data-i18n="sortByImdb">
+                  Sort by imdb rating
+                </h4>
+                <div class="rating-process-wrapper">
+                  <div class="rating-min">0</div>
+                  <div class="rating-track" id="ratingTrack">
+                    <div class="rating-track-fill" id="ratingFill"></div>
+                    <div
+                      class="rating-knob"
+                      id="ratingKnob"
+                      role="slider"
+                      tabindex="0"
+                    >
+                      <div class="rating-bubble" id="ratingBubble">
+                        Rating &gt; <span id="ratingBubbleValue">0.0</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="rating-max">10</div>
+                </div>
+                <div class="rating-controls button-wrap">
+                  <button id="applyRatingFilter" class="apply-imdb small">
+                    <span>Apply</span>
+                  </button>
+                  <div class="button-shadow"></div>
+                </div>
+              </div>
+
+              <div class="year-filter">
+                <div class="year-filter-row">
+                  <div class="year-filter-label" data-i18n="sortByReleaseDate">
+                    Sort by Release date
+                  </div>
+                  <div class="year-filter-sign">+</div>
+                  <div class="year-spinner" id="yearSpinner">
+                    <div
+                      class="year-spinner-item year-spinner-top"
+                      id="yearSpinnerTop"
+                    ></div>
+                    <div
+                      class="year-spinner-item year-spinner-center"
+                      id="yearSpinnerCenter"
+                    ></div>
+                    <div
+                      class="year-spinner-item year-spinner-bottom"
+                      id="yearSpinnerBottom"
+                    ></div>
+                  </div>
+                </div>
+                <div class="year-apply-wrap button-wrap">
+                  <button id="applyYearFilter" class="apply-imdb small">
+                    <span>Apply</span>
+                  </button>
+                  <div class="button-shadow"></div>
                 </div>
               </div>
             </div>
-            <div class="rating-max">10</div>
-          </div>
-          <div class="rating-controls button-wrap">
-            <button id="applyRatingFilter" class="apply-imdb small">
-              <span>Apply</span>
-            </button>
-            <div class="button-shadow"></div>
-          </div>
-        </div>
-
-        <div class="year-filter">
-          <div class="year-filter-row">
-            <div class="year-filter-label" data-i18n="sortByReleaseDate">
-              Sort by Release date
-            </div>
-            <div class="year-filter-sign">+</div>
-            <div class="year-spinner" id="yearSpinner">
-              <div
-                class="year-spinner-item year-spinner-top"
-                id="yearSpinnerTop"
-              ></div>
-              <div
-                class="year-spinner-item year-spinner-center"
-                id="yearSpinnerCenter"
-              ></div>
-              <div
-                class="year-spinner-item year-spinner-bottom"
-                id="yearSpinnerBottom"
-              ></div>
-            </div>
-          </div>
-          <div class="year-apply-wrap button-wrap">
-            <button id="applyYearFilter" class="apply-imdb small">
-              <span>Apply</span>
-            </button>
-            <div class="button-shadow"></div>
           </div>
         </div>
       </div>

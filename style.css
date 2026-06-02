@@ -7693,3 +7693,33 @@ html:not([lang="en"]) .coming-soon-heading {
 body.dark .coming-soon-admin-list-title {
   color: var(--theme-accent-light);
 }
+
+/* Movie-page related cards reuse the same grid-card design as the Coming Soon view-all overlay. */
+.movie-page-body .similar-movies-container.favorites-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  overflow: visible;
+  padding-right: 0;
+}
+
+.movie-page-body .similar-movies-container .similar-movie-card {
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+}
+
+.movie-page-body .similar-movies-container .favorite-cover {
+  aspect-ratio: 2 / 3;
+  max-height: none;
+}
+
+.movie-page-body .similar-movies-container .favorite-title {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.movie-page-body .similar-movies-container .favorite-actions .button-wrap,
+.movie-page-body .similar-movies-container .similar-go-btn {
+  width: 100%;
+}

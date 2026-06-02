@@ -1691,6 +1691,7 @@ document.addEventListener("DOMContentLoaded", () => {
       floatingSummaryPanel: "Floating Summary Panel",
       collapsePosts: "Collapse posts",
       links: "Links",
+      sortByMenu: "Sort by...",
       sortByImdb: "Sort by IMDb rating",
       sortByReleaseDate: "Sort by release date",
       goToPagination: "Go to pagination",
@@ -1804,6 +1805,7 @@ document.addEventListener("DOMContentLoaded", () => {
       floatingSummaryPanel: "پنل شناور خلاصه",
       collapsePosts: "جمع‌کردن پست‌ها",
       links: "لینک‌ها",
+      sortByMenu: "مرتب‌سازی بر اساس...",
       sortByImdb: "مرتب‌سازی بر اساس امتیاز IMDb",
       sortByReleaseDate: "مرتب‌سازی بر اساس تاریخ انتشار",
       goToPagination: "رفتن به صفحه‌بندی",
@@ -7812,6 +7814,16 @@ function openMovieModal(m, startIdx = 0) {
 
   // -------------------- Admin Tabs --------------------
   function initAdminTabs() {
+    const backToSiteBtn = document.getElementById("backToSiteBtn");
+    backToSiteBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+
     const tabButtons = document.querySelectorAll(".admin-tabs .tab-btn");
 
     const sections = {
