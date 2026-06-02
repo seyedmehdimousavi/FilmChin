@@ -1967,6 +1967,10 @@ document.addEventListener("DOMContentLoaded", () => {
     ) {
       refreshMoviesForCurrentActiveTab();
     }
+    const comingSoonSection = document.getElementById("coming-soon-carousel");
+    if (comingSoonSection?.dataset.ready === "1" && typeof fetchComingSoonMovies === "function") {
+      fetchComingSoonMovies();
+    }
   }
 
   languageButtons.forEach((btn) => {
