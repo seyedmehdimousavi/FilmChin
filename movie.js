@@ -50,7 +50,7 @@ const movieI18n = {
     postOptionFavoriteStatusIn: "In favorites",
     postOptionLoginRequired: "Login required",
     postOptionCopyLink: "Copy link",
-    postOptionCopyLinkSub: "Copy movie link ( /movie/slug )",
+    postOptionCopyLinkSub: "Copy movie page link",
     postOptionShareLink: "Share link",
     postOptionShareLinkSub: "Share movie link with other apps",
   },
@@ -94,7 +94,7 @@ const movieI18n = {
     postOptionFavoriteStatusIn: "در علاقه‌مندی‌ها",
     postOptionLoginRequired: "نیاز به ورود",
     postOptionCopyLink: "کپی لینک",
-    postOptionCopyLinkSub: "کپی لینک فیلم ( /movie/slug )",
+    postOptionCopyLinkSub: "کپی لینک صفحه فیلم",
     postOptionShareLink: "اشتراک لینک",
     postOptionShareLinkSub: "اشتراک لینک فیلم با سایر برنامه‌ها",
   },
@@ -241,6 +241,16 @@ function makeActorSlug(name) {
     .replace(/^-|-$/g, "");
 }
 
+function buildMoviePageHref(title) {
+  const slug = makeMovieSlug(title || "");
+  return slug ? `/movie.html?slug=${encodeURIComponent(slug)}` : "/movie.html";
+}
+
+function buildActorPageHref(name) {
+  const slug = makeActorSlug(name || "");
+  return slug ? `/actor.html?slug=${encodeURIComponent(slug)}` : "/actor.html";
+}
+
 function parseSlug() {
   const pathname = window.location.pathname || "";
   if (pathname.startsWith("/movie/")) {
@@ -308,7 +318,7 @@ function getActorAvatarHtml(name) {
 function buildActorChip(value) {
   const safeValue = escapeHtml(value);
   const avatar = getActorAvatarHtml(value);
-  return `<a class="person-chip actor-chip" dir="auto" href="/actor/${encodeURIComponent(makeActorSlug(value))}">${avatar}<span>${safeValue}</span></a>`;
+  return `<a class="person-chip actor-chip" dir="auto" href="${buildActorPageHref(value)}">${avatar}<span>${safeValue}</span></a>`;
 }
 
 async function fetchActorAvatars() {
@@ -570,13 +580,13 @@ function bindPostOptions(slug) {
   });
 
   document.getElementById("postOptionCopyLink")?.addEventListener("click", async () => {
-    const url = `${window.location.origin}/movie/${encodeURIComponent(slug)}`;
+    const url = `${window.location.origin}/movie.html?slug=${encodeURIComponent(slug)}`;
     await navigator.clipboard.writeText(url);
     closePostOptions();
   });
 
   document.getElementById("postOptionShareLink")?.addEventListener("click", async () => {
-    const url = `${window.location.origin}/movie/${encodeURIComponent(slug)}`;
+    const url = `${window.location.origin}/movie.html?slug=${encodeURIComponent(slug)}`;
     if (navigator.share) {
       await navigator.share({ title: currentMovie?.title || "FilmChiin", url });
     } else {
@@ -725,7 +735,7 @@ function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
     .map((m) => {
       const title = escapeHtml(m.title || "-");
       const cover = escapeHtml(m.cover || "https://via.placeholder.com/300x200?text=No+Cover");
-      const url = `/movie/${encodeURIComponent(makeMovieSlug(m.title || ""))}`;
+      const url = buildMoviePageHref(m.title || "");
       return `
         <div class="favorite-item coming-soon-grid-item similar-movie-card" data-url="${escapeHtml(url)}">
           <div class="coming-soon-poster-wrap">

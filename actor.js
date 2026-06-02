@@ -48,6 +48,21 @@ function makeActorSlug(name) {
     .replace(/^-|-$/g, "");
 }
 
+function makeMovieSlug(title) {
+  return String(title || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[\(\)\[\]\{\}]/g, "")
+    .replace(/[^a-z0-9\u0600-\u06FF]+/gi, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function buildMoviePageHref(title) {
+  const slug = makeMovieSlug(title || "");
+  return slug ? `/movie.html?slug=${encodeURIComponent(slug)}` : "/movie.html";
+}
+
 function parseActorSlug() {
   const pathname = window.location.pathname || "";
   if (pathname.startsWith("/actor/")) {
@@ -118,7 +133,7 @@ function renderActorPosts(posts, episodesMap = new Map()) {
       const cover = escapeHtml(m.cover || "https://via.placeholder.com/120x80?text=No+Cover");
       const title = escapeHtml(m.title || "-");
       const synopsis = escapeHtml(m.synopsis || "-");
-      const url = `/movie/${encodeURIComponent(String(m.title || "").toLowerCase().trim().replace(/[^a-z0-9\u0600-\u06FF]+/gi, "-").replace(/-+/g, "-").replace(/^-|-$/g, ""))}`;
+      const url = buildMoviePageHref(m.title || "");
       const movieEpisodes = episodesMap.get(String(m.id)) || [];
       const showEpisodes = m.type === "collection" && movieEpisodes.length > 0;
       const episodesHtml = showEpisodes
