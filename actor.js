@@ -146,7 +146,10 @@ function renderActorPosts(posts, episodesMap = new Map()) {
       const title = escapeHtml(m.title || "-");
       const synopsis = escapeHtml(m.synopsis || "-");
       const url = buildMoviePageHref(m.title || "");
-      const movieEpisodes = episodesMap.get(String(m.id)) || [];
+      const storedEpisodes = episodesMap.get(String(m.id)) || [];
+      const movieEpisodes = m.type === "collection"
+        ? [{ title: m.title, cover: m.cover, link: m.link, synopsis: m.synopsis }, ...storedEpisodes]
+        : storedEpisodes;
       const showEpisodes = m.type === "collection" && movieEpisodes.length > 0;
       const episodesHtml = showEpisodes
         ? `<div class="actor-episodes-block">
@@ -157,7 +160,7 @@ function renderActorPosts(posts, episodesMap = new Map()) {
                   const epTitle = escapeHtml(ep.title || `Episode ${idx + 1}`);
                   const epCover = escapeHtml(ep.cover || m.cover || "https://via.placeholder.com/120x80?text=No+Cover");
                   const scrollable = epTitle.length > 16 ? "scrollable" : "";
-                  return `<div class="episode-card actor-episode-card"><img src="${epCover}" alt="${epTitle}" class="episode-cover"><span class="episode-title ${scrollable}"><span>${epTitle}</span></span></div>`;
+                  return `<div class="episode-card actor-episode-card ${idx === 0 ? "active" : ""}"><img src="${epCover}" alt="${epTitle}" class="episode-cover"><span class="episode-title ${scrollable}"><span>${epTitle}</span></span></div>`;
                 }).join("")}
               </div>
             </div>
@@ -173,7 +176,7 @@ function renderActorPosts(posts, episodesMap = new Map()) {
           ${episodesHtml}
           <div class="post-action-row movie-page-actions actor-post-actions">
             <div class="button-wrap">
-              <button class="go-page-btn actor-go-page-btn" data-url="${url}" type="button"><span>${t("goToPage")}</span></button>
+              <button class="favorite-goto-btn actor-go-page-btn" data-url="${url}" type="button"><span>${t("goToPage")}</span></button>
               <div class="button-shadow"></div>
             </div>
           </div>
@@ -214,7 +217,7 @@ async function loadActorPage() {
     return;
   }
 
-  const { data: movies, error } = await db.from("movies").select("id,title,cover,synopsis,stars,type,created_at").order("created_at", { ascending: false });
+  const { data: movies, error } = await db.from("movies").select("id,title,cover,link,synopsis,stars,type,created_at").order("created_at", { ascending: false });
   if (error || !Array.isArray(movies)) {
     status.textContent = t("actorNotFound");
     return;
