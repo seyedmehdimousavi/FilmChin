@@ -108,11 +108,23 @@ function applySavedTheme() {
 }
 
 async function hydrateBannerFromHome() {
+  if (window.FilmChiinSharedSections?.hydrate) {
+    await window.FilmChiinSharedSections.hydrate();
+    return;
+  }
+
   const resp = await fetch("/");
   const html = await resp.text();
   const doc = new DOMParser().parseFromString(html, "text/html");
-  const banner = doc.querySelector("#site-banner .banner-content");
-  if (banner) document.getElementById("movieBannerMount").innerHTML = banner.outerHTML;
+  const header = doc.querySelector(".main-header");
+  const features = doc.querySelector("#siteFeatures");
+  if (header) {
+    const targetHeader = document.querySelector(".main-header");
+    targetHeader.className = header.className;
+    targetHeader.innerHTML = header.innerHTML;
+    document.body.classList.add("shared-header-ready");
+  }
+  if (features) document.getElementById("movieFeaturesMount").innerHTML = features.outerHTML;
 }
 
 function buildActorEpisodesMap(items) {
