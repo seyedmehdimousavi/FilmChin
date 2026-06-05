@@ -102,6 +102,49 @@
     }).forEach(([key, value]) => rootStyle.setProperty(key, value));
   }
 
+  function getCachedCurrentUser() {
+    try {
+      return JSON.parse(localStorage.getItem("currentUser") || "null");
+    } catch {
+      return null;
+    }
+  }
+
+  function setHeaderProfileAvatar(root, avatarUrl) {
+    const profileBtn = root.querySelector("#profileBtn");
+    if (!profileBtn) return;
+    const badge = profileBtn.querySelector("#commentBadge")?.outerHTML || '<span id="commentBadge" class="badge" style="display: none">!</span>';
+    const src = avatarUrl || "/images/icons8-user-96.png";
+    profileBtn.innerHTML = `<img src="${src}" alt="user" />${badge}`;
+  }
+
+  async function hydrateHeaderProfile(root) {
+    const cached = getCachedCurrentUser();
+    if (cached?.avatarUrl) setHeaderProfileAvatar(root, cached.avatarUrl);
+    if (cached?.username) {
+      const usernameEl = root.querySelector("#profileUsername");
+      if (usernameEl) usernameEl.textContent = cached.username;
+    }
+
+    if (!window.supabase?.createClient) return;
+    try {
+      const db = window.supabase.createClient(
+        "https://gwsmvcgjdodmkoqupdal.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY"
+      );
+      const { data: sessionData } = await db.auth.getSession();
+      const user = sessionData?.session?.user;
+      if (!user) return;
+      const { data: dbUser } = await db.from("users").select("username,avatar_url").eq("id", user.id).maybeSingle();
+      const avatarUrl = dbUser?.avatar_url ? db.storage.from("avatars").getPublicUrl(dbUser.avatar_url).data.publicUrl : null;
+      setHeaderProfileAvatar(root, avatarUrl);
+      const usernameEl = root.querySelector("#profileUsername");
+      if (usernameEl) usernameEl.textContent = dbUser?.username || user.email || "User";
+    } catch (err) {
+      console.warn("shared profile hydrate error", err);
+    }
+  }
+
   function initHeaderInteractions(root) {
     const lang = getLang();
     const searchInput = root.querySelector("#search");
@@ -110,13 +153,24 @@
     const themeSwitchCheckbox = root.querySelector("#themeSwitchCheckbox");
 
     if (profileBtn) profileBtn.setAttribute("href", "/admin.html");
+    hydrateHeaderProfile(root);
     if (searchInput) searchInput.setAttribute("placeholder", featureI18n[lang].searchPlaceholder);
+    const syncThemeSwitchFromStorage = () => {
+      const dark = localStorage.getItem("theme") === "dark";
+      document.body.classList.toggle("dark", dark);
+      if (themeSwitchCheckbox) themeSwitchCheckbox.checked = dark;
+    };
+
     if (themeSwitchCheckbox) {
-      themeSwitchCheckbox.checked = localStorage.getItem("theme") === "dark";
+      syncThemeSwitchFromStorage();
       themeSwitchCheckbox.addEventListener("change", (e) => {
         const dark = e.target.checked;
         document.body.classList.toggle("dark", dark);
         localStorage.setItem("theme", dark ? "dark" : "light");
+      });
+      window.addEventListener("pageshow", syncThemeSwitchFromStorage);
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) syncThemeSwitchFromStorage();
       });
     }
 

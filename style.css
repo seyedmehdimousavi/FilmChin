@@ -3353,6 +3353,9 @@ body.dark .active-filters-toast .filter-badge {
 #profileBtn img {
   width: 40px !important;
   height: 40px !important;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
 }
 
 #profileMenu {
@@ -7745,4 +7748,103 @@ body.movie-page-body.shared-header-ready .main-header {
   position: fixed;
   top: 0;
   z-index: 12000;
+}
+
+/* ===== Requested detail-page and pagination fixes ===== */
+.banner-content {
+  text-decoration: none;
+  color: inherit;
+}
+
+.pagination-container .pagination-nav-row {
+  flex: 0 0 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.pagination-nav-btn {
+  min-width: 116px;
+  border: 1px solid rgba(var(--theme-accent-rgb), 0.28);
+  border-radius: 999px;
+  padding: 9px 16px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--theme-accent-dark);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(var(--theme-accent-rgb), 0.14);
+}
+
+.pagination-next-btn {
+  margin-inline-start: auto;
+}
+
+.pagination-prev-btn {
+  margin-inline-end: auto;
+}
+
+.pagination-nav-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  box-shadow: none;
+}
+
+body.dark .pagination-nav-btn {
+  background: rgba(30, 36, 40, 0.9);
+  color: var(--theme-accent-light);
+  border-color: rgba(var(--theme-accent-rgb), 0.42);
+}
+
+.movie-page-container {
+  padding-top: 64px;
+}
+
+.movie-page-back {
+  position: fixed;
+  top: calc(120px + 14px);
+  left: max(16px, env(safe-area-inset-left));
+  z-index: 11999;
+  margin-bottom: 0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 24px rgba(var(--theme-accent-rgb), 0.16);
+}
+
+html[lang="fa"] .movie-page-back {
+  left: auto;
+  right: max(16px, env(safe-area-inset-right));
+  direction: rtl;
+}
+
+.movie-page-body::after {
+  filter: blur(14px) saturate(112%);
+  transform: scale(1.06);
+}
+
+.movie-page-body::before {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body.dark .movie-page-body::before {
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.actor-post-actions .button-wrap {
+  width: min(220px, 100%);
+  max-width: 220px;
+}
+
+.actor-post-actions .favorite-goto-btn {
+  width: 100%;
+}
+
+.actor-episode-card {
+  border: 0;
+  font: inherit;
 }

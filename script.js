@@ -3099,6 +3099,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 70);
   }
 
+  function syncThemeSwitchFromStorage() {
+    const isDark = localStorage.getItem("theme") === "dark";
+    document.body.classList.toggle("dark", isDark);
+    if (themeSwitchCheckbox) themeSwitchCheckbox.checked = isDark;
+  }
+
   // تغییر با سوییچر
   if (themeSwitchCheckbox) {
     themeSwitchCheckbox.addEventListener("change", (e) => {
@@ -3106,9 +3112,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // مقدار ذخیره‌شده
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "dark") themeSwitchCheckbox.checked = true;
+  // مقدار ذخیره‌شده و هماهنگی بعد از برگشت از صفحات جزئیات (bfcache)
+  syncThemeSwitchFromStorage();
+  window.addEventListener("pageshow", syncThemeSwitchFromStorage);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) syncThemeSwitchFromStorage();
+  });
 
   const savedColorTheme = localStorage.getItem("colorTheme") || "blue";
   applyColorTheme(savedColorTheme);
@@ -3468,6 +3477,40 @@ document.addEventListener("DOMContentLoaded", () => {
     paginationContainer.innerHTML = "";
     const total = computeTotalPages(filteredLength);
     if (total <= 1) return;
+
+    const goToPage = async (page) => {
+      const targetPage = Math.min(Math.max(Number(page), 1), total);
+      if (!Number.isFinite(targetPage) || targetPage === currentPage) return;
+
+      try {
+        const url = new URL(window.location.href);
+        if (targetPage <= 1) {
+          url.searchParams.delete("page");
+        } else {
+          url.searchParams.set("page", String(targetPage));
+        }
+        window.history.pushState({}, "", url);
+      } catch (err) {
+        console.warn("pagination pushState error:", err);
+      }
+
+      currentPage = targetPage;
+      if (shouldUseServerPagination()) {
+        usingServerPagination = true;
+        await fetchMoviesPage(currentPage, currentTypeFilter);
+        await fetchEpisodes(movies.map((m) => m.id));
+        await renderPagedMovies(true);
+      } else {
+        await renderPagedMovies(true);
+      }
+
+      const cont = document.querySelector(".container");
+      window.scrollTo({
+        top: (cont?.offsetTop || 0) - 8,
+        behavior: "smooth",
+      });
+    };
+
     const createBubble = (label, page, isActive = false) => {
       if (page === "dots") {
         const span = document.createElement("span");
@@ -3482,47 +3525,9 @@ document.addEventListener("DOMContentLoaded", () => {
       a.href = `?page=${page}`;
 
       a.addEventListener("click", async (e) => {
-        // اجازه بده تب جدید / میان‌کلیک رفتار خودش رو داشته باشه
-        if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) {
-          return;
-        }
-
+        if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
         e.preventDefault();
-
-        const targetPage = Number(page);
-        if (!Number.isFinite(targetPage)) return;
-
-        // 🔹 ساختن یک history state جدید برای این صفحه
-        try {
-          const url = new URL(window.location.href);
-          if (targetPage <= 1) {
-            // صفحه ۱ → پارامتر page پاک شود تا URL تمیز بماند
-            url.searchParams.delete("page");
-          } else {
-            url.searchParams.set("page", String(targetPage));
-          }
-          window.history.pushState({}, "", url);
-        } catch (err) {
-          console.warn("pagination pushState error:", err);
-        }
-
-        // ست کردن صفحه فعلی و رندر
-        currentPage = targetPage;
-        if (shouldUseServerPagination()) {
-          usingServerPagination = true;
-          await fetchMoviesPage(currentPage, currentTypeFilter);
-          await fetchEpisodes(movies.map((m) => m.id));
-          await renderPagedMovies(true);
-        } else {
-          await renderPagedMovies(true);
-        }
-
-        // اسکرول نرم به بالای لیست
-        const cont = document.querySelector(".container");
-        window.scrollTo({
-          top: (cont?.offsetTop || 0) - 8,
-          behavior: "smooth",
-        });
+        await goToPage(page);
       });
 
       return a;
@@ -3553,6 +3558,26 @@ document.addEventListener("DOMContentLoaded", () => {
         paginationContainer.appendChild(createBubble("...", "dots"));
       }
     }
+
+    const nav = document.createElement("div");
+    nav.className = "pagination-nav-row";
+
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "pagination-nav-btn pagination-prev-btn";
+    prevBtn.type = "button";
+    prevBtn.textContent = uiText("prev");
+    prevBtn.disabled = currentPage <= 1;
+    prevBtn.addEventListener("click", () => goToPage(currentPage - 1));
+
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "pagination-nav-btn pagination-next-btn";
+    nextBtn.type = "button";
+    nextBtn.textContent = uiText("next");
+    nextBtn.disabled = currentPage >= total;
+    nextBtn.addEventListener("click", () => goToPage(currentPage + 1));
+
+    nav.append(prevBtn, nextBtn);
+    paginationContainer.appendChild(nav);
   }
 
   // Search live
