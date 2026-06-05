@@ -803,7 +803,7 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
       const epTitle = escapeHtml(ep.title || `Episode ${idx + 1}`);
       const epCover = escapeHtml(ep.cover || "https://via.placeholder.com/120x80?text=No+Cover");
       const scrollable = epTitle.length > 16 ? "scrollable" : "";
-      return `<button class="episode-card ${idx === 0 ? "active" : ""}" type="button" data-link="${escapeHtml(ep.link || "#")}" data-title="${epTitle}"><img src="${epCover}" alt="${epTitle}" class="episode-cover"><span class="episode-title ${scrollable}"><span>${epTitle}</span></span></button>`;
+      return `<div class="episode-card ${idx === 0 ? "active" : ""}" data-link="${escapeHtml(ep.link || "#")}" data-title="${epTitle}"><img src="${epCover}" alt="${epTitle}" class="episode-cover"><span class="episode-title ${scrollable}"><span>${epTitle}</span></span></div>`;
     })
     .join("");
 
