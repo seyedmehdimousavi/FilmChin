@@ -7735,3 +7735,14 @@ body.dark .coming-soon-admin-list-title {
 .movie-page-body .similar-movies-container .similar-go-btn {
   width: 100%;
 }
+
+/* Full shared homepage header on detail pages */
+body.movie-page-body.shared-header-ready {
+  margin-top: 170px;
+}
+
+body.movie-page-body.shared-header-ready .main-header {
+  position: fixed;
+  top: 0;
+  z-index: 12000;
+}
