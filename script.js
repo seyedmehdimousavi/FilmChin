@@ -1518,6 +1518,14 @@ function escapeHtml(text) {
   );
 }
 
+// -------------------- Localization helpers --------------------
+var languageMap = {};
+
+function uiText(key) {
+  const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
+  return languageMap[lang]?.[key] || languageMap.en?.[key] || key;
+}
+
 // -------------------- Comments --------------------
 async function loadComments(movieId) {
   try {
@@ -1677,7 +1685,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const genreGrid = document.getElementById("genreGrid");
   const languageIndicator = document.getElementById("languageIndicator");
   const languageButtons = document.querySelectorAll(".language-option");
-  const languageMap = {
+  languageMap = {
     en: {
       languageLabel: "Language / زبان",
       themePaletteTitle: "Site color theme",
@@ -1908,10 +1916,6 @@ document.addEventListener("DOMContentLoaded", () => {
     },
   };
 
-  const uiText = (key) => {
-    const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
-    return languageMap[lang]?.[key] || languageMap.en[key] || key;
-  };
 
   function applyLanguage(lang) {
     const nextLang = lang === "fa" ? "fa" : "en";
@@ -3113,6 +3117,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // مقدار ذخیره‌شده و هماهنگی بعد از برگشت از صفحات جزئیات (bfcache)
+  const savedTheme = localStorage.getItem("theme");
   syncThemeSwitchFromStorage();
   window.addEventListener("pageshow", syncThemeSwitchFromStorage);
   document.addEventListener("visibilitychange", () => {
