@@ -155,12 +155,22 @@
     if (profileBtn) profileBtn.setAttribute("href", "/admin.html");
     hydrateHeaderProfile(root);
     if (searchInput) searchInput.setAttribute("placeholder", featureI18n[lang].searchPlaceholder);
+    const syncThemeSwitchFromStorage = () => {
+      const dark = localStorage.getItem("theme") === "dark";
+      document.body.classList.toggle("dark", dark);
+      if (themeSwitchCheckbox) themeSwitchCheckbox.checked = dark;
+    };
+
     if (themeSwitchCheckbox) {
-      themeSwitchCheckbox.checked = localStorage.getItem("theme") === "dark";
+      syncThemeSwitchFromStorage();
       themeSwitchCheckbox.addEventListener("change", (e) => {
         const dark = e.target.checked;
         document.body.classList.toggle("dark", dark);
         localStorage.setItem("theme", dark ? "dark" : "light");
+      });
+      window.addEventListener("pageshow", syncThemeSwitchFromStorage);
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) syncThemeSwitchFromStorage();
       });
     }
 

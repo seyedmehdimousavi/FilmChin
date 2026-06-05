@@ -3353,6 +3353,9 @@ body.dark .active-filters-toast .filter-badge {
 #profileBtn img {
   width: 40px !important;
   height: 40px !important;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
 }
 
 #profileMenu {
@@ -7800,9 +7803,9 @@ body.dark .pagination-nav-btn {
 
 .movie-page-back {
   position: fixed;
-  top: 76px;
+  top: calc(120px + 14px);
   left: max(16px, env(safe-area-inset-left));
-  z-index: 12;
+  z-index: 11999;
   margin-bottom: 0;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);

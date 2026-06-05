@@ -3099,6 +3099,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 70);
   }
 
+  function syncThemeSwitchFromStorage() {
+    const isDark = localStorage.getItem("theme") === "dark";
+    document.body.classList.toggle("dark", isDark);
+    if (themeSwitchCheckbox) themeSwitchCheckbox.checked = isDark;
+  }
+
   // تغییر با سوییچر
   if (themeSwitchCheckbox) {
     themeSwitchCheckbox.addEventListener("change", (e) => {
@@ -3106,9 +3112,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // مقدار ذخیره‌شده
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "dark") themeSwitchCheckbox.checked = true;
+  // مقدار ذخیره‌شده و هماهنگی بعد از برگشت از صفحات جزئیات (bfcache)
+  syncThemeSwitchFromStorage();
+  window.addEventListener("pageshow", syncThemeSwitchFromStorage);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) syncThemeSwitchFromStorage();
+  });
 
   const savedColorTheme = localStorage.getItem("colorTheme") || "blue";
   applyColorTheme(savedColorTheme);
