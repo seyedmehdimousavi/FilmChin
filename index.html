@@ -157,6 +157,8 @@
     <div id="toast-container"></div>
     <!-- Active Filters Toast -->
     <div id="activeFilters" class="active-filters-toast"></div>
+    <!-- Admin broadcast messages -->
+    <div id="adminMessages" class="messages-container" aria-live="polite"></div>
     <!-- Header (sticky with blur) -->
     <header class="main-header">
       <!-- 🔹 بنر بالای سایت -->
@@ -1066,7 +1068,7 @@
       <!-- 3) فیلتر نوع و ژانر -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title"
+          <span class="feature-title" data-i18n="featureTitle4"
             >فیلترفیلم هاوژانرها در تب‌های جداگانه</span
           >
           <span class="feature-icon"
@@ -1086,7 +1088,7 @@
       <!-- 4) چیدمان و مرتب‌سازی بر اساس امتیاز -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title" data-i18n="featureTitle4"
+          <span class="feature-title" data-i18n="featureTitle5"
             >مرتب‌سازی بر اساس امتیاز IMDb</span
           >
           <span class="feature-icon"
@@ -1105,7 +1107,7 @@
 
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title" data-i18n="featureTitle5"
+          <span class="feature-title" data-i18n="featureTitle6"
             >مرتب‌سازی بر اساس سال انتشار</span
           >
           <span class="feature-icon"
@@ -1124,7 +1126,7 @@
       <!-- 5) نمایش آمار دقیق فیلم‌ها -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title" data-i18n="featureTitle6"
+          <span class="feature-title" data-i18n="featureTitle7"
             >آمار دقیق تعداد فیلم‌ها در هر لحظه</span
           >
           <span class="feature-icon"
@@ -1144,7 +1146,7 @@
       <!-- 6) لیست قسمت‌های سریال و کالکشن -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title" data-i18n="featureTitle7"
+          <span class="feature-title" data-i18n="featureTitle8"
             >لیست قسمت‌های سریال وکالکشن</span
           >
           <span class="feature-icon"
@@ -1164,7 +1166,7 @@
       <!-- 7) دسترسی به فایل با یک کلیک از طریق ربات -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title" data-i18n="featureTitle8"
+          <span class="feature-title" data-i18n="featureTitle9"
             >دسترسی به فایل فقط با یک کلیک</span
           >
           <span class="feature-icon"
@@ -1183,7 +1185,7 @@
       <!-- 8) سیستم کامنت‌ها -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title" data-i18n="featureTitle9"
+          <span class="feature-title" data-i18n="featureTitle10"
             >کامنت و نمایش گفت‌وگو در همان پست</span
           >
           <span class="feature-icon"
@@ -1202,7 +1204,7 @@
       <!-- 9) فیلم‌های پرطرفدار و لیست صفحه -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title"
+          <span class="feature-title" data-i18n="featureTitle11"
             >فیلم‌های پرطرفدارولیست فیلم‌های صفحه</span
           >
           <span class="feature-icon"
@@ -1222,7 +1224,7 @@
       <!-- 10) اشتراک و کپی لینک فیلم -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title" data-i18n="featureTitle10"
+          <span class="feature-title" data-i18n="featureTitle12"
             >کپی یا اشتراک لینک هر فیلم</span
           >
           <span class="feature-icon"
@@ -1230,7 +1232,7 @@
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p>
+          <p data-i18n-html="featureDesc12">
             برای هر پست، دکمه‌هایی برای <strong>کپی </strong> و
             <strong>اشتراک لینک</strong> وجود دارد. با باز شدن لینک، یک
             مودال،اطلاعات فیلم را نمایش می‌دهد و از همان‌جا می‌توانید دکمه Go to
@@ -1242,7 +1244,7 @@
       <!-- 11) طراحی liquid glass و تجربه کاربری -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title" data-i18n="featureTitle11"
+          <span class="feature-title" data-i18n="featureTitle13"
             >طراحی Liquid Glass واکنش‌گرا</span
           >
           <span class="feature-icon"
@@ -1250,7 +1252,7 @@
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p>
+          <p data-i18n-html="featureDesc13">
             بخش هایی از سایت با الهام از طراحی Liquid Glass ساخته شده است؛
             کارت‌ها، دکمه‌ها و پنل‌ها دارای حاشیه‌های گرد، شفافیت کنترل‌شده و
             انیمیشن‌های ملایم هستند تا در موبایل و دسکتاپ تجربه کاربری روان و
@@ -1263,7 +1265,7 @@
       <!-- 12) تغییر زبان سایت -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title" data-i18n="featureTitle12"
+          <span class="feature-title" data-i18n="featureTitle14"
             >امکان تغییر زبان سایت</span
           >
           <span class="feature-icon"
@@ -1271,7 +1273,7 @@
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p data-i18n-html="featureDesc12">
+          <p data-i18n-html="featureDesc14">
             در بخش تنظیمات زبان می‌توانید رابط کاربری سایت را بین فارسی و انگلیسی
             جابه‌جا کنید. تمام متن‌های اصلی، عنوان‌ها و توضیحات امکانات بر اساس
             زبان انتخابی شما به‌صورت یکپارچه تغییر می‌کنند.
@@ -1282,7 +1284,7 @@
       <!-- 13) تغییر تم رنگی سایت -->
       <section class="feature-accordion">
         <div class="feature-accordion-header" role="button">
-          <span class="feature-title" data-i18n="featureTitle13"
+          <span class="feature-title" data-i18n="featureTitle15"
             >امکان تغییر تم رنگی سایت</span
           >
           <span class="feature-icon"
@@ -1290,10 +1292,28 @@
           /></span>
         </div>
         <div class="feature-accordion-body">
-          <p data-i18n-html="featureDesc13">
+          <p data-i18n-html="featureDesc15">
             با گزینه تغییر تم رنگی، می‌توانید ظاهر سایت را متناسب با سلیقه خود
             شخصی‌سازی کنید. تم انتخابی روی بخش‌های مختلف رابط کاربری اعمال می‌شود
             تا تجربه مرور سایت هماهنگ‌تر و دلپذیرتر باشد.
+          </p>
+        </div>
+      </section>
+
+      <!-- 16) پیام‌های مدیریت -->
+      <section class="feature-accordion">
+        <div class="feature-accordion-header" role="button">
+          <span class="feature-title" data-i18n="featureTitle16"
+            >اعلان‌های مدیریت در صفحه اصلی</span
+          >
+          <span class="feature-icon"
+            ><img src="/images/icons8-double-left.apng" alt="toggle"
+          /></span>
+        </div>
+        <div class="feature-accordion-body">
+          <p data-i18n-html="featureDesc16">
+            پیام‌هایی که مدیریت از پنل ادمین منتشر می‌کند، به‌صورت اعلان در صفحه
+            اصلی نمایش داده می‌شوند و کاربر می‌تواند بعد از خواندن، آن‌ها را علامت‌گذاری کند.
           </p>
         </div>
       </section>
