@@ -936,7 +936,6 @@ Body.dark .message-bubble {
   font-weight: 500;
   color: #fff;
   min-height: 32px;
-  padding: 6px 10px;
 }
 
 .message-bubble .button-wrap {
@@ -2243,9 +2242,10 @@ body.dark .chip-separator {
   line-height: 1;
   cursor: pointer;
   user-select: none;
-  padding: 5px 10px;
+  padding: 3px 6px;
   font-size: 12px;
   font-weight: bold;
+  gap: 3px;
 }
 Body.dark .genre-chip {
   background: rgba(var(--theme-accent-rgb), 0.35);
@@ -2303,6 +2303,7 @@ body.dark .genre-chip.active {
 
 /* ===== Year filter + spinner ===== */
 .year-filter {
+  margin: 5px 2px;
   padding: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   direction: ltr;
@@ -2856,10 +2857,6 @@ body.dark .message-bubble {
   transition: background 0.2s;
 }
 
-.msg-close:hover {
-  background: #005bb5;
-}
-
 body.dark .message-bubble {
   background: rgba(40, 40, 40, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -3021,6 +3018,7 @@ body.dark .links-toggle {
 
 /* ===== rating filter styles ===== */
 .rating-filter {
+  margin: 5px 2px;
   padding: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   direction: ltr;
@@ -4673,27 +4671,6 @@ body.dark .msg-bubble.admin {
   word-wrap: break-word;
   overflow-wrap: anywhere;
 }
-
-.msg-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: #666;
-  line-height: 1;
-  justify-content: end;
-}
-.msg-meta span {
-  font-size: 0.7rem;
-}
-body.dark .msg-meta {
-  color: #bbb;
-}
-.msg-meta img {
-  width: 14px;
-  height: 14px;
-}
-
 /* کامپوزر پایین اوورلی */
 .chat-composer {
   display: flex;
@@ -7700,7 +7677,6 @@ html:not([lang="en"]) .coming-soon-heading {
 }
 
 .coming-soon-info-btn span {
-  font-size: 12px;
   font-weight: 700;
 }
 
@@ -7803,6 +7779,7 @@ body.movie-page-body.shared-header-ready .main-header {
 }
 
 .pagination-nav-btn {
+  text-align: center;
   min-width: 116px;
   border: 1px solid rgba(var(--theme-accent-rgb), 0.28);
   border-radius: 999px;
