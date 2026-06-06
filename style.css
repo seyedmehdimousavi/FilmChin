@@ -7609,6 +7609,7 @@ body.dark .movie-page-body::before {
   justify-content: space-between;
   gap: 10px;
   margin: 22px 0 20px;
+  padding: 10px;
 }
 
 html[lang="en"] .coming-soon-heading {
