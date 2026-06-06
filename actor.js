@@ -203,6 +203,7 @@ async function loadActorPage() {
   const actorAvatarFallback = document.getElementById("actorAvatarFallback");
 
   document.documentElement.lang = pageLang;
+  document.documentElement.dir = pageLang === "fa" ? "rtl" : "ltr";
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
     if (key) el.textContent = t(key);

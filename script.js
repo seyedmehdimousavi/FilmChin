@@ -1759,6 +1759,10 @@ document.addEventListener("DOMContentLoaded", () => {
       siteFeaturesTitle: "FilmChiin site features",
       adminPostManagement: "Post Management",
       adminMessages: "Admin Messages",
+      adminMessageSender: "Admin",
+      adminMessageTimeNow: "now",
+      adminMessageMarkRead: "Mark as Read",
+      adminMessageCloseLabel: "close message",
       adminUnpublishedComments: "Unpublished Comments",
       adminLinksInSidemenu: "Links in sidemenu",
       adminSearchReleasedMovies: "Search in released movies",
@@ -1781,20 +1785,26 @@ document.addEventListener("DOMContentLoaded", () => {
       featureDesc5: "Sort visible list by IMDb score and quickly focus on higher-rated titles.",
       featureTitle6: "Sort by release year",
       featureDesc6: "Use release filter to prioritize newer/older titles based on your preference.",
-      featureTitle7: "Episode list for collections/series",
-      featureDesc7: "For collections and series, all episodes are shown in small cards in the same post and selecting an episode updates card info instantly.",
-      featureTitle8: "One-click file access",
-      featureDesc8: "With <strong>Go to file</strong>, <code>@Filmchinbot</code> sends movie/episode file directly without needing channel join.",
-      featureTitle9: "Comments in each post",
-      featureDesc9: "Each post supports comments with custom UI and avatars; comment count is shown near the comment icon.",
-      featureTitle10: "Popular movies and page list",
-      featureDesc10: "Popular section is built from click stats and the floating panel lists current-page posts for quick navigation.",
-      featureTitle11: "Responsive Liquid Glass design",
-      featureDesc11: "Parts of UI use a Liquid Glass-inspired design with smooth animations and balanced transparency on mobile/desktop.",
-      featureTitle12: "Site language switch",
-      featureDesc12: "From language settings, you can switch the UI between Persian and English. Core texts, headings, and feature descriptions update consistently based on your selected language.",
-      featureTitle13: "Site color theme switch",
-      featureDesc13: "With the color theme option, you can personalize the site look to match your taste. Your selected theme is applied across UI sections for a more consistent and pleasant browsing experience.",
+      featureTitle7: "Live movie count",
+      featureDesc7: "At the top of the homepage, the visible movie count updates immediately when search, genres, tabs, IMDb filters, or release filters change.",
+      featureTitle8: "Episode list for collections/series",
+      featureDesc8: "For collections and series, all episodes are shown in small cards in the same post and selecting an episode updates card info instantly.",
+      featureTitle9: "One-click file access",
+      featureDesc9: "With <strong>Go to file</strong>, <code>@Filmchinbot</code> sends the movie or episode file directly without needing channel join.",
+      featureTitle10: "Comments in each post",
+      featureDesc10: "Each post supports comments with custom UI and avatars; comment count is shown near the comment icon.",
+      featureTitle11: "Popular movies and page list",
+      featureDesc11: "Popular section is built from click stats and the floating panel lists current-page posts for quick navigation.",
+      featureTitle12: "Copy or share movie links",
+      featureDesc12: "Each post includes copy and share buttons for its dedicated movie page link, so you can open the post details and continue to the file from there.",
+      featureTitle13: "Responsive Liquid Glass design",
+      featureDesc13: "Parts of UI use a Liquid Glass-inspired design with smooth animations and balanced transparency on mobile/desktop.",
+      featureTitle14: "Site language switch",
+      featureDesc14: "From language settings, you can switch the UI between Persian and English. Core texts, headings, and feature descriptions update consistently based on your selected language.",
+      featureTitle15: "Site color theme switch",
+      featureDesc15: "With the color theme option, you can personalize the site look to match your taste. Your selected theme is applied across UI sections for a more consistent and pleasant browsing experience.",
+      featureTitle16: "Admin announcements on homepage",
+      featureDesc16: "Messages published from the admin panel appear as announcements on the homepage, and users can mark them as read after viewing them.",
       similarByActorsTitle: "Other movies with similar cast",
       bySameDirectorTitle: "Other movies by this director",
       noSimilarActors: "No similar-cast movies found.",
@@ -1873,6 +1883,10 @@ document.addEventListener("DOMContentLoaded", () => {
       siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
       adminPostManagement: "مدیریت پست‌ها",
       adminMessages: "پیام مدیریت",
+      adminMessageSender: "مدیریت",
+      adminMessageTimeNow: "اکنون",
+      adminMessageMarkRead: "خواندم",
+      adminMessageCloseLabel: "بستن پیام",
       adminUnpublishedComments: "کامنت‌های منتشرنشده",
       adminLinksInSidemenu: "لینک‌های ساید منو",
       adminSearchReleasedMovies: "جستجو در فیلم‌های منتشر شده",
@@ -1895,20 +1909,26 @@ document.addEventListener("DOMContentLoaded", () => {
       featureDesc5: "لیست قابل مشاهده را می‌توانید بر اساس امتیاز IMDb مرتب کنید تا سریع‌تر به عناوین با امتیاز بالاتر برسید.",
       featureTitle6: "مرتب‌سازی بر اساس سال انتشار",
       featureDesc6: "با فیلتر سال انتشار می‌توانید عناوین جدیدتر یا قدیمی‌تر را بر اساس نیاز خود ببینید.",
-      featureTitle7: "لیست قسمت‌های سریال وکالکشن",
-      featureDesc7: "برای سریال‌ها و کالکشن‌ها، تمام قسمت‌ها در قالب کارت‌های کوچک داخل همان پست نمایش داده می‌شوند و با انتخاب هر قسمت اطلاعات کارت فوراً آپدیت می‌شود.",
-      featureTitle8: "دسترسی به فایل فقط با یک کلیک",
-      featureDesc8: "با فشردن دکمه <strong>Go to file</strong> بات <code>@Filmchinbot</code> فایل فیلم یا قسمت سریال را برای شما ارسال می‌کند؛ بدون نیاز به جوین شدن در کانال.",
-      featureTitle9: "کامنت و نمایش گفت‌وگو در همان پست",
-      featureDesc9: "برای هر پست می‌توانید کامنت بگذارید و همه نظرات در همان کارت فیلم با طراحی اختصاصی و آواتارها نمایش داده می‌شوند.",
-      featureTitle10: "فیلم‌های پرطرفدارولیست فیلم‌های صفحه",
-      featureDesc10: "بخش فیلم‌های پرطرفدار بر اساس آمار کلیک‌ها ساخته می‌شود و دکمه شناور لیست فیلم‌های صفحه فعلی را نشان می‌دهد.",
-      featureTitle11: "طراحی Liquid Glass واکنش‌گرا",
-      featureDesc11: "بخش هایی از سایت با الهام از طراحی Liquid Glass ساخته شده است؛ کارت‌ها، دکمه‌ها و پنل‌ها تجربه کاربری روان و چشم‌نواز ایجاد می‌کنند.",
-      featureTitle12: "امکان تغییر زبان سایت",
-      featureDesc12: "در بخش تنظیمات زبان می‌توانید رابط کاربری سایت را بین فارسی و انگلیسی جابه‌جا کنید. تمام متن‌های اصلی، عنوان‌ها و توضیحات امکانات بر اساس زبان انتخابی شما به‌صورت یکپارچه تغییر می‌کنند.",
-      featureTitle13: "امکان تغییر تم رنگی سایت",
-      featureDesc13: "با گزینه تغییر تم رنگی، می‌توانید ظاهر سایت را متناسب با سلیقه خود شخصی‌سازی کنید. تم انتخابی روی بخش‌های مختلف رابط کاربری اعمال می‌شود تا تجربه مرور سایت هماهنگ‌تر و دلپذیرتر باشد.",
+      featureTitle7: "آمار دقیق تعداد فیلم‌ها در هر لحظه",
+      featureDesc7: "در بالای صفحه اصلی، تعداد فیلم‌های در حال نمایش با توجه به فیلترها و جست‌وجوی فعلی نمایش داده می‌شود و بعد از هر تغییر به‌صورت لحظه‌ای به‌روزرسانی می‌شود.",
+      featureTitle8: "لیست قسمت‌های سریال وکالکشن",
+      featureDesc8: "برای سریال‌ها و کالکشن‌ها، تمام قسمت‌ها در قالب کارت‌های کوچک داخل همان پست نمایش داده می‌شوند و با انتخاب هر قسمت اطلاعات کارت فوراً آپدیت می‌شود.",
+      featureTitle9: "دسترسی به فایل فقط با یک کلیک",
+      featureDesc9: "با فشردن دکمه <strong>Go to file</strong> بات <code>@Filmchinbot</code> فایل فیلم یا قسمت سریال را برای شما ارسال می‌کند؛ بدون نیاز به جوین شدن در کانال.",
+      featureTitle10: "کامنت و نمایش گفت‌وگو در همان پست",
+      featureDesc10: "برای هر پست می‌توانید کامنت بگذارید و همه نظرات در همان کارت فیلم با طراحی اختصاصی و آواتارها نمایش داده می‌شوند.",
+      featureTitle11: "فیلم‌های پرطرفدارولیست فیلم‌های صفحه",
+      featureDesc11: "بخش فیلم‌های پرطرفدار بر اساس آمار کلیک‌ها ساخته می‌شود و دکمه شناور لیست فیلم‌های صفحه فعلی را نشان می‌دهد.",
+      featureTitle12: "کپی یا اشتراک لینک هر فیلم",
+      featureDesc12: "برای هر پست، دکمه‌هایی برای کپی و اشتراک لینک صفحه اختصاصی فیلم وجود دارد تا بتوانید اطلاعات پست را باز کنید و از همان‌جا به فایل بروید.",
+      featureTitle13: "طراحی Liquid Glass واکنش‌گرا",
+      featureDesc13: "بخش هایی از سایت با الهام از طراحی Liquid Glass ساخته شده است؛ کارت‌ها، دکمه‌ها و پنل‌ها تجربه کاربری روان و چشم‌نواز ایجاد می‌کنند.",
+      featureTitle14: "امکان تغییر زبان سایت",
+      featureDesc14: "در بخش تنظیمات زبان می‌توانید رابط کاربری سایت را بین فارسی و انگلیسی جابه‌جا کنید. تمام متن‌های اصلی، عنوان‌ها و توضیحات امکانات بر اساس زبان انتخابی شما به‌صورت یکپارچه تغییر می‌کنند.",
+      featureTitle15: "امکان تغییر تم رنگی سایت",
+      featureDesc15: "با گزینه تغییر تم رنگی، می‌توانید ظاهر سایت را متناسب با سلیقه خود شخصی‌سازی کنید. تم انتخابی روی بخش‌های مختلف رابط کاربری اعمال می‌شود تا تجربه مرور سایت هماهنگ‌تر و دلپذیرتر باشد.",
+      featureTitle16: "اعلان‌های مدیریت در صفحه اصلی",
+      featureDesc16: "پیام‌هایی که مدیریت از پنل ادمین منتشر می‌کند، به‌صورت اعلان در صفحه اصلی نمایش داده می‌شوند و کاربر می‌تواند بعد از خواندن، آن‌ها را علامت‌گذاری کند.",
       similarByActorsTitle: "فیلم‌های دیگر با بازیگران مشابه",
       bySameDirectorTitle: "فیلم‌های دیگر این کارگردان",
       noSimilarActors: "فیلم مشابه بر اساس بازیگران پیدا نشد.",
@@ -1921,6 +1941,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextLang = lang === "fa" ? "fa" : "en";
     localStorage.setItem("siteLanguage", nextLang);
     document.documentElement.lang = nextLang;
+    document.documentElement.dir = nextLang === "fa" ? "rtl" : "ltr";
 
     document.querySelectorAll("[data-i18n]").forEach((el) => {
       const key = el.getAttribute("data-i18n");
@@ -1972,6 +1993,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof updateComingSoonLanguageText === "function") {
       updateComingSoonLanguageText();
     }
+
+    window.dispatchEvent(new CustomEvent("filmchin:languagechange", { detail: { lang: nextLang } }));
 
     if (
       window.__filmchinTabsReady === true &&
@@ -3404,13 +3427,13 @@ document.addEventListener("DOMContentLoaded", () => {
           <img class="msg-icon" src="/images/icons8-message.apng" alt="msg-icon">
         </div>
         <div class="msg-meta">
-          <span class="msg-title">Admin</span>
-          <span class="msg-time">now</span>
+          <span class="msg-title">${escapeHtml(uiText("adminMessageSender"))}</span>
+          <span class="msg-time">${escapeHtml(uiText("adminMessageTimeNow"))}</span>
         </div>
       </div>
       <div class="msg-body">${escapeHtml(m.text)}</div>
       <div class="button-wrap">
-      <button class="msg-close" aria-label="close message"><span>Mark as Read</span></button><div class="button-shadow"></div></div>
+      <button class="msg-close" aria-label="${escapeHtml(uiText("adminMessageCloseLabel"))}"><span>${escapeHtml(uiText("adminMessageMarkRead"))}</span></button><div class="button-shadow"></div></div>
     `;
       div.querySelector(".msg-close").addEventListener("click", () => {
         markMessageAsRead(m.id); // 👈 ذخیره در localStorage
@@ -3419,6 +3442,8 @@ document.addEventListener("DOMContentLoaded", () => {
       adminMessagesContainer.appendChild(div);
     });
   }
+  window.addEventListener("filmchin:languagechange", () => renderMessages());
+
   // Genre grid
   function buildGenreGrid() {
     if (!genreGrid) return;
