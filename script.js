@@ -1704,6 +1704,8 @@ document.addEventListener("DOMContentLoaded", () => {
       backToTopButton: "Back to Top Button",
       floatingSummaryPanel: "Floating Summary Panel",
       collapsePosts: "Collapse posts",
+      expandPost: "Expand",
+      collapsePost: "Collapse",
       links: "Links",
       sortByMenu: "Sort by...",
       sortByImdb: "Sort by IMDb rating",
@@ -1828,6 +1830,8 @@ document.addEventListener("DOMContentLoaded", () => {
       backToTopButton: "دکمه بازگشت به بالا",
       floatingSummaryPanel: "پنل شناور خلاصه",
       collapsePosts: "جمع‌کردن پست‌ها",
+      expandPost: "بزرگ‌نمایی",
+      collapsePost: "کوچک‌نمایی",
       links: "لینک‌ها",
       sortByMenu: "مرتب‌سازی بر اساس...",
       sortByImdb: "مرتب‌سازی بر اساس امتیاز IMDb",
@@ -4673,13 +4677,14 @@ function setTabInUrl(type) {
 </div>
 
 <div class="post-collapse-bar" role="button" tabindex="0" aria-expanded="false" aria-label="Expand post details">
-  <img class="collapse-arrow" src="/images/icons8-double-left.apng" alt="toggle post" />
+  <span class="collapse-label">${uiText("expandPost")}</span>
 </div>
 `;
 
     moviesGrid.appendChild(card);
 
     const collapseBar = card.querySelector(".post-collapse-bar");
+    const collapseLabel = card.querySelector(".collapse-label");
     const goBtnLabel = card.querySelector(".go-btn span");
 
     const syncCollapseUi = () => {
@@ -4691,6 +4696,12 @@ function setTabInUrl(type) {
       if (goBtnLabel) {
         goBtnLabel.textContent =
           uiText("goToFile");
+      }
+
+      if (collapseLabel) {
+        collapseLabel.textContent = isExpanded
+          ? uiText("collapsePost")
+          : uiText("expandPost");
       }
 
       if (collapseBar) {
@@ -4783,9 +4794,73 @@ function setTabInUrl(type) {
       const toggleCollapseState = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        const isExpanded = card.classList.toggle("post-expanded");
+
+        const isCurrentlyExpanded = card.classList.contains("post-expanded");
+
+        if (!isCurrentlyExpanded) {
+          // ===== بزرگ‌نمایی: کارت expand می‌شه =====
+          // مرحله ۱: ضبط موقعیت فعلی عناصر (FLIP - First)
+          const coverEl = card.querySelector(".cover-container");
+          const titleEl = card.querySelector(".movie-title");
+          const barEl = collapseBar;
+
+          const coverRect = coverEl ? coverEl.getBoundingClientRect() : null;
+          const titleRect = titleEl ? titleEl.getBoundingClientRect() : null;
+          const barRect = barEl ? barEl.getBoundingClientRect() : null;
+
+          // مرحله ۲: اضافه کردن کلاس expanding برای انیمیشن
+          card.classList.add("post-expanding");
+          card.classList.add("post-expanded");
+          card.classList.remove("post-expanding");
+
+          // مرحله ۳: عناصر جدید رو با delay ظاهر کن
+          const movieInfo = card.querySelector(".movie-info");
+          if (movieInfo) {
+            const children = Array.from(movieInfo.children);
+            children.forEach((child, i) => {
+              if (child.classList.contains("movie-title")) return; // عنوان قبلاً بوده
+              child.style.opacity = "0";
+              child.style.transform = "translateY(12px)";
+              child.style.transition = "none";
+              setTimeout(() => {
+                child.style.transition = `opacity 220ms ease ${60 + i * 45}ms, transform 220ms ease ${60 + i * 45}ms`;
+                child.style.opacity = "";
+                child.style.transform = "";
+              }, 20);
+            });
+          }
+
+        } else {
+          // ===== کوچک‌نمایی: کارت collapse می‌شه =====
+          const movieInfo = card.querySelector(".movie-info");
+          if (movieInfo) {
+            const children = Array.from(movieInfo.children).reverse();
+            children.forEach((child, i) => {
+              if (child.classList.contains("movie-title")) return;
+              child.style.transition = `opacity 150ms ease ${i * 30}ms, transform 150ms ease ${i * 30}ms`;
+              child.style.opacity = "0";
+              child.style.transform = "translateY(8px)";
+            });
+          }
+
+          const delay = movieInfo ? Math.min(movieInfo.children.length * 30 + 150, 400) : 0;
+          setTimeout(() => {
+            // پاک کردن inline styles
+            if (movieInfo) {
+              Array.from(movieInfo.children).forEach((child) => {
+                child.style.opacity = "";
+                child.style.transform = "";
+                child.style.transition = "";
+              });
+            }
+            card.classList.remove("post-expanded");
+            syncCollapseUi();
+          }, delay);
+          return; // syncCollapseUi بعد از timeout صدا زده میشه
+        }
+
         if (collapseBar) {
-          collapseBar.setAttribute("aria-expanded", String(isExpanded));
+          collapseBar.setAttribute("aria-expanded", String(!isCurrentlyExpanded));
         }
         syncCollapseUi();
       };

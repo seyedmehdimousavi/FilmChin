@@ -630,9 +630,12 @@ Body.dark .avatar {
   background: var(--accent-soft-bg);
   color: var(--theme-accent-dark);
   cursor: pointer;
-  min-height: 24px;
+  min-height: 28px;
   align-items: center;
   justify-content: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
 }
 body.dark .post-collapse-bar {
   background: rgba(255, 255, 255, 0.08);
@@ -647,33 +650,50 @@ body.dark .post-collapse-bar {
   transition: transform 300ms ease;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) {
+/* ===================== حالت Collapse — طرح favorite-item ===================== */
+
+/* گرید اصلی که همه کارت‌های کوچک توش میان */
+body.posts-collapsed-mode #moviesGrid,
+body.posts-collapsed-mode .movies-grid {
   display: grid;
-  grid-template-columns: 74px 1fr auto;
-  grid-template-rows: minmax(94px, auto) 26px;
-  align-items: center;
-  gap: 0 10px;
-  padding: 8px 10px 0;
-  border-radius: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  align-items: start;
 }
 
+/* کارت کوچک‌شده: مثل favorite-item — flex عمودی */
+body.posts-collapsed-mode .movie-card.post-collapsible:not(.post-expanded) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 5px;
+  border-radius: 14px;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* cover تمام عرض، نسبت پوستر */
 body.posts-collapsed-mode
   .movie-card.post-collapsible:not(.post-expanded)
   .cover-container {
-  grid-column: 1;
-  grid-row: 1;
-  width: 64px;
-  height: 86px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 9 / 15;
   border-radius: 10px;
   overflow: hidden;
-  transition: all 260ms ease;
-  justify-self: start;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 420ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.posts-collapsed-mode
   .movie-card.post-collapsible:not(.post-expanded)
   .cover-blur {
-  filter: blur(8px);
+  filter: blur(10px);
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  inset: 0;
 }
 
 body.posts-collapsed-mode
@@ -681,20 +701,21 @@ body.posts-collapsed-mode
   .cover-image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   padding: 0;
+  border-radius: 10px;
+  position: relative;
+  z-index: 1;
 }
 
+/* تمام محتوای movie-info مخفی */
 body.posts-collapsed-mode
   .movie-card.post-collapsible:not(.post-expanded)
   .movie-info {
-  grid-column: 2 / 4;
-  grid-row: 1;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 6px 10px;
-  padding: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 5px 5px 0;
+  gap: 0;
 }
 
 body.posts-collapsed-mode
@@ -704,22 +725,14 @@ body.posts-collapsed-mode
   display: none !important;
 }
 
-body.posts-collapsed-mode
-  .movie-card.post-collapsible:not(.post-expanded)
-  .movie-title,
-body.posts-collapsed-mode
-  .movie-card.post-collapsible:not(.post-expanded)
-  .movie-info
-  > .button-wrap {
-  display: block !important;
-}
-
+/* فقط عنوان نمایش داده بشه */
 body.posts-collapsed-mode
   .movie-card.post-collapsible:not(.post-expanded)
   .movie-title {
+  display: block !important;
   margin: 0;
-  font-size: 1rem;
-  grid-column: 1;
+  padding: 0;
+  transition: all 420ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.posts-collapsed-mode
@@ -728,38 +741,28 @@ body.posts-collapsed-mode
   display: none !important;
 }
 
+/* اسم فیلم — opacity مجبور به ۱ برای override کردن anim classes */
 body.posts-collapsed-mode
   .movie-card.post-collapsible:not(.post-expanded)
   .movie-name {
-  display: -webkit-box;
+  display: -webkit-box !important;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.35;
+  line-height: 1.3;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  color: inherit !important;
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: none;
+  transition: all 420ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-body.posts-collapsed-mode
-  .movie-card.post-collapsible:not(.post-expanded)
-  .movie-info
-  > .button-wrap {
-  margin: 0;
-  grid-column: 2;
-  align-self: center;
-}
-
-body.posts-collapsed-mode
-  .movie-card.post-collapsible:not(.post-expanded)
-  .movie-info
-  > .button-wrap
-  .go-btn {
-  margin: 0;
-  width: auto;
-  min-width: 60px;
-  font-size: 13px;
-  padding: 5px 8px;
-}
-
+/* collapse-bar در پایین کارت */
 body.posts-collapsed-mode .movie-card.post-collapsible .post-collapse-bar {
   display: flex;
   width: 100%;
@@ -768,35 +771,54 @@ body.posts-collapsed-mode .movie-card.post-collapsible .post-collapse-bar {
 body.posts-collapsed-mode
   .movie-card.post-collapsible:not(.post-expanded)
   .post-collapse-bar {
-  grid-column: 1 / 4;
-  grid-row: 2;
-  width: calc(100% + 20px);
-  margin: 8px -10px 0;
-  border-radius: 0 0 14px 14px;
+  width: 100%;
+  margin: 4px 0 0;
+  border-radius: 0 0 10px 10px;
+  border-top: none;
+  min-height: 26px;
+  transition: all 420ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* حالت باز‌شده: collapse-bar در پایین */
 body.posts-collapsed-mode
   .movie-card.post-collapsible.post-expanded
   .post-collapse-bar {
   margin-top: 0;
 }
 
-body.posts-collapsed-mode .movie-card.post-collapsible,
-body.posts-collapsed-mode .movie-card.post-collapsible .cover-container,
-body.posts-collapsed-mode .movie-card.post-collapsible .movie-info,
-body.posts-collapsed-mode .movie-card.post-collapsible .movie-title,
-body.posts-collapsed-mode
-  .movie-card.post-collapsible
-  .movie-info
-  > .button-wrap
-  .go-btn {
-  transition: all 280ms ease;
+/* انیمیشن عمومی کارت */
+body.posts-collapsed-mode .movie-card.post-collapsible {
+  transition: all 420ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* وقتی پست باز است → کارت کامل عرض */
+body.posts-collapsed-mode .movie-card.post-collapsible.post-expanded {
+  grid-column: 1 / -1;
+  transition: grid-column 0ms, all 420ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* متن دکمه collapse */
+.collapse-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding: 0 4px;
+  pointer-events: none;
+}
+
+/* override anim classes برای کارت‌های collapsed که باید اسم‌شون دیده بشه */
 body.posts-collapsed-mode
-  .movie-card.post-collapsible.post-expanded
-  .collapse-arrow {
-  transform: rotate(90deg);
+  .movie-card.post-collapsible:not(.post-expanded)
+  .anim-horizontal,
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .anim-left-right,
+body.posts-collapsed-mode
+  .movie-card.post-collapsible:not(.post-expanded)
+  .anim-vertical {
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
 }
 .comments-panel-inner {
   width: 100%;
