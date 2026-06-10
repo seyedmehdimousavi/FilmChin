@@ -375,7 +375,21 @@ function setButtonLoading(btn, text) {
   if (!btn) return;
   btn.dataset.originalText = btn.innerHTML;
   btn.classList.add("btn-loading");
-  btn.innerHTML = `<span class="spinner"></span>${text}`;
+  btn.textContent = "";
+
+  const content = document.createElement("span");
+  content.className = "button-loading-content";
+
+  const spinner = document.createElement("span");
+  spinner.className = "spinner";
+  spinner.setAttribute("aria-hidden", "true");
+
+  const label = document.createElement("span");
+  label.className = "button-loading-text";
+  label.textContent = text;
+
+  content.append(spinner, label);
+  btn.appendChild(content);
   btn.disabled = true;
 }
 function clearButtonLoading(btn) {
@@ -383,6 +397,21 @@ function clearButtonLoading(btn) {
   btn.classList.remove("btn-loading");
   btn.innerHTML = btn.dataset.originalText || "Submit";
   btn.disabled = false;
+}
+
+function setButtonContent(btn, html) {
+  if (!btn) return;
+  btn.innerHTML = html;
+  btn.dataset.originalText = html;
+}
+
+function setSignupButtonState(state) {
+  if (!signupNextBtn) return;
+  const states = {
+    next: `<span class="signup-action-content signup-action-next"><img src="/images/icons8-next.apng" alt="next" class="signup-action-icon" /></span>`,
+    complete: `<span class="signup-action-content">${uiText("completeSignup")}</span>`,
+  };
+  setButtonContent(signupNextBtn, states[state] || states.next);
 }
 
 // -------------------- User Auth --------------------
@@ -427,6 +456,7 @@ const signupForm = document.getElementById("signupForm");
 const signupStep1 = document.getElementById("signupStep1");
 const signupStep2 = document.getElementById("signupStep2");
 const signupNextBtn = document.getElementById("signupNextBtn");
+setSignupButtonState("next");
 
 let signupStage = 1;
 let pendingUserId = null;
@@ -448,7 +478,7 @@ signupNextBtn?.addEventListener("click", async (e) => {
       return;
     }
 
-    setButtonLoading(signupNextBtn, "در حال ثبت‌نام...");
+    setButtonLoading(signupNextBtn, uiText("signupLoading"));
 
     try {
       // 🔹 چک بلاک بودن قبل از ثبت‌نام
@@ -498,7 +528,7 @@ signupNextBtn?.addEventListener("click", async (e) => {
       requestAnimationFrame(() => signupStep2.classList.add("active-step"));
 
       signupStage = 2;
-      signupNextBtn.innerHTML = "تکمیل ثبت‌نام";
+      setSignupButtonState("complete");
       showToast("اکنون تصویر پروفایل خود را انتخاب کنید ✅", "success");
     } catch (err) {
       console.error("signup step1 error:", err);
@@ -513,7 +543,7 @@ signupNextBtn?.addEventListener("click", async (e) => {
       return;
     }
 
-    setButtonLoading(signupNextBtn, "در حال آپلود...");
+    setButtonLoading(signupNextBtn, uiText("uploadLoading"));
 
     try {
       // بررسی session معتبر
@@ -587,7 +617,7 @@ signupNextBtn?.addEventListener("click", async (e) => {
         signupStep2.style.display = "none";
         signupStep1.classList.add("active-step");
         signupStep2.classList.remove("active-step");
-        signupNextBtn.innerHTML = `<img src="/images/nextsignup.png" alt="Next" style="height:22px;vertical-align:middle;">`;
+        setSignupButtonState("next");
       });
     }
   }
@@ -597,7 +627,7 @@ signupNextBtn?.addEventListener("click", async (e) => {
 document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const btn = e.currentTarget.querySelector("button[type='submit']");
-  setButtonLoading(btn, "در حال ورود...");
+  setButtonLoading(btn, uiText("loginLoading"));
 
   try {
     const email = loginUsername.value.trim();
@@ -681,6 +711,35 @@ function setUserProfile(avatarUrl) {
 }
 
 // کلیک روی پروفایل
+function positionProfileMenu() {
+  if (!profileMenu || !profileBtn) return;
+  const rect = profileBtn.getBoundingClientRect();
+  const gap = 8;
+  const menuWidth = Math.min(280, window.innerWidth - 24);
+  const left = Math.max(12, Math.min(window.innerWidth - menuWidth - 12, rect.right - menuWidth));
+  profileMenu.style.width = `${menuWidth}px`;
+  profileMenu.style.left = `${left}px`;
+  profileMenu.style.right = "auto";
+  profileMenu.style.top = `${Math.min(window.innerHeight - 20, rect.bottom + gap)}px`;
+}
+
+function showProfileMenu() {
+  if (!profileMenu) return;
+  positionProfileMenu();
+  profileMenu.classList.remove("hidden");
+  document.body.classList.add("profile-menu-open");
+}
+
+function hideProfileMenu() {
+  profileMenu?.classList.add("hidden");
+  document.body.classList.remove("profile-menu-open");
+}
+
+function toggleProfileMenu() {
+  if (!profileMenu || profileMenu.classList.contains("hidden")) showProfileMenu();
+  else hideProfileMenu();
+}
+
 profileBtn?.addEventListener("click", async (e) => {
   e.preventDefault();
   e.stopPropagation();
@@ -694,16 +753,17 @@ profileBtn?.addEventListener("click", async (e) => {
 
   if (isAdminRole) {
     if (window.location.pathname.includes("admin.html")) {
-      // ادمین داخل پنل → فقط حباب باز بشه
-      profileMenu.classList.toggle("hidden");
+      toggleProfileMenu();
     } else {
-      // ادمین داخل سایت → بره به پنل
       window.location.href = "admin.html";
     }
   } else {
-    // کاربر عادی → همیشه حباب باز بشه
-    profileMenu.classList.toggle("hidden");
+    toggleProfileMenu();
   }
+});
+
+window.addEventListener("resize", () => {
+  if (profileMenu && !profileMenu.classList.contains("hidden")) positionProfileMenu();
 });
 
 // خروج از حساب
@@ -718,7 +778,7 @@ async function doLogoutAndRefresh() {
   } finally {
     currentUser = null;
     setUserProfile(null);
-    profileMenu?.classList.add("hidden");
+    hideProfileMenu();
 
     // ✅ پاک کردن favorites در خروج
     favoriteMovieIds = new Set();
@@ -749,9 +809,11 @@ window.addEventListener("click", (e) => {
   if (
     profileMenu &&
     !profileMenu.classList.contains("hidden") &&
-    !profileBtn.contains(e.target)
-  )
-    profileMenu.classList.add("hidden");
+    !profileBtn?.contains(e.target) &&
+    !profileMenu.contains(e.target)
+  ) {
+    hideProfileMenu();
+  }
 });
 // -------------------- Utilities --------------------
 function escapeHtml(str) {
@@ -1523,7 +1585,8 @@ var languageMap = {};
 
 function uiText(key) {
   const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
-  return languageMap[lang]?.[key] || languageMap.en?.[key] || key;
+  const maps = typeof languageMap === "object" && languageMap ? languageMap : {};
+  return maps[lang]?.[key] || maps.en?.[key] || key;
 }
 
 // -------------------- Comments --------------------
@@ -1669,6 +1732,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const sideMenu = document.getElementById("sideMenu");
   const menuOverlay = document.getElementById("menuOverlay");
 
+  document.querySelectorAll(".mobile-bottom-dock .dock-item-wrap").forEach((wrap) => {
+    wrap.addEventListener("click", (e) => {
+      if (e.target.closest(".dock-btn")) return;
+      const btn = wrap.querySelector(".dock-btn");
+      btn?.click();
+    });
+  });
+
   const menuUsername = document.getElementById("menuUsername");
   const menuUserId = document.getElementById("menuUserId");
 
@@ -1690,6 +1761,15 @@ document.addEventListener("DOMContentLoaded", () => {
       languageLabel: "Language / زبان",
       themePaletteTitle: "Site color theme",
       searchPlaceholder: "Search...",
+      login: "Login",
+      signUp: "Sign Up",
+      gmailOrUsername: "Gmail or Username",
+      password: "Password",
+      gmail: "Gmail",
+      maxAvatarSize: "Maximum image size: 500KB",
+      signupLoading: "Signing up...",
+      uploadLoading: "Uploading...",
+      loginLoading: "Logging in...",
       favoriteMovies: "Favorite movies",
       logout: "Logout",
       tabAll: "All",
@@ -1773,6 +1853,26 @@ document.addEventListener("DOMContentLoaded", () => {
       adminSearchReleasedMovies: "Search in released movies",
       adminReleasedMovies: "Released Movies",
       adminUsersAdmins: "Users & Admins",
+      adminPanel: "Admin Panel",
+      adminsList: "Admins List",
+      usersList: "Users List",
+      searchActorsPlaceholder: "Search actors...",
+      actors: "Actors",
+      searchActorsTitle: "Search actors",
+      dailyVisits: "Daily visits",
+      topSearches: "Top searches",
+      topClicks: "Top clicks",
+      avatar: "Avatar",
+      username: "Username",
+      email: "Email",
+      role: "Role",
+      joinedAt: "Joined",
+      actions: "Actions",
+      block: "Block",
+      promote: "Promote",
+      demote: "Demote",
+      choosePhoto: "Choose photo",
+      completeSignup: "Complete sign up",
       adminSearchMoviesPlaceholder: "Search movies...",
       seoIntroTitle: "Download top movies and series with FilmChiin",
       seoIntroP1: "FilmChiin is a personal archive of top movies and series (Persian dub and uncensored) delivered securely via Telegram bot.",
@@ -1819,6 +1919,15 @@ document.addEventListener("DOMContentLoaded", () => {
       languageLabel: "زبان / Language",
       themePaletteTitle: "قالب رنگی سایت",
       searchPlaceholder: "جستجو...",
+      login: "ورود",
+      signUp: "ثبت‌نام",
+      gmailOrUsername: "جیمیل یا نام کاربری",
+      password: "رمز عبور",
+      gmail: "جیمیل",
+      maxAvatarSize: "حداکثر حجم عکس: 500KB",
+      signupLoading: "در حال ثبت‌نام...",
+      uploadLoading: "در حال آپلود...",
+      loginLoading: "در حال ورود...",
       favoriteMovies: "فیلم‌های مورد علاقه",
       logout: "خروج",
       tabAll: "همه",
@@ -1902,6 +2011,26 @@ document.addEventListener("DOMContentLoaded", () => {
       adminSearchReleasedMovies: "جستجو در فیلم‌های منتشر شده",
       adminReleasedMovies: "فیلم‌های منتشر شده",
       adminUsersAdmins: "کاربران و ادمین‌ها",
+      adminPanel: "پنل ادمین",
+      adminsList: "لیست ادمین‌ها",
+      usersList: "لیست کاربران",
+      searchActorsPlaceholder: "جستجوی بازیگرها...",
+      actors: "بازیگرها",
+      searchActorsTitle: "جستجو در بازیگرها",
+      dailyVisits: "بازدیدهای روزانه",
+      topSearches: "جستجوهای برتر",
+      topClicks: "کلیک‌های برتر",
+      avatar: "کاور",
+      username: "نام کاربری",
+      email: "ایمیل",
+      role: "سمت",
+      joinedAt: "تاریخ عضویت",
+      actions: "عملیات",
+      block: "بلاک",
+      promote: "ارتقا",
+      demote: "تنزل",
+      choosePhoto: "انتخاب عکس",
+      completeSignup: "تکمیل ثبت‌نام",
       adminSearchMoviesPlaceholder: "جستجوی فیلم...",
       seoIntroTitle: "دانلود فیلم و سریال های برتر با FilmChiin",
       seoIntroP1: "FilmChiin (فیلمچین) یک آرشیو شخصی از فیلم‌ها و سریال‌های برتر(دوبله فارسی و بدون سانسور)است که فایل‌ها به‌صورت امن از طریق ربات تلگرام ارائه می‌شود.",
@@ -2002,6 +2131,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (typeof updateComingSoonLanguageText === "function") {
       updateComingSoonLanguageText();
+    }
+
+    if (signupNextBtn && !signupNextBtn.classList.contains("btn-loading")) {
+      setSignupButtonState(signupStage === 2 ? "complete" : "next");
     }
 
     window.dispatchEvent(new CustomEvent("filmchin:languagechange", { detail: { lang: nextLang } }));
@@ -2988,7 +3121,7 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     e.stopPropagation();
     // بستن حباب پروفایل
-    profileMenu?.classList.add("hidden");
+    hideProfileMenu();
     openFavoritesOverlayUI();
   });
 
@@ -3698,8 +3831,11 @@ renderPagedMovies(true);
 
     bottomSearchBtn?.addEventListener("click", (e) => {
       e.preventDefault();
-      searchInput.scrollIntoView({ behavior: "smooth", block: "center" });
-      searchInput.focus();
+      try {
+        searchInput.focus({ preventScroll: true });
+      } catch {
+        searchInput.focus();
+      }
       searchInput.click();
     });
   }
@@ -5909,7 +6045,6 @@ async function initSupportSheet() {
         </div>
       `;
 
-      bubble.addEventListener("click", copyFn);
       bubble.querySelector(".support-copy-btn")?.addEventListener("click", (e) => {
         e.stopPropagation();
         copyFn();
@@ -6793,12 +6928,12 @@ function openMovieModal(m, startIdx = 0) {
     <table class="users-table">
       <thead>
         <tr>
-          <th>کاور</th>
-          <th>نام کاربری</th>
-          <th>ایمیل</th>
-          <th>سمت</th>
-          <th>تاریخ عضویت</th>
-          <th>عملیات</th>
+          <th>${uiText("avatar")}</th>
+          <th>${uiText("username")}</th>
+          <th>${uiText("email")}</th>
+          <th>${uiText("role")}</th>
+          <th>${uiText("joinedAt")}</th>
+          <th>${uiText("actions")}</th>
         </tr>
       </thead>
       <tbody id="usersTableBody"></tbody>
@@ -6823,8 +6958,8 @@ function openMovieModal(m, startIdx = 0) {
       <td>
         ${
           currentUser.role === "owner"
-            ? `<div class="button-wrap"><button class="btn-danger" onclick="blockUser('${u.id}','${u.email}','${u.username}')"><span>Block</span></button><div class="button-shadow"></div></div>
-               <div class="button-wrap"><button class="btn-primary" onclick="promoteToAdmin('${u.id}')"><span>Promote</span></button><div class="button-shadow"></div></div>`
+            ? `<div class="button-wrap"><button class="btn-danger" onclick="blockUser('${u.id}','${u.email}','${u.username}')"><span>${uiText("block")}</span></button><div class="button-shadow"></div></div>
+               <div class="button-wrap"><button class="btn-primary" onclick="promoteToAdmin('${u.id}')"><span>${uiText("promote")}</span></button><div class="button-shadow"></div></div>`
             : ""
         }
       </td>
@@ -6873,11 +7008,11 @@ function openMovieModal(m, startIdx = 0) {
     <table class="users-table">
       <thead>
         <tr>
-          <th>کاور</th>
-          <th>نام کاربری</th>
-          <th>ایمیل</th>
-          <th>سمت</th>
-          <th>عملیات</th>
+          <th>${uiText("avatar")}</th>
+          <th>${uiText("username")}</th>
+          <th>${uiText("email")}</th>
+          <th>${uiText("role")}</th>
+          <th>${uiText("actions")}</th>
         </tr>
       </thead>
       <tbody id="adminsTableBody"></tbody>
@@ -6901,8 +7036,8 @@ function openMovieModal(m, startIdx = 0) {
       <td>
         ${
           currentUser.role === "owner" && u.role !== "owner"
-            ? `<div class="button-wrap"><button class="btn-danger" onclick="demoteToUser('${u.id}')"><span>Demote</span></button><div class="button-shadow"></div></div>
-               <div class="button-wrap"><button class="btn-danger" onclick="blockUser('${u.id}','${u.email}','${u.username}')"><span>Block</span></button><div class="button-shadow"></div></div>`
+            ? `<div class="button-wrap"><button class="btn-danger" onclick="demoteToUser('${u.id}')"><span>${uiText("demote")}</span></button><div class="button-shadow"></div></div>
+               <div class="button-wrap"><button class="btn-danger" onclick="blockUser('${u.id}','${u.email}','${u.username}')"><span>${uiText("block")}</span></button><div class="button-shadow"></div></div>`
             : ""
         }
       </td>
@@ -7841,7 +7976,7 @@ function openMovieModal(m, startIdx = 0) {
             <div class="admin-actor-photo">${a.profile_url ? `<img src="${escapeHtml(a.profile_url)}" alt="${escapeHtml(a.name)}" />` : '<img src="/images/icons8-user-96.png" alt="profile" class="admin-actor-photo-fallback" />'}</div>
             <div class="admin-actor-name" dir="auto">${escapeHtml(a.name)}</div>
             <div class="button-wrap">
-              <button class="admin-submit actor-upload-btn" type="button" data-id="${a.id}"><span>انتخاب عکس</span></button>
+              <button class="admin-submit actor-upload-btn" type="button" data-id="${a.id}"><span>${uiText("choosePhoto")}</span></button>
               <div class="button-shadow"></div>
             </div>
             <input class="actor-upload-input" type="file" accept="image/*" hidden />
