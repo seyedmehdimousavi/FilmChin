@@ -1571,7 +1571,8 @@ var languageMap = {};
 
 function uiText(key) {
   const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
-  return languageMap[lang]?.[key] || languageMap.en?.[key] || key;
+  const maps = typeof languageMap === "object" && languageMap ? languageMap : {};
+  return maps[lang]?.[key] || maps.en?.[key] || key;
 }
 
 // -------------------- Comments --------------------
