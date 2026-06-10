@@ -1757,6 +1757,9 @@ document.addEventListener("DOMContentLoaded", () => {
       search: "Search",
       support: "Support",
       supportHint: "Small helps make big changes.",
+      supportUs: "Support us",
+      copyAddress: "Copy",
+      copiedAddress: "Copied ✓",
       siteFeaturesButton: "Site features",
       siteFeaturesTitle: "FilmChiin site features",
       adminPostManagement: "Post Management",
@@ -1883,6 +1886,9 @@ document.addEventListener("DOMContentLoaded", () => {
       search: "جستجو",
       support: "حمایت",
       supportHint: "کمک‌های کوچک تغییرات بزرگی ایجاد می‌کنند.",
+      supportUs: "حمایت از ما",
+      copyAddress: "کپی",
+      copiedAddress: "کپی شد ✓",
       siteFeaturesButton: "لیست امکانات سایت",
       siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
       adminPostManagement: "مدیریت پست‌ها",
@@ -5864,23 +5870,63 @@ async function initSupportSheet() {
   if (!chip || !sheet || !listEl) return;
 
   const closeSheet = () => sheet.classList.remove("open");
+
+  const renderWallets = (wallets) => {
+    // عنوان و متن hint رو آپدیت کن
+    const titleEl = panel?.querySelector(".support-sheet-title");
+    const hintEl = panel?.querySelector(".support-sheet-hint");
+    if (titleEl) titleEl.textContent = uiText("supportUs");
+    if (hintEl) hintEl.textContent = uiText("supportHint");
+
+    listEl.innerHTML = "";
+    (wallets || []).forEach((w) => {
+      const bubble = document.createElement("div");
+      bubble.className = "support-wallet-bubble";
+
+      const copyFn = async () => {
+        try {
+          await navigator.clipboard.writeText(w.address || "");
+        } catch {
+          const ta = document.createElement("textarea");
+          ta.value = w.address || "";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+        const btnSpan = bubble.querySelector(".support-copy-btn");
+        if (btnSpan) {
+          btnSpan.textContent = uiText("copiedAddress");
+          setTimeout(() => { btnSpan.textContent = uiText("copyAddress"); }, 1800);
+        }
+      };
+
+      bubble.innerHTML = `
+        <div class="support-wallet-name">${escapeHtml(w.name || "")}</div>
+        <div class="support-wallet-addr-row">
+          <span class="support-wallet-addr">${escapeHtml(w.address || "")}</span>
+          <button class="support-copy-btn" type="button" aria-label="copy">${uiText("copyAddress")}</button>
+        </div>
+      `;
+
+      bubble.addEventListener("click", copyFn);
+      bubble.querySelector(".support-copy-btn")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        copyFn();
+      });
+
+      listEl.appendChild(bubble);
+    });
+  };
+
   chip.addEventListener("click", async () => {
     const { data } = await db.from("wallets").select("name,address").order("created_at", { ascending: true });
-    listEl.innerHTML = "";
-    (data || []).forEach((w) => {
-      const row = document.createElement("div");
-      row.className = "support-wallet-row";
-      row.innerHTML = `<strong>${escapeHtml(w.name || "")}</strong><span>${escapeHtml(w.address || "")}</span>`;
-      row.onclick = async () => {
-        await navigator.clipboard.writeText(`${w.name}\n${w.address}`);
-        closeSheet();
-      };
-      listEl.appendChild(row);
-    });
+    renderWallets(data);
     sheet.classList.add("open");
     document.getElementById("sideMenu")?.classList.remove("active");
     document.getElementById("menuOverlay")?.classList.remove("active");
   });
+
   backdrop?.addEventListener("click", closeSheet);
   panel?.addEventListener("click", (e) => e.stopPropagation());
 }
@@ -5932,23 +5978,17 @@ async function initComingSoonAdminPanel() {
     }
 
     listEl.innerHTML = data.map((m) => `
-      <div class="movie-item coming-soon-admin-row" data-id="${escapeHtml(String(m.id))}">
-        <div class="movie-top">
-          <img class="movie-cover" src="${escapeHtml(m.cover || "")}" alt="${escapeHtml(m.title || "")}">
-          <div class="movie-info-admin">
-            <div class="movie-title-row">
-              <span class="movie-name">${escapeHtml(m.title || "")}</span>
-            </div>
+      <div class="coming-soon-admin-card" data-id="${escapeHtml(String(m.id))}">
+        <img class="cs-admin-cover" src="${escapeHtml(m.cover || "")}" alt="${escapeHtml(m.title || "")}">
+        <div class="cs-admin-title">${escapeHtml(m.title || "")}</div>
+        <div class="cs-admin-actions">
+          <div class="button-wrap">
+            <button class="btn-edit coming-soon-edit" data-id="${escapeHtml(String(m.id))}" type="button"><span><i class="bi bi-pencil"></i></span></button>
+            <div class="button-shadow"></div>
           </div>
-          <div class="movie-actions">
-            <div class="button-wrap">
-              <button class="btn-edit coming-soon-edit" data-id="${escapeHtml(String(m.id))}" type="button"><span><i class="bi bi-pencil"></i> Edit</span></button>
-              <div class="button-shadow"></div>
-            </div>
-            <div class="button-wrap">
-              <button class="btn-delete coming-soon-delete" data-id="${escapeHtml(String(m.id))}" type="button"><span><i class="bi bi-trash"></i> Delete</span></button>
-              <div class="button-shadow"></div>
-            </div>
+          <div class="button-wrap">
+            <button class="btn-delete coming-soon-delete" data-id="${escapeHtml(String(m.id))}" type="button"><span><i class="bi bi-trash"></i></span></button>
+            <div class="button-shadow"></div>
           </div>
         </div>
       </div>
