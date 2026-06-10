@@ -82,7 +82,7 @@
 </div>
 
           <!-- متن ثابت Admin Panel به جای سرچ -->
-          <div class="admin-title">Admin Panel</div>
+          <div class="admin-title" data-i18n="adminPanel">Admin Panel</div>
 
           <!-- دکمه پروفایل -->
           <div class="button-wrap">
@@ -486,10 +486,10 @@
         </section>
 
         <section id="admin-actors-section" class="admin-section-item">
-          <h2>بازیگر ها</h2>
+          <h2 data-i18n="actors">Actors</h2>
           <div class="admin-search-wrapper">
-            <h3>جستجو در بازیگر ها</h3>
-            <input id="adminActorsSearch" class="admin-search-input" type="text" placeholder="Search actors..." />
+            <h3 data-i18n="searchActorsTitle">Search actors</h3>
+            <input id="adminActorsSearch" class="admin-search-input" type="text" placeholder="Search actors..." data-i18n-placeholder="searchActorsPlaceholder" />
           </div>
           <div id="adminActorsGrid" class="admin-actors-grid"></div>
           <div id="adminActorsPagination" class="pagination-container"></div>
@@ -502,13 +502,13 @@
         >
           <h2 data-i18n="analytics">Analytics</h2>
 
-          <h3>Daily visits</h3>
+          <h3 data-i18n="dailyVisits">Daily visits</h3>
           <canvas id="visitsChart" height="120"></canvas>
 
-          <h3>Top searches</h3>
+          <h3 data-i18n="topSearches">Top searches</h3>
           <div id="topSearches"></div>
 
-          <h3>Top clicks</h3>
+          <h3 data-i18n="topClicks">Top clicks</h3>
           <div id="topClicks"></div>
         </section>
 
@@ -529,7 +529,7 @@
               background: #f0f0f0;
             "
           >
-            <h3>Admins List</h3>
+            <h3 data-i18n="adminsList">Admins List</h3>
             <div
               id="adminsContainer"
               class="white-box"
@@ -542,7 +542,7 @@
             class="card grey-box"
             style="padding: 10px; border-radius: 8px; background: #f0f0f0"
           >
-            <h3>Users List</h3>
+            <h3 data-i18n="usersList">Users List</h3>
             <div
               class="search-bar"
               style="display: flex; align-items: center; gap: 8px"
@@ -551,6 +551,7 @@
                 type="text"
                 id="userSearch"
                 placeholder="Search..."
+                data-i18n-placeholder="searchPlaceholder"
                 style="flex: 1; padding: 6px"
               />
               <div class="button-wrap">

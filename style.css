@@ -8089,3 +8089,217 @@ body.dark .movie-page-body::before {
   border: 0;
   font: inherit;
 }
+
+/* ===== Targeted UI fixes: auth/profile/dock/support/admin actors ===== */
+body.profile-menu-open::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999998;
+  background: rgba(10, 16, 22, 0.18);
+  backdrop-filter: blur(5px) saturate(90%);
+  -webkit-backdrop-filter: blur(5px) saturate(90%);
+  pointer-events: none;
+}
+
+#profileMenu.profile-menu {
+  position: fixed;
+  z-index: 999999;
+  max-width: calc(100vw - 24px);
+  padding: 8px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.22);
+}
+body.dark #profileMenu.profile-menu {
+  background: rgba(20, 26, 34, 0.86);
+  border-color: rgba(255, 255, 255, 0.10);
+}
+#profileMenu .profile-bubble {
+  min-width: 0;
+}
+
+.mobile-bottom-dock .dock-btn,
+.mobile-bottom-dock .dock-btn:hover,
+.mobile-bottom-dock .dock-btn:active {
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transform: none;
+}
+.mobile-bottom-dock .dock-btn::after,
+.mobile-bottom-dock .dock-btn span::after,
+.mobile-bottom-dock .button-shadow {
+  content: none !important;
+  display: none !important;
+}
+.mobile-bottom-dock .dock-btn:active img,
+.mobile-bottom-dock .dock-btn:active i {
+  transform: scale(0.86);
+  opacity: 0.68;
+}
+
+.support-sheet-panel {
+  border: 0;
+  box-shadow: 0 -12px 34px rgba(15, 23, 42, 0.14);
+}
+.support-sheet-panel::before,
+.support-sheet-panel::after,
+.support-wallet-bubble::before,
+.support-wallet-bubble::after {
+  content: none !important;
+  display: none !important;
+}
+.support-wallet-bubble {
+  cursor: default;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+.support-copy-btn {
+  box-shadow: 0 8px 18px rgba(var(--theme-accent-rgb), 0.18);
+}
+.support-copy-btn::after,
+.support-copy-btn span::after {
+  content: none !important;
+  display: none !important;
+}
+
+#authModal .login-box {
+  border-radius: 22px;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+}
+#authModal input[type="text"],
+#authModal input[type="email"],
+#authModal input[type="password"],
+#authModal input[type="file"],
+.comment-input-row .comment-name,
+.comment-input-row .comment-text,
+.name-comments-close .comment-name,
+.comments-panel input,
+.comments-panel textarea {
+  min-height: 48px;
+  border: 1px solid rgba(var(--theme-accent-rgb), 0.20) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(245,249,255,0.88)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.90),
+    0 10px 24px rgba(15, 23, 42, 0.06) !important;
+  color: #111827;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+#authModal input[type="text"]:focus,
+#authModal input[type="email"]:focus,
+#authModal input[type="password"]:focus,
+#authModal input[type="file"]:focus,
+.comment-input-row .comment-name:focus,
+.comment-input-row .comment-text:focus,
+.name-comments-close .comment-name:focus,
+.comments-panel input:focus,
+.comments-panel textarea:focus {
+  border-color: rgba(var(--theme-accent-rgb), 0.72) !important;
+  box-shadow:
+    0 0 0 4px rgba(var(--theme-accent-rgb), 0.12),
+    0 14px 30px rgba(var(--theme-accent-rgb), 0.12) !important;
+  transform: translateY(-1px);
+}
+#authModal input[type="file"] {
+  padding: 9px !important;
+  font-size: 13px;
+}
+body.dark #authModal .login-box {
+  background: rgba(20, 26, 34, 0.94);
+}
+body.dark #authModal input,
+body.dark .comment-input-row .comment-name,
+body.dark .comment-input-row .comment-text,
+body.dark .comments-panel input,
+body.dark .comments-panel textarea {
+  background: linear-gradient(180deg, rgba(31,41,55,0.96), rgba(17,24,39,0.88)) !important;
+  color: #f8fafc;
+}
+.signup-next-btn {
+  overflow: hidden;
+  min-height: 52px;
+}
+.signup-next-btn .signup-action-content,
+.signup-next-btn .spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 !important;
+  text-shadow: none;
+}
+.signup-next-btn .signup-action-content::after,
+.signup-next-btn .spinner::after {
+  content: none !important;
+  display: none !important;
+}
+.signup-action-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+.fade-step:not(.active-step) {
+  display: none !important;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.admin-actor-card {
+  align-items: center;
+  min-width: 0;
+}
+.admin-actor-photo {
+  width: clamp(68px, 18vw, 92px);
+  height: clamp(68px, 18vw, 92px);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--theme-accent-rgb), 0.20);
+  box-shadow: 0 10px 24px rgba(var(--theme-accent-rgb), 0.10);
+}
+.admin-actor-photo img {
+  border-radius: 50%;
+}
+.admin-actor-photo-fallback {
+  padding: 10px;
+  object-fit: contain !important;
+}
+.actor-upload-btn.admin-submit {
+  min-height: 34px;
+  font-size: 12px;
+  padding: 0;
+}
+.actor-upload-btn.admin-submit span {
+  padding: 7px 14px;
+  font-size: 12px;
+  line-height: 1.1;
+}
+.admin-actor-card .button-wrap {
+  transform: none !important;
+}
+
+@media (max-width: 420px) {
+  .admin-actors-grid {
+    gap: 10px;
+  }
+  .admin-actor-card {
+    padding: 8px 6px;
+  }
+  .admin-actor-name {
+    font-size: 13px;
+    line-height: 1.25;
+  }
+  .actor-upload-btn.admin-submit span {
+    padding: 6px 10px;
+  }
+}
