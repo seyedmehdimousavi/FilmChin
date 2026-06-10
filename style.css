@@ -8303,3 +8303,104 @@ body.dark .comments-panel textarea {
     padding: 6px 10px;
   }
 }
+
+/* ===== Follow-up fixes: focused popover, pinned dock and centered auth loading ===== */
+body.profile-menu-open::after {
+  z-index: 13990;
+  background: rgba(10, 16, 22, 0.08);
+  backdrop-filter: blur(1.5px) saturate(96%);
+  -webkit-backdrop-filter: blur(1.5px) saturate(96%);
+}
+#profileMenu.profile-menu {
+  z-index: 14000;
+  filter: none !important;
+  backdrop-filter: blur(10px) saturate(145%);
+  -webkit-backdrop-filter: blur(10px) saturate(145%);
+}
+
+.mobile-bottom-dock {
+  top: calc(100lvh - 80px - env(safe-area-inset-bottom, 0px));
+  bottom: auto !important;
+  transform: translate3d(-50%, 0, 0);
+  will-change: transform;
+  contain: layout paint;
+}
+.mobile-bottom-dock .dock-item-wrap {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.mobile-bottom-dock .dock-label {
+  pointer-events: none;
+}
+.mobile-bottom-dock .dock-btn {
+  width: 100%;
+  height: 38px;
+  border-radius: 0;
+}
+.mobile-bottom-dock .dock-btn img,
+.mobile-bottom-dock .dock-btn i {
+  pointer-events: none;
+}
+@supports not (height: 100lvh) {
+  .mobile-bottom-dock {
+    top: auto;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+#authModal .login-box {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px) saturate(145%);
+  -webkit-backdrop-filter: blur(14px) saturate(145%);
+}
+body.dark #authModal .login-box {
+  background: rgba(20, 26, 34, 0.78);
+}
+#authModal .login-btn,
+#authModal .tab-btn,
+.signup-next-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center;
+  overflow: hidden;
+}
+#authModal .login-btn > span,
+#authModal .tab-btn > span,
+#authModal .button-loading-content,
+#authModal .button-loading-text,
+.signup-next-btn .signup-action-content {
+  position: static !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px;
+  width: 100%;
+  padding: 0 !important;
+  margin: 0 !important;
+  text-align: center;
+  letter-spacing: normal;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-shadow: none !important;
+}
+#authModal .login-btn > span::after,
+#authModal .tab-btn > span::after,
+#authModal .button-loading-content::after,
+#authModal .button-loading-text::after {
+  content: none !important;
+  display: none !important;
+}
+#authModal .btn-loading {
+  direction: inherit;
+  min-height: 52px;
+}
+#authModal .btn-loading .spinner {
+  flex: 0 0 auto;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+#authModal.login-modal {
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}

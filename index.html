@@ -1325,14 +1325,14 @@
         <div class="auth-tabs">
           <div class="button-wrap">
             <button class="tab-btn active" data-tab="login">
-              <span>Login</span>
+              <span data-i18n="login">Login</span>
             </button>
             <div class="button-shadow"></div>
           </div>
 
           <div class="button-wrap">
             <button class="tab-btn" data-tab="signup">
-              <span>Sign Up</span>
+              <span data-i18n="signUp">Sign Up</span>
             </button>
             <div class="button-shadow"></div>
           </div>
@@ -1344,16 +1344,18 @@
             type="text"
             id="loginUsername"
             placeholder="Gmail or Username"
+            data-i18n-placeholder="gmailOrUsername"
             required
           />
           <input
             type="password"
             id="loginPassword"
             placeholder="Password"
+            data-i18n-placeholder="password"
             required
           />
           <div class="button-wrap">
-            <button type="submit" class="login-btn"><span>Login</span></button>
+            <button type="submit" class="login-btn"><span data-i18n="login">Login</span></button>
             <div class="button-shadow"></div>
           </div>
         </form>
@@ -1367,17 +1369,19 @@
         >
           <!-- مرحله ۱ -->
           <div id="signupStep1" class="fade-step active-step">
-            <input type="email" id="signupEmail" placeholder="Gmail" required />
+            <input type="email" id="signupEmail" placeholder="Gmail" data-i18n-placeholder="gmail" required />
             <input
               type="text"
               id="signupUsername"
               placeholder="Username"
+              data-i18n-placeholder="username"
               required
             />
             <input
               type="password"
               id="signupPassword"
               placeholder="Password"
+              data-i18n-placeholder="password"
               required
             />
           </div>
@@ -1385,7 +1389,7 @@
           <!-- مرحله ۲ -->
           <div id="signupStep2" class="fade-step" style="display: none">
             <input type="file" id="signupAvatar" accept="image/*" required />
-            <small style="font-size: 12px; color: #888"
+            <small style="font-size: 12px; color: #888" data-i18n="maxAvatarSize"
               >حداکثر حجم عکس: 500KB</small
             >
           </div>
