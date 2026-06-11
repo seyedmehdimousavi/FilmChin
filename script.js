@@ -10243,7 +10243,7 @@ initSideMenuAccordions();
     // Prevent closing when clicking in dropdown
     dropdown.addEventListener("click", e => e.stopPropagation());
 
-    // Handle URL params: openMenu, openFavorites (from dock on movie/actor pages)
+    // Handle URL params: openMenu, openFavorites, search (from dock on movie/actor pages)
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("openMenu") === "1") {
       const menuBtn = document.getElementById("bottomMenuBtn") || document.getElementById("menuBtn");
@@ -10252,6 +10252,18 @@ initSideMenuAccordions();
     if (urlParams.get("openFavorites") === "1") {
       const favBtn = document.getElementById("favoriteMoviesBtn") || document.getElementById("bottomFavoritesBtn");
       if (favBtn) setTimeout(() => favBtn.click(), 400);
+    }
+    // اگه از صفحه فیلم/بازیگر با Enter جستجو شد
+    const searchParam = urlParams.get("search");
+    if (searchParam) {
+      const searchInput = document.getElementById("search");
+      if (searchInput) {
+        setTimeout(() => {
+          searchInput.value = searchParam;
+          searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+          searchInput.focus({ preventScroll: false });
+        }, 600);
+      }
     }
   });
 })();

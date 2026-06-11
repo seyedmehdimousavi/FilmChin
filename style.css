@@ -7087,10 +7087,11 @@ body.dark .movie-page-back {
 .similar-movies-title {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 0 8px 8px;
+  gap: 8px;
+  margin: 0 8px 10px;
   font-weight: 800;
-  color: var(--muted);
+  font-size: 1.05rem;
+  color: var(--theme-accent-dark);
 }
 
 .similar-movies-container .episode-title span {
@@ -8044,7 +8045,7 @@ body.dark .pagination-nav-btn {
 
 .movie-page-back {
   position: fixed;
-  top: calc(120px + 14px);
+  top: calc(120px + 100px + 14px);
   left: max(16px, env(safe-area-inset-left));
   z-index: 11999;
   margin-bottom: 0;
@@ -8405,15 +8406,21 @@ body.dark #authModal .login-box {
   -webkit-backdrop-filter: blur(2px);
 }
 
-/* ===== PATCH: Series badge orange, Collection badge blue ===== */
+/* ===== PATCH: Series badge orange warm, Collection badge blue cool ===== */
 .badge-serial {
-  background: #e65100 !important; /* نارنجی تیره برای سریال */
+  background: linear-gradient(90deg, #e65100 0%, #f57c00 100%) !important;
 }
 .badge-serial.collection-badge {
-  background: #e65100 !important;
+  background: linear-gradient(90deg, #e65100 0%, #f57c00 100%) !important;
+}
+.badge-serial .badge-count {
+  color: #e65100 !important;
 }
 .badge-collection {
-  background: var(--theme-accent, #1e88e5) !important; /* آبی برای کالکشن */
+  background: linear-gradient(90deg, #1565c0 0%, #1e88e5 100%) !important;
+}
+.badge-collection .badge-count {
+  color: #1565c0 !important;
 }
 
 /* ===== PATCH: Dock — always at bottom, never moves with keyboard ===== */
@@ -8511,8 +8518,8 @@ html[lang="fa"] .actor-page-container {
   backdrop-filter: blur(12px) saturate(150%);
   -webkit-backdrop-filter: blur(12px) saturate(150%);
   border-radius: 16px;
-  border: 1.5px solid rgba(0, 136, 204, 0.22);
-  box-shadow: 0 4px 18px rgba(0, 136, 204, 0.10), 0 1px 4px rgba(0,0,0,0.06);
+  border: 1.5px solid rgba(var(--theme-accent-rgb), 0.22);
+  box-shadow: 0 4px 18px rgba(var(--theme-accent-rgb), 0.10), 0 1px 4px rgba(0,0,0,0.06);
   overflow: hidden;
   text-decoration: none;
   color: inherit;
@@ -8525,8 +8532,8 @@ html[lang="fa"] .actor-page-container {
 }
 body.dark .social-link-card {
   background: rgba(20, 26, 34, 0.82);
-  border-color: rgba(0, 136, 204, 0.25);
-  box-shadow: 0 4px 18px rgba(0, 136, 204, 0.15), 0 1px 4px rgba(0,0,0,0.3);
+  border-color: rgba(var(--theme-accent-rgb), 0.28);
+  box-shadow: 0 4px 18px rgba(var(--theme-accent-rgb), 0.18), 0 1px 4px rgba(0,0,0,0.3);
 }
 .social-link-icon {
   width: 56px;
@@ -8534,12 +8541,15 @@ body.dark .social-link-card {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 136, 204, 0.10);
+  background: rgba(var(--theme-accent-rgb), 0.10);
   height: 60px;
   border-radius: 0;
+  color: var(--theme-accent-dark);
+  font-size: 1.5rem;
 }
 body.dark .social-link-icon {
-  background: rgba(0, 136, 204, 0.15);
+  background: rgba(var(--theme-accent-rgb), 0.18);
+  color: var(--theme-accent-light, #a0c4ff);
 }
 .social-link-icon img {
   width: 30px;
@@ -8551,18 +8561,18 @@ body.dark .social-link-icon {
   text-align: center;
   font-size: 15px;
   font-weight: 700;
-  color: #0a4c73;
+  color: var(--theme-accent-dark);
   padding: 0 8px;
 }
 body.dark .social-link-label {
-  color: #7ecff5;
+  color: var(--theme-accent-light, #a0c4ff);
 }
 .social-link-join-bubble {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0088cc, #0055a5);
-  color: #fff;
+  background: rgba(var(--theme-accent-rgb), 0.12);
+  color: var(--theme-accent-dark);
   font-size: 12px;
   font-weight: 700;
   padding: 6px 14px;
@@ -8570,7 +8580,10 @@ body.dark .social-link-label {
   margin-right: 12px;
   white-space: nowrap;
   min-width: 52px;
-  box-shadow: 0 2px 6px rgba(0,136,204,0.25);
+}
+body.dark .social-link-join-bubble {
+  background: rgba(var(--theme-accent-rgb), 0.22);
+  color: var(--theme-accent-light, #a0c4ff);
 }
 html[dir="ltr"] .social-link-join-bubble {
   margin-right: 0;

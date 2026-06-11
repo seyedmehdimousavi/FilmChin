@@ -274,19 +274,133 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   loadActorPage();
 
-  // Dock: search button → focus search input in hydrated header
+  // Dock: menu → open side menu locally
+  document.querySelector("#bottomMenuBtn")?.addEventListener("click", () => {
+    const sideMenu = document.getElementById("sideMenu");
+    const menuOverlay = document.getElementById("menuOverlay");
+    if (sideMenu) {
+      sideMenu.classList.toggle("active");
+      if (menuOverlay) menuOverlay.classList.toggle("active");
+    } else {
+      window.location.href = new URL("/?openMenu=1", window.location.origin).href;
+    }
+  });
+
+  // Dock: favorites → open overlay locally if available
+  document.querySelector("#bottomFavoritesBtn")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const favBtn = document.getElementById("favoriteMoviesBtn");
+    if (favBtn) {
+      favBtn.click();
+    } else {
+      window.location.href = new URL("/?openFavorites=1", window.location.origin).href;
+    }
+  });
+
+  // Dock: search → focus
   document.querySelector("#bottomSearchBtn")?.addEventListener("click", (e) => {
     e.preventDefault();
     const si = document.getElementById("search");
-    if (si) { try { si.focus({ preventScroll: true }); } catch { si.focus(); } window.scrollTo({ top: 0, behavior: "smooth" }); }
+    if (si) {
+      try { si.focus({ preventScroll: true }); } catch { si.focus(); }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   });
-  // Dock: menu → go home and open menu
-  document.querySelector("#bottomMenuBtn")?.addEventListener("click", () => {
-    window.location.href = new URL("/?openMenu=1", window.location.origin).href;
-  });
-  // Dock: favorites → go home and open favorites
-  document.querySelector("#bottomFavoritesBtn")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    window.location.href = new URL("/?openFavorites=1", window.location.origin).href;
-  });
+
+  // Live search dropdown for actor page
+  (function initActorPageLiveSearch() {
+    const attachDropdown = () => {
+      const searchInput = document.getElementById("search");
+      const dropdown = document.getElementById("searchLiveDropdown");
+      if (!searchInput || !dropdown) return;
+
+      let debounce = null;
+      searchInput.addEventListener("input", () => {
+        clearTimeout(debounce);
+        debounce = setTimeout(async () => {
+          const query = searchInput.value.trim();
+          if (!query) { dropdown.style.display = "none"; return; }
+
+          const allMovies = Array.isArray(window._fcMovies) ? window._fcMovies : [];
+          if (!allMovies.length) {
+            // Fetch if not cached
+            try {
+              const { createClient } = window.supabase || {};
+              if (!createClient) return;
+              const db2 = createClient(window.SUPABASE_URL || "", window.SUPABASE_KEY || "");
+              const { data } = await db2.from("movies").select("id,title,cover,type,synopsis,stars,director");
+              window._fcMovies = data || [];
+            } catch(e) { return; }
+          }
+
+          const q = query.toLowerCase();
+          const scored = (window._fcMovies || [])
+            .map(m => {
+              const title = (m.title || "").toLowerCase();
+              const synopsis = (m.synopsis || "").toLowerCase();
+              const stars = (m.stars || "").toLowerCase();
+              const director = (m.director || "").toLowerCase();
+              let score = 0;
+              if (title.includes(q)) score = 3;
+              else if (stars.includes(q) || director.includes(q)) score = 2;
+              else if (synopsis.includes(q)) score = 1;
+              return { m, score };
+            })
+            .filter(r => r.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .map(r => r.m);
+
+          if (!scored.length) { dropdown.style.display = "none"; return; }
+
+          const lang = localStorage.getItem("siteLanguage") || "en";
+          const openLabel = lang === "fa" ? "باز کن" : "Open";
+
+          dropdown.innerHTML = scored.map(m => {
+            const slug = String(m.title || "").toLowerCase().trim()
+              .replace(/[\(\)\[\]\{\}]/g, "").replace(/[^a-z0-9\u0600-\u06FF]+/gi, "-")
+              .replace(/-+/g, "-").replace(/^-|-$/g, "");
+            const href = slug ? `/movie.html?slug=${encodeURIComponent(slug)}` : "/movie.html";
+            const borderClass = m.type === "collection" ? "collection-border" : m.type === "serial" ? "serial-border" : "";
+            return `<div class="search-dropdown-item ${borderClass}" data-href="${href}">
+              <img src="${m.cover || ""}" alt="" class="search-dropdown-cover" />
+              <span class="search-dropdown-title">${m.title || ""}</span>
+              <button class="search-dropdown-open-btn" data-href="${href}">${openLabel}</button>
+            </div>`;
+          }).join("");
+
+          dropdown.querySelectorAll(".search-dropdown-item").forEach(item => {
+            item.addEventListener("click", (e) => {
+              if (e.target.closest(".search-dropdown-open-btn")) {
+                e.stopPropagation();
+                window.open(item.dataset.href, "_blank");
+                return;
+              }
+              window.location.href = item.dataset.href;
+            });
+          });
+
+          dropdown.style.display = "block";
+        }, 180);
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+          dropdown.style.display = "none";
+        }
+      });
+      dropdown.addEventListener("click", e => e.stopPropagation());
+
+      searchInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          const q = searchInput.value.trim();
+          if (q) window.location.href = `/?search=${encodeURIComponent(q)}`;
+        }
+      });
+    };
+
+    attachDropdown();
+    setTimeout(attachDropdown, 800);
+    setTimeout(attachDropdown, 2000);
+  })();
 });
