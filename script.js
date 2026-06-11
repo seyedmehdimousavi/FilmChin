@@ -8245,6 +8245,74 @@ function openMovieModal(m, startIdx = 0) {
         showToast("Error updating version");
       }
     });
+
+  // === Sitemap Generator ===
+  document.getElementById("generateSitemapBtn")?.addEventListener("click", async () => {
+    const btn = document.getElementById("generateSitemapBtn");
+    if (btn) btn.querySelector("span").textContent = "⏳ Generating...";
+
+    try {
+      const { data: movies } = await db.from("movies").select("title, updated_at").order("updated_at", { ascending: false });
+      const { data: actors } = await db.from("actors").select("name, slug, updated_at");
+
+      const today = new Date().toISOString().split("T")[0];
+      const BASE = "https://filmchiin.ir";
+
+      const slugifyTitle = (title) => {
+        if (!title) return "";
+        return String(title).toLowerCase().trim()
+          .replace(/[\(\)\[\]\{\}]/g, "")
+          .replace(/[^a-z0-9ا-ی]+/gi, "-")
+          .replace(/-+/g, "-")
+          .replace(/^-|-$/g, "");
+      };
+      const slugifyName = (name) => {
+        if (!name) return "";
+        return String(name).toLowerCase().trim()
+          .replace(/[^a-z0-9ا-ی]+/gi, "-")
+          .replace(/-+/g, "-")
+          .replace(/^-|-$/g, "");
+      };
+
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+
+      // صفحه اصلی
+      xml += `  <url>\n    <loc>${BASE}/</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
+
+      // صفحه‌های فیلم‌ها
+      (movies || []).forEach((m) => {
+        const slug = slugifyTitle(m.title);
+        if (!slug) return;
+        const lastmod = m.updated_at ? m.updated_at.split("T")[0] : today;
+        xml += `  <url>\n    <loc>${BASE}/movie/${encodeURIComponent(slug)}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>\n`;
+      });
+
+      // صفحه‌های بازیگران
+      (actors || []).forEach((a) => {
+        const slug = a.slug || slugifyName(a.name);
+        if (!slug) return;
+        const lastmod = a.updated_at ? a.updated_at.split("T")[0] : today;
+        xml += `  <url>\n    <loc>${BASE}/actor/${encodeURIComponent(slug)}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.6</priority>\n  </url>\n`;
+      });
+
+      xml += `</urlset>`;
+
+      // دانلود فایل
+      const blob = new Blob([xml], { type: "application/xml" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "sitemap.xml";
+      a.click();
+      URL.revokeObjectURL(url);
+
+      showToast(`✅ Sitemap با ${(movies||[]).length} فیلم و ${(actors||[]).length} بازیگر ساخته شد`, "success");
+    } catch (err) {
+      showToast("❌ خطا در ساخت sitemap: " + err.message, "error");
+    } finally {
+      if (btn) btn.querySelector("span").textContent = "📥 Generate & Download Sitemap";
+    }
+  });
   
   // === IMDb Rating Filter (with persistent toast badge) ===
 const ratingTrack = document.getElementById("ratingTrack");

@@ -515,25 +515,99 @@ function applySavedTheme() {
 }
 
 function setSeo(movie, slug) {
-  const title = movie?.title ? `${movie.title} | FilmChiin` : mt("postPageTitle");
-  const desc = (movie?.synopsis || "").trim() || mt("postPageDesc");
+  const movieTitle = movie?.title || "";
+  const year = movie?.year || "";
+  const genre = Array.isArray(movie?.genre)
+    ? movie.genre.join(", ")
+    : (movie?.genre || "");
+  const director = movie?.director || "";
+  const imdb = movie?.imdb ? `امتیاز IMDb: ${movie.imdb}` : "";
+
+  // عنوان بهینه برای گوگل
+  const titleParts = [movieTitle];
+  if (year) titleParts.push(year);
+  const seoTitle = titleParts.length > 1
+    ? `دانلود ${titleParts.join(" ")} | فیلمچین FilmChiin`
+    : `FilmChiin | دانلود فیلم و سریال`;
+
+  // توضیح غنی
+  const rawDesc = (movie?.synopsis || "").trim();
+  const descParts = [];
+  if (movieTitle) descParts.push(`دانلود ${movieTitle}`);
+  if (year) descParts.push(year);
+  if (genre) descParts.push(genre);
+  if (imdb) descParts.push(imdb);
+  const seoDesc = rawDesc
+    ? rawDesc.substring(0, 155)
+    : (descParts.join(" | ") || "دانلود فیلم و سریال با لینک مستقیم در فیلمچین");
+
   const cover = movie?.cover || "https://filmchiin.ir/images/banner-icon.png";
+
+  // canonical — clean URL بدون .html
   const canonical = `https://filmchiin.ir/movie/${encodeURIComponent(slug)}`;
 
-  document.title = title;
+  // آپدیت متا تگ‌ها
+  document.title = seoTitle;
   const setMeta = (selector, content) => {
     const el = document.querySelector(selector);
     if (el) el.setAttribute("content", content);
   };
-  setMeta('meta[name="description"]', desc);
-  setMeta('meta[property="og:title"]', title);
-  setMeta('meta[property="og:description"]', desc);
+  setMeta('meta[name="description"]', seoDesc);
+  setMeta('meta[name="keywords"]', `دانلود ${movieTitle}, ${movieTitle} ${year}, فیلمچین, filmchiin, دانلود فیلم`);
+  setMeta('meta[property="og:title"]', seoTitle);
+  setMeta('meta[property="og:description"]', seoDesc);
   setMeta('meta[property="og:image"]', cover);
   setMeta('meta[property="og:url"]', canonical);
-  setMeta('meta[name="twitter:title"]', title);
-  setMeta('meta[name="twitter:description"]', desc);
+  setMeta('meta[name="twitter:title"]', seoTitle);
+  setMeta('meta[name="twitter:description"]', seoDesc);
   setMeta('meta[name="twitter:image"]', cover);
-  document.querySelector('link[rel="canonical"]')?.setAttribute("href", canonical);
+
+  // canonical link
+  let canonicalEl = document.querySelector('link[rel="canonical"]');
+  if (!canonicalEl) {
+    canonicalEl = document.createElement("link");
+    canonicalEl.rel = "canonical";
+    document.head.appendChild(canonicalEl);
+  }
+  canonicalEl.setAttribute("href", canonical);
+
+  // JSON-LD Structured Data (Schema.org)
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Movie",
+    "name": movieTitle,
+    "url": canonical,
+    "image": cover,
+    "description": seoDesc,
+    ...(year ? { "datePublished": String(year) } : {}),
+    ...(director ? { "director": { "@type": "Person", "name": director } } : {}),
+    ...(movie?.imdb ? { "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": String(movie.imdb),
+      "bestRating": "10",
+      "ratingCount": "1000"
+    }} : {}),
+    ...(genre ? { "genre": genre.split(",").map(g => g.trim()) } : {}),
+    "publisher": {
+      "@type": "Organization",
+      "name": "FilmChiin | فیلمچین",
+      "url": "https://filmchiin.ir",
+      "logo": "https://filmchiin.ir/images/banner-icon.png"
+    }
+  };
+
+  let ldEl = document.getElementById("movieJsonLd");
+  if (!ldEl) {
+    ldEl = document.createElement("script");
+    ldEl.type = "application/ld+json";
+    ldEl.id = "movieJsonLd";
+    document.head.appendChild(ldEl);
+  }
+  ldEl.textContent = JSON.stringify(jsonLd, null, 2);
+
+  // آپدیت html lang برای فارسی بودن محتوا
+  document.documentElement.setAttribute("lang", "fa");
+  document.documentElement.setAttribute("dir", "rtl");
 }
 
 function openPostOptions() {
