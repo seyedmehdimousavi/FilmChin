@@ -605,9 +605,9 @@ function setSeo(movie, slug) {
   }
   ldEl.textContent = JSON.stringify(jsonLd, null, 2);
 
-  // آپدیت html lang برای فارسی بودن محتوا
-  document.documentElement.setAttribute("lang", "fa");
-  document.documentElement.setAttribute("dir", "rtl");
+  // آپدیت html lang و dir بر اساس زبان ذخیره‌شده کاربر
+  document.documentElement.setAttribute("lang", pageLang);
+  document.documentElement.setAttribute("dir", pageLang === "fa" ? "rtl" : "ltr");
 }
 
 function openPostOptions() {
@@ -1110,4 +1110,20 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "/";
   });
   loadMoviePage();
+
+  // Dock: search button → focus search input in hydrated header
+  document.querySelector("#bottomSearchBtn")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const si = document.getElementById("search");
+    if (si) { try { si.focus({ preventScroll: true }); } catch { si.focus(); } window.scrollTo({ top: 0, behavior: "smooth" }); }
+  });
+  // Dock: menu → go home and open menu
+  document.querySelector("#bottomMenuBtn")?.addEventListener("click", () => {
+    window.location.href = new URL("/?openMenu=1", window.location.origin).href;
+  });
+  // Dock: favorites → go home and open favorites
+  document.querySelector("#bottomFavoritesBtn")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    window.location.href = new URL("/?openFavorites=1", window.location.origin).href;
+  });
 });

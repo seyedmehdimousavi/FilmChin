@@ -286,3 +286,303 @@
 
   window.FilmChiinSharedSections = { hydrate };
 })();
+
+// ===== PATCH: Dock functionality for movie/actor pages =====
+(function initSharedDock() {
+  function setupDock() {
+    const dock = document.querySelector(".mobile-bottom-dock");
+    if (!dock) return;
+
+    // ---- Menu button → navigate home and open sidemenu ----
+    const menuBtn = dock.querySelector("#bottomMenuBtn");
+    if (menuBtn) {
+      menuBtn.addEventListener("click", () => {
+        const url = new URL("/", window.location.origin);
+        url.searchParams.set("openMenu", "1");
+        window.location.href = url.toString();
+      });
+    }
+
+    // ---- Favorites button → navigate home and open favorites ----
+    const favBtn = dock.querySelector("#bottomFavoritesBtn");
+    if (favBtn) {
+      favBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const url = new URL("/", window.location.origin);
+        url.searchParams.set("openFavorites", "1");
+        window.location.href = url.toString();
+      });
+    }
+
+    // ---- Search button → focus the header search input ----
+    const searchBtn = dock.querySelector("#bottomSearchBtn");
+    if (searchBtn) {
+      searchBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const searchInput = document.getElementById("search");
+        if (searchInput) {
+          try { searchInput.focus({ preventScroll: true }); } catch { searchInput.focus(); }
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      });
+    }
+
+    // ---- Keyboard detection: hide dock when keyboard open ----
+    function checkKeyboard() {
+      const vvHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      const winHeight = window.screen.height;
+      const keyboardOpen = vvHeight < winHeight * 0.70;
+      document.body.classList.toggle("keyboard-open", keyboardOpen);
+    }
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", checkKeyboard);
+    } else {
+      window.addEventListener("resize", checkKeyboard);
+    }
+    checkKeyboard();
+  }
+
+  // ---- Social links i18n ----
+  function updateSocialLinksLang() {
+    const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
+    const label = document.querySelector("#socialLinksSection .social-link-label");
+    const bubble = document.querySelector("#socialLinksSection .social-link-join-bubble");
+    if (label) label.textContent = lang === "fa" ? "کانال تلگرام" : "Telegram Channel";
+    if (bubble) bubble.textContent = lang === "fa" ? "جوین" : "Join";
+  }
+
+  // Run after hydrate
+  const origHydrate = window.FilmChiinSharedSections?.hydrate;
+  if (origHydrate) {
+    window.FilmChiinSharedSections.hydrate = async function() {
+      await origHydrate();
+      setupDock();
+      updateSocialLinksLang();
+    };
+  }
+
+  // Also run on DOMContentLoaded for pages that already have dock
+  document.addEventListener("DOMContentLoaded", () => {
+    setupDock();
+    updateSocialLinksLang();
+  });
+})();
+
+// ===== PATCH: Live search dropdown on movie/actor pages =====
+(function initSharedSearchDropdown() {
+  const SUPABASE_URL = "https://gwsmvcgjdodmkoqupdal.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
+
+  let moviesCache = null;
+  let episodesCacheMap = new Map();
+  let coverCycleTimers = new Map();
+
+  async function getMovies() {
+    if (moviesCache) return moviesCache;
+    if (!window.supabase?.createClient) return [];
+    try {
+      const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const { data } = await db.from("movies").select("id,title,cover,type,synopsis,stars,director").order("updated_at", { ascending: false });
+      moviesCache = data || [];
+      return moviesCache;
+    } catch { return []; }
+  }
+
+  async function getEpisodes(movieIds) {
+    if (!window.supabase?.createClient || !movieIds.length) return new Map();
+    const missing = movieIds.filter(id => !episodesCacheMap.has(id));
+    if (missing.length) {
+      try {
+        const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const { data } = await db.from("movie_items").select("movie_id,cover,order_index")
+          .in("movie_id", missing).order("order_index", { ascending: true });
+        const grouped = new Map();
+        (data || []).forEach(ep => {
+          if (!grouped.has(ep.movie_id)) grouped.set(ep.movie_id, []);
+          grouped.get(ep.movie_id).push(ep.cover);
+        });
+        missing.forEach(id => episodesCacheMap.set(id, grouped.get(id) || []));
+      } catch {}
+    }
+    return episodesCacheMap;
+  }
+
+  function makeMovieSlug(title) {
+    return String(title || "").toLowerCase().trim()
+      .replace(/[\(\)\[\]\{\}]/g, "")
+      .replace(/[^a-z0-9\u0600-\u06FF]+/gi, "-")
+      .replace(/-+/g, "-").replace(/^-|-$/g, "");
+  }
+
+  function buildMoviePageHref(title) {
+    const slug = makeMovieSlug(title || "");
+    return slug ? `/movie.html?slug=${encodeURIComponent(slug)}` : "/movie.html";
+  }
+
+  function scoreMovie(movie, query) {
+    const q = query.toLowerCase();
+    const title = (movie.title || "").toLowerCase();
+    const synopsis = (movie.synopsis || "").toLowerCase();
+    const stars = (movie.stars || "").toLowerCase();
+    const director = (movie.director || "").toLowerCase();
+    if (title.includes(q)) return 3;
+    if (stars.includes(q) || director.includes(q)) return 2;
+    if (synopsis.includes(q)) return 1;
+    return 0;
+  }
+
+  function stopCoverCycle(itemId) {
+    const t = coverCycleTimers.get(itemId);
+    if (t) clearInterval(t);
+    coverCycleTimers.delete(itemId);
+  }
+
+  function startCoverCycle(wrap, covers, movieId) {
+    stopCoverCycle(movieId);
+    if (!covers || covers.length <= 1) return;
+    let idx = 0;
+    const imgs = wrap.querySelectorAll("img");
+    if (imgs.length < 2) {
+      // Build two images for crossfade
+      const img2 = document.createElement("img");
+      img2.style.cssText = "opacity:0;";
+      img2.src = covers[1 % covers.length];
+      wrap.appendChild(img2);
+    }
+    const timer = setInterval(() => {
+      idx = (idx + 1) % covers.length;
+      const allImgs = wrap.querySelectorAll("img");
+      const next = covers[idx];
+      // fade current out, show next
+      allImgs.forEach(im => { im.style.opacity = "0"; });
+      const newImg = wrap.querySelector("img") || document.createElement("img");
+      newImg.src = next;
+      newImg.style.opacity = "1";
+    }, 2000);
+    coverCycleTimers.set(movieId, timer);
+  }
+
+  function renderDropdown(dropdown, results, query) {
+    if (!results.length) {
+      dropdown.innerHTML = `<div class="search-dropdown-no-results">No results found</div>`;
+      return;
+    }
+
+    dropdown.innerHTML = results.map((m, i) => {
+      const href = buildMoviePageHref(m.title);
+      const borderClass = m.type === "collection" ? "collection-border" : m.type === "series" ? "serial-border" : "";
+      const coverHtml = m.type === "collection"
+        ? `<div class="search-dropdown-cover-wrap" data-movie-id="${m.id}"><img src="${m.cover || ''}" alt="${m.title || ''}" class="search-dropdown-cover" /></div>`
+        : `<img src="${m.cover || ''}" alt="${m.title || ''}" class="search-dropdown-cover" />`;
+      return `<div class="search-dropdown-item ${borderClass}" data-href="${href}" data-movie-id="${m.id}" data-type="${m.type || 'single'}">
+        ${coverHtml}
+        <span class="search-dropdown-title">${m.title || ''}</span>
+        <button class="search-dropdown-open-btn" data-href="${href}" tabindex="-1">Open</button>
+      </div>`;
+    }).join("");
+
+    // Attach click handlers
+    dropdown.querySelectorAll(".search-dropdown-item").forEach(item => {
+      item.addEventListener("click", (e) => {
+        if (e.target.closest(".search-dropdown-open-btn")) {
+          e.stopPropagation();
+          window.open(e.target.closest(".search-dropdown-open-btn").dataset.href, "_blank");
+          return;
+        }
+        const href = item.dataset.href;
+        if (href) window.location.href = href;
+      });
+      // Long press → open in new tab
+      let pressTimer;
+      item.addEventListener("pointerdown", () => {
+        pressTimer = setTimeout(() => {
+          const href = item.dataset.href;
+          if (href) window.open(href, "_blank");
+        }, 600);
+      });
+      item.addEventListener("pointerup", () => clearTimeout(pressTimer));
+      item.addEventListener("pointerleave", () => clearTimeout(pressTimer));
+    });
+
+    // Start cover cycling for collections
+    results.forEach((m) => {
+      if (m.type !== "collection") return;
+      const wrap = dropdown.querySelector(`.search-dropdown-cover-wrap[data-movie-id="${m.id}"]`);
+      if (!wrap) return;
+      const epMap = episodesCacheMap.get(m.id);
+      if (epMap && epMap.length > 0) {
+        const allCovers = [m.cover, ...epMap].filter(Boolean);
+        startCoverCycle(wrap, allCovers, m.id);
+      }
+    });
+  }
+
+  let searchDebounce = null;
+
+  async function onSearchInput(searchInput, dropdown) {
+    const query = searchInput.value.trim();
+    if (!query) {
+      dropdown.style.display = "none";
+      coverCycleTimers.forEach((t) => clearInterval(t));
+      coverCycleTimers.clear();
+      return;
+    }
+
+    const allMovies = await getMovies();
+    const scored = allMovies
+      .map(m => ({ movie: m, score: scoreMovie(m, query) }))
+      .filter(r => r.score > 0)
+      .sort((a, b) => b.score - a.score || 0)
+      .slice(0, 10)
+      .map(r => r.movie);
+
+    // Pre-fetch episodes for collections in results
+    const collectionIds = scored.filter(m => m.type === "collection").map(m => m.id);
+    if (collectionIds.length) await getEpisodes(collectionIds);
+
+    if (scored.length === 0 && !query) {
+      dropdown.style.display = "none";
+      return;
+    }
+
+    renderDropdown(dropdown, scored, query);
+    dropdown.style.display = "block";
+  }
+
+  function attachSearchDropdown(searchInput) {
+    // Check if dropdown already exists (index.html)
+    let dropdown = document.getElementById("searchLiveDropdown");
+    if (!dropdown) {
+      // Create and inject after the input
+      dropdown = document.createElement("div");
+      dropdown.id = "searchLiveDropdown";
+      dropdown.className = "search-live-dropdown";
+      dropdown.style.display = "none";
+      const wrap = searchInput.closest(".search-input-wrap") || searchInput.parentElement;
+      if (wrap) {
+        wrap.style.position = "relative";
+        wrap.appendChild(dropdown);
+      }
+    }
+
+    searchInput.addEventListener("input", () => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => onSearchInput(searchInput, dropdown), 200);
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.style.display = "none";
+      }
+    });
+
+    // Prevent dropdown from closing when clicking inside it
+    dropdown.addEventListener("click", (e) => e.stopPropagation());
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("search");
+    if (searchInput) attachSearchDropdown(searchInput);
+  });
+})();

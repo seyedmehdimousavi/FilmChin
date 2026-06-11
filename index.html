@@ -10,7 +10,6 @@
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="shortcut icon" href="/favicon.ico" />
 
-    <!-- رنگ برای مرورگر و موبایل -->
     <meta name="theme-color" content="#ffffff" />
     <meta name="msapplication-TileColor" content="#ffffff" />
 
@@ -210,7 +209,7 @@
         </div>
 
         <div class="search-bar">
-          <div class="search-input-wrap">
+          <div class="search-input-wrap search-input-wrapper" style="position:relative;">
             <input
               id="search"
               type="text"
@@ -226,6 +225,7 @@
               <span class="typed-part"></span
               ><span class="suggestion-part" role="button" tabindex="0"></span>
             </div>
+            <div id="searchLiveDropdown" class="search-live-dropdown" style="display:none;"></div>
           </div>
 
           <button
@@ -1318,6 +1318,16 @@
         </div>
       </section>
     </footer>
+    <!-- Social Links Section -->
+    <section class="social-links-section" id="socialLinksSection">
+      <a class="social-link-card" href="tg://resolve?domain=filmchiin" target="_blank" rel="noopener">
+        <div class="social-link-icon">
+          <img src="/images/icons8-telegram-96.png" alt="Telegram" />
+        </div>
+        <span class="social-link-label" data-i18n="telegramChannel">کانال تلگرام</span>
+        <span class="social-link-join-bubble" data-i18n="joinChannel">Join</span>
+      </a>
+    </section>
     <!-- Auth Modal -->
     <div id="authModal" class="login-modal" aria-hidden="true">
       <div class="login-box">

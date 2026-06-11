@@ -766,6 +766,28 @@ window.addEventListener("resize", () => {
   if (profileMenu && !profileMenu.classList.contains("hidden")) positionProfileMenu();
 });
 
+// ===== Keyboard detection: hide dock when keyboard is open =====
+(function initKeyboardDockHide() {
+  const dock = document.querySelector(".mobile-bottom-dock");
+  if (!dock) return;
+
+  function checkKeyboard() {
+    // Use visualViewport if available (most accurate)
+    const vvHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    const winHeight = window.screen.height;
+    // If visible viewport is more than 30% smaller than screen, keyboard is likely open
+    const keyboardOpen = vvHeight < winHeight * 0.70;
+    document.body.classList.toggle("keyboard-open", keyboardOpen);
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", checkKeyboard);
+  } else {
+    window.addEventListener("resize", checkKeyboard);
+  }
+  checkKeyboard();
+})();
+
 // خروج از حساب
 async function doLogoutAndRefresh() {
   try {
@@ -1833,6 +1855,8 @@ document.addEventListener("DOMContentLoaded", () => {
       send: "Send",
       designLabel: "Design :",
       menu: "Menu",
+      telegramChannel: "Telegram Channel",
+      joinChannel: "Join",
       favorites: "Favorites",
       search: "Search",
       support: "Support",
@@ -1991,6 +2015,8 @@ document.addEventListener("DOMContentLoaded", () => {
       send: "ارسال",
       designLabel: "طراحی :",
       menu: "منو",
+      telegramChannel: "کانال تلگرام",
+      joinChannel: "جوین",
       favorites: "علاقه‌مندی‌ها",
       search: "جستجو",
       support: "حمایت",
@@ -3827,6 +3853,10 @@ renderPagedMovies(true);
     searchCloseBtn.addEventListener("click", () => {
       searchInput.value = "";
       searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+      // Also close live dropdown if present
+      const dropdown = document.getElementById("searchLiveDropdown");
+      if (dropdown) dropdown.style.display = "none";
+      searchInput.focus({ preventScroll: true });
     });
 
     bottomSearchBtn?.addEventListener("click", (e) => {
@@ -10045,3 +10075,183 @@ initSideMenuAccordions();
   initWalletAdminPanel();
   initAdminActorsPanel();
 });
+
+// ======================= Live Search Dropdown (Homepage) =======================
+(function initHomepageLiveSearchDropdown() {
+  const SUPABASE_URL = "https://gwsmvcgjdodmkoqupdal.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
+
+  let episodesCoverMap = new Map();
+  let coverCycleTimers = new Map();
+
+  async function prefetchEpisodeCovers(collectionIds) {
+    const missing = collectionIds.filter(id => !episodesCoverMap.has(id));
+    if (!missing.length) return;
+    try {
+      const dbLocal = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const { data } = await dbLocal.from("movie_items").select("movie_id,cover,order_index")
+        .in("movie_id", missing).order("order_index", { ascending: true });
+      const grouped = new Map();
+      (data || []).forEach(ep => {
+        if (!grouped.has(ep.movie_id)) grouped.set(ep.movie_id, []);
+        grouped.get(ep.movie_id).push(ep.cover);
+      });
+      missing.forEach(id => episodesCoverMap.set(id, grouped.get(id) || []));
+    } catch(e) { console.warn("episode covers fetch:", e); }
+  }
+
+  function stopCycle(movieId) {
+    const t = coverCycleTimers.get(movieId);
+    if (t) clearInterval(t);
+    coverCycleTimers.delete(movieId);
+  }
+
+  function startCycle(wrap, covers, movieId) {
+    stopCycle(movieId);
+    if (!covers || covers.length <= 1) return;
+    let idx = 0;
+    const timer = setInterval(() => {
+      idx = (idx + 1) % covers.length;
+      const currentImg = wrap.querySelector("img.active-cover");
+      const nextSrc = covers[idx];
+      // Swap the image src with a fade
+      const imgs = wrap.querySelectorAll("img");
+      imgs.forEach(im => im.style.opacity = "0");
+      if (imgs[0]) {
+        imgs[0].src = nextSrc;
+        imgs[0].style.opacity = "1";
+      }
+    }, 2000);
+    coverCycleTimers.set(movieId, timer);
+  }
+
+  function scoreMovieLocal(movie, query) {
+    const q = query.toLowerCase();
+    const title = (movie.title || "").toLowerCase();
+    const synopsis = (movie.synopsis || "").toLowerCase();
+    const stars = (movie.stars || "").toLowerCase();
+    const director = (movie.director || "").toLowerCase();
+    if (title.includes(q)) return 3;
+    if (stars.includes(q) || director.includes(q)) return 2;
+    if (synopsis.includes(q)) return 1;
+    return 0;
+  }
+
+  function renderLiveDropdown(dropdown, results) {
+    if (!results.length) {
+      dropdown.innerHTML = `<div class="search-dropdown-no-results">No results</div>`;
+      return;
+    }
+    const lang = localStorage.getItem("siteLanguage") || "en";
+    const openLabel = lang === "fa" ? "باز کن" : "Open";
+
+    dropdown.innerHTML = results.map(m => {
+      const href = buildMoviePageHref ? buildMoviePageHref(m.title) : `/movie.html?slug=${encodeURIComponent((m.title||"").toLowerCase().replace(/\s+/g,"-"))}`;
+      const borderClass = m.type === "collection" ? "collection-border" : m.type === "series" ? "serial-border" : "";
+      const coverHtml = m.type === "collection"
+        ? `<div class="search-dropdown-cover-wrap" data-mid="${m.id}"><img src="${escapeHtml(m.cover||"")}" alt="" style="opacity:1;" /></div>`
+        : `<img src="${escapeHtml(m.cover||"")}" alt="" class="search-dropdown-cover" />`;
+      return `<div class="search-dropdown-item ${borderClass}" data-href="${escapeHtml(href)}" data-mid="${m.id}">
+        ${coverHtml}
+        <span class="search-dropdown-title">${escapeHtml(m.title||"")}</span>
+        <button class="search-dropdown-open-btn" data-href="${escapeHtml(href)}">${openLabel}</button>
+      </div>`;
+    }).join("");
+
+    // Click handlers
+    dropdown.querySelectorAll(".search-dropdown-item").forEach(item => {
+      item.addEventListener("click", (e) => {
+        const openBtn = e.target.closest(".search-dropdown-open-btn");
+        if (openBtn) {
+          e.stopPropagation();
+          window.open(openBtn.dataset.href, "_blank");
+          return;
+        }
+        const href = item.dataset.href;
+        if (href) window.location.href = href;
+      });
+    });
+
+    // Collection cover cycling
+    results.filter(m => m.type === "collection").forEach(m => {
+      const wrap = dropdown.querySelector(`.search-dropdown-cover-wrap[data-mid="${m.id}"]`);
+      if (!wrap) return;
+      const epCovers = episodesCoverMap.get(m.id) || [];
+      const allCovers = [m.cover, ...epCovers].filter(Boolean);
+      startCycle(wrap, allCovers, m.id);
+    });
+  }
+
+  // Build movie page href using same logic as script.js
+  function buildMoviePageHref(title) {
+    if (typeof makeMovieSlug === "function") {
+      const slug = makeMovieSlug(title || "");
+      return slug ? `/movie.html?slug=${encodeURIComponent(slug)}` : "/movie.html";
+    }
+    const slug = String(title || "").toLowerCase().trim()
+      .replace(/[\(\)\[\]\{\}]/g, "")
+      .replace(/[^a-z0-9\u0600-\u06FF]+/gi, "-")
+      .replace(/-+/g, "-").replace(/^-|-$/g, "");
+    return slug ? `/movie.html?slug=${encodeURIComponent(slug)}` : "/movie.html";
+  }
+
+  let dropdownDebounce = null;
+
+  function onHomepageSearchInput(searchInput, dropdown) {
+    clearTimeout(dropdownDebounce);
+    dropdownDebounce = setTimeout(async () => {
+      const query = searchInput.value.trim();
+      if (!query) {
+        dropdown.style.display = "none";
+        coverCycleTimers.forEach(t => clearInterval(t));
+        coverCycleTimers.clear();
+        return;
+      }
+
+      // Use in-memory movies array from main script
+      const allMovies = Array.isArray(movies) ? movies : [];
+      const scored = allMovies
+        .map(m => ({ movie: m, score: scoreMovieLocal(m, query) }))
+        .filter(r => r.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10)
+        .map(r => r.movie);
+
+      // Prefetch episode covers for collections
+      const colIds = scored.filter(m => m.type === "collection").map(m => m.id);
+      if (colIds.length) await prefetchEpisodeCovers(colIds);
+
+      renderLiveDropdown(dropdown, scored);
+      dropdown.style.display = scored.length ? "block" : "none";
+    }, 180);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("search");
+    const dropdown = document.getElementById("searchLiveDropdown");
+    if (!searchInput || !dropdown) return;
+
+    searchInput.addEventListener("input", () => onHomepageSearchInput(searchInput, dropdown));
+
+    // Close dropdown on outside click
+    document.addEventListener("click", (e) => {
+      if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.style.display = "none";
+      }
+    });
+
+    // Prevent closing when clicking in dropdown
+    dropdown.addEventListener("click", e => e.stopPropagation());
+
+    // Handle URL params: openMenu, openFavorites (from dock on movie/actor pages)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("openMenu") === "1") {
+      const menuBtn = document.getElementById("bottomMenuBtn") || document.getElementById("menuBtn");
+      if (menuBtn) setTimeout(() => menuBtn.click(), 400);
+    }
+    if (urlParams.get("openFavorites") === "1") {
+      const favBtn = document.getElementById("favoriteMoviesBtn") || document.getElementById("bottomFavoritesBtn");
+      if (favBtn) setTimeout(() => favBtn.click(), 400);
+    }
+  });
+})();

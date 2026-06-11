@@ -5,10 +5,16 @@
     { "source": "/movie/:slug*", "destination": "/movie.html?slug=:slug*" },
     { "source": "/actor", "destination": "/actor.html" },
     { "source": "/actor/", "destination": "/actor.html" },
-    { "source": "/actor/:slug*", "destination": "/actor.html?slug=:slug*" },
-    { "source": "/sitemap.xml", "destination": "/sitemap.xml" }
+    { "source": "/actor/:slug*", "destination": "/actor.html?slug=:slug*" }
   ],
   "headers": [
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        { "key": "Content-Type", "value": "application/xml; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    },
     {
       "source": "/movie/:slug*",
       "headers": [

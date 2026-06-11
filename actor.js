@@ -273,4 +273,20 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "/";
   });
   loadActorPage();
+
+  // Dock: search button → focus search input in hydrated header
+  document.querySelector("#bottomSearchBtn")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const si = document.getElementById("search");
+    if (si) { try { si.focus({ preventScroll: true }); } catch { si.focus(); } window.scrollTo({ top: 0, behavior: "smooth" }); }
+  });
+  // Dock: menu → go home and open menu
+  document.querySelector("#bottomMenuBtn")?.addEventListener("click", () => {
+    window.location.href = new URL("/?openMenu=1", window.location.origin).href;
+  });
+  // Dock: favorites → go home and open favorites
+  document.querySelector("#bottomFavoritesBtn")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    window.location.href = new URL("/?openFavorites=1", window.location.origin).href;
+  });
 });

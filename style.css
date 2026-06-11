@@ -2456,15 +2456,15 @@ body.dark .year-spinner-center {
 }
 
 .badge-collection {
-  background: var(--btn-day);
-}
+  background: linear-gradient(90deg, rgba(var(--theme-accent-rgb), 0.85) 0%, var(--theme-accent) 100%);
+} /* آبی برای کالکشن */
 .badge-serial {
   background: linear-gradient(
     90deg,
-    rgba(var(--theme-accent-rgb), 0.75) 0%,
-    var(--theme-accent) 100%
+    rgba(230, 81, 0, 0.85) 0%,
+    #e65100 100%
   );
-} /* آبی */
+} /* نارنجی برای سریال */
 
 .collection-badge .badge-count {
   display: inline-flex;
@@ -8404,3 +8404,311 @@ body.dark #authModal .login-box {
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
+
+/* ===== PATCH: Series badge orange, Collection badge blue ===== */
+.badge-serial {
+  background: #e65100 !important; /* نارنجی تیره برای سریال */
+}
+.badge-serial.collection-badge {
+  background: #e65100 !important;
+}
+.badge-collection {
+  background: var(--theme-accent, #1e88e5) !important; /* آبی برای کالکشن */
+}
+
+/* ===== PATCH: Dock — always at bottom, never moves with keyboard ===== */
+.mobile-bottom-dock {
+  position: fixed !important;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+  top: auto !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  will-change: auto !important;
+  contain: none !important;
+  z-index: 13000 !important;
+}
+@supports (height: 100dvh) {
+  .mobile-bottom-dock {
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    top: auto !important;
+  }
+}
+/* Force dock visible and unaffected by viewport resize (keyboard) */
+body.keyboard-open .mobile-bottom-dock {
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+/* ===== PATCH: Login/Signup padding fix ===== */
+#authModal .login-box {
+  padding: 20px !important;
+}
+#authModal .auth-tabs {
+  margin-bottom: 16px !important;
+}
+#authModal .tab-content {
+  gap: 12px !important;
+}
+#authModal input[type="text"],
+#authModal input[type="email"],
+#authModal input[type="password"] {
+  padding: 10px 12px !important;
+  min-height: 44px !important;
+}
+#authModal .login-btn {
+  padding: 12px !important;
+  min-height: 44px !important;
+}
+#authModal .tab-btn {
+  padding: 10px 12px !important;
+  min-height: 40px !important;
+}
+
+/* ===== PATCH: Site Features — direction based on language ===== */
+html[lang="en"] .site-features,
+html[lang="en"] .site-features .feature-accordion-body,
+html[lang="en"] .site-features .feature-accordion-header {
+  direction: ltr !important;
+  text-align: left !important;
+}
+html[lang="en"] .site-features h2 {
+  direction: ltr !important;
+  text-align: left !important;
+}
+html[lang="en"] .site-features .feature-accordion-body p {
+  direction: ltr !important;
+  text-align: left !important;
+}
+html[lang="fa"] .site-features,
+html[lang="fa"] .site-features .feature-accordion-body,
+html[lang="fa"] .site-features .feature-accordion-header {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+/* ===== PATCH: Movie/Actor page — document direction fixed by JS lang ===== */
+html[lang="en"] .movie-page-container,
+html[lang="en"] .actor-page-container {
+  direction: ltr;
+}
+html[lang="fa"] .movie-page-container,
+html[lang="fa"] .actor-page-container {
+  direction: rtl;
+}
+
+/* ===== Social Links Section ===== */
+.social-links-section {
+  max-width: 600px;
+  margin: 0 auto 24px;
+  padding: 0 12px;
+}
+.social-link-card {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border-radius: 16px;
+  border: 1.5px solid rgba(0, 136, 204, 0.22);
+  box-shadow: 0 4px 18px rgba(0, 136, 204, 0.10), 0 1px 4px rgba(0,0,0,0.06);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+  min-height: 60px;
+  cursor: pointer;
+}
+.social-link-card:active {
+  transform: scale(0.98);
+}
+body.dark .social-link-card {
+  background: rgba(20, 26, 34, 0.82);
+  border-color: rgba(0, 136, 204, 0.25);
+  box-shadow: 0 4px 18px rgba(0, 136, 204, 0.15), 0 1px 4px rgba(0,0,0,0.3);
+}
+.social-link-icon {
+  width: 56px;
+  min-width: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 136, 204, 0.10);
+  height: 60px;
+  border-radius: 0;
+}
+body.dark .social-link-icon {
+  background: rgba(0, 136, 204, 0.15);
+}
+.social-link-icon img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+.social-link-label {
+  flex: 1;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0a4c73;
+  padding: 0 8px;
+}
+body.dark .social-link-label {
+  color: #7ecff5;
+}
+.social-link-join-bubble {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0088cc, #0055a5);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-right: 12px;
+  white-space: nowrap;
+  min-width: 52px;
+  box-shadow: 0 2px 6px rgba(0,136,204,0.25);
+}
+html[dir="ltr"] .social-link-join-bubble {
+  margin-right: 0;
+  margin-left: 12px;
+}
+html[lang="fa"] .social-link-label {
+  text-align: center;
+}
+html[lang="en"] .social-link-label {
+  text-align: center;
+}
+
+/* ===== Search Dropdown (live preview) ===== */
+.search-live-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20000;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.07);
+  border: 1px solid rgba(0,0,0,0.07);
+  overflow: hidden;
+  max-height: 480px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+body.dark .search-live-dropdown {
+  background: rgba(18, 24, 32, 0.97);
+  border-color: rgba(255,255,255,0.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.25);
+}
+.search-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  transition: background 0.15s;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+}
+body.dark .search-dropdown-item {
+  border-bottom-color: rgba(255,255,255,0.05);
+}
+.search-dropdown-item:last-child {
+  border-bottom: none;
+}
+.search-dropdown-item:hover,
+.search-dropdown-item:active {
+  background: rgba(var(--theme-accent-rgb, 30,136,229), 0.07);
+}
+.search-dropdown-item.collection-border {
+  border-left: 3px solid #1e88e5;
+}
+html[dir="rtl"] .search-dropdown-item.collection-border {
+  border-left: none;
+  border-right: 3px solid #1e88e5;
+}
+.search-dropdown-item.serial-border {
+  border-left: 3px solid #e65100;
+}
+html[dir="rtl"] .search-dropdown-item.serial-border {
+  border-left: none;
+  border-right: 3px solid #e65100;
+}
+.search-dropdown-cover {
+  width: 42px;
+  min-width: 42px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #eee;
+}
+.search-dropdown-title {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.search-dropdown-open-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--theme-accent, #1e88e5);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  min-width: 46px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.search-dropdown-open-btn:hover {
+  background: var(--theme-accent-dark, #1565c0);
+}
+/* Sliding cover for collections */
+.search-dropdown-cover-wrap {
+  position: relative;
+  width: 42px;
+  min-width: 42px;
+  height: 58px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.search-dropdown-cover-wrap img {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  transition: opacity 0.4s ease;
+}
+.search-dropdown-no-results {
+  padding: 16px;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.55;
+}
+/* Wrapper for search input — needed for dropdown positioning */
+.search-input-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
