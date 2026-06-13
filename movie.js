@@ -3,7 +3,31 @@ const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+window._supabaseClient = db;
+window.SUPABASE_URL = SUPABASE_URL;
+window.SUPABASE_KEY = SUPABASE_KEY;
 let currentMovie = null;
+
+function showToast(msg) {
+  try {
+    let container = document.getElementById("topToastContainer");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "topToastContainer";
+      container.style.cssText = "position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:999999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:max-content;max-width:90vw;";
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement("div");
+    toast.style.cssText = "pointer-events:auto;max-width:min(920px,95%);padding:10px 14px;background:rgba(0,74,124,0.85);color:#fff;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.3);font-size:14px;line-height:1.2;text-align:center;opacity:0;transition:opacity 220ms ease,transform 220ms ease;transform:translateY(-6px);";
+    toast.textContent = msg || "";
+    container.appendChild(toast);
+    requestAnimationFrame(() => { toast.style.opacity = "1"; toast.style.transform = "translateY(0)"; });
+    setTimeout(() => {
+      toast.style.opacity = "0"; toast.style.transform = "translateY(-6px)";
+      setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 250);
+    }, 3000);
+  } catch(err) { console.error("showToast error", err); }
+}
 let currentUser = null;
 let favoriteMovieIds = new Set();
 let actorAvatarMap = new Map();
@@ -759,6 +783,7 @@ function attachCommentsHandlers(card, movieId) {
     await db.from("comments").insert([{ movie_id: movieId, name, text, approved: false, published: false }]);
     if (nameInput) nameInput.value = "";
     if (textInput) textInput.value = "";
+    showToast(pageLang === "fa" ? "کامنت بعد از تایید ادمین نمایش داده خواهد شد" : "Comment will be shown after admin approval");
     await refresh();
     sendBtn.disabled = false;
   });
@@ -1057,6 +1082,52 @@ async function loadMoviePage() {
     const slug = parseSlug();
     if (!slug) return (status.textContent = mt("missingSlug"));
 
+    // ===== نمایش فوری از کش sessionStorage =====
+    let quickMovie = null;
+    try {
+      const cached = sessionStorage.getItem("filmchin_quick_movie");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && makeMovieSlug(parsed.title || "") === slug) {
+          quickMovie = parsed;
+        }
+        sessionStorage.removeItem("filmchin_quick_movie");
+      }
+    } catch(e) { /* ignore */ }
+
+    if (quickMovie) {
+      currentMovie = quickMovie;
+      applyMovieHeroBackground(quickMovie.cover || "");
+      await loadCurrentUserAndFavorites();
+      bindPostOptions(slug);
+      syncFavoriteOptionUi();
+      setSeo(quickMovie, slug);
+      // رندر کارت اصلی فوری (بدون فیلم‌های مشابه)
+      renderMovieCard(cardContainer, quickMovie, [], []);
+      status.hidden = true;
+      cardContainer.hidden = false;
+
+      // لود کامل در پس‌زمینه برای فیلم‌های مشابه
+      fetchActorAvatars().catch(() => {});
+      db.from("movies").select("*").then(({ data: allMovies, error }) => {
+        if (error || !Array.isArray(allMovies)) return;
+        window._fcMovies = allMovies;
+        setTimeout(() => {
+          if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
+          if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
+        }, 200);
+        const fullMovie = allMovies.find((item) => makeMovieSlug(item.title) === slug) || quickMovie;
+        currentMovie = fullMovie;
+        // افزودن فیلم‌های مشابه بعد از لود
+        cardContainer.querySelectorAll(".similar-movies-section").forEach(el => el.remove());
+        renderSimilarMovies(cardContainer, buildSimilarByGenre(fullMovie, allMovies), "similarByGenreTitle", "noSimilarGenre");
+        renderSimilarMovies(cardContainer, buildSimilarByActors(fullMovie, allMovies), "similarByActorsTitle", "noActorsArchive");
+        renderSimilarMovies(cardContainer, buildBySameDirector(fullMovie, allMovies), "bySameDirectorTitle", "noDirectorArchive");
+      });
+      return;
+    }
+
+    // ===== بدون کش: لود معمولی =====
     await fetchActorAvatars();
     const { data: movies, error } = await db.from("movies").select("*");
     if (error || !Array.isArray(movies)) return (status.textContent = mt("fetchError"));
@@ -1064,8 +1135,17 @@ async function loadMoviePage() {
     const movie = movies.find((item) => makeMovieSlug(item.title) === slug);
     if (!movie) return (status.textContent = mt("notFound"));
 
-    // ذخیره برای live search dropdown
+    // ذخیره برای live search dropdown و genre/country grid در سایدمنو
     window._fcMovies = movies;
+    // ساخت genre و country grid در sidemenu بعد از لود فیلم‌ها
+    setTimeout(() => {
+      if (window.FilmChiinSharedSections?.buildSideMenuGenres) {
+        window.FilmChiinSharedSections.buildSideMenuGenres();
+      }
+      if (window.FilmChiinSharedSections?.buildSideMenuCountries) {
+        window.FilmChiinSharedSections.buildSideMenuCountries();
+      }
+    }, 200);
 
     currentMovie = movie;
     applyMovieHeroBackground(movie.cover || "");

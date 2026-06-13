@@ -1,3 +1,55 @@
+// -------------------- Scroll position restoration --------------------
+// از bfcache مرورگر استفاده می‌کنیم تا صفحه عیناً همان‌طور که بود برگردد
+// بدون لود مجدد - دقیقاً مانند تمام سایت‌های استاندارد
+(function setupScrollRestoration() {
+  // "auto" به مرورگر اجازه می‌دهد از bfcache برای برگشت سریع استفاده کند
+  if ("scrollRestoration" in history) {
+    history.scrollRestoration = "auto";
+  }
+  // اگر از bfcache برگشتیم، اسکرول به جای ذخیره‌شده برود
+  window.addEventListener("pageshow", (e) => {
+    const saved = sessionStorage.getItem("filmchin_scroll_y");
+    if (saved !== null && e.persisted) {
+      // bfcache hit + موقعیت ذخیره شده
+      const y = parseInt(saved, 10) || 0;
+      sessionStorage.removeItem("filmchin_scroll_y");
+      setTimeout(() => window.scrollTo({ top: y, behavior: "instant" }), 16);
+    } else if (saved !== null && !e.persisted) {
+      // صفحه دوباره لود شد (نه bfcache) - اسکرول را بازیابی کن
+      const y = parseInt(saved, 10) || 0;
+      sessionStorage.removeItem("filmchin_scroll_y");
+      setTimeout(() => window.scrollTo({ top: y, behavior: "instant" }), 80);
+    }
+  });
+
+  // ===== bfcache: قطع Supabase WebSocket قبل از خروج از صفحه =====
+  // Supabase JS SDK یک WebSocket برای auth token refresh باز می‌کند
+  // که باعث می‌شود مرورگر صفحه را در bfcache ذخیره نکند.
+  // راه‌حل: قبل از pagehide کانال‌ها را می‌بندیم و بعد از pageshow بازیابی می‌کنیم.
+  window.addEventListener("pagehide", () => {
+    try {
+      const client = window._supabaseClient;
+      if (client?.realtime) {
+        client.realtime.disconnect();
+      }
+    } catch(e) { /* ignore */ }
+  });
+
+  window.addEventListener("pageshow", (ev) => {
+    if (ev.persisted) {
+      // صفحه از bfcache برگشت — اتصال Supabase را بازیابی کن
+      try {
+        const client = window._supabaseClient;
+        if (client?.realtime) {
+          client.realtime.connect();
+        }
+        // بازیابی auth token در صورت انقضا
+        client?.auth?.startAutoRefresh?.();
+      } catch(e) { /* ignore */ }
+    }
+  });
+})();
+
 // -------------------- Supabase config --------------------
 const SUPABASE_URL = "https://gwsmvcgjdodmkoqupdal.supabase.co";
 const SUPABASE_KEY =
@@ -1799,6 +1851,7 @@ document.addEventListener("DOMContentLoaded", () => {
       tabSeries: "Series",
       tabMovies: "Movies",
       genres: "Genres",
+      countries: "Countries",
       homepageManager: "Homepage Manager",
       animations: "Animations",
       tabs: "Tabs",
@@ -1959,6 +2012,7 @@ document.addEventListener("DOMContentLoaded", () => {
       tabSeries: "سریال‌ها",
       tabMovies: "فیلم‌ها",
       genres: "ژانرها",
+      countries: "کشورها",
       homepageManager: "مدیریت صفحه اصلی",
       animations: "انیمیشن‌ها",
       tabs: "تب‌ها",
@@ -3102,9 +3156,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
-      if (currentTabGenre) {
+      if (currentTabGenres.length > 0) {
         filtered = filtered.filter((m) => {
-          return (m.genre || "").split(" ").includes(currentTabGenre);
+          const mg = (m.genre || "").split(" ");
+          return currentTabGenres.every((g) => mg.includes(g));
         });
       }
 
@@ -3389,7 +3444,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function shouldUseServerPagination() {
     const hasSearch = Boolean((searchInput?.value || "").trim());
     const hasExtraFilters =
-      Boolean(currentTabGenre) ||
+      currentTabGenres.length > 0 ||
       imdbMinRating !== null ||
       typeof yearMinFilter === "number";
     return !hasSearch && !hasExtraFilters;
@@ -3403,7 +3458,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function fetchMovieStats() {
-    const { data, error } = await db.from("movies").select("type,genre");
+    const { data, error } = await db.from("movies").select("type,genre,product");
     if (error) {
       console.error("fetchMovieStats error", error);
       moviesStats = [];
@@ -3491,6 +3546,9 @@ document.addEventListener("DOMContentLoaded", () => {
       // ساخت و بروزرسانی گرید ژانرها در سایدبار یا بخش فیلترها
       if (typeof buildGenreGrid === "function") {
         buildGenreGrid();
+      }
+      if (typeof buildCountryGrid === "function") {
+        buildCountryGrid();
       }
 
       if (usingServerPagination) {
@@ -3612,6 +3670,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
   window.addEventListener("filmchin:languagechange", () => renderMessages());
+  // بازسازی ژانرها و کشورها در سایدمنو هنگام تغییر زبان
+  window.addEventListener("filmchin:languagechange", () => {
+    if (typeof buildGenreGrid === "function") buildGenreGrid();
+    if (typeof buildCountryGrid === "function") buildCountryGrid();
+  });
 
   // Genre grid
   function buildGenreGrid() {
@@ -3636,10 +3699,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const clean = g.startsWith("#") ? g.slice(1) : g;
       return !/^[A-Za-z]/.test(clean);
     });
-    const orderedGenres = [
-      ...englishGenres.sort((a, b) => b[1] - a[1]),
-      ...persianGenres.sort((a, b) => b[1] - a[1]),
-    ];
+    const orderedGenres = (() => {
+      const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
+      if (lang === "fa") {
+        return persianGenres.sort((a, b) => b[1] - a[1]);
+      } else {
+        return englishGenres.sort((a, b) => b[1] - a[1]);
+      }
+    })();
 
     orderedGenres.forEach(([g, count]) => {
       const div = document.createElement("div");
@@ -3661,6 +3728,43 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.remove("no-scroll", "menu-open");
       };
       genreGrid.appendChild(div);
+    });
+  }
+
+  // Country grid (based on product field — only #-prefixed tokens)
+  function buildCountryGrid() {
+    const countryGrid = document.getElementById("countryGrid");
+    if (!countryGrid) return;
+    const countryCounts = {};
+    const source = Array.isArray(moviesStats) && moviesStats.length ? moviesStats : (movies || []);
+    source.forEach((m) => {
+      if (m.product)
+        m.product.split(" ").forEach((c) => {
+          const name = c.trim();
+          // فقط توکن‌هایی که با # شروع می‌شوند (کشور سازنده)
+          if (!name || !name.startsWith("#")) return;
+          countryCounts[name] = (countryCounts[name] || 0) + 1;
+        });
+    });
+    countryGrid.innerHTML = "";
+    const countryEntries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]);
+    countryEntries.forEach(([country, count]) => {
+      const div = document.createElement("div");
+      div.className = "genre-chip";
+      div.innerHTML = `${escapeHtml(country)} <span class="count">${count}</span>`;
+      div.setAttribute("dir", "auto");
+      div.onclick = () => {
+        if (searchInput) {
+          searchInput.value = country;
+          searchInput.setAttribute("dir", "auto");
+        }
+        currentPage = 1;
+        renderPagedMovies();
+        document.getElementById("sideMenu")?.classList.remove("active");
+        document.getElementById("menuOverlay")?.classList.remove("active");
+        document.body.classList.remove("no-scroll", "menu-open");
+      };
+      countryGrid.appendChild(div);
     });
   }
 
@@ -4023,10 +4127,11 @@ function setTabInUrl(type) {
         searchInput.value = "";
       }
 
-      currentTabGenre = null;
+      currentTabGenres = [];
       document
         .querySelectorAll(".tab-genres-list .genre-chip.active")
         .forEach((ch) => ch.classList.remove("active"));
+      updateGenreStickyBehavior();
 
       applyActiveTab(type);
       updateDynamicTitle();
@@ -4150,7 +4255,25 @@ function setTabInUrl(type) {
 
   // -------------------- Render movies (paged) --------------------
   // متغیر سراسری برای ژانر انتخاب‌شده
-  let currentTabGenre = null;
+  let currentTabGenres = []; // چند ژانر همزمان (تا ۳ تا)
+
+  // Sticky genres: وقتی ژانری فعال باشد، کلاس genre-sticky-active به wrapper داده می‌شود
+  // CSS با position:sticky و top:10px کار sticky را انجام می‌دهد — بدون IntersectionObserver
+  function updateGenreStickyBehavior() {
+    const wrapper = document.querySelector(".tab-genres-wrapper");
+    if (!wrapper) return;
+    if (currentTabGenres.length > 0) {
+      wrapper.classList.add("genre-sticky-active");
+    } else {
+      wrapper.classList.remove("genre-sticky-active");
+    }
+  }
+
+  function initGenreScrollSticky() {
+    // هیچ observer نمی‌سازیم — CSS position:sticky کار را انجام می‌دهد
+    updateGenreStickyBehavior();
+  }
+  initGenreScrollSticky();
 
   function buildTabGenres(filteredMovies = null) {
     const container = document.querySelector(".tab-genres-list");
@@ -4230,7 +4353,7 @@ function setTabInUrl(type) {
 
       chip.setAttribute("dir", "auto");
 
-      if (currentTabGenre === g) {
+      if (currentTabGenres.includes(g)) {
         chip.classList.add("active");
       }
 
@@ -4240,22 +4363,29 @@ function setTabInUrl(type) {
       chip.appendChild(countSpan);
 
       chip.onclick = () => {
-        if (currentTabGenre === g) {
+        const idx = currentTabGenres.indexOf(g);
+        if (idx !== -1) {
+          // deselect
+          currentTabGenres.splice(idx, 1);
           chip.classList.remove("active");
-          currentTabGenre = null;
         } else {
-          container
-            .querySelectorAll(".genre-chip")
-            .forEach((c) => c.classList.remove("active"));
+          if (currentTabGenres.length >= 3) {
+            const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
+            showToast(lang === "fa" ? "بیشتر از ۳ ژانر نمی‌توانید انتخاب کنید" : "You can select up to 3 genres at once");
+            return;
+          }
+          currentTabGenres.push(g);
           chip.classList.add("active");
-          currentTabGenre = g;
         }
+        updateGenreStickyBehavior();
         currentPage = 1;
         renderPagedMovies();
       };
 
       container.appendChild(chip);
     });
+    // به‌روزرسانی sticky behavior بعد از بازسازی ژانرها
+    updateGenreStickyBehavior();
   }
 
   const episodeMatches = new Map();
@@ -4629,9 +4759,10 @@ function setTabInUrl(type) {
     });
   }
 // 3. فیلتر ژانر
-  if (currentTabGenre) {
+  if (currentTabGenres.length > 0) {
     filtered = filtered.filter((m) => {
-      return (m.genre || "").split(" ").includes(currentTabGenre);
+      const mg = (m.genre || "").split(" ");
+      return currentTabGenres.every((g) => mg.includes(g));
     });
   }
 
@@ -4934,6 +5065,11 @@ function setTabInUrl(type) {
         if (detailLink) {
           localStorage.setItem("filmchin_focus_movie_id", String(m.id || ""));
         }
+        // ذخیره موقعیت اسکرول و داده فیلم برای بارگذاری فوری
+        sessionStorage.setItem("filmchin_scroll_y", String(window.scrollY));
+        try {
+          sessionStorage.setItem("filmchin_quick_movie", JSON.stringify(m));
+        } catch(e) { /* ignore */ }
         return;
       }
 
@@ -5052,6 +5188,11 @@ function setTabInUrl(type) {
         e.preventDefault();
         e.stopPropagation();
         localStorage.setItem("filmchin_focus_movie_id", String(m.id || ""));
+        sessionStorage.setItem("filmchin_scroll_y", String(window.scrollY));
+        // ذخیره داده فیلم برای نمایش فوری در صفحه فیلم
+        try {
+          sessionStorage.setItem("filmchin_quick_movie", JSON.stringify(m));
+        } catch(e) { /* ignore quota errors */ }
         const url = goPageBtn.getAttribute("href") || goPageBtn.dataset.url || "#";
         if (url && url !== "#") window.location.href = url;
       });
@@ -8251,6 +8392,8 @@ function openMovieModal(m, startIdx = 0) {
       if (!error && data) {
         const el = document.getElementById("appVersion");
         if (el) el.textContent = "v" + data.value;
+        const adminEl = document.getElementById("adminVersionDisplay");
+        if (adminEl) adminEl.textContent = "نسخه فعلی: v" + data.value;
       }
     } catch (err) {
       console.error("loadAppVersion error:", err);

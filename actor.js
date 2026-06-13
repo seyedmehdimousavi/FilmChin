@@ -3,6 +3,9 @@ const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+window._supabaseClient = db;
+window.SUPABASE_URL = SUPABASE_URL;
+window.SUPABASE_KEY = SUPABASE_KEY;
 const pageLang = localStorage.getItem("siteLanguage") || "en";
 
 const i18n = {
@@ -218,11 +221,17 @@ async function loadActorPage() {
     return;
   }
 
-  const { data: movies, error } = await db.from("movies").select("id,title,cover,link,synopsis,stars,type,created_at").order("created_at", { ascending: false });
+  const { data: movies, error } = await db.from("movies").select("id,title,cover,link,synopsis,stars,type,created_at,genre,product").order("created_at", { ascending: false });
   if (error || !Array.isArray(movies)) {
     status.textContent = t("actorNotFound");
     return;
   }
+  // ذخیره برای live search و genre/country grid در سایدمنو
+  window._fcMovies = movies;
+  setTimeout(() => {
+    if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
+    if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
+  }, 200);
 
   const posts = movies.filter((m) => extractCommaSeparatedNames(m.stars || "").some((name) => makeActorSlug(name) === slug));
   if (!posts.length) {

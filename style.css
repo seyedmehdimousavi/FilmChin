@@ -172,6 +172,7 @@ Body.dark .main-header {
   backdrop-filter: blur(6px);
   height: 50px;
   position: relative;
+  z-index: 13000;
 }
 .themetogglle {
   width: 44px;
@@ -2225,6 +2226,19 @@ body.dark .chip-separator {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+}
+
+.tab-genres-wrapper.genre-sticky-active {
+  position: sticky;
+  top: 10px;
+  z-index: 899;
+  background: var(--theme-bg-day, #f2f7ff);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+body.dark .tab-genres-wrapper.genre-sticky-active {
+  background: rgba(20, 26, 34, 0.9);
 }
 
 .tab-genres-list {
@@ -7094,11 +7108,18 @@ body.dark .movie-page-back {
 .similar-movies-title {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  margin: 0 8px 10px;
-  font-weight: 800;
-  font-size: 1.05rem;
+  margin: 0 8px 14px;
+  font-weight: 900 !important;
+  font-size: 1.45rem !important;
   color: var(--theme-accent-dark);
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+.similar-movies-title strong {
+  font-weight: 900 !important;
+  font-size: inherit !important;
 }
 
 .similar-movies-container .episode-title span {
@@ -7494,31 +7515,43 @@ body.dark .dock-btn {
 .person-chip.actor-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
+  gap: 0;
+  padding: 0 8px 0 0;
   font-size: 11px;
   font-weight: 700;
   margin: 5px 0px 0px;
   line-height: 1;
+  overflow: hidden;
 }
 .actor-chip-avatar {
-  width: 14px;
-  height: 14px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   object-fit: cover;
-  flex: 0 0 14px;
-  border: 1px solid rgba(var(--theme-accent-rgb), 0.5);
+  flex: 0 0 22px;
+  border: none;
+  margin-right: 6px;
+}
+html[dir="rtl"] .actor-chip-avatar {
+  margin-right: 0;
+  margin-left: 6px;
 }
 .actor-chip-avatar-fallback {
-  width: 14px;
-  height: 14px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: rgba(var(--theme-accent-rgb), 0.2);
   color: var(--theme-accent-dark);
-  font-size: 8px;
+  font-size: 10px;
+  flex: 0 0 22px;
+  margin-right: 6px;
+}
+html[dir="rtl"] .actor-chip-avatar-fallback {
+  margin-right: 0;
+  margin-left: 6px;
 }
 
 /* ===== Movie page dynamic hero background ===== */
@@ -8760,4 +8793,9 @@ html[dir="rtl"] .search-dropdown-item.serial-border {
   position: relative;
   flex: 1;
   min-width: 0;
+}
+
+/* ===== Country accordion: hidden on index, visible on movie/actor pages ===== */
+body:not(.movie-page-body) #acc-country {
+  display: none !important;
 }
