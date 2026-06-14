@@ -4432,31 +4432,20 @@ body.dark .chat-input-row input {
 /* اوورلی تمام‌صفحه داخل سایدمنو */
 
 .chat-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 2147480000;
   backdrop-filter: blur(12px);
   background: rgba(0, 0, 0, 0.45);
   grid-template-rows: auto 1fr auto;
 }
-.chat-overlay {
-  top: 65px;
-}
 #chatOverlay {
   display: none;
 }
-#chatOverlay[aria-hidden="false"] {
-  display: grid !important; /* وقتی باز شد */
-}
-
-/* در صفحه‌های فرعی (movie/actor): chatOverlay داخل sideMenu است
-   باید فقط سایدمنو را پر کند نه کل صفحه */
+/* chatOverlay همیشه داخل sideMenu است — absolute روی sideMenu که خودش fixed است */
 .side-menu #chatOverlay[aria-hidden="false"] {
+  display: grid !important;
   position: absolute !important;
   inset: 0 !important;
-  top: 0 !important;
   z-index: 9999 !important;
-  border-radius: 0;
+  grid-template-rows: auto 1fr auto !important;
 }
 
 .chat-overlay-header {
@@ -4660,10 +4649,6 @@ body.dark .user-thread-snippet {
   display: flex;
   flex-direction: column;
   gap: 9px;
-}
-ack-btn {
-  background: #333;
-  color: #fff;
 }
 
 .chat-admin-avatar {

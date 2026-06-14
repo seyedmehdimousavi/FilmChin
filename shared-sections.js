@@ -811,8 +811,8 @@
         menuOverlayEl?.classList.remove("active");
         document.body.classList.remove("menu-open");
       } else {
-        // صفحه‌های فرعی: overlay را داخل sideMenu نگه دار
-        // مطمئن شو که chatOverlay داخل sideMenu است
+        // صفحه‌های فرعی: overlay را مستقیماً داخل sideMenu بذار (نه داخل chatBubble)
+        // چون chatBubble دارای position:relative است و overlay را محدود می‌کند
         const sideMenuEl = document.getElementById("sideMenu");
         if (sideMenuEl && chatOverlay.parentElement !== sideMenuEl) {
           sideMenuEl.appendChild(chatOverlay);
@@ -820,9 +820,8 @@
         // سایدمنو را scroll-lock کن تا overlay درست دیده شود
         if (sideMenuEl) sideMenuEl.style.overflow = "hidden";
         // سایدمنو باید باز بماند تا چت دیده شود
-        const sideMenuEl2 = document.getElementById("sideMenu");
-        if (sideMenuEl2 && !sideMenuEl2.classList.contains("active")) {
-          sideMenuEl2.classList.add("active");
+        if (sideMenuEl && !sideMenuEl.classList.contains("active")) {
+          sideMenuEl.classList.add("active");
           const menuOverlayEl = document.getElementById("menuOverlay");
           if (menuOverlayEl) menuOverlayEl.classList.add("active");
         }
@@ -1314,6 +1313,29 @@
   }
   window.fetchSocialLinksSubPage = fetchSocialLinksSubPage;
 
+  // بارگذاری نسخه اپ از Supabase برای صفحات فرعی
+  async function loadAppVersionSubPage() {
+    const el = document.getElementById("appVersion");
+    if (!el) return;
+    // اگر مقدار پیش‌فرض placeholder است لود کن
+    const SUPABASE_URL = "https://gwsmvcgjdodmkoqupdal.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
+    try {
+      if (!window.supabase?.createClient) return;
+      const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const { data, error } = await db
+        .from("app_meta")
+        .select("value")
+        .eq("key", "version")
+        .single();
+      if (!error && data?.value) {
+        el.textContent = "v" + data.value;
+      }
+    } catch (err) {
+      console.warn("loadAppVersionSubPage error:", err);
+    }
+  }
+
   // Run after hydrate
   const origHydrate = window.FilmChiinSharedSections?.hydrate;
   if (origHydrate) {
@@ -1323,6 +1345,8 @@
       updateSocialLinksLang();
       // Load social links for injected sidemenu
       setTimeout(() => fetchSocialLinksSubPage(), 600);
+      // Load real app version into sideMenu
+      setTimeout(() => loadAppVersionSubPage(), 300);
     };
   }
 

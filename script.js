@@ -8723,6 +8723,19 @@ function clearRatingFilter() {
     }
 
     // اوورلی باز شود
+    // chatOverlay باید مستقیم داخل sideMenu باشد (نه داخل chatBubble که position:relative دارد)
+    // sideMenu خودش fixed است → absolute داخلش دقیقاً اندازه sideMenu می‌شود
+    const sideMenuForChat = document.getElementById("sideMenu");
+    if (sideMenuForChat && chatOverlay && chatOverlay.parentElement !== sideMenuForChat) {
+      sideMenuForChat.appendChild(chatOverlay);
+    }
+    // سایدمنو باید باز باشد تا overlay دیده شود
+    if (sideMenuForChat && !sideMenuForChat.classList.contains("active")) {
+      sideMenuForChat.classList.add("active");
+      const menuOverlay = document.getElementById("menuOverlay");
+      if (menuOverlay) menuOverlay.classList.add("active");
+    }
+    if (sideMenuForChat) sideMenuForChat.style.overflow = "hidden";
     chatOverlay?.setAttribute("aria-hidden", "false");
 
     // کلاس وضعیت روی والد برای مخفی کردن ردیف ورودی
@@ -8734,7 +8747,9 @@ function clearRatingFilter() {
   function closeChatOverlay() {
     // اوورلی بسته شود
     chatOverlay?.setAttribute("aria-hidden", "true");
-
+    // بازگردانی overflow سایدمنو
+    const sideMenuForChat = document.getElementById("sideMenu");
+    if (sideMenuForChat) sideMenuForChat.style.overflow = "";
     // حذف کلاس وضعیت از والد برای نمایش دوباره ردیف ورودی
     chatBubble?.classList.remove("chat-open");
   }
