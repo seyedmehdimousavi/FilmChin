@@ -1107,27 +1107,71 @@ async function loadMoviePage() {
       status.hidden = true;
       cardContainer.hidden = false;
 
-      // لود کامل در پس‌زمینه برای فیلم‌های مشابه
+      // لود کامل در پس‌زمینه برای فیلم‌های مشابه + رندر کامل کارت
       fetchActorAvatars().catch(() => {});
-      db.from("movies").select("*").then(({ data: allMovies, error }) => {
+
+      // ابتدا movies را بگیر، سپس movie_items را برای رندر کامل کارت
+      db.from("movies").select("*").then(async ({ data: allMovies, error }) => {
         if (error || !Array.isArray(allMovies)) return;
+
+        // ذخیره در حافظه موقت مرورگر برای صفحات بعدی (ژانر/کشور سایدمنو)
         window._fcMovies = allMovies;
+        try { sessionStorage.setItem("filmchin_movies_cache", JSON.stringify(allMovies)); } catch(e) { /* quota */ }
+
         setTimeout(() => {
           if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
           if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
         }, 200);
+
         const fullMovie = allMovies.find((item) => makeMovieSlug(item.title) === slug) || quickMovie;
         currentMovie = fullMovie;
-        // افزودن فیلم‌های مشابه بعد از لود
-        cardContainer.querySelectorAll(".similar-movies-section").forEach(el => el.remove());
-        renderSimilarMovies(cardContainer, buildSimilarByGenre(fullMovie, allMovies), "similarByGenreTitle", "noSimilarGenre");
-        renderSimilarMovies(cardContainer, buildSimilarByActors(fullMovie, allMovies), "similarByActorsTitle", "noActorsArchive");
-        renderSimilarMovies(cardContainer, buildBySameDirector(fullMovie, allMovies), "bySameDirectorTitle", "noDirectorArchive");
+
+        // لود movie_items برای رندر کامل کارت (اپیزودها برای collection/serial)
+        let episodes = [];
+        if (fullMovie.type === "collection" || fullMovie.type === "serial") {
+          const { data: items } = await db.from("movie_items").select("*").eq("movie_id", fullMovie.id).order("order_index", { ascending: true });
+          episodes = [
+            {
+              title: fullMovie.title,
+              cover: fullMovie.cover,
+              link: fullMovie.link,
+              synopsis: fullMovie.synopsis,
+              director: fullMovie.director,
+              product: fullMovie.product,
+              stars: fullMovie.stars,
+              imdb: fullMovie.imdb,
+              release_info: fullMovie.release_info,
+              genre: fullMovie.genre,
+            },
+            ...(items || []),
+          ];
+        }
+
+        // رندر کامل کارت با داده‌های کامل (جایگزین رندر سریع اولیه)
+        applyMovieHeroBackground(fullMovie.cover || "");
+        setSeo(fullMovie, slug);
+        renderMovieCard(cardContainer, fullMovie, allMovies, episodes);
+        syncFavoriteOptionUi();
       });
       return;
     }
 
     // ===== بدون کش: لود معمولی =====
+    // سعی کن ابتدا از کش sessionStorage استفاده کن تا سایدمنو سریع‌تر لود شود
+    try {
+      const cachedMovies = sessionStorage.getItem("filmchin_movies_cache");
+      if (cachedMovies) {
+        const parsed = JSON.parse(cachedMovies);
+        if (Array.isArray(parsed) && parsed.length) {
+          window._fcMovies = parsed;
+          setTimeout(() => {
+            if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
+            if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
+          }, 100);
+        }
+      }
+    } catch(e) { /* ignore */ }
+
     await fetchActorAvatars();
     const { data: movies, error } = await db.from("movies").select("*");
     if (error || !Array.isArray(movies)) return (status.textContent = mt("fetchError"));
@@ -1137,6 +1181,8 @@ async function loadMoviePage() {
 
     // ذخیره برای live search dropdown و genre/country grid در سایدمنو
     window._fcMovies = movies;
+    // ذخیره در sessionStorage برای استفاده در صفحات بعدی (ژانر/کشور سایدمنو)
+    try { sessionStorage.setItem("filmchin_movies_cache", JSON.stringify(movies)); } catch(e) { /* quota */ }
     // ساخت genre و country grid در sidemenu بعد از لود فیلم‌ها
     setTimeout(() => {
       if (window.FilmChiinSharedSections?.buildSideMenuGenres) {

@@ -381,7 +381,17 @@
     const genreGrid = document.getElementById("genreGrid");
     if (!genreGrid) return;
     // Use movies from window._fcMovies if available (movie.js sets this)
-    const movies = window._fcMovies || [];
+    let movies = window._fcMovies || [];
+    // اگر در حافظه نبود از sessionStorage بخوان
+    if (!movies.length) {
+      try {
+        const cached = sessionStorage.getItem("filmchin_movies_cache");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length) { movies = parsed; window._fcMovies = parsed; }
+        }
+      } catch(e) { /* ignore */ }
+    }
     if (!movies.length) return;
     const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
     const genreCounts = {};
@@ -412,7 +422,17 @@
   function buildSideMenuCountries() {
     const countryGrid = document.getElementById("countryGrid");
     if (!countryGrid) return;
-    const movies = window._fcMovies || [];
+    let movies = window._fcMovies || [];
+    // اگر در حافظه نبود از sessionStorage بخوان
+    if (!movies.length) {
+      try {
+        const cached = sessionStorage.getItem("filmchin_movies_cache");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length) { movies = parsed; window._fcMovies = parsed; }
+        }
+      } catch(e) { /* ignore */ }
+    }
     if (!movies.length) return;
     const countryCounts = {};
     movies.forEach((m) => {
@@ -504,6 +524,18 @@
         } else {
           acc.classList.add("open");
           body.style.maxHeight = body.scrollHeight + "px";
+          // Lazy-load social links when links accordion is opened
+          if (acc.id === "acc-links") {
+            setTimeout(() => {
+              if (typeof window.fetchSocialLinksSubPage === "function") window.fetchSocialLinksSubPage();
+              // Recalculate height after content loaded
+              setTimeout(() => { body.style.maxHeight = body.scrollHeight + "px"; }, 600);
+            }, 50);
+          }
+          // Lazy-load countries when country accordion is opened
+          if (acc.id === "acc-country") {
+            setTimeout(() => { body.style.maxHeight = body.scrollHeight + "px"; }, 200);
+          }
         }
       });
     });
@@ -744,22 +776,80 @@
     }
 
     function openChatOverlay() {
-      if (chatOverlay) chatOverlay.setAttribute("aria-hidden", "false");
+      if (!chatOverlay) return;
+
+      // ✅ اگر کاربر لاگین نیست → toast نشان بده و برگرد (مانند صفحه اصلی)
+      const db = getDb();
+      if (!db) {
+        showChatToast(lang === "fa" ? "خطا در اتصال به سرویس" : "Service unavailable");
+        return;
+      }
+      db.auth.getUser().then(({ data: { user } }) => {
+        if (!user) {
+          showChatToast(lang === "fa" ? "برای ارسال پیام ابتدا لاگین کنید" : "Please log in to send messages");
+          return;
+        }
+        // کاربر لاگین است → چت را باز کن
+        _doOpenChatOverlay();
+      });
+    }
+
+    function _doOpenChatOverlay() {
+      if (!chatOverlay) return;
+      // بررسی کن آیا در صفحه فرعی (movie/actor) هستیم یا صفحه اصلی
+      const isSubPage = document.querySelector(".movie-page-body, .actor-page-body") !== null;
+      if (!isSubPage) {
+        // صفحه اصلی: overlay را به body منتقل کن تا position:fixed درست کار کند
+        // (sideMenu دارای transform است که containing block جدید می‌سازد)
+        if (chatOverlay.parentElement !== document.body) {
+          document.body.appendChild(chatOverlay);
+        }
+        // سایدمنو را ببند تا overlay دیده شود
+        const sideMenuEl = document.getElementById("sideMenu");
+        const menuOverlayEl = document.getElementById("menuOverlay");
+        sideMenuEl?.classList.remove("active");
+        menuOverlayEl?.classList.remove("active");
+        document.body.classList.remove("menu-open");
+      } else {
+        // صفحه‌های فرعی: overlay را داخل sideMenu نگه دار
+        // مطمئن شو که chatOverlay داخل sideMenu است
+        const sideMenuEl = document.getElementById("sideMenu");
+        if (sideMenuEl && chatOverlay.parentElement !== sideMenuEl) {
+          sideMenuEl.appendChild(chatOverlay);
+        }
+        // سایدمنو را scroll-lock کن تا overlay درست دیده شود
+        if (sideMenuEl) sideMenuEl.style.overflow = "hidden";
+        // سایدمنو باید باز بماند تا چت دیده شود
+        const sideMenuEl2 = document.getElementById("sideMenu");
+        if (sideMenuEl2 && !sideMenuEl2.classList.contains("active")) {
+          sideMenuEl2.classList.add("active");
+          const menuOverlayEl = document.getElementById("menuOverlay");
+          if (menuOverlayEl) menuOverlayEl.classList.add("active");
+        }
+      }
+      chatOverlay.setAttribute("aria-hidden", "false");
       chatBubble.classList.add("chat-open");
-      if (overlayInput) overlayInput.focus();
+      if (overlayInput) setTimeout(() => overlayInput.focus(), 100);
       loadChatMessages();
     }
 
     function closeChatOverlay() {
       if (chatOverlay) chatOverlay.setAttribute("aria-hidden", "true");
       chatBubble.classList.remove("chat-open");
+      // بازیابی overflow سایدمنو در صفحه‌های فرعی
+      const sideMenuEl = document.getElementById("sideMenu");
+      if (sideMenuEl) sideMenuEl.style.overflow = "";
     }
 
     chatBubble.addEventListener("click", (e) => {
-      if (chatOverlay.getAttribute("aria-hidden") !== "false") openChatOverlay();
+      if (!chatOverlay || chatOverlay.getAttribute("aria-hidden") !== "false") openChatOverlay();
     });
     chatInput?.addEventListener("focus", () => openChatOverlay());
-    chatBackBtn?.addEventListener("click", closeChatOverlay);
+    // دکمه بازگشت — با listener روی document چون overlay به body منتقل می‌شود
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("#userChatBackBtn");
+      if (btn) closeChatOverlay();
+    });
 
     async function ensureThread() {
       const db = getDb();
@@ -801,12 +891,12 @@
       if (!chatMessagesList) return;
       chatMessagesList.innerHTML = (arr || []).map((m) => {
         const side = m.role === "user" ? "user" : "admin";
-        const img = m.image_url ? `<img class="msg-image" src="${m.image_url}" alt="image" style="max-width:100%;border-radius:8px;">` : "";
+        const img = m.image_url ? `<img class="msg-image" src="${m.image_url.replace(/"/g,'&quot;')}" alt="image">` : "";
         const txt = m.text ? `<div class="msg-text">${m.text.replace(/</g,"&lt;")}</div>` : "";
         const time = new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        return `<div class="chat-message ${side}"><div class="msg-bubble">${img}${txt}<span class="msg-time">${time}</span></div></div>`;
+        return `<div class="msg-row ${side}"><div class="msg-bubble ${side}">${img}${txt}<div class="msg-meta"><span>${time}</span></div></div></div>`;
       }).join("");
-      chatMessagesList.scrollTop = chatMessagesList.scrollHeight;
+      setTimeout(() => { chatMessagesList.scrollTop = chatMessagesList.scrollHeight; }, 30);
     }
 
     // Send from overlay
@@ -827,15 +917,28 @@
       }
       if (!text && !imageUrl) return;
       if (inputEl) inputEl.value = "";
+      // Disable send button after sending
+      if (overlaySendBtn) overlaySendBtn.classList.add("disabled");
       await sendChatMessage(text, imageUrl);
     };
 
-    overlaySendBtn?.addEventListener("click", () => sendFn(overlayInput, overlayAttachFile));
+    // Enable/disable send button based on input
+    function updateSendBtnState() {
+      const hasText = (overlayInput?.value || "").trim().length > 0;
+      if (overlaySendBtn) overlaySendBtn.classList.toggle("disabled", !hasText);
+    }
+    overlayInput?.addEventListener("input", updateSendBtnState);
+    updateSendBtnState();
+
+    overlaySendBtn?.addEventListener("click", () => { if (!overlaySendBtn.classList.contains("disabled")) sendFn(overlayInput, overlayAttachFile); });
     overlayInput?.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendFn(overlayInput, overlayAttachFile); } });
     chatSendBtn?.addEventListener("click", () => sendFn(chatInput, chatAttachFile));
     chatInput?.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); sendFn(chatInput, chatAttachFile); } });
     overlayAttachBtn?.addEventListener("click", () => overlayAttachFile?.click());
     chatAttachBtn?.addEventListener("click", () => chatAttachFile?.click());
+
+    // Also clear and reset send btn after sending
+    const origSendFn = sendFn;
   } // end wireChatForSubPage
 
   // Support sheet wiring for movie/actor pages
@@ -954,22 +1057,14 @@
       newFavBtn.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
-        // Try to find overlay - it should be injected by hydrate()
-        const favOverlay = document.getElementById("favoritesOverlay");
-        if (favOverlay) {
-          favOverlay.setAttribute("aria-hidden", "false");
-          // Also trigger favorites load if function exists
-          if (typeof window.openFavoritesOverlayUI === "function") {
-            window.openFavoritesOverlayUI();
-          }
-        } else {
-          // Fallback: try again after a short delay (hydration may be async)
-          setTimeout(() => {
-            const overlay = document.getElementById("favoritesOverlay");
-            if (overlay) {
-              overlay.setAttribute("aria-hidden", "false");
-            }
-          }, 300);
+        if (typeof window.openFavoritesOverlayUI === "function") {
+          // Main page: use full function
+          window.openFavoritesOverlayUI();
+          return;
+        }
+        // Sub-pages (movie/actor): use standalone loader
+        if (typeof window.openFavoritesSubPage === "function") {
+          window.openFavoritesSubPage();
         }
       });
     }
@@ -1011,6 +1106,214 @@
     if (bubble) bubble.textContent = lang === "fa" ? "جوین" : "Join";
   }
 
+  // ---- Favorites standalone loader for sub-pages (movie/actor) ----
+  // از همان منطق صفحه اصلی استفاده می‌کند: favorites از DB + movies از window._fcMovies (کش) یا DB
+  const SUBPAGE_FAV_PAGE_SIZE = 9;
+  let subpageFavPage = 1;
+  let subpageFavData = []; // [{fav, movie}]
+
+  async function openFavoritesSubPage() {
+    const db = window._supabaseClient || window.db;
+    const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
+    if (!db) return;
+
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) {
+      _subpageShowToast(lang === "fa" ? "برای مشاهده علاقه‌مندی‌ها باید وارد شوید" : "Please log in to view favorites", true);
+      return;
+    }
+
+    const favOverlay = document.getElementById("favoritesOverlay");
+    if (!favOverlay) return;
+    favOverlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("no-scroll");
+
+    // Wire close button
+    const closeBtn = favOverlay.querySelector("#favoritesCloseBtn");
+    if (closeBtn && !closeBtn._wiredClose) {
+      closeBtn._wiredClose = true;
+      closeBtn.addEventListener("click", () => {
+        favOverlay.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("no-scroll");
+      });
+    }
+    // Wire pagination buttons (wire once)
+    const prevBtn = favOverlay.querySelector("#favoritesPrev");
+    const nextBtn = favOverlay.querySelector("#favoritesNext");
+    if (prevBtn && !prevBtn._wiredSubpage) {
+      prevBtn._wiredSubpage = true;
+      prevBtn.addEventListener("click", () => {
+        if (subpageFavPage > 1) { subpageFavPage--; _renderSubpageFavGrid(lang); }
+      });
+    }
+    if (nextBtn && !nextBtn._wiredSubpage) {
+      nextBtn._wiredSubpage = true;
+      nextBtn.addEventListener("click", () => {
+        const totalPages = Math.ceil(subpageFavData.length / SUBPAGE_FAV_PAGE_SIZE) || 1;
+        if (subpageFavPage < totalPages) { subpageFavPage++; _renderSubpageFavGrid(lang); }
+      });
+    }
+
+    const grid = document.getElementById("favoritesGrid");
+    if (!grid) return;
+    grid.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-muted,#888)">${lang === "fa" ? "در حال بارگذاری..." : "Loading..."}</div>`;
+
+    try {
+      // 1) بگیر favorites از DB (همان روش صفحه اصلی)
+      const { data: favRows, error: favErr } = await db.from("favorites")
+        .select("movie_id, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (favErr || !favRows || !favRows.length) {
+        grid.innerHTML = `<div class="favorites-empty">${lang === "fa" ? "هنوز فیلمی به علاقه‌مندی‌ها اضافه نشده" : "No favorite movies yet."}</div>`;
+        _updateSubpagePageInfo(0, 0);
+        return;
+      }
+
+      // 2) بگیر movies از کش window._fcMovies (همان منبع صفحه اصلی)
+      let allMovies = Array.isArray(window._fcMovies) && window._fcMovies.length ? window._fcMovies : null;
+
+      // اگر کش موجود نبود، از sessionStorage بخوان
+      if (!allMovies) {
+        try {
+          const cached = sessionStorage.getItem("filmchin_movies_cache");
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed) && parsed.length) { allMovies = parsed; window._fcMovies = parsed; }
+          }
+        } catch(e) { /* ignore */ }
+      }
+
+      // اگر هنوز هم موجود نبود، از DB بگیر
+      if (!allMovies) {
+        const { data: dbMovies } = await db.from("movies").select("*");
+        allMovies = dbMovies || [];
+        window._fcMovies = allMovies;
+        try { sessionStorage.setItem("filmchin_movies_cache", JSON.stringify(allMovies)); } catch(e) { /* quota */ }
+        // ساخت سایدمنو ژانر/کشور
+        setTimeout(() => {
+          if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
+          if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
+        }, 100);
+      }
+
+      // 3) ترکیب favorites + movies (همان منطق buildFavoritesWithMovies صفحه اصلی)
+      subpageFavData = favRows
+        .map(fav => {
+          const movie = allMovies.find(m => String(m.id) === String(fav.movie_id));
+          return movie ? { fav, movie } : null;
+        })
+        .filter(Boolean);
+
+      if (!subpageFavData.length) {
+        grid.innerHTML = `<div class="favorites-empty">${lang === "fa" ? "هیچ فیلمی پیدا نشد" : "No movies found."}</div>`;
+        _updateSubpagePageInfo(0, 0);
+        return;
+      }
+
+      subpageFavPage = 1;
+      _renderSubpageFavGrid(lang);
+
+    } catch (err) {
+      console.error("openFavoritesSubPage error", err);
+      const grid2 = document.getElementById("favoritesGrid");
+      if (grid2) grid2.innerHTML = `<div style="padding:20px;text-align:center;color:red">${lang === "fa" ? "خطا در بارگذاری" : "Error loading favorites"}</div>`;
+    }
+  }
+
+  function _renderSubpageFavGrid(lang) {
+    const grid = document.getElementById("favoritesGrid");
+    if (!grid) return;
+
+    const totalPages = Math.ceil(subpageFavData.length / SUBPAGE_FAV_PAGE_SIZE) || 1;
+    if (subpageFavPage < 1) subpageFavPage = 1;
+    if (subpageFavPage > totalPages) subpageFavPage = totalPages;
+
+    const start = (subpageFavPage - 1) * SUBPAGE_FAV_PAGE_SIZE;
+    const slice = subpageFavData.slice(start, start + SUBPAGE_FAV_PAGE_SIZE);
+
+    grid.innerHTML = slice.map(({ movie: m }) => {
+      const title = (m.title || "").replace(/</g, "&lt;");
+      const cover = (m.cover || m.poster || "/images/placeholder.png").replace(/"/g, "&quot;");
+      return `<div class="favorite-item" data-movie-id="${m.id}" style="cursor:pointer">
+        <img src="${cover}" alt="${title}" class="favorite-cover" loading="lazy" onerror="this.src='/images/placeholder.png'">
+        <div class="favorite-title" dir="auto">${title}</div>
+        <div class="favorite-meta"></div>
+        <div class="favorite-actions">
+          <div class="button-wrap">
+            <button class="favorite-goto-btn subpage-fav-goto" data-id="${m.id}"
+              style="font-size:12px;padding:4px 10px;">
+              <span>${lang === "fa" ? "صفحه فیلم" : "Go to page"}</span>
+            </button>
+            <div class="button-shadow"></div>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+
+    // Wire go-to buttons
+    grid.querySelectorAll(".subpage-fav-goto").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        if (id) window.location.href = `/movie.html?id=${id}`;
+      });
+    });
+    // Wire card click (whole card)
+    grid.querySelectorAll(".favorite-item").forEach(card => {
+      card.addEventListener("click", () => {
+        const id = card.dataset.movieId;
+        if (id) window.location.href = `/movie.html?id=${id}`;
+      });
+    });
+
+    _updateSubpagePageInfo(subpageFavPage, totalPages);
+
+    const prevBtn = document.getElementById("favoritesPrev");
+    const nextBtn = document.getElementById("favoritesNext");
+    if (prevBtn) prevBtn.disabled = subpageFavPage <= 1;
+    if (nextBtn) nextBtn.disabled = subpageFavPage >= totalPages;
+  }
+
+  function _updateSubpagePageInfo(page, total) {
+    const pageInfo = document.getElementById("favoritesPageInfo");
+    if (pageInfo) pageInfo.textContent = `${page} / ${total}`;
+  }
+
+  function _subpageShowToast(msg, isError = false) {
+    let container = document.getElementById("topToastContainer");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "topToastContainer";
+      container.style.cssText = "position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:999999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;";
+      document.body.appendChild(container);
+    }
+    const t = document.createElement("div");
+    t.style.cssText = `pointer-events:auto;padding:10px 16px;background:${isError ? "rgba(180,20,20,0.9)" : "rgba(0,74,124,0.9)"};color:#fff;border-radius:8px;font-size:14px;`;
+    t.textContent = msg;
+    container.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  window.openFavoritesSubPage = openFavoritesSubPage;
+
+  // ---- Social links loader for sub-pages ----
+  async function fetchSocialLinksSubPage() {
+    const db = window._supabaseClient || window.db;
+    if (!db) return;
+    const grid = document.getElementById("socialGrid");
+    if (!grid || grid.children.length > 0) return;
+    try {
+      const { data, error } = await db.from("social_links").select("*").order("created_at", { ascending: false });
+      if (error || !data) return;
+      grid.innerHTML = data.map(s =>
+        `<a href="${(s.url||"").replace(/"/g,"&quot;")}" target="_blank" rel="noopener" class="social-item"><img src="${(s.icon||"").replace(/"/g,"&quot;")}" alt="${(s.title||"").replace(/"/g,"&quot;")}"><span>${(s.title||"").replace(/</g,"&lt;")}</span></a>`
+      ).join("");
+    } catch(e) { console.error("fetchSocialLinksSubPage error", e); }
+  }
+  window.fetchSocialLinksSubPage = fetchSocialLinksSubPage;
+
   // Run after hydrate
   const origHydrate = window.FilmChiinSharedSections?.hydrate;
   if (origHydrate) {
@@ -1018,6 +1321,8 @@
       await origHydrate();
       setupDock();
       updateSocialLinksLang();
+      // Load social links for injected sidemenu
+      setTimeout(() => fetchSocialLinksSubPage(), 600);
     };
   }
 

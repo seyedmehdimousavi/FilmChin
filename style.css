@@ -2226,6 +2226,7 @@ body.dark .chip-separator {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  background: transparent;
 }
 
 .tab-genres-wrapper.genre-sticky-active {
@@ -4447,6 +4448,17 @@ body.dark .chat-input-row input {
 #chatOverlay[aria-hidden="false"] {
   display: grid !important; /* وقتی باز شد */
 }
+
+/* در صفحه‌های فرعی (movie/actor): chatOverlay داخل sideMenu است
+   باید فقط سایدمنو را پر کند نه کل صفحه */
+.side-menu #chatOverlay[aria-hidden="false"] {
+  position: absolute !important;
+  inset: 0 !important;
+  top: 0 !important;
+  z-index: 9999 !important;
+  border-radius: 0;
+}
+
 .chat-overlay-header {
   display: flex;
   align-items: center;
@@ -8795,7 +8807,54 @@ html[dir="rtl"] .search-dropdown-item.serial-border {
   min-width: 0;
 }
 
-/* ===== Country accordion: hidden on index, visible on movie/actor pages ===== */
-body:not(.movie-page-body) #acc-country {
-  display: none !important;
+/* ===== Country accordion: visible on all pages ===== */
+
+/* ===== Favorites sub-page cards (movie/actor pages) ===== */
+.fav-card {
+  background: var(--card-bg, rgba(255,255,255,0.95));
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+  transition: transform 0.18s;
+}
+.fav-card:active { transform: scale(0.97); }
+body.dark .fav-card {
+  background: #1f252a;
+}
+.fav-poster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  display: block;
+}
+.fav-info {
+  padding: 6px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.fav-title {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  color: var(--text-main, #111);
+}
+body.dark .fav-title { color: #f0f0f0; }
+.fav-meta {
+  font-size: 11px;
+  color: var(--text-muted, #888);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.fav-imdb {
+  color: #f5c518;
+  font-weight: 600;
+  font-size: 11px;
 }

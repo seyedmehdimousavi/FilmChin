@@ -221,6 +221,21 @@ async function loadActorPage() {
     return;
   }
 
+  // سعی کن ابتدا از کش sessionStorage استفاده کن تا سایدمنو سریع‌تر لود شود
+  try {
+    const cachedMovies = sessionStorage.getItem("filmchin_movies_cache");
+    if (cachedMovies) {
+      const parsed = JSON.parse(cachedMovies);
+      if (Array.isArray(parsed) && parsed.length) {
+        window._fcMovies = parsed;
+        setTimeout(() => {
+          if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
+          if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
+        }, 100);
+      }
+    }
+  } catch(e) { /* ignore */ }
+
   const { data: movies, error } = await db.from("movies").select("id,title,cover,link,synopsis,stars,type,created_at,genre,product").order("created_at", { ascending: false });
   if (error || !Array.isArray(movies)) {
     status.textContent = t("actorNotFound");
@@ -228,6 +243,8 @@ async function loadActorPage() {
   }
   // ذخیره برای live search و genre/country grid در سایدمنو
   window._fcMovies = movies;
+  // ذخیره در sessionStorage برای استفاده در صفحات بعدی (ژانر/کشور سایدمنو)
+  try { sessionStorage.setItem("filmchin_movies_cache", JSON.stringify(movies)); } catch(e) { /* quota */ }
   setTimeout(() => {
     if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
     if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
