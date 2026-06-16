@@ -34,6 +34,8 @@
       featureDesc15: "With the color theme option, you can personalize the site look to match your taste. Your selected theme is applied across UI sections for a more consistent and pleasant browsing experience.",
       featureTitle16: "Admin announcements on homepage",
       featureDesc16: "Messages published from the admin panel appear as announcements on the homepage, and users can mark them as read after viewing them.",
+      featureTitle17: "Dedicated genre page",
+      featureDesc17: "Clicking any genre from the 'Genres' section opens a dedicated page showing all movies of that genre. Movies are displayed in a 3-column card layout, with a 'Show more' button to load additional films.",
       searchPlaceholder: "Search...",
     },
     fa: {
@@ -70,6 +72,8 @@
       featureDesc15: "با گزینه تغییر تم رنگی، می‌توانید ظاهر سایت را متناسب با سلیقه خود شخصی‌سازی کنید. تم انتخابی روی بخش‌های مختلف رابط کاربری اعمال می‌شود تا تجربه مرور سایت هماهنگ‌تر و دلپذیرتر باشد.",
       featureTitle16: "اعلان‌های مدیریت در صفحه اصلی",
       featureDesc16: "پیام‌هایی که مدیریت از پنل ادمین منتشر می‌کند، به‌صورت اعلان در صفحه اصلی نمایش داده می‌شوند و کاربر می‌تواند بعد از خواندن، آن‌ها را علامت‌گذاری کند.",
+      featureTitle17: "صفحه اختصاصی ژانر",
+      featureDesc17: "با کلیک روی هر ژانر از بخش «ژانر ها» صفحه‌ای اختصاصی با تمامی فیلم‌های آن ژانر باز می‌شود. فیلم‌ها در قالب کارت‌های سه‌ستونه نمایش داده می‌شوند و دکمه «نمایش بیشتر» به کاربر امکان می‌دهد فیلم‌های بیشتری را ببیند.",
       searchPlaceholder: "جست‌وجو...",
     },
   };
@@ -412,8 +416,8 @@
       div.setAttribute("dir", "auto");
       div.innerHTML = `${g.replace(/</g,"&lt;")} <span class="count">${count}</span>`;
       div.onclick = () => {
-        // Navigate to homepage with search query for this genre
-        window.location.href = `/?search=${encodeURIComponent(g)}`;
+        // Navigate to genre page for this genre
+        window.location.href = `/genre.html?genre=${encodeURIComponent(g)}`;
       };
       genreGrid.appendChild(div);
     });
@@ -460,7 +464,7 @@
   // ===== Wire up injected side menu for movie/actor pages =====
   function wireSideMenuOnSubPages() {
     // Only run on sub-pages (not index.html which has script.js)
-    if (!document.querySelector(".movie-page-body, .actor-page-body")) return;
+    if (!document.querySelector(".movie-page-body, .actor-page-body, .genre-page-body")) return;
 
     const sideMenu = document.getElementById("sideMenu");
     if (!sideMenu || sideMenu.dataset.wired === "1") return;
@@ -797,7 +801,7 @@
     function _doOpenChatOverlay() {
       if (!chatOverlay) return;
       // بررسی کن آیا در صفحه فرعی (movie/actor) هستیم یا صفحه اصلی
-      const isSubPage = document.querySelector(".movie-page-body, .actor-page-body") !== null;
+      const isSubPage = document.querySelector(".movie-page-body, .actor-page-body, .genre-page-body") !== null;
       if (!isSubPage) {
         // صفحه اصلی: overlay را به body منتقل کن تا position:fixed درست کار کند
         // (sideMenu دارای transform است که containing block جدید می‌سازد)
@@ -1020,7 +1024,56 @@
     }
   } // end wireSupportForSubPage
 
-  window.FilmChiinSharedSections = { hydrate, buildSideMenuGenres, buildSideMenuCountries };
+  // ===== Genre Hub Grid for sub-pages =====
+  function buildGenreHubGrid() {
+    const genreHubGrid = document.getElementById("genreHubGrid");
+    if (!genreHubGrid) return;
+    let movies = window._fcMovies || [];
+    if (!movies.length) {
+      try {
+        const cached = sessionStorage.getItem("filmchin_movies_cache");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length) { movies = parsed; window._fcMovies = parsed; }
+        }
+      } catch(e) { /* ignore */ }
+    }
+    if (!movies.length) return;
+    const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
+    const hubI18n = {
+      en: { title: "Genres", subtitle: "Click on a genre to browse movies and series." },
+      fa: { title: "ژانر ها", subtitle: "برای دانلود فیلم و سریال های ژانر مورد علاقه روش کلیک کن." },
+    };
+    const genreCounts = {};
+    movies.forEach((m) => {
+      if (m.genre) m.genre.split(" ").forEach((g) => {
+        const name = g.trim();
+        if (!name) return;
+        genreCounts[name] = (genreCounts[name] || 0) + 1;
+      });
+    });
+    const genreEntries = Object.entries(genreCounts);
+    const persianGenres = genreEntries.filter(([g]) => !/^[A-Za-z]/.test(g.startsWith("#") ? g.slice(1) : g));
+    const englishGenres = genreEntries.filter(([g]) => /^[A-Za-z]/.test(g.startsWith("#") ? g.slice(1) : g));
+    const orderedGenres = (lang === "fa" ? persianGenres : englishGenres).sort((a, b) => b[1] - a[1]);
+    genreHubGrid.innerHTML = "";
+    orderedGenres.forEach(([g, count]) => {
+      const cleanName = g.startsWith("#") ? g.slice(1) : g;
+      const chip = document.createElement("a");
+      chip.className = "genre-hub-chip";
+      chip.setAttribute("dir", "auto");
+      chip.href = `/genre.html?genre=${encodeURIComponent(g)}`;
+      chip.innerHTML = `<span class="genre-hub-chip-name">${cleanName.replace(/</g,"&lt;")}</span><span class="genre-hub-chip-count">${count}</span>`;
+      genreHubGrid.appendChild(chip);
+    });
+    // Update header i18n
+    const hubTitleEl = document.querySelector(".genre-hub-title");
+    const hubSubEl = document.querySelector(".genre-hub-subtitle");
+    const t = hubI18n[lang] || hubI18n.fa;
+    if (hubTitleEl) hubTitleEl.textContent = t.title;
+    if (hubSubEl) hubSubEl.textContent = t.subtitle;
+  }
+  window.FilmChiinSharedSections = { hydrate, buildSideMenuGenres, buildSideMenuCountries, buildGenreHubGrid };
 })();
 
 // ===== PATCH: Dock functionality for movie/actor pages =====

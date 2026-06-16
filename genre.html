@@ -1,39 +1,70 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="fa" dir="rtl">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>FilmChiin | Actor page</title>
-    <meta name="description" content="View actor profile and related posts on FilmChiin" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+    <title>FilmChiin | صفحه ژانر</title>
+    <meta name="description" content="فیلم‌ها بر اساس ژانر در FilmChiin | فیلمچین" />
+    <meta name="keywords" content="دانلود فیلم, ژانر, filmchiin, فیلمچین" />
+    <meta name="robots" content="index,follow" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
     <link rel="stylesheet" href="/style.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script defer src="/shared-sections.js"></script>
-    <script defer src="/actor.js"></script>
+    <script defer src="/genre.js"></script>
   </head>
-  <body class="index-body movie-page-body actor-page-body">
+  <body class="index-body movie-page-body genre-page-body">
     <header class="main-header movie-page-header-only">
       <div id="movieBannerMount" class="site-banner"></div>
     </header>
 
-    <main class="movie-page-container actor-page-container">
+    <main class="movie-page-container genre-page-container">
       <a class="movie-page-back" href="/" data-i18n="backToHome">← Back to homepage</a>
-      <section id="actorPageStatus" class="movie-page-status" data-i18n="loading">Loading...</section>
 
-      <section id="actorHeader" class="actor-profile-card" hidden>
-        <div class="actor-avatar-wrap">
-          <img id="actorAvatar" class="actor-avatar" src="/images/icons8-user-96.png" alt="actor" />
-          <div id="actorAvatarFallback" class="actor-avatar-fallback" hidden>
-            <img src="/images/icons8-user-96.png" alt="profile" />
+      <!-- Genre Hero Bubble -->
+      <div class="genre-hero-bubble">
+        <div class="genre-hero-icon">
+          <img src="/images/icons8-comedy-96.png" alt="genre" />
+        </div>
+        <h1 class="genre-hero-title" id="genreHeroTitle">-</h1>
+        <p class="genre-hero-subtitle" id="genreHeroSubtitle">
+          <span data-i18n="genrePageWatching">شما در حال تماشای فیلم‌هایی با ژانر</span>
+          <span class="genre-hero-name-accent" id="genreHeroAccent"></span>
+          <span data-i18n="genrePageAre">هستید</span>
+        </p>
+      </div>
+
+      <!-- Status -->
+      <section id="genrePageStatus" class="movie-page-status" data-i18n="loading">Loading...</section>
+
+      <!-- Movies Grid -->
+      <div class="genre-movies-block" id="genreMoviesBlock" hidden>
+        <div class="similar-block-card">
+          <div class="similar-movies-title">
+            <img src="/images/icons8-movie.apng" style="width:22px;height:22px;">
+            <strong id="genreMoviesTitle"></strong>
+          </div>
+          <div class="favorites-grid coming-soon-grid similar-movies-container genre-movies-grid" id="genreMoviesGrid"></div>
+
+          <!-- Show More Button -->
+          <div class="genre-show-more-wrap" id="genreShowMoreWrap" hidden>
+            <div class="button-wrap genre-show-more-btn-wrap">
+              <button class="genre-show-more-btn" id="genreShowMoreBtn" type="button">
+                <span data-i18n="showMore">نمایش بیشتر</span>
+              </button>
+              <div class="button-shadow"></div>
+            </div>
           </div>
         </div>
-        <h1 id="actorName" class="actor-name">-</h1>
-      </section>
+      </div>
 
-      <section id="actorMoviesBlock" class="actor-movies-block" hidden>
-        <h2 class="actor-movies-title" data-i18n="actorMovies">Actor movies</h2>
-        <div id="actorMoviesList" class="actor-movies-list"></div>
-      </section>
+      <!-- Empty State -->
+      <div class="genre-empty-state" id="genreEmptyState" hidden>
+        <p data-i18n="genreNoMovies">فیلمی برای این ژانر پیدا نشد.</p>
+      </div>
     </main>
 
     <!-- Genre Hub Section -->

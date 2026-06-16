@@ -9,6 +9,24 @@
   // اگر از bfcache برگشتیم، اسکرول به جای ذخیره‌شده برود
   window.addEventListener("pageshow", (e) => {
     const saved = sessionStorage.getItem("filmchin_scroll_y");
+
+    // ===== بازیابی فوری کارت‌ها از کش هنگام برگشت (bfcache یا reload) =====
+    const cachedGrid = sessionStorage.getItem("filmchin_grid_html");
+    const cachedCount = sessionStorage.getItem("filmchin_count_html");
+    if (cachedGrid && !e.persisted) {
+      // صفحه reload شده (نه bfcache) — کارت‌ها را فوری نشان بده تا fetch تمام شود
+      const grid = document.getElementById("moviesGrid");
+      const count = document.getElementById("movieCount");
+      if (grid && !grid.innerHTML) {
+        grid.innerHTML = cachedGrid;
+        if (count && cachedCount) count.innerHTML = cachedCount;
+        // Re-attach observers for animations
+        grid.querySelectorAll(".reveal").forEach(card => {
+          if (window._cardObserver) window._cardObserver.observe(card);
+        });
+      }
+    }
+
     if (saved !== null && e.persisted) {
       // bfcache hit + موقعیت ذخیره شده
       const y = parseInt(saved, 10) || 0;
@@ -1919,6 +1937,8 @@ document.addEventListener("DOMContentLoaded", () => {
       copiedAddress: "Copied ✓",
       siteFeaturesButton: "Site features",
       siteFeaturesTitle: "FilmChiin site features",
+      genreHubTitle: "Genres",
+      genreHubSubtitle: "Click on a genre to browse movies and series.",
       adminPostManagement: "Post Management",
       adminMessages: "Admin Messages",
       adminMessageSender: "Admin",
@@ -1987,6 +2007,8 @@ document.addEventListener("DOMContentLoaded", () => {
       featureDesc15: "With the color theme option, you can personalize the site look to match your taste. Your selected theme is applied across UI sections for a more consistent and pleasant browsing experience.",
       featureTitle16: "Admin announcements on homepage",
       featureDesc16: "Messages published from the admin panel appear as announcements on the homepage, and users can mark them as read after viewing them.",
+      featureTitle17: "Dedicated genre page",
+      featureDesc17: "Clicking any genre from the 'Genres' section opens a dedicated page showing all movies of that genre. Movies are displayed in a 3-column card layout, with a 'Show more' button to load additional films.",
       similarByActorsTitle: "Other movies with similar cast",
       bySameDirectorTitle: "Other movies by this director",
       noSimilarActors: "No similar-cast movies found.",
@@ -2080,6 +2102,8 @@ document.addEventListener("DOMContentLoaded", () => {
       copiedAddress: "کپی شد ✓",
       siteFeaturesButton: "لیست امکانات سایت",
       siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
+      genreHubTitle: "ژانر ها",
+      genreHubSubtitle: "برای دانلود فیلم و سریال های ژانر مورد علاقه روش کلیک کن.",
       adminPostManagement: "مدیریت پست‌ها",
       adminMessages: "پیام مدیریت",
       adminMessageSender: "مدیریت",
@@ -2148,6 +2172,8 @@ document.addEventListener("DOMContentLoaded", () => {
       featureDesc15: "با گزینه تغییر تم رنگی، می‌توانید ظاهر سایت را متناسب با سلیقه خود شخصی‌سازی کنید. تم انتخابی روی بخش‌های مختلف رابط کاربری اعمال می‌شود تا تجربه مرور سایت هماهنگ‌تر و دلپذیرتر باشد.",
       featureTitle16: "اعلان‌های مدیریت در صفحه اصلی",
       featureDesc16: "پیام‌هایی که مدیریت از پنل ادمین منتشر می‌کند، به‌صورت اعلان در صفحه اصلی نمایش داده می‌شوند و کاربر می‌تواند بعد از خواندن، آن‌ها را علامت‌گذاری کند.",
+      featureTitle17: "صفحه اختصاصی ژانر",
+      featureDesc17: "با کلیک روی هر ژانر از بخش «ژانر ها» صفحه‌ای اختصاصی با تمامی فیلم‌های آن ژانر باز می‌شود. فیلم‌ها در قالب کارت‌های سه‌ستونه نمایش داده می‌شوند و دکمه «نمایش بیشتر» به کاربر امکان می‌دهد فیلم‌های بیشتری را ببیند.",
       similarByActorsTitle: "فیلم‌های دیگر با بازیگران مشابه",
       bySameDirectorTitle: "فیلم‌های دیگر این کارگردان",
       noSimilarActors: "فیلم مشابه بر اساس بازیگران پیدا نشد.",
@@ -3547,6 +3573,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (typeof buildGenreGrid === "function") {
         buildGenreGrid();
       }
+      if (typeof buildGenreHubGrid === "function") {
+        buildGenreHubGrid();
+      }
       if (typeof buildCountryGrid === "function") {
         buildCountryGrid();
       }
@@ -3673,6 +3702,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // بازسازی ژانرها و کشورها در سایدمنو هنگام تغییر زبان
   window.addEventListener("filmchin:languagechange", () => {
     if (typeof buildGenreGrid === "function") buildGenreGrid();
+    if (typeof buildGenreHubGrid === "function") buildGenreHubGrid();
     if (typeof buildCountryGrid === "function") buildCountryGrid();
   });
 
@@ -3729,6 +3759,42 @@ document.addEventListener("DOMContentLoaded", () => {
       };
       genreGrid.appendChild(div);
     });
+  }
+
+  // ===== Genre Hub Grid (above site features, all 3 main pages) =====
+  function buildGenreHubGrid() {
+    const genreHubGrid = document.getElementById("genreHubGrid");
+    if (!genreHubGrid) return;
+    const source = Array.isArray(moviesStats) && moviesStats.length ? moviesStats : (movies || []);
+    if (!source.length) return;
+    const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
+    const genreCounts = {};
+    source.forEach((m) => {
+      if (m.genre) m.genre.split(" ").forEach((g) => {
+        const name = g.trim();
+        if (!name) return;
+        genreCounts[name] = (genreCounts[name] || 0) + 1;
+      });
+    });
+    const genreEntries = Object.entries(genreCounts);
+    const persianGenres = genreEntries.filter(([g]) => !/^[A-Za-z]/.test(g.startsWith("#") ? g.slice(1) : g));
+    const englishGenres = genreEntries.filter(([g]) => /^[A-Za-z]/.test(g.startsWith("#") ? g.slice(1) : g));
+    const orderedGenres = (lang === "fa" ? persianGenres : englishGenres).sort((a, b) => b[1] - a[1]);
+    genreHubGrid.innerHTML = "";
+    orderedGenres.forEach(([g, count]) => {
+      const cleanName = g.startsWith("#") ? g.slice(1) : g;
+      const chip = document.createElement("a");
+      chip.className = "genre-hub-chip";
+      chip.setAttribute("dir", "auto");
+      chip.href = `/genre.html?genre=${encodeURIComponent(g)}`;
+      chip.innerHTML = `<span class="genre-hub-chip-count">${count}</span><span class="genre-hub-chip-name">${escapeHtml(cleanName)}</span>`;
+      genreHubGrid.appendChild(chip);
+    });
+    // Apply i18n to header
+    const hubTitleEl = document.querySelector(".genre-hub-title");
+    const hubSubEl = document.querySelector(".genre-hub-subtitle");
+    if (hubTitleEl) hubTitleEl.textContent = uiText("genreHubTitle");
+    if (hubSubEl) hubSubEl.textContent = uiText("genreHubSubtitle");
   }
 
   // Country grid (based on product field — only #-prefixed tokens)
@@ -4252,6 +4318,7 @@ function setTabInUrl(type) {
 
   const animObserver = new IntersectionObserver(animCallback, observerOptions);
   const cardObserver = new IntersectionObserver(cardCallback, observerOptions);
+  window._cardObserver = cardObserver; // برای بازیابی هنگام برگشت از bfcache
 
   // -------------------- Render movies (paged) --------------------
   // متغیر سراسری برای ژانر انتخاب‌شده
@@ -4853,6 +4920,8 @@ function setTabInUrl(type) {
     : filtered.slice(start, start + PAGE_SIZE);
 
   moviesGrid.innerHTML = "";
+  // پاک کردن کش قدیمی — این رندر جدیده
+  try { sessionStorage.removeItem("filmchin_grid_html"); } catch(e) { /* ignore */ }
   movieCount.innerHTML = `${uiText("numberOfMovies")}: ${totalItemsForPagination}${
     smartSearchHint
       ? `<div style="margin-top:6px;font-size:12px;opacity:.9">${escapeHtml(smartSearchHint)}</div>`
@@ -5070,6 +5139,15 @@ function setTabInUrl(type) {
         try {
           sessionStorage.setItem("filmchin_quick_movie", JSON.stringify(m));
         } catch(e) { /* ignore */ }
+        // ذخیره کارت‌های رندر شده برای بازیابی فوری هنگام برگشت
+        try {
+          const grid = document.getElementById("moviesGrid");
+          const count = document.getElementById("movieCount");
+          if (grid && grid.innerHTML) {
+            sessionStorage.setItem("filmchin_grid_html", grid.innerHTML);
+            if (count) sessionStorage.setItem("filmchin_count_html", count.innerHTML);
+          }
+        } catch(e) { /* ignore */ }
         return;
       }
 
@@ -5193,6 +5271,15 @@ function setTabInUrl(type) {
         try {
           sessionStorage.setItem("filmchin_quick_movie", JSON.stringify(m));
         } catch(e) { /* ignore quota errors */ }
+        // ذخیره کارت‌های رندر شده برای بازیابی فوری هنگام برگشت
+        try {
+          const grid = document.getElementById("moviesGrid");
+          const count = document.getElementById("movieCount");
+          if (grid && grid.innerHTML) {
+            sessionStorage.setItem("filmchin_grid_html", grid.innerHTML);
+            if (count) sessionStorage.setItem("filmchin_count_html", count.innerHTML);
+          }
+        } catch(e) { /* ignore */ }
         const url = goPageBtn.getAttribute("href") || goPageBtn.dataset.url || "#";
         if (url && url !== "#") window.location.href = url;
       });

@@ -173,6 +173,8 @@ const movieFeatureI18n = {
     featureDesc15: "With the color theme option, you can personalize the site look to match your taste. Your selected theme is applied across UI sections for a more consistent and pleasant browsing experience.",
     featureTitle16: "Admin announcements on homepage",
     featureDesc16: "Messages published from the admin panel appear as announcements on the homepage, and users can mark them as read after viewing them.",
+    featureTitle17: "Dedicated genre page",
+    featureDesc17: "Clicking any genre from the 'Genres' section opens a dedicated page showing all movies of that genre. Movies are displayed in a 3-column card layout, with a 'Show more' button to load additional films.",
   },
   fa: {
     siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
@@ -208,6 +210,8 @@ const movieFeatureI18n = {
     featureDesc15: "با گزینه تغییر تم رنگی، می‌توانید ظاهر سایت را متناسب با سلیقه خود شخصی‌سازی کنید. تم انتخابی روی بخش‌های مختلف رابط کاربری اعمال می‌شود تا تجربه مرور سایت هماهنگ‌تر و دلپذیرتر باشد.",
     featureTitle16: "اعلان‌های مدیریت در صفحه اصلی",
     featureDesc16: "پیام‌هایی که مدیریت از پنل ادمین منتشر می‌کند، به‌صورت اعلان در صفحه اصلی نمایش داده می‌شوند و کاربر می‌تواند بعد از خواندن، آن‌ها را علامت‌گذاری کند.",
+    featureTitle17: "صفحه اختصاصی ژانر",
+    featureDesc17: "با کلیک روی هر ژانر از بخش «ژانر ها» صفحه‌ای اختصاصی با تمامی فیلم‌های آن ژانر باز می‌شود. فیلم‌ها در قالب کارت‌های سه‌ستونه نمایش داده می‌شوند و دکمه «نمایش بیشتر» به کاربر امکان می‌دهد فیلم‌های بیشتری را ببیند.",
   },
 };
 
@@ -1102,8 +1106,21 @@ async function loadMoviePage() {
       bindPostOptions(slug);
       syncFavoriteOptionUi();
       setSeo(quickMovie, slug);
-      // رندر کارت اصلی فوری (بدون فیلم‌های مشابه)
-      renderMovieCard(cardContainer, quickMovie, [], []);
+
+      // بارگذاری فوری اپیزودها برای collection/serial (بدون انتظار برای لود کامل)
+      let quickEpisodes = [];
+      if (quickMovie.type === "collection" || quickMovie.type === "serial") {
+        try {
+          const { data: qItems } = await db.from("movie_items").select("*").eq("movie_id", quickMovie.id).order("order_index", { ascending: true });
+          quickEpisodes = [
+            { title: quickMovie.title, cover: quickMovie.cover, link: quickMovie.link, synopsis: quickMovie.synopsis, director: quickMovie.director, product: quickMovie.product, stars: quickMovie.stars, imdb: quickMovie.imdb, release_info: quickMovie.release_info, genre: quickMovie.genre },
+            ...(qItems || []),
+          ];
+        } catch(e) { /* ignore */ }
+      }
+
+      // رندر کارت اصلی فوری (با اپیزودها اگر موجود باشد)
+      renderMovieCard(cardContainer, quickMovie, [], quickEpisodes);
       status.hidden = true;
       cardContainer.hidden = false;
 
@@ -1121,6 +1138,7 @@ async function loadMoviePage() {
         setTimeout(() => {
           if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
           if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
+          if (window.FilmChiinSharedSections?.buildGenreHubGrid) window.FilmChiinSharedSections.buildGenreHubGrid();
         }, 200);
 
         const fullMovie = allMovies.find((item) => makeMovieSlug(item.title) === slug) || quickMovie;
@@ -1167,6 +1185,7 @@ async function loadMoviePage() {
           setTimeout(() => {
             if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
             if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
+            if (window.FilmChiinSharedSections?.buildGenreHubGrid) window.FilmChiinSharedSections.buildGenreHubGrid();
           }, 100);
         }
       }
@@ -1190,6 +1209,9 @@ async function loadMoviePage() {
       }
       if (window.FilmChiinSharedSections?.buildSideMenuCountries) {
         window.FilmChiinSharedSections.buildSideMenuCountries();
+      }
+      if (window.FilmChiinSharedSections?.buildGenreHubGrid) {
+        window.FilmChiinSharedSections.buildGenreHubGrid();
       }
     }, 200);
 
