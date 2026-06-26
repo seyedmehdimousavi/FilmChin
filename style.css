@@ -9260,3 +9260,138 @@ body.dark .comments-panel-inner {
   margin: 28px 0 10px;
 }
 
+/* ===== Themed Go to file animated button (matches requested download-button design) ===== */
+.button-wrap.go-file-wrap,
+.button-wrap:has(.go-file-button) {
+  transform: none !important;
+  background: transparent !important;
+  transition: none !important;
+}
+.button-wrap.go-file-wrap .button-shadow,
+.button-wrap:has(.go-file-button) .button-shadow {
+  display: none !important;
+}
+.go-btn.go-file-button.download-button {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  pointer-events: auto;
+  position: relative;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 340px;
+  min-height: 68px;
+  padding: 24px 64px;
+  border-radius: 8px;
+  background: var(--go-file-bg, var(--theme-accent));
+  color: #fff;
+  font-family: "Roboto", "Product Sans", "IRANSansWeb", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow: 0 12px 28px rgba(var(--go-file-shadow-rgb, var(--theme-accent-rgb)), 0.24);
+  transition: transform 0.18s linear, background-color 0.18s linear, box-shadow 0.18s linear;
+}
+.go-btn.go-file-button.download-button:hover {
+  transform: scale(1.01);
+  background: var(--go-file-bg-hover, var(--theme-accent-light));
+}
+.go-btn.go-file-button.download-button:focus {
+  outline: none !important;
+}
+.go-btn.go-file-button.download-button:active {
+  transform: scale(0.99);
+}
+.go-btn.go-file-button.download-button::after,
+.go-btn.go-file-button.download-button span::after {
+  content: none !important;
+  display: none !important;
+}
+.go-btn.go-file-button.download-button span {
+  all: unset;
+  box-sizing: border-box;
+}
+.download-button-inner {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+}
+.svg-container {
+  width: 22px;
+  height: 22px;
+  display: grid !important;
+  place-items: center;
+  flex: 0 0 22px;
+}
+.download-icon,
+.check-svg {
+  display: block;
+}
+.download-arrow {
+  transition: transform 0.2s linear;
+}
+.go-btn.go-file-button.download-button:hover .download-arrow {
+  transform: translate(0, 3px);
+}
+.check-svg {
+  animation: svgScale 0.5s ease-in-out;
+}
+.download-loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  opacity: 0;
+  animation: button-loading-spinner 1s ease 3;
+}
+.button-copy {
+  color: #fff !important;
+  line-height: 1;
+  padding-inline-start: 8px;
+  padding-top: 2px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.hidden {
+  display: none !important;
+}
+@keyframes svgScale {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+@keyframes button-loading-spinner {
+  from {
+    transform: rotate(0turn);
+    opacity: 1;
+  }
+  to {
+    transform: rotate(1turn);
+    opacity: 0;
+  }
+}
+body.reduce-animations .download-loader,
+body.reduce-animations .check-svg {
+  animation-duration: 0.01ms;
+  animation-iteration-count: 1;
+}
+@media (max-width: 375px) {
+  .go-btn.go-file-button.download-button {
+    min-width: 300px;
+    padding-inline: 32px;
+  }
+}
+@media (max-width: 340px) {
+  .go-btn.go-file-button.download-button {
+    min-width: 100%;
+  }
+}
