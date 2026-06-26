@@ -9260,42 +9260,7 @@ body.dark .comments-panel-inner {
   margin: 28px 0 10px;
 }
 
-
-/* ===== Themed Go to file animated button ===== */
-.go-btn.go-file-button {
-  min-height: 68px;
-  min-width: min(340px, 100%);
-  gap: 10px;
-  padding: 0 22px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--theme-accent), var(--theme-accent-dark));
-  box-shadow: 0 14px 30px rgba(var(--theme-accent-rgb), 0.28);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
-}
-body.dark .go-btn.go-file-button {
-  background: linear-gradient(135deg, var(--theme-accent-light), var(--theme-accent));
-  box-shadow: 0 14px 30px rgba(var(--theme-accent-rgb), 0.36);
-}
-.go-btn.go-file-button:hover { transform: scale(1.01); }
-.go-btn.go-file-button:active { transform: scale(0.99); }
-.go-btn.go-file-button:focus { outline: none !important; }
-.go-file-button-inner { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; position:relative; }
-.go-file-svg-container { width:22px; height:22px; display:grid; place-items:center; flex:0 0 22px; }
-.go-file-download-icon, .go-file-check-svg { display:block; }
-.go-file-download-arrow { transition: transform 0.2s linear; }
-.go-btn.go-file-button:hover .go-file-download-arrow { transform: translateY(3px); }
-.go-file-check-svg { animation: goFileSvgScale 0.5s ease-in-out; }
-.go-file-loader { width:16px; height:16px; border-radius:50%; border:2px solid rgba(255,255,255,0.45); border-top-color:#fff; animation: goFileSpin 0.7s linear infinite; }
-.go-file-hidden { display:none !important; }
-.go-file-button-copy { color:#fff; line-height:1; font-weight:800; white-space:nowrap; }
-@keyframes goFileSpin { to { transform: rotate(360deg); } }
-@keyframes goFileSvgScale { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-body.reduce-animations .go-file-loader, body.reduce-animations .go-file-check-svg { animation:none; }
-@media (max-width: 420px) { .go-btn.go-file-button { min-width: 100%; min-height: 62px; padding: 0 16px; } }
-
-/* Keep the custom Go to file control independent from the site's glass button wrapper system. */
+/* ===== Themed Go to file animated button (matches requested download-button design) ===== */
 .button-wrap.go-file-wrap,
 .button-wrap:has(.go-file-button) {
   transform: none !important;
@@ -9306,7 +9271,7 @@ body.reduce-animations .go-file-loader, body.reduce-animations .go-file-check-sv
 .button-wrap:has(.go-file-button) .button-shadow {
   display: none !important;
 }
-.go-btn.go-file-button {
+.go-btn.go-file-button.download-button {
   all: unset;
   box-sizing: border-box;
   cursor: pointer;
@@ -9317,48 +9282,116 @@ body.reduce-animations .go-file-loader, body.reduce-animations .go-file-check-sv
   align-items: center;
   justify-content: center;
   width: 100%;
+  min-width: 340px;
   min-height: 68px;
-  min-width: min(340px, 100%);
-  gap: 10px;
-  padding: 0 22px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--theme-accent), var(--theme-accent-dark));
-  box-shadow: 0 14px 30px rgba(var(--theme-accent-rgb), 0.28);
-  letter-spacing: 0.08em;
+  padding: 24px 64px;
+  border-radius: 8px;
+  background: var(--go-file-bg, var(--theme-accent));
+  color: #fff;
+  font-family: "Roboto", "Product Sans", "IRANSansWeb", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 12px 28px rgba(var(--go-file-shadow-rgb, var(--theme-accent-rgb)), 0.24);
+  transition: transform 0.18s linear, background-color 0.18s linear, box-shadow 0.18s linear;
 }
-.go-btn.go-file-button::after,
-.go-btn.go-file-button span::after {
+.go-btn.go-file-button.download-button:hover {
+  transform: scale(1.01);
+  background: var(--go-file-bg-hover, var(--theme-accent-light));
+}
+.go-btn.go-file-button.download-button:focus {
+  outline: none !important;
+}
+.go-btn.go-file-button.download-button:active {
+  transform: scale(0.99);
+}
+.go-btn.go-file-button.download-button::after,
+.go-btn.go-file-button.download-button span::after {
   content: none !important;
   display: none !important;
 }
-.go-btn.go-file-button span {
+.go-btn.go-file-button.download-button span {
   all: unset;
   box-sizing: border-box;
 }
-body.dark .go-btn.go-file-button {
-  background: linear-gradient(135deg, var(--theme-accent-light), var(--theme-accent));
-  box-shadow: 0 14px 30px rgba(var(--theme-accent-rgb), 0.36);
-}
-.go-file-button .go-file-button-inner {
-  display: flex;
+.download-button-inner {
+  display: flex !important;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  width: 100%;
   position: relative;
+  width: 100%;
 }
-.go-file-button .go-file-svg-container {
+.svg-container {
   width: 22px;
   height: 22px;
-  display: grid;
+  display: grid !important;
   place-items: center;
   flex: 0 0 22px;
 }
-.go-file-button .go-file-button-copy {
-  color: #fff;
+.download-icon,
+.check-svg {
+  display: block;
+}
+.download-arrow {
+  transition: transform 0.2s linear;
+}
+.go-btn.go-file-button.download-button:hover .download-arrow {
+  transform: translate(0, 3px);
+}
+.check-svg {
+  animation: svgScale 0.5s ease-in-out;
+}
+.download-loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  opacity: 0;
+  animation: button-loading-spinner 1s ease 3;
+}
+.button-copy {
+  color: #fff !important;
   line-height: 1;
-  font-weight: 800;
+  padding-inline-start: 8px;
+  padding-top: 2px;
+  font-weight: 700;
   white-space: nowrap;
+}
+.hidden {
+  display: none !important;
+}
+@keyframes svgScale {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+@keyframes button-loading-spinner {
+  from {
+    transform: rotate(0turn);
+    opacity: 1;
+  }
+  to {
+    transform: rotate(1turn);
+    opacity: 0;
+  }
+}
+body.reduce-animations .download-loader,
+body.reduce-animations .check-svg {
+  animation-duration: 0.01ms;
+  animation-iteration-count: 1;
+}
+@media (max-width: 375px) {
+  .go-btn.go-file-button.download-button {
+    min-width: 300px;
+    padding-inline: 32px;
+  }
+}
+@media (max-width: 340px) {
+  .go-btn.go-file-button.download-button {
+    min-width: 100%;
+  }
 }
