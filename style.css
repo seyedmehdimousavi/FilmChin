@@ -9260,3 +9260,37 @@ body.dark .comments-panel-inner {
   margin: 28px 0 10px;
 }
 
+
+/* ===== Themed Go to file animated button ===== */
+.go-btn.go-file-button {
+  min-height: 68px;
+  min-width: min(340px, 100%);
+  gap: 10px;
+  padding: 0 22px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--theme-accent), var(--theme-accent-dark));
+  box-shadow: 0 14px 30px rgba(var(--theme-accent-rgb), 0.28);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+body.dark .go-btn.go-file-button {
+  background: linear-gradient(135deg, var(--theme-accent-light), var(--theme-accent));
+  box-shadow: 0 14px 30px rgba(var(--theme-accent-rgb), 0.36);
+}
+.go-btn.go-file-button:hover { transform: scale(1.01); }
+.go-btn.go-file-button:active { transform: scale(0.99); }
+.go-btn.go-file-button:focus { outline: none !important; }
+.go-file-button-inner { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; position:relative; }
+.go-file-svg-container { width:22px; height:22px; display:grid; place-items:center; flex:0 0 22px; }
+.go-file-download-icon, .go-file-check-svg { display:block; }
+.go-file-download-arrow { transition: transform 0.2s linear; }
+.go-btn.go-file-button:hover .go-file-download-arrow { transform: translateY(3px); }
+.go-file-check-svg { animation: goFileSvgScale 0.5s ease-in-out; }
+.go-file-loader { width:16px; height:16px; border-radius:50%; border:2px solid rgba(255,255,255,0.45); border-top-color:#fff; animation: goFileSpin 0.7s linear infinite; }
+.go-file-hidden { display:none !important; }
+.go-file-button-copy { color:#fff; line-height:1; font-weight:800; white-space:nowrap; }
+@keyframes goFileSpin { to { transform: rotate(360deg); } }
+@keyframes goFileSvgScale { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+body.reduce-animations .go-file-loader, body.reduce-animations .go-file-check-svg { animation:none; }
+@media (max-width: 420px) { .go-btn.go-file-button { min-width: 100%; min-height: 62px; padding: 0 16px; } }
