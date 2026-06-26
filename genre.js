@@ -1,14 +1,22 @@
 // ==================== genre.js ====================
 // صفحه اختصاصی نمایش فیلم‌ها بر اساس ژانر
 
-const SUPABASE_URL = "https://gwsmvcgjdodmkoqupdal.supabase.co";
+const SUPABASE_URL = "https://etevwqbiynardwsezasn.supabase.co";
 const SUPABASE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0ZXZ3cWJpeW5hcmR3c2V6YXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NjI0MzMsImV4cCI6MjA5NzEzODQzM30.1yPLfjydENjHacsI3PXLvekF7kIIWZDtaTARyDt5tUw";
 
 if (!window._supabaseClient) {
-  window._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
-  });
+  window._supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+    },
+  );
 }
 const db = window._supabaseClient;
 
@@ -101,7 +109,9 @@ let shownCount = 0;
 
 // ===== Render movie cards =====
 function renderMovieCard(movie) {
-  const cover = escapeHtml(movie.cover || "https://via.placeholder.com/200x300?text=No+Image");
+  const cover = escapeHtml(
+    movie.cover || "https://via.placeholder.com/200x300?text=No+Image",
+  );
   const title = escapeHtml(movie.title || "-");
   const href = buildMoviePageHref(movie.title || "");
 
@@ -238,14 +248,21 @@ async function loadGenrePage() {
   allGenreMovies = allMovies.filter((m) => {
     if (!m.genre) return false;
     const tokens = m.genre.toLowerCase().split(/\s+/);
-    return tokens.some((t) => t === genreToken || t.replace(/^#/, "") === genreToken.replace(/^#/, ""));
+    return tokens.some(
+      (t) =>
+        t === genreToken ||
+        t.replace(/^#/, "") === genreToken.replace(/^#/, ""),
+    );
   });
 
   // Update side menu genres from loaded data
   setTimeout(() => {
-    if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
-    if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
-    if (window.FilmChiinSharedSections?.buildGenreHubGrid) window.FilmChiinSharedSections.buildGenreHubGrid();
+    if (window.FilmChiinSharedSections?.buildSideMenuGenres)
+      window.FilmChiinSharedSections.buildSideMenuGenres();
+    if (window.FilmChiinSharedSections?.buildSideMenuCountries)
+      window.FilmChiinSharedSections.buildSideMenuCountries();
+    if (window.FilmChiinSharedSections?.buildGenreHubGrid)
+      window.FilmChiinSharedSections.buildGenreHubGrid();
   }, 200);
 
   if (statusEl) statusEl.hidden = true;
@@ -280,14 +297,64 @@ function applySavedTheme() {
   document.body.classList.toggle("dark", dark);
 
   const colorThemes = {
-    blue: { accentRgb: "30, 136, 229", accentDark: "#1565c0", accent: "#1e88e5", accentLight: "#42a5f5", accentContrast: "#0d47a1", bgDay: "#f2f7ff", bgSoft: "#e5f0ff" },
-    green: { accentRgb: "46, 157, 87", accentDark: "#227a43", accent: "#2e9d57", accentLight: "#45b36e", accentContrast: "#195b32", bgDay: "#f1faf4", bgSoft: "#e1f3e7" },
-    yellow: { accentRgb: "197, 163, 23", accentDark: "#9f8010", accent: "#c5a317", accentLight: "#d6b63e", accentContrast: "#6b5505", bgDay: "#fdf9ec", bgSoft: "#f8efcf" },
-    red: { accentRgb: "200, 70, 70", accentDark: "#9b2d2d", accent: "#c84646", accentLight: "#dc6666", accentContrast: "#6e2020", bgDay: "#fcf2f2", bgSoft: "#f6e0e0" },
-    purple: { accentRgb: "123, 97, 255", accentDark: "#5f46d2", accent: "#7b61ff", accentLight: "#a68fff", accentContrast: "#47329e", bgDay: "#f7f4ff", bgSoft: "#eee8ff" },
-    teal: { accentRgb: "76, 201, 240", accentDark: "#2c9bc0", accent: "#4cc9f0", accentLight: "#7fdcf7", accentContrast: "#1f6e87", bgDay: "#f2fbff", bgSoft: "#e2f6ff" },
+    blue: {
+      accentRgb: "30, 136, 229",
+      accentDark: "#1565c0",
+      accent: "#1e88e5",
+      accentLight: "#42a5f5",
+      accentContrast: "#0d47a1",
+      bgDay: "#f2f7ff",
+      bgSoft: "#e5f0ff",
+    },
+    green: {
+      accentRgb: "46, 157, 87",
+      accentDark: "#227a43",
+      accent: "#2e9d57",
+      accentLight: "#45b36e",
+      accentContrast: "#195b32",
+      bgDay: "#f1faf4",
+      bgSoft: "#e1f3e7",
+    },
+    yellow: {
+      accentRgb: "197, 163, 23",
+      accentDark: "#9f8010",
+      accent: "#c5a317",
+      accentLight: "#d6b63e",
+      accentContrast: "#6b5505",
+      bgDay: "#fdf9ec",
+      bgSoft: "#f8efcf",
+    },
+    red: {
+      accentRgb: "200, 70, 70",
+      accentDark: "#9b2d2d",
+      accent: "#c84646",
+      accentLight: "#dc6666",
+      accentContrast: "#6e2020",
+      bgDay: "#fcf2f2",
+      bgSoft: "#f6e0e0",
+    },
+    purple: {
+      accentRgb: "123, 97, 255",
+      accentDark: "#5f46d2",
+      accent: "#7b61ff",
+      accentLight: "#a68fff",
+      accentContrast: "#47329e",
+      bgDay: "#f7f4ff",
+      bgSoft: "#eee8ff",
+    },
+    teal: {
+      accentRgb: "76, 201, 240",
+      accentDark: "#2c9bc0",
+      accent: "#4cc9f0",
+      accentLight: "#7fdcf7",
+      accentContrast: "#1f6e87",
+      bgDay: "#f2fbff",
+      bgSoft: "#e2f6ff",
+    },
   };
-  const selected = colorThemes[localStorage.getItem("colorTheme") || "blue"] || colorThemes.blue;
+  const selected =
+    colorThemes[localStorage.getItem("colorTheme") || "blue"] ||
+    colorThemes.blue;
   const rootStyle = document.documentElement.style;
   Object.entries({
     "--theme-accent-rgb": selected.accentRgb,

@@ -3,77 +3,111 @@
     en: {
       siteFeaturesTitle: "FilmChiin site features",
       featureTitle1: "Create account",
-      featureDesc1: "By creating an account, you unlock extra capabilities: build a personal favorites list and chat with admin.",
+      featureDesc1:
+        "By creating an account, you unlock extra capabilities: build a personal favorites list and chat with admin.",
       featureTitle2: "Instant and advanced search",
-      featureDesc2: "Search is fully instant. As you type, results filter immediately and matched text is highlighted in title, synopsis, cast, and other fields.",
+      featureDesc2:
+        "Search is fully instant. As you type, results filter immediately and matched text is highlighted in title, synopsis, cast, and other fields.",
       featureTitle3: "Customize homepage layout",
-      featureDesc3: "Use SideMenu options to arrange homepage layout based on your preference.",
+      featureDesc3:
+        "Use SideMenu options to arrange homepage layout based on your preference.",
       featureTitle4: "Type and genre tabs",
-      featureDesc4: "Homepage is separated by content type (movie, collection, series). You can also filter each tab by genres with one click.",
+      featureDesc4:
+        "Homepage is separated by content type (movie, collection, series). You can also filter each tab by genres with one click.",
       featureTitle5: "Sort by IMDb rating",
-      featureDesc5: "Sort visible list by IMDb score and quickly focus on higher-rated titles.",
+      featureDesc5:
+        "Sort visible list by IMDb score and quickly focus on higher-rated titles.",
       featureTitle6: "Sort by release year",
-      featureDesc6: "Use release filter to prioritize newer/older titles based on your preference.",
+      featureDesc6:
+        "Use release filter to prioritize newer/older titles based on your preference.",
       featureTitle7: "Live movie count",
-      featureDesc7: "At the top of the homepage, the visible movie count updates immediately when search, genres, tabs, IMDb filters, or release filters change.",
+      featureDesc7:
+        "At the top of the homepage, the visible movie count updates immediately when search, genres, tabs, IMDb filters, or release filters change.",
       featureTitle8: "Episode list for collections/series",
-      featureDesc8: "For collections and series, all episodes are shown in small cards in the same post and selecting an episode updates card info instantly.",
+      featureDesc8:
+        "For collections and series, all episodes are shown in small cards in the same post and selecting an episode updates card info instantly.",
       featureTitle9: "One-click file access",
-      featureDesc9: "With <strong>Go to file</strong>, <code>@Filmchinbot</code> sends the movie or episode file directly without needing channel join.",
+      featureDesc9:
+        "With <strong>Go to file</strong>, <code>@Filmchinbot</code> sends the movie or episode file directly without needing channel join.",
       featureTitle10: "Comments in each post",
-      featureDesc10: "Each post supports comments with custom UI and avatars; comment count is shown near the comment icon.",
+      featureDesc10:
+        "Each post supports comments with custom UI and avatars; comment count is shown near the comment icon.",
       featureTitle11: "Popular movies and page list",
-      featureDesc11: "Popular section is built from click stats and the floating panel lists current-page posts for quick navigation.",
+      featureDesc11:
+        "Popular section is built from click stats and the floating panel lists current-page posts for quick navigation.",
       featureTitle12: "Copy or share movie links",
-      featureDesc12: "Each post includes copy and share buttons for its dedicated movie page link, so you can open the post details and continue to the file from there.",
+      featureDesc12:
+        "Each post includes copy and share buttons for its dedicated movie page link, so you can open the post details and continue to the file from there.",
       featureTitle13: "Responsive Liquid Glass design",
-      featureDesc13: "Parts of UI use a Liquid Glass-inspired design with smooth animations and balanced transparency on mobile/desktop.",
+      featureDesc13:
+        "Parts of UI use a Liquid Glass-inspired design with smooth animations and balanced transparency on mobile/desktop.",
       featureTitle14: "Site language switch",
-      featureDesc14: "From language settings, you can switch the UI between Persian and English. Core texts, headings, and feature descriptions update consistently based on your selected language.",
+      featureDesc14:
+        "From language settings, you can switch the UI between Persian and English. Core texts, headings, and feature descriptions update consistently based on your selected language.",
       featureTitle15: "Site color theme switch",
-      featureDesc15: "With the color theme option, you can personalize the site look to match your taste. Your selected theme is applied across UI sections for a more consistent and pleasant browsing experience.",
+      featureDesc15:
+        "With the color theme option, you can personalize the site look to match your taste. Your selected theme is applied across UI sections for a more consistent and pleasant browsing experience.",
       featureTitle16: "Admin announcements on homepage",
-      featureDesc16: "Messages published from the admin panel appear as announcements on the homepage, and users can mark them as read after viewing them.",
+      featureDesc16:
+        "Messages published from the admin panel appear as announcements on the homepage, and users can mark them as read after viewing them.",
       featureTitle17: "Dedicated genre page",
-      featureDesc17: "Clicking any genre from the 'Genres' section opens a dedicated page showing all movies of that genre. Movies are displayed in a 3-column card layout, with a 'Show more' button to load additional films.",
+      featureDesc17:
+        "Clicking any genre from the 'Genres' section opens a dedicated page showing all movies of that genre. Movies are displayed in a 3-column card layout, with a 'Show more' button to load additional films.",
       searchPlaceholder: "Search...",
     },
     fa: {
       siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
       featureTitle1: "ساخت حساب کاربری",
-      featureDesc1: "با ساخت حساب کاربری به قابلیت های بیشتری دسترسی دارید می‌توانید برای خودتان یک لیست اختصاصی از فیلم‌های مورد علاقه بسازید. میتوانید از چت با ادمین استفاده کنید.",
+      featureDesc1:
+        "با ساخت حساب کاربری به قابلیت های بیشتری دسترسی دارید می‌توانید برای خودتان یک لیست اختصاصی از فیلم‌های مورد علاقه بسازید. میتوانید از چت با ادمین استفاده کنید.",
       featureTitle2: "جست‌وجوی لحظه‌ای و پیشرفته",
-      featureDesc2: "جست‌وجوی سایت کاملاً لحظه‌ای است؛ با تایپ هر عبارت، نتایج بلافاصله فیلتر می‌شوند. عبارت جست‌وجوشده در عنوان، خلاصه، بازیگران و سایر فیلدها هایلایت می‌شود.",
+      featureDesc2:
+        "جست‌وجوی سایت کاملاً لحظه‌ای است؛ با تایپ هر عبارت، نتایج بلافاصله فیلتر می‌شوند. عبارت جست‌وجوشده در عنوان، خلاصه، بازیگران و سایر فیلدها هایلایت می‌شود.",
       featureTitle3: "شخصی سازی چیدمان صفحه",
-      featureDesc3: "از طریق گزینه های موجود در SideMenu میتوانید چیدمان صفحه اصلی را مطابق با سلیقه ی خود مرتب کنید.",
+      featureDesc3:
+        "از طریق گزینه های موجود در SideMenu میتوانید چیدمان صفحه اصلی را مطابق با سلیقه ی خود مرتب کنید.",
       featureTitle4: "فیلترفیلم هاوژانرها در تب‌های جداگانه",
-      featureDesc4: "صفحه اصلی بر اساس نوع محتوا (فیلم سینمایی، کالکشن، سریال) با تب‌ها تفکیک شده است. علاوه بر آن، در هر تب می‌توانید با یک کلیک ژانر را فیلتر کنید.",
+      featureDesc4:
+        "صفحه اصلی بر اساس نوع محتوا (فیلم سینمایی، کالکشن، سریال) با تب‌ها تفکیک شده است. علاوه بر آن، در هر تب می‌توانید با یک کلیک ژانر را فیلتر کنید.",
       featureTitle5: "مرتب‌سازی بر اساس امتیاز IMDb",
-      featureDesc5: "لیست قابل مشاهده را می‌توانید بر اساس امتیاز IMDb مرتب کنید تا سریع‌تر به عناوین با امتیاز بالاتر برسید.",
+      featureDesc5:
+        "لیست قابل مشاهده را می‌توانید بر اساس امتیاز IMDb مرتب کنید تا سریع‌تر به عناوین با امتیاز بالاتر برسید.",
       featureTitle6: "مرتب‌سازی بر اساس سال انتشار",
-      featureDesc6: "با فیلتر سال انتشار می‌توانید عناوین جدیدتر یا قدیمی‌تر را بر اساس نیاز خود ببینید.",
+      featureDesc6:
+        "با فیلتر سال انتشار می‌توانید عناوین جدیدتر یا قدیمی‌تر را بر اساس نیاز خود ببینید.",
       featureTitle7: "آمار دقیق تعداد فیلم‌ها در هر لحظه",
-      featureDesc7: "در بالای صفحه اصلی، تعداد فیلم‌های در حال نمایش با توجه به فیلترها و جست‌وجوی فعلی نمایش داده می‌شود و بعد از هر تغییر به‌صورت لحظه‌ای به‌روزرسانی می‌شود.",
+      featureDesc7:
+        "در بالای صفحه اصلی، تعداد فیلم‌های در حال نمایش با توجه به فیلترها و جست‌وجوی فعلی نمایش داده می‌شود و بعد از هر تغییر به‌صورت لحظه‌ای به‌روزرسانی می‌شود.",
       featureTitle8: "لیست قسمت‌های سریال وکالکشن",
-      featureDesc8: "برای سریال‌ها و کالکشن‌ها، تمام قسمت‌ها در قالب کارت‌های کوچک داخل همان پست نمایش داده می‌شوند و با انتخاب هر قسمت اطلاعات کارت فوراً آپدیت می‌شود.",
+      featureDesc8:
+        "برای سریال‌ها و کالکشن‌ها، تمام قسمت‌ها در قالب کارت‌های کوچک داخل همان پست نمایش داده می‌شوند و با انتخاب هر قسمت اطلاعات کارت فوراً آپدیت می‌شود.",
       featureTitle9: "دسترسی به فایل فقط با یک کلیک",
-      featureDesc9: "با فشردن دکمه <strong>Go to file</strong> بات <code>@Filmchinbot</code> فایل فیلم یا قسمت سریال را برای شما ارسال می‌کند؛ بدون نیاز به جوین شدن در کانال.",
+      featureDesc9:
+        "با فشردن دکمه <strong>Go to file</strong> بات <code>@Filmchinbot</code> فایل فیلم یا قسمت سریال را برای شما ارسال می‌کند؛ بدون نیاز به جوین شدن در کانال.",
       featureTitle10: "کامنت و نمایش گفت‌وگو در همان پست",
-      featureDesc10: "برای هر پست می‌توانید کامنت بگذارید و همه نظرات در همان کارت فیلم با طراحی اختصاصی و آواتارها نمایش داده می‌شوند.",
+      featureDesc10:
+        "برای هر پست می‌توانید کامنت بگذارید و همه نظرات در همان کارت فیلم با طراحی اختصاصی و آواتارها نمایش داده می‌شوند.",
       featureTitle11: "فیلم‌های پرطرفدارولیست فیلم‌های صفحه",
-      featureDesc11: "بخش فیلم‌های پرطرفدار بر اساس آمار کلیک‌ها ساخته می‌شود و دکمه شناور لیست فیلم‌های صفحه فعلی را نشان می‌دهد.",
+      featureDesc11:
+        "بخش فیلم‌های پرطرفدار بر اساس آمار کلیک‌ها ساخته می‌شود و دکمه شناور لیست فیلم‌های صفحه فعلی را نشان می‌دهد.",
       featureTitle12: "کپی یا اشتراک لینک هر فیلم",
-      featureDesc12: "برای هر پست، دکمه‌هایی برای کپی و اشتراک لینک صفحه اختصاصی فیلم وجود دارد تا بتوانید اطلاعات پست را باز کنید و از همان‌جا به فایل بروید.",
+      featureDesc12:
+        "برای هر پست، دکمه‌هایی برای کپی و اشتراک لینک صفحه اختصاصی فیلم وجود دارد تا بتوانید اطلاعات پست را باز کنید و از همان‌جا به فایل بروید.",
       featureTitle13: "طراحی Liquid Glass واکنش‌گرا",
-      featureDesc13: "بخش هایی از سایت با الهام از طراحی Liquid Glass ساخته شده است؛ کارت‌ها، دکمه‌ها و پنل‌ها تجربه کاربری روان و چشم‌نواز ایجاد می‌کنند.",
+      featureDesc13:
+        "بخش هایی از سایت با الهام از طراحی Liquid Glass ساخته شده است؛ کارت‌ها، دکمه‌ها و پنل‌ها تجربه کاربری روان و چشم‌نواز ایجاد می‌کنند.",
       featureTitle14: "امکان تغییر زبان سایت",
-      featureDesc14: "در بخش تنظیمات زبان می‌توانید رابط کاربری سایت را بین فارسی و انگلیسی جابه‌جا کنید. تمام متن‌های اصلی، عنوان‌ها و توضیحات امکانات بر اساس زبان انتخابی شما به‌صورت یکپارچه تغییر می‌کنند.",
+      featureDesc14:
+        "در بخش تنظیمات زبان می‌توانید رابط کاربری سایت را بین فارسی و انگلیسی جابه‌جا کنید. تمام متن‌های اصلی، عنوان‌ها و توضیحات امکانات بر اساس زبان انتخابی شما به‌صورت یکپارچه تغییر می‌کنند.",
       featureTitle15: "امکان تغییر تم رنگی سایت",
-      featureDesc15: "با گزینه تغییر تم رنگی، می‌توانید ظاهر سایت را متناسب با سلیقه خود شخصی‌سازی کنید. تم انتخابی روی بخش‌های مختلف رابط کاربری اعمال می‌شود تا تجربه مرور سایت هماهنگ‌تر و دلپذیرتر باشد.",
+      featureDesc15:
+        "با گزینه تغییر تم رنگی، می‌توانید ظاهر سایت را متناسب با سلیقه خود شخصی‌سازی کنید. تم انتخابی روی بخش‌های مختلف رابط کاربری اعمال می‌شود تا تجربه مرور سایت هماهنگ‌تر و دلپذیرتر باشد.",
       featureTitle16: "اعلان‌های مدیریت در صفحه اصلی",
-      featureDesc16: "پیام‌هایی که مدیریت از پنل ادمین منتشر می‌کند، به‌صورت اعلان در صفحه اصلی نمایش داده می‌شوند و کاربر می‌تواند بعد از خواندن، آن‌ها را علامت‌گذاری کند.",
+      featureDesc16:
+        "پیام‌هایی که مدیریت از پنل ادمین منتشر می‌کند، به‌صورت اعلان در صفحه اصلی نمایش داده می‌شوند و کاربر می‌تواند بعد از خواندن، آن‌ها را علامت‌گذاری کند.",
       featureTitle17: "صفحه اختصاصی ژانر",
-      featureDesc17: "با کلیک روی هر ژانر از بخش «ژانر ها» صفحه‌ای اختصاصی با تمامی فیلم‌های آن ژانر باز می‌شود. فیلم‌ها در قالب کارت‌های سه‌ستونه نمایش داده می‌شوند و دکمه «نمایش بیشتر» به کاربر امکان می‌دهد فیلم‌های بیشتری را ببیند.",
+      featureDesc17:
+        "با کلیک روی هر ژانر از بخش «ژانر ها» صفحه‌ای اختصاصی با تمامی فیلم‌های آن ژانر باز می‌شود. فیلم‌ها در قالب کارت‌های سه‌ستونه نمایش داده می‌شوند و دکمه «نمایش بیشتر» به کاربر امکان می‌دهد فیلم‌های بیشتری را ببیند.",
       searchPlaceholder: "جست‌وجو...",
     },
   };
@@ -98,14 +132,64 @@
     document.body.classList.toggle("dark", dark);
 
     const colorThemes = {
-      blue: { accentRgb: "30, 136, 229", accentDark: "#1565c0", accent: "#1e88e5", accentLight: "#42a5f5", accentContrast: "#0d47a1", bgDay: "#f2f7ff", bgSoft: "#e5f0ff" },
-      green: { accentRgb: "46, 157, 87", accentDark: "#227a43", accent: "#2e9d57", accentLight: "#45b36e", accentContrast: "#195b32", bgDay: "#f1faf4", bgSoft: "#e1f3e7" },
-      yellow: { accentRgb: "197, 163, 23", accentDark: "#9f8010", accent: "#c5a317", accentLight: "#d6b63e", accentContrast: "#6b5505", bgDay: "#fdf9ec", bgSoft: "#f8efcf" },
-      red: { accentRgb: "200, 70, 70", accentDark: "#9b2d2d", accent: "#c84646", accentLight: "#dc6666", accentContrast: "#6e2020", bgDay: "#fcf2f2", bgSoft: "#f6e0e0" },
-      purple: { accentRgb: "123, 97, 255", accentDark: "#5f46d2", accent: "#7b61ff", accentLight: "#a68fff", accentContrast: "#47329e", bgDay: "#f7f4ff", bgSoft: "#eee8ff" },
-      teal: { accentRgb: "76, 201, 240", accentDark: "#2c9bc0", accent: "#4cc9f0", accentLight: "#7fdcf7", accentContrast: "#1f6e87", bgDay: "#f2fbff", bgSoft: "#e2f6ff" },
+      blue: {
+        accentRgb: "30, 136, 229",
+        accentDark: "#1565c0",
+        accent: "#1e88e5",
+        accentLight: "#42a5f5",
+        accentContrast: "#0d47a1",
+        bgDay: "#f2f7ff",
+        bgSoft: "#e5f0ff",
+      },
+      green: {
+        accentRgb: "46, 157, 87",
+        accentDark: "#227a43",
+        accent: "#2e9d57",
+        accentLight: "#45b36e",
+        accentContrast: "#195b32",
+        bgDay: "#f1faf4",
+        bgSoft: "#e1f3e7",
+      },
+      yellow: {
+        accentRgb: "197, 163, 23",
+        accentDark: "#9f8010",
+        accent: "#c5a317",
+        accentLight: "#d6b63e",
+        accentContrast: "#6b5505",
+        bgDay: "#fdf9ec",
+        bgSoft: "#f8efcf",
+      },
+      red: {
+        accentRgb: "200, 70, 70",
+        accentDark: "#9b2d2d",
+        accent: "#c84646",
+        accentLight: "#dc6666",
+        accentContrast: "#6e2020",
+        bgDay: "#fcf2f2",
+        bgSoft: "#f6e0e0",
+      },
+      purple: {
+        accentRgb: "123, 97, 255",
+        accentDark: "#5f46d2",
+        accent: "#7b61ff",
+        accentLight: "#a68fff",
+        accentContrast: "#47329e",
+        bgDay: "#f7f4ff",
+        bgSoft: "#eee8ff",
+      },
+      teal: {
+        accentRgb: "76, 201, 240",
+        accentDark: "#2c9bc0",
+        accent: "#4cc9f0",
+        accentLight: "#7fdcf7",
+        accentContrast: "#1f6e87",
+        bgDay: "#f2fbff",
+        bgSoft: "#e2f6ff",
+      },
     };
-    const selected = colorThemes[localStorage.getItem("colorTheme") || "blue"] || colorThemes.blue;
+    const selected =
+      colorThemes[localStorage.getItem("colorTheme") || "blue"] ||
+      colorThemes.blue;
     const rootStyle = document.documentElement.style;
     Object.entries({
       "--theme-accent-rgb": selected.accentRgb,
@@ -129,7 +213,9 @@
   function setHeaderProfileAvatar(root, avatarUrl) {
     const profileBtn = root.querySelector("#profileBtn");
     if (!profileBtn) return;
-    const badge = profileBtn.querySelector("#commentBadge")?.outerHTML || '<span id="commentBadge" class="badge" style="display: none">!</span>';
+    const badge =
+      profileBtn.querySelector("#commentBadge")?.outerHTML ||
+      '<span id="commentBadge" class="badge" style="display: none">!</span>';
     const src = avatarUrl || "/images/icons8-user-96.png";
     profileBtn.innerHTML = `<img src="${src}" alt="user" />${badge}`;
   }
@@ -146,16 +232,24 @@
     try {
       const db = window.supabase.createClient(
         "https://gwsmvcgjdodmkoqupdal.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY"
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY",
       );
       const { data: sessionData } = await db.auth.getSession();
       const user = sessionData?.session?.user;
       if (!user) return;
-      const { data: dbUser } = await db.from("users").select("username,avatar_url").eq("id", user.id).maybeSingle();
-      const avatarUrl = dbUser?.avatar_url ? db.storage.from("avatars").getPublicUrl(dbUser.avatar_url).data.publicUrl : null;
+      const { data: dbUser } = await db
+        .from("users")
+        .select("username,avatar_url")
+        .eq("id", user.id)
+        .maybeSingle();
+      const avatarUrl = dbUser?.avatar_url
+        ? db.storage.from("avatars").getPublicUrl(dbUser.avatar_url).data
+            .publicUrl
+        : null;
       setHeaderProfileAvatar(root, avatarUrl);
       const usernameEl = root.querySelector("#profileUsername");
-      if (usernameEl) usernameEl.textContent = dbUser?.username || user.email || "User";
+      if (usernameEl)
+        usernameEl.textContent = dbUser?.username || user.email || "User";
     } catch (err) {
       console.warn("shared profile hydrate error", err);
     }
@@ -170,7 +264,11 @@
 
     if (profileBtn) profileBtn.setAttribute("href", "/admin.html");
     hydrateHeaderProfile(root);
-    if (searchInput) searchInput.setAttribute("placeholder", featureI18n[lang].searchPlaceholder);
+    if (searchInput)
+      searchInput.setAttribute(
+        "placeholder",
+        featureI18n[lang].searchPlaceholder,
+      );
     const syncThemeSwitchFromStorage = () => {
       const dark = localStorage.getItem("theme") === "dark";
       document.body.classList.toggle("dark", dark);
@@ -340,7 +438,9 @@
     // Wire up favorites close button
     const favOverlay = document.getElementById("favoritesOverlay");
     if (favOverlay) {
-      const favCloseBtn = favOverlay.querySelector(".favorites-close-btn, [id*='CloseBtn'], .close-btn");
+      const favCloseBtn = favOverlay.querySelector(
+        ".favorites-close-btn, [id*='CloseBtn'], .close-btn",
+      );
       if (favCloseBtn) {
         favCloseBtn.addEventListener("click", () => {
           favOverlay.setAttribute("aria-hidden", "true");
@@ -348,7 +448,8 @@
       }
       // Backdrop click closes overlay
       favOverlay.addEventListener("click", (e) => {
-        if (e.target === favOverlay) favOverlay.setAttribute("aria-hidden", "true");
+        if (e.target === favOverlay)
+          favOverlay.setAttribute("aria-hidden", "true");
       });
     }
 
@@ -392,29 +493,42 @@
         const cached = sessionStorage.getItem("filmchin_movies_cache");
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length) { movies = parsed; window._fcMovies = parsed; }
+          if (Array.isArray(parsed) && parsed.length) {
+            movies = parsed;
+            window._fcMovies = parsed;
+          }
         }
-      } catch(e) { /* ignore */ }
+      } catch (e) {
+        /* ignore */
+      }
     }
     if (!movies.length) return;
     const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
     const genreCounts = {};
     movies.forEach((m) => {
-      if (m.genre) m.genre.split(" ").forEach((g) => {
-        const name = g.trim(); if (!name) return;
-        genreCounts[name] = (genreCounts[name] || 0) + 1;
-      });
+      if (m.genre)
+        m.genre.split(" ").forEach((g) => {
+          const name = g.trim();
+          if (!name) return;
+          genreCounts[name] = (genreCounts[name] || 0) + 1;
+        });
     });
     const genreEntries = Object.entries(genreCounts);
-    const englishGenres = genreEntries.filter(([g]) => /^[A-Za-z#]/.test(g.startsWith("#") ? g.slice(1) : g));
-    const persianGenres = genreEntries.filter(([g]) => !/^[A-Za-z]/.test(g.startsWith("#") ? g.slice(1) : g));
-    const orderedGenres = (lang === "fa" ? persianGenres : englishGenres).sort((a, b) => b[1] - a[1]);
+    const englishGenres = genreEntries.filter(([g]) =>
+      /^[A-Za-z#]/.test(g.startsWith("#") ? g.slice(1) : g),
+    );
+    const persianGenres = genreEntries.filter(
+      ([g]) => !/^[A-Za-z]/.test(g.startsWith("#") ? g.slice(1) : g),
+    );
+    const orderedGenres = (lang === "fa" ? persianGenres : englishGenres).sort(
+      (a, b) => b[1] - a[1],
+    );
     genreGrid.innerHTML = "";
     orderedGenres.forEach(([g, count]) => {
       const div = document.createElement("div");
       div.className = "genre-chip";
       div.setAttribute("dir", "auto");
-      div.innerHTML = `${g.replace(/</g,"&lt;")} <span class="count">${count}</span>`;
+      div.innerHTML = `${g.replace(/</g, "&lt;")} <span class="count">${count}</span>`;
       div.onclick = () => {
         // Navigate to genre page for this genre
         window.location.href = `/genre.html?genre=${encodeURIComponent(g)}`;
@@ -433,27 +547,35 @@
         const cached = sessionStorage.getItem("filmchin_movies_cache");
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length) { movies = parsed; window._fcMovies = parsed; }
+          if (Array.isArray(parsed) && parsed.length) {
+            movies = parsed;
+            window._fcMovies = parsed;
+          }
         }
-      } catch(e) { /* ignore */ }
+      } catch (e) {
+        /* ignore */
+      }
     }
     if (!movies.length) return;
     const countryCounts = {};
     movies.forEach((m) => {
-      if (m.product) m.product.split(" ").forEach((c) => {
-        const name = c.trim();
-        // فقط توکن‌هایی که با # شروع می‌شوند
-        if (!name || !name.startsWith("#")) return;
-        countryCounts[name] = (countryCounts[name] || 0) + 1;
-      });
+      if (m.product)
+        m.product.split(" ").forEach((c) => {
+          const name = c.trim();
+          // فقط توکن‌هایی که با # شروع می‌شوند
+          if (!name || !name.startsWith("#")) return;
+          countryCounts[name] = (countryCounts[name] || 0) + 1;
+        });
     });
-    const countryEntries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]);
+    const countryEntries = Object.entries(countryCounts).sort(
+      (a, b) => b[1] - a[1],
+    );
     countryGrid.innerHTML = "";
     countryEntries.forEach(([country, count]) => {
       const div = document.createElement("div");
       div.className = "genre-chip";
       div.setAttribute("dir", "auto");
-      div.innerHTML = `${country.replace(/</g,"&lt;")} <span class="count">${count}</span>`;
+      div.innerHTML = `${country.replace(/</g, "&lt;")} <span class="count">${count}</span>`;
       div.onclick = () => {
         window.location.href = `/?search=${encodeURIComponent(country)}`;
       };
@@ -464,7 +586,12 @@
   // ===== Wire up injected side menu for movie/actor pages =====
   function wireSideMenuOnSubPages() {
     // Only run on sub-pages (not index.html which has script.js)
-    if (!document.querySelector(".movie-page-body, .actor-page-body, .genre-page-body")) return;
+    if (
+      !document.querySelector(
+        ".movie-page-body, .actor-page-body, .genre-page-body",
+      )
+    )
+      return;
 
     const sideMenu = document.getElementById("sideMenu");
     if (!sideMenu || sideMenu.dataset.wired === "1") return;
@@ -475,25 +602,43 @@
     // Language map for sidemenu i18n keys
     const i18nMap = {
       en: {
-        genres: "Genres", countries: "Countries", links: "Links",
-        sortByMenu: "Sort by...", homepageManager: "Homepage Manager",
-        animations: "Animations", tabs: "Tabs", subTabGenres: "Sub-tab genres",
-        backToTopButton: "Back to Top Button", floatingSummaryPanel: "Floating Summary Panel",
-        collapsePosts: "Collapse posts", languageLabel: "Language / زبان",
-        themePaletteTitle: "Site color theme", popularMovies: "Popular movies",
-        messageToAdmin: "Message to admin", sortByImdb: "Sort by imdb rating",
+        genres: "Genres",
+        countries: "Countries",
+        links: "Links",
+        sortByMenu: "Sort by...",
+        homepageManager: "Homepage Manager",
+        animations: "Animations",
+        tabs: "Tabs",
+        subTabGenres: "Sub-tab genres",
+        backToTopButton: "Back to Top Button",
+        floatingSummaryPanel: "Floating Summary Panel",
+        collapsePosts: "Collapse posts",
+        languageLabel: "Language / زبان",
+        themePaletteTitle: "Site color theme",
+        popularMovies: "Popular movies",
+        messageToAdmin: "Message to admin",
+        sortByImdb: "Sort by imdb rating",
         sortByReleaseDate: "Sort by Release date",
       },
       fa: {
-        genres: "ژانرها", countries: "کشورها", links: "لینک‌ها",
-        sortByMenu: "مرتب‌سازی بر اساس...", homepageManager: "مدیریت صفحه اصلی",
-        animations: "انیمیشن‌ها", tabs: "تب‌ها", subTabGenres: "زیرتب ژانرها",
-        backToTopButton: "دکمه بازگشت به بالا", floatingSummaryPanel: "پنل شناور خلاصه",
-        collapsePosts: "جمع‌کردن پست‌ها", languageLabel: "Language / زبان",
-        themePaletteTitle: "تم رنگی سایت", popularMovies: "فیلم‌های پرطرفدار",
-        messageToAdmin: "پیام به ادمین", sortByImdb: "مرتب‌سازی بر اساس امتیاز IMDb",
+        genres: "ژانرها",
+        countries: "کشورها",
+        links: "لینک‌ها",
+        sortByMenu: "مرتب‌سازی بر اساس...",
+        homepageManager: "مدیریت صفحه اصلی",
+        animations: "انیمیشن‌ها",
+        tabs: "تب‌ها",
+        subTabGenres: "زیرتب ژانرها",
+        backToTopButton: "دکمه بازگشت به بالا",
+        floatingSummaryPanel: "پنل شناور خلاصه",
+        collapsePosts: "جمع‌کردن پست‌ها",
+        languageLabel: "Language / زبان",
+        themePaletteTitle: "تم رنگی سایت",
+        popularMovies: "فیلم‌های پرطرفدار",
+        messageToAdmin: "پیام به ادمین",
+        sortByImdb: "مرتب‌سازی بر اساس امتیاز IMDb",
         sortByReleaseDate: "مرتب‌سازی بر اساس تاریخ انتشار",
-      }
+      },
     };
 
     // Apply i18n to sidemenu
@@ -531,14 +676,19 @@
           // Lazy-load social links when links accordion is opened
           if (acc.id === "acc-links") {
             setTimeout(() => {
-              if (typeof window.fetchSocialLinksSubPage === "function") window.fetchSocialLinksSubPage();
+              if (typeof window.fetchSocialLinksSubPage === "function")
+                window.fetchSocialLinksSubPage();
               // Recalculate height after content loaded
-              setTimeout(() => { body.style.maxHeight = body.scrollHeight + "px"; }, 600);
+              setTimeout(() => {
+                body.style.maxHeight = body.scrollHeight + "px";
+              }, 600);
             }, 50);
           }
           // Lazy-load countries when country accordion is opened
           if (acc.id === "acc-country") {
-            setTimeout(() => { body.style.maxHeight = body.scrollHeight + "px"; }, 200);
+            setTimeout(() => {
+              body.style.maxHeight = body.scrollHeight + "px";
+            }, 200);
           }
         }
       });
@@ -551,7 +701,8 @@
       langBtns.forEach((btn, idx) => {
         const active = btn.dataset.lang === activeLang;
         btn.classList.toggle("active", active);
-        if (active && langIndicator) langIndicator.style.transform = `translateX(${idx * 100}%)`;
+        if (active && langIndicator)
+          langIndicator.style.transform = `translateX(${idx * 100}%)`;
       });
     }
     setActiveLanguageUI(lang);
@@ -565,24 +716,76 @@
         setActiveLanguageUI(nextLang);
         applySideMenuI18n(nextLang);
         // Rebuild genre/country grids with new language
-        if (typeof buildSideMenuGenres === "function") buildSideMenuGenres(nextLang);
+        if (typeof buildSideMenuGenres === "function")
+          buildSideMenuGenres(nextLang);
         // Reload the page preserving scroll position to apply language fully
         sessionStorage.setItem("filmchin_scroll_y", String(window.scrollY));
         window.location.reload();
       });
       btn.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); btn.click(); }
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          btn.click();
+        }
       });
     });
 
     // Theme palette (color)
     const colorThemes = {
-      blue: { accentRgb: "30, 136, 229", accentDark: "#1565c0", accent: "#1e88e5", accentLight: "#42a5f5", accentContrast: "#0d47a1", bgDay: "#f2f7ff", bgSoft: "#e5f0ff" },
-      green: { accentRgb: "46, 157, 87", accentDark: "#227a43", accent: "#2e9d57", accentLight: "#45b36e", accentContrast: "#195b32", bgDay: "#f1faf4", bgSoft: "#e1f3e7" },
-      yellow: { accentRgb: "197, 163, 23", accentDark: "#9f8010", accent: "#c5a317", accentLight: "#d6b63e", accentContrast: "#6b5505", bgDay: "#fdf9ec", bgSoft: "#f8efcf" },
-      red: { accentRgb: "200, 70, 70", accentDark: "#9b2d2d", accent: "#c84646", accentLight: "#dc6666", accentContrast: "#6e2020", bgDay: "#fcf2f2", bgSoft: "#f6e0e0" },
-      purple: { accentRgb: "123, 97, 255", accentDark: "#5f46d2", accent: "#7b61ff", accentLight: "#a68fff", accentContrast: "#47329e", bgDay: "#f7f4ff", bgSoft: "#eee8ff" },
-      teal: { accentRgb: "76, 201, 240", accentDark: "#2c9bc0", accent: "#4cc9f0", accentLight: "#7fdcf7", accentContrast: "#1f6e87", bgDay: "#f2fbff", bgSoft: "#e2f6ff" },
+      blue: {
+        accentRgb: "30, 136, 229",
+        accentDark: "#1565c0",
+        accent: "#1e88e5",
+        accentLight: "#42a5f5",
+        accentContrast: "#0d47a1",
+        bgDay: "#f2f7ff",
+        bgSoft: "#e5f0ff",
+      },
+      green: {
+        accentRgb: "46, 157, 87",
+        accentDark: "#227a43",
+        accent: "#2e9d57",
+        accentLight: "#45b36e",
+        accentContrast: "#195b32",
+        bgDay: "#f1faf4",
+        bgSoft: "#e1f3e7",
+      },
+      yellow: {
+        accentRgb: "197, 163, 23",
+        accentDark: "#9f8010",
+        accent: "#c5a317",
+        accentLight: "#d6b63e",
+        accentContrast: "#6b5505",
+        bgDay: "#fdf9ec",
+        bgSoft: "#f8efcf",
+      },
+      red: {
+        accentRgb: "200, 70, 70",
+        accentDark: "#9b2d2d",
+        accent: "#c84646",
+        accentLight: "#dc6666",
+        accentContrast: "#6e2020",
+        bgDay: "#fcf2f2",
+        bgSoft: "#f6e0e0",
+      },
+      purple: {
+        accentRgb: "123, 97, 255",
+        accentDark: "#5f46d2",
+        accent: "#7b61ff",
+        accentLight: "#a68fff",
+        accentContrast: "#47329e",
+        bgDay: "#f7f4ff",
+        bgSoft: "#eee8ff",
+      },
+      teal: {
+        accentRgb: "76, 201, 240",
+        accentDark: "#2c9bc0",
+        accent: "#4cc9f0",
+        accentLight: "#7fdcf7",
+        accentContrast: "#1f6e87",
+        bgDay: "#f2fbff",
+        bgSoft: "#e2f6ff",
+      },
     };
     function applyColorTheme(name) {
       const selected = colorThemes[name] || colorThemes.blue;
@@ -657,7 +860,9 @@
     });
 
     // Favorites overlay open/close from sidemenu (if any favorites buttons exist)
-    const favBtns = sideMenu.querySelectorAll("[id*='Favorite'], [id*='favorite'], #favoriteMoviesBtn");
+    const favBtns = sideMenu.querySelectorAll(
+      "[id*='Favorite'], [id*='favorite'], #favoriteMoviesBtn",
+    );
     favBtns.forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.preventDefault();
@@ -669,44 +874,62 @@
     // Favorites overlay close button
     const favOverlay = document.getElementById("favoritesOverlay");
     if (favOverlay) {
-      const closeBtn = favOverlay.querySelector(".favorites-close-btn, [id*='Close'], .close-btn");
-      closeBtn?.addEventListener("click", () => favOverlay.setAttribute("aria-hidden", "true"));
+      const closeBtn = favOverlay.querySelector(
+        ".favorites-close-btn, [id*='Close'], .close-btn",
+      );
+      closeBtn?.addEventListener("click", () =>
+        favOverlay.setAttribute("aria-hidden", "true"),
+      );
       favOverlay.addEventListener("click", (e) => {
-        if (e.target === favOverlay) favOverlay.setAttribute("aria-hidden", "true");
+        if (e.target === favOverlay)
+          favOverlay.setAttribute("aria-hidden", "true");
       });
     }
 
     // ===== Sort-by accordion: disabled on movie/actor pages =====
     const sortAccordion = sideMenu.querySelector("#acc-sort-by");
     if (sortAccordion) {
-      const sortHeader = sortAccordion.querySelector(".sidemenu-accordion-header");
+      const sortHeader = sortAccordion.querySelector(
+        ".sidemenu-accordion-header",
+      );
       if (sortHeader) {
         sortHeader.style.opacity = "0.5";
         sortHeader.style.cursor = "not-allowed";
         // Override the accordion click listener with a toast
-        sortHeader.addEventListener("click", (e) => {
-          e.stopImmediatePropagation();
-          const msg = lang === "fa"
-            ? "مرتب‌سازی فقط در صفحه اصلی سایت در دسترس است"
-            : "Sorting is only available on the homepage";
-          // Show toast
-          let container = document.getElementById("topToastContainer");
-          if (!container) {
-            container = document.createElement("div");
-            container.id = "topToastContainer";
-            container.style.cssText = "position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:999999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:max-content;max-width:90vw;";
-            document.body.appendChild(container);
-          }
-          const toast = document.createElement("div");
-          toast.style.cssText = "pointer-events:auto;padding:10px 16px;background:rgba(0,74,124,0.9);color:#fff;border-radius:8px;font-size:14px;text-align:center;opacity:0;transition:opacity 220ms ease,transform 220ms ease;transform:translateY(-6px);";
-          toast.textContent = msg;
-          container.appendChild(toast);
-          requestAnimationFrame(() => { toast.style.opacity = "1"; toast.style.transform = "translateY(0)"; });
-          setTimeout(() => {
-            toast.style.opacity = "0"; toast.style.transform = "translateY(-6px)";
-            setTimeout(() => toast.remove(), 250);
-          }, 3000);
-        }, true); // capture=true so it fires before the accordion listener
+        sortHeader.addEventListener(
+          "click",
+          (e) => {
+            e.stopImmediatePropagation();
+            const msg =
+              lang === "fa"
+                ? "مرتب‌سازی فقط در صفحه اصلی سایت در دسترس است"
+                : "Sorting is only available on the homepage";
+            // Show toast
+            let container = document.getElementById("topToastContainer");
+            if (!container) {
+              container = document.createElement("div");
+              container.id = "topToastContainer";
+              container.style.cssText =
+                "position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:999999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:max-content;max-width:90vw;";
+              document.body.appendChild(container);
+            }
+            const toast = document.createElement("div");
+            toast.style.cssText =
+              "pointer-events:auto;padding:10px 16px;background:rgba(0,74,124,0.9);color:#fff;border-radius:8px;font-size:14px;text-align:center;opacity:0;transition:opacity 220ms ease,transform 220ms ease;transform:translateY(-6px);";
+            toast.textContent = msg;
+            container.appendChild(toast);
+            requestAnimationFrame(() => {
+              toast.style.opacity = "1";
+              toast.style.transform = "translateY(0)";
+            });
+            setTimeout(() => {
+              toast.style.opacity = "0";
+              toast.style.transform = "translateY(-6px)";
+              setTimeout(() => toast.remove(), 250);
+            }, 3000);
+          },
+          true,
+        ); // capture=true so it fires before the accordion listener
       }
     }
 
@@ -751,12 +974,19 @@
     // Wait for db to be ready (movie.js/actor.js may not have run yet)
     function waitForDb(callback) {
       const db = getDb();
-      if (db) { callback(db); return; }
+      if (db) {
+        callback(db);
+        return;
+      }
       let attempts = 0;
       const interval = setInterval(() => {
         attempts++;
         const db2 = getDb();
-        if (db2) { clearInterval(interval); callback(db2); return; }
+        if (db2) {
+          clearInterval(interval);
+          callback(db2);
+          return;
+        }
         if (attempts > 20) clearInterval(interval); // give up after 2s
       }, 100);
     }
@@ -769,11 +999,13 @@
       if (!container) {
         container = document.createElement("div");
         container.id = "topToastContainer";
-        container.style.cssText = "position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:999999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:max-content;max-width:90vw;";
+        container.style.cssText =
+          "position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:999999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:max-content;max-width:90vw;";
         document.body.appendChild(container);
       }
       const t = document.createElement("div");
-      t.style.cssText = "pointer-events:auto;padding:10px 16px;background:rgba(0,74,124,0.9);color:#fff;border-radius:8px;font-size:14px;text-align:center;";
+      t.style.cssText =
+        "pointer-events:auto;padding:10px 16px;background:rgba(0,74,124,0.9);color:#fff;border-radius:8px;font-size:14px;text-align:center;";
       t.textContent = msg;
       container.appendChild(t);
       setTimeout(() => t.remove(), 3000);
@@ -785,12 +1017,18 @@
       // ✅ اگر کاربر لاگین نیست → toast نشان بده و برگرد (مانند صفحه اصلی)
       const db = getDb();
       if (!db) {
-        showChatToast(lang === "fa" ? "خطا در اتصال به سرویس" : "Service unavailable");
+        showChatToast(
+          lang === "fa" ? "خطا در اتصال به سرویس" : "Service unavailable",
+        );
         return;
       }
       db.auth.getUser().then(({ data: { user } }) => {
         if (!user) {
-          showChatToast(lang === "fa" ? "برای ارسال پیام ابتدا لاگین کنید" : "Please log in to send messages");
+          showChatToast(
+            lang === "fa"
+              ? "برای ارسال پیام ابتدا لاگین کنید"
+              : "Please log in to send messages",
+          );
           return;
         }
         // کاربر لاگین است → چت را باز کن
@@ -801,7 +1039,10 @@
     function _doOpenChatOverlay() {
       if (!chatOverlay) return;
       // بررسی کن آیا در صفحه فرعی (movie/actor) هستیم یا صفحه اصلی
-      const isSubPage = document.querySelector(".movie-page-body, .actor-page-body, .genre-page-body") !== null;
+      const isSubPage =
+        document.querySelector(
+          ".movie-page-body, .actor-page-body, .genre-page-body",
+        ) !== null;
       if (!isSubPage) {
         // صفحه اصلی: overlay را به body منتقل کن تا position:fixed درست کار کند
         // (sideMenu دارای transform است که containing block جدید می‌سازد)
@@ -845,7 +1086,8 @@
     }
 
     chatBubble.addEventListener("click", (e) => {
-      if (!chatOverlay || chatOverlay.getAttribute("aria-hidden") !== "false") openChatOverlay();
+      if (!chatOverlay || chatOverlay.getAttribute("aria-hidden") !== "false")
+        openChatOverlay();
     });
     chatInput?.addEventListener("focus", () => openChatOverlay());
     // دکمه بازگشت — با listener روی document چون overlay به body منتقل می‌شود
@@ -856,17 +1098,47 @@
 
     async function ensureThread() {
       const db = getDb();
-      if (!db) { showChatToast(lang === "fa" ? "خطا در اتصال به سرویس چت" : "Chat service unavailable"); return null; }
-      const { data: { user } } = await db.auth.getUser();
+      if (!db) {
+        showChatToast(
+          lang === "fa"
+            ? "خطا در اتصال به سرویس چت"
+            : "Chat service unavailable",
+        );
+        return null;
+      }
+      const {
+        data: { user },
+      } = await db.auth.getUser();
       if (!user) {
-        showChatToast(lang === "fa" ? "برای ارسال پیام باید وارد شوید" : "Please log in to send messages");
+        showChatToast(
+          lang === "fa"
+            ? "برای ارسال پیام باید وارد شوید"
+            : "Please log in to send messages",
+        );
         return null;
       }
       if (chatThreadId) return chatThreadId;
-      const { data: existing } = await db.from("user_admin_threads").select("id").eq("user_id", user.id).limit(1).single();
-      if (existing?.id) { chatThreadId = existing.id; return chatThreadId; }
-      const { data: created } = await db.from("user_admin_threads").insert([{ user_id: user.id, unread_for_admin: false, unread_for_user: false }]).select("id").single();
-      if (created?.id) { chatThreadId = created.id; return chatThreadId; }
+      const { data: existing } = await db
+        .from("user_admin_threads")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .single();
+      if (existing?.id) {
+        chatThreadId = existing.id;
+        return chatThreadId;
+      }
+      const { data: created } = await db
+        .from("user_admin_threads")
+        .insert([
+          { user_id: user.id, unread_for_admin: false, unread_for_user: false },
+        ])
+        .select("id")
+        .single();
+      if (created?.id) {
+        chatThreadId = created.id;
+        return chatThreadId;
+      }
       return null;
     }
 
@@ -876,8 +1148,23 @@
       const tid = await ensureThread();
       if (!tid) return;
       if (!text && !imageUrl) return;
-      await db.from("user_admin_messages").insert([{ thread_id: tid, role: "user", text: text || null, image_url: imageUrl || null }]);
-      await db.from("user_admin_threads").update({ unread_for_admin: true, last_message_at: new Date().toISOString() }).eq("id", tid);
+      await db
+        .from("user_admin_messages")
+        .insert([
+          {
+            thread_id: tid,
+            role: "user",
+            text: text || null,
+            image_url: imageUrl || null,
+          },
+        ]);
+      await db
+        .from("user_admin_threads")
+        .update({
+          unread_for_admin: true,
+          last_message_at: new Date().toISOString(),
+        })
+        .eq("id", tid);
       loadChatMessages();
     }
 
@@ -886,20 +1173,36 @@
       if (!db) return;
       const tid = await ensureThread();
       if (!tid) return;
-      const { data } = await db.from("user_admin_messages").select("*").eq("thread_id", tid).order("created_at", { ascending: true }).limit(500);
+      const { data } = await db
+        .from("user_admin_messages")
+        .select("*")
+        .eq("thread_id", tid)
+        .order("created_at", { ascending: true })
+        .limit(500);
       renderChatMsgs(data || []);
     }
 
     function renderChatMsgs(arr) {
       if (!chatMessagesList) return;
-      chatMessagesList.innerHTML = (arr || []).map((m) => {
-        const side = m.role === "user" ? "user" : "admin";
-        const img = m.image_url ? `<img class="msg-image" src="${m.image_url.replace(/"/g,'&quot;')}" alt="image">` : "";
-        const txt = m.text ? `<div class="msg-text">${m.text.replace(/</g,"&lt;")}</div>` : "";
-        const time = new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        return `<div class="msg-row ${side}"><div class="msg-bubble ${side}">${img}${txt}<div class="msg-meta"><span>${time}</span></div></div></div>`;
-      }).join("");
-      setTimeout(() => { chatMessagesList.scrollTop = chatMessagesList.scrollHeight; }, 30);
+      chatMessagesList.innerHTML = (arr || [])
+        .map((m) => {
+          const side = m.role === "user" ? "user" : "admin";
+          const img = m.image_url
+            ? `<img class="msg-image" src="${m.image_url.replace(/"/g, "&quot;")}" alt="image">`
+            : "";
+          const txt = m.text
+            ? `<div class="msg-text">${m.text.replace(/</g, "&lt;")}</div>`
+            : "";
+          const time = new Date(m.created_at).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          return `<div class="msg-row ${side}"><div class="msg-bubble ${side}">${img}${txt}<div class="msg-meta"><span>${time}</span></div></div></div>`;
+        })
+        .join("");
+      setTimeout(() => {
+        chatMessagesList.scrollTop = chatMessagesList.scrollHeight;
+      }, 30);
     }
 
     // Send from overlay
@@ -911,9 +1214,13 @@
       if (attachEl?.files?.[0]) {
         const file = attachEl.files[0];
         const path = `chat/${Date.now()}_${file.name}`;
-        const { data: uploaded } = await db.storage.from(SUPABASE_STORAGE_BUCKET).upload(path, file, { upsert: true });
+        const { data: uploaded } = await db.storage
+          .from(SUPABASE_STORAGE_BUCKET)
+          .upload(path, file, { upsert: true });
         if (uploaded) {
-          const { data: urlData } = db.storage.from(SUPABASE_STORAGE_BUCKET).getPublicUrl(path);
+          const { data: urlData } = db.storage
+            .from(SUPABASE_STORAGE_BUCKET)
+            .getPublicUrl(path);
           imageUrl = urlData?.publicUrl || null;
         }
         attachEl.value = "";
@@ -933,11 +1240,28 @@
     overlayInput?.addEventListener("input", updateSendBtnState);
     updateSendBtnState();
 
-    overlaySendBtn?.addEventListener("click", () => { if (!overlaySendBtn.classList.contains("disabled")) sendFn(overlayInput, overlayAttachFile); });
-    overlayInput?.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendFn(overlayInput, overlayAttachFile); } });
-    chatSendBtn?.addEventListener("click", () => sendFn(chatInput, chatAttachFile));
-    chatInput?.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); sendFn(chatInput, chatAttachFile); } });
-    overlayAttachBtn?.addEventListener("click", () => overlayAttachFile?.click());
+    overlaySendBtn?.addEventListener("click", () => {
+      if (!overlaySendBtn.classList.contains("disabled"))
+        sendFn(overlayInput, overlayAttachFile);
+    });
+    overlayInput?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendFn(overlayInput, overlayAttachFile);
+      }
+    });
+    chatSendBtn?.addEventListener("click", () =>
+      sendFn(chatInput, chatAttachFile),
+    );
+    chatInput?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendFn(chatInput, chatAttachFile);
+      }
+    });
+    overlayAttachBtn?.addEventListener("click", () =>
+      overlayAttachFile?.click(),
+    );
     chatAttachBtn?.addEventListener("click", () => chatAttachFile?.click());
 
     // Also clear and reset send btn after sending
@@ -959,42 +1283,59 @@
       const panel = sheet.querySelector(".support-sheet-panel");
       const titleEl = panel?.querySelector(".support-sheet-title");
       const hintEl = panel?.querySelector(".support-sheet-hint");
-      if (titleEl) titleEl.textContent = lang === "fa" ? "حمایت از ما" : "Support us";
-      if (hintEl) hintEl.textContent = lang === "fa" ? "کمک‌های کوچک تغییرات بزرگی ایجاد می‌کنند." : "Small helps make big changes.";
+      if (titleEl)
+        titleEl.textContent = lang === "fa" ? "حمایت از ما" : "Support us";
+      if (hintEl)
+        hintEl.textContent =
+          lang === "fa"
+            ? "کمک‌های کوچک تغییرات بزرگی ایجاد می‌کنند."
+            : "Small helps make big changes.";
 
       if (listEl) {
         // Load wallets from Supabase
         const db = window._supabaseClient || window.db;
         if (db) {
-          db.from("wallets").select("name,address").order("created_at", { ascending: true }).then(({ data }) => {
-            listEl.innerHTML = "";
-            (data || []).forEach((w) => {
-              const bubble = document.createElement("div");
-              bubble.className = "support-wallet-bubble";
-              bubble.innerHTML = `
-                <div class="support-wallet-name">${(w.name || "").replace(/</g,"&lt;")}</div>
+          db.from("wallets")
+            .select("name,address")
+            .order("created_at", { ascending: true })
+            .then(({ data }) => {
+              listEl.innerHTML = "";
+              (data || []).forEach((w) => {
+                const bubble = document.createElement("div");
+                bubble.className = "support-wallet-bubble";
+                bubble.innerHTML = `
+                <div class="support-wallet-name">${(w.name || "").replace(/</g, "&lt;")}</div>
                 <div class="support-wallet-addr-row">
-                  <span class="support-wallet-addr">${(w.address || "").replace(/</g,"&lt;")}</span>
+                  <span class="support-wallet-addr">${(w.address || "").replace(/</g, "&lt;")}</span>
                   <button class="support-copy-btn" type="button">${lang === "fa" ? "کپی آدرس" : "Copy address"}</button>
                 </div>
               `;
-              bubble.querySelector(".support-copy-btn")?.addEventListener("click", async (e) => {
-                e.stopPropagation();
-                const btn = bubble.querySelector(".support-copy-btn");
-                try { await navigator.clipboard.writeText(w.address || ""); }
-                catch {
-                  const ta = document.createElement("textarea");
-                  ta.value = w.address || "";
-                  document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove();
-                }
-                if (btn) {
-                  btn.textContent = lang === "fa" ? "کپی شد!" : "Copied!";
-                  setTimeout(() => { btn.textContent = lang === "fa" ? "کپی آدرس" : "Copy address"; }, 1800);
-                }
+                bubble
+                  .querySelector(".support-copy-btn")
+                  ?.addEventListener("click", async (e) => {
+                    e.stopPropagation();
+                    const btn = bubble.querySelector(".support-copy-btn");
+                    try {
+                      await navigator.clipboard.writeText(w.address || "");
+                    } catch {
+                      const ta = document.createElement("textarea");
+                      ta.value = w.address || "";
+                      document.body.appendChild(ta);
+                      ta.select();
+                      document.execCommand("copy");
+                      ta.remove();
+                    }
+                    if (btn) {
+                      btn.textContent = lang === "fa" ? "کپی شد!" : "Copied!";
+                      setTimeout(() => {
+                        btn.textContent =
+                          lang === "fa" ? "کپی آدرس" : "Copy address";
+                      }, 1800);
+                    }
+                  });
+                listEl.appendChild(bubble);
               });
-              listEl.appendChild(bubble);
             });
-          });
         }
       }
 
@@ -1034,28 +1375,46 @@
         const cached = sessionStorage.getItem("filmchin_movies_cache");
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length) { movies = parsed; window._fcMovies = parsed; }
+          if (Array.isArray(parsed) && parsed.length) {
+            movies = parsed;
+            window._fcMovies = parsed;
+          }
         }
-      } catch(e) { /* ignore */ }
+      } catch (e) {
+        /* ignore */
+      }
     }
     if (!movies.length) return;
     const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
     const hubI18n = {
-      en: { title: "Genres", subtitle: "Click on a genre to browse movies and series." },
-      fa: { title: "ژانر ها", subtitle: "برای دانلود فیلم و سریال های ژانر مورد علاقه روش کلیک کن." },
+      en: {
+        title: "Genres",
+        subtitle: "Click on a genre to browse movies and series.",
+      },
+      fa: {
+        title: "ژانر ها",
+        subtitle: "برای دانلود فیلم و سریال های ژانر مورد علاقه روش کلیک کن.",
+      },
     };
     const genreCounts = {};
     movies.forEach((m) => {
-      if (m.genre) m.genre.split(" ").forEach((g) => {
-        const name = g.trim();
-        if (!name) return;
-        genreCounts[name] = (genreCounts[name] || 0) + 1;
-      });
+      if (m.genre)
+        m.genre.split(" ").forEach((g) => {
+          const name = g.trim();
+          if (!name) return;
+          genreCounts[name] = (genreCounts[name] || 0) + 1;
+        });
     });
     const genreEntries = Object.entries(genreCounts);
-    const persianGenres = genreEntries.filter(([g]) => !/^[A-Za-z]/.test(g.startsWith("#") ? g.slice(1) : g));
-    const englishGenres = genreEntries.filter(([g]) => /^[A-Za-z]/.test(g.startsWith("#") ? g.slice(1) : g));
-    const orderedGenres = (lang === "fa" ? persianGenres : englishGenres).sort((a, b) => b[1] - a[1]);
+    const persianGenres = genreEntries.filter(
+      ([g]) => !/^[A-Za-z]/.test(g.startsWith("#") ? g.slice(1) : g),
+    );
+    const englishGenres = genreEntries.filter(([g]) =>
+      /^[A-Za-z]/.test(g.startsWith("#") ? g.slice(1) : g),
+    );
+    const orderedGenres = (lang === "fa" ? persianGenres : englishGenres).sort(
+      (a, b) => b[1] - a[1],
+    );
     genreHubGrid.innerHTML = "";
     orderedGenres.forEach(([g, count]) => {
       const cleanName = g.startsWith("#") ? g.slice(1) : g;
@@ -1063,7 +1422,7 @@
       chip.className = "genre-hub-chip";
       chip.setAttribute("dir", "auto");
       chip.href = `/genre.html?genre=${encodeURIComponent(g)}`;
-      chip.innerHTML = `<span class="genre-hub-chip-name">${cleanName.replace(/</g,"&lt;")}</span><span class="genre-hub-chip-count">${count}</span>`;
+      chip.innerHTML = `<span class="genre-hub-chip-name">${cleanName.replace(/</g, "&lt;")}</span><span class="genre-hub-chip-count">${count}</span>`;
       genreHubGrid.appendChild(chip);
     });
     // Update header i18n
@@ -1073,7 +1432,12 @@
     if (hubTitleEl) hubTitleEl.textContent = t.title;
     if (hubSubEl) hubSubEl.textContent = t.subtitle;
   }
-  window.FilmChiinSharedSections = { hydrate, buildSideMenuGenres, buildSideMenuCountries, buildGenreHubGrid };
+  window.FilmChiinSharedSections = {
+    hydrate,
+    buildSideMenuGenres,
+    buildSideMenuCountries,
+    buildGenreHubGrid,
+  };
 })();
 
 // ===== PATCH: Dock functionality for movie/actor pages =====
@@ -1128,7 +1492,11 @@
         e.preventDefault();
         const searchInput = document.getElementById("search");
         if (searchInput) {
-          try { searchInput.focus({ preventScroll: true }); } catch { searchInput.focus(); }
+          try {
+            searchInput.focus({ preventScroll: true });
+          } catch {
+            searchInput.focus();
+          }
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
       });
@@ -1136,9 +1504,11 @@
 
     // ---- Keyboard detection: hide dock when keyboard open ----
     function checkKeyboard() {
-      const vvHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      const vvHeight = window.visualViewport
+        ? window.visualViewport.height
+        : window.innerHeight;
       const winHeight = window.screen.height;
-      const keyboardOpen = vvHeight < winHeight * 0.70;
+      const keyboardOpen = vvHeight < winHeight * 0.7;
       document.body.classList.toggle("keyboard-open", keyboardOpen);
     }
     if (window.visualViewport) {
@@ -1152,9 +1522,14 @@
   // ---- Social links i18n ----
   function updateSocialLinksLang() {
     const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
-    const label = document.querySelector("#socialLinksSection .social-link-label");
-    const bubble = document.querySelector("#socialLinksSection .social-link-join-bubble");
-    if (label) label.textContent = lang === "fa" ? "کانال تلگرام" : "Telegram Channel";
+    const label = document.querySelector(
+      "#socialLinksSection .social-link-label",
+    );
+    const bubble = document.querySelector(
+      "#socialLinksSection .social-link-join-bubble",
+    );
+    if (label)
+      label.textContent = lang === "fa" ? "کانال تلگرام" : "Telegram Channel";
     if (bubble) bubble.textContent = lang === "fa" ? "جوین" : "Join";
   }
 
@@ -1169,9 +1544,16 @@
     const lang = localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
     if (!db) return;
 
-    const { data: { user } } = await db.auth.getUser();
+    const {
+      data: { user },
+    } = await db.auth.getUser();
     if (!user) {
-      _subpageShowToast(lang === "fa" ? "برای مشاهده علاقه‌مندی‌ها باید وارد شوید" : "Please log in to view favorites", true);
+      _subpageShowToast(
+        lang === "fa"
+          ? "برای مشاهده علاقه‌مندی‌ها باید وارد شوید"
+          : "Please log in to view favorites",
+        true,
+      );
       return;
     }
 
@@ -1195,14 +1577,21 @@
     if (prevBtn && !prevBtn._wiredSubpage) {
       prevBtn._wiredSubpage = true;
       prevBtn.addEventListener("click", () => {
-        if (subpageFavPage > 1) { subpageFavPage--; _renderSubpageFavGrid(lang); }
+        if (subpageFavPage > 1) {
+          subpageFavPage--;
+          _renderSubpageFavGrid(lang);
+        }
       });
     }
     if (nextBtn && !nextBtn._wiredSubpage) {
       nextBtn._wiredSubpage = true;
       nextBtn.addEventListener("click", () => {
-        const totalPages = Math.ceil(subpageFavData.length / SUBPAGE_FAV_PAGE_SIZE) || 1;
-        if (subpageFavPage < totalPages) { subpageFavPage++; _renderSubpageFavGrid(lang); }
+        const totalPages =
+          Math.ceil(subpageFavData.length / SUBPAGE_FAV_PAGE_SIZE) || 1;
+        if (subpageFavPage < totalPages) {
+          subpageFavPage++;
+          _renderSubpageFavGrid(lang);
+        }
       });
     }
 
@@ -1212,7 +1601,8 @@
 
     try {
       // 1) بگیر favorites از DB (همان روش صفحه اصلی)
-      const { data: favRows, error: favErr } = await db.from("favorites")
+      const { data: favRows, error: favErr } = await db
+        .from("favorites")
         .select("movie_id, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
@@ -1224,7 +1614,10 @@
       }
 
       // 2) بگیر movies از کش window._fcMovies (همان منبع صفحه اصلی)
-      let allMovies = Array.isArray(window._fcMovies) && window._fcMovies.length ? window._fcMovies : null;
+      let allMovies =
+        Array.isArray(window._fcMovies) && window._fcMovies.length
+          ? window._fcMovies
+          : null;
 
       // اگر کش موجود نبود، از sessionStorage بخوان
       if (!allMovies) {
@@ -1232,9 +1625,14 @@
           const cached = sessionStorage.getItem("filmchin_movies_cache");
           if (cached) {
             const parsed = JSON.parse(cached);
-            if (Array.isArray(parsed) && parsed.length) { allMovies = parsed; window._fcMovies = parsed; }
+            if (Array.isArray(parsed) && parsed.length) {
+              allMovies = parsed;
+              window._fcMovies = parsed;
+            }
           }
-        } catch(e) { /* ignore */ }
+        } catch (e) {
+          /* ignore */
+        }
       }
 
       // اگر هنوز هم موجود نبود، از DB بگیر
@@ -1242,18 +1640,29 @@
         const { data: dbMovies } = await db.from("movies").select("*");
         allMovies = dbMovies || [];
         window._fcMovies = allMovies;
-        try { sessionStorage.setItem("filmchin_movies_cache", JSON.stringify(allMovies)); } catch(e) { /* quota */ }
+        try {
+          sessionStorage.setItem(
+            "filmchin_movies_cache",
+            JSON.stringify(allMovies),
+          );
+        } catch (e) {
+          /* quota */
+        }
         // ساخت سایدمنو ژانر/کشور
         setTimeout(() => {
-          if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
-          if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
+          if (window.FilmChiinSharedSections?.buildSideMenuGenres)
+            window.FilmChiinSharedSections.buildSideMenuGenres();
+          if (window.FilmChiinSharedSections?.buildSideMenuCountries)
+            window.FilmChiinSharedSections.buildSideMenuCountries();
         }, 100);
       }
 
       // 3) ترکیب favorites + movies (همان منطق buildFavoritesWithMovies صفحه اصلی)
       subpageFavData = favRows
-        .map(fav => {
-          const movie = allMovies.find(m => String(m.id) === String(fav.movie_id));
+        .map((fav) => {
+          const movie = allMovies.find(
+            (m) => String(m.id) === String(fav.movie_id),
+          );
           return movie ? { fav, movie } : null;
         })
         .filter(Boolean);
@@ -1266,11 +1675,11 @@
 
       subpageFavPage = 1;
       _renderSubpageFavGrid(lang);
-
     } catch (err) {
       console.error("openFavoritesSubPage error", err);
       const grid2 = document.getElementById("favoritesGrid");
-      if (grid2) grid2.innerHTML = `<div style="padding:20px;text-align:center;color:red">${lang === "fa" ? "خطا در بارگذاری" : "Error loading favorites"}</div>`;
+      if (grid2)
+        grid2.innerHTML = `<div style="padding:20px;text-align:center;color:red">${lang === "fa" ? "خطا در بارگذاری" : "Error loading favorites"}</div>`;
     }
   }
 
@@ -1278,17 +1687,23 @@
     const grid = document.getElementById("favoritesGrid");
     if (!grid) return;
 
-    const totalPages = Math.ceil(subpageFavData.length / SUBPAGE_FAV_PAGE_SIZE) || 1;
+    const totalPages =
+      Math.ceil(subpageFavData.length / SUBPAGE_FAV_PAGE_SIZE) || 1;
     if (subpageFavPage < 1) subpageFavPage = 1;
     if (subpageFavPage > totalPages) subpageFavPage = totalPages;
 
     const start = (subpageFavPage - 1) * SUBPAGE_FAV_PAGE_SIZE;
     const slice = subpageFavData.slice(start, start + SUBPAGE_FAV_PAGE_SIZE);
 
-    grid.innerHTML = slice.map(({ movie: m }) => {
-      const title = (m.title || "").replace(/</g, "&lt;");
-      const cover = (m.cover || m.poster || "/images/placeholder.png").replace(/"/g, "&quot;");
-      return `<div class="favorite-item" data-movie-id="${m.id}" style="cursor:pointer">
+    grid.innerHTML = slice
+      .map(({ movie: m }) => {
+        const title = (m.title || "").replace(/</g, "&lt;");
+        const cover = (
+          m.cover ||
+          m.poster ||
+          "/images/placeholder.png"
+        ).replace(/"/g, "&quot;");
+        return `<div class="favorite-item" data-movie-id="${m.id}" style="cursor:pointer">
         <img src="${cover}" alt="${title}" class="favorite-cover" loading="lazy" onerror="this.src='/images/placeholder.png'">
         <div class="favorite-title" dir="auto">${title}</div>
         <div class="favorite-meta"></div>
@@ -1302,10 +1717,11 @@
           </div>
         </div>
       </div>`;
-    }).join("");
+      })
+      .join("");
 
     // Wire go-to buttons
-    grid.querySelectorAll(".subpage-fav-goto").forEach(btn => {
+    grid.querySelectorAll(".subpage-fav-goto").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const id = btn.dataset.id;
@@ -1313,7 +1729,7 @@
       });
     });
     // Wire card click (whole card)
-    grid.querySelectorAll(".favorite-item").forEach(card => {
+    grid.querySelectorAll(".favorite-item").forEach((card) => {
       card.addEventListener("click", () => {
         const id = card.dataset.movieId;
         if (id) window.location.href = `/movie.html?id=${id}`;
@@ -1338,7 +1754,8 @@
     if (!container) {
       container = document.createElement("div");
       container.id = "topToastContainer";
-      container.style.cssText = "position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:999999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;";
+      container.style.cssText =
+        "position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:999999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;";
       document.body.appendChild(container);
     }
     const t = document.createElement("div");
@@ -1357,12 +1774,20 @@
     const grid = document.getElementById("socialGrid");
     if (!grid || grid.children.length > 0) return;
     try {
-      const { data, error } = await db.from("social_links").select("*").order("created_at", { ascending: false });
+      const { data, error } = await db
+        .from("social_links")
+        .select("*")
+        .order("created_at", { ascending: false });
       if (error || !data) return;
-      grid.innerHTML = data.map(s =>
-        `<a href="${(s.url||"").replace(/"/g,"&quot;")}" target="_blank" rel="noopener" class="social-item"><img src="${(s.icon||"").replace(/"/g,"&quot;")}" alt="${(s.title||"").replace(/"/g,"&quot;")}"><span>${(s.title||"").replace(/</g,"&lt;")}</span></a>`
-      ).join("");
-    } catch(e) { console.error("fetchSocialLinksSubPage error", e); }
+      grid.innerHTML = data
+        .map(
+          (s) =>
+            `<a href="${(s.url || "").replace(/"/g, "&quot;")}" target="_blank" rel="noopener" class="social-item"><img src="${(s.icon || "").replace(/"/g, "&quot;")}" alt="${(s.title || "").replace(/"/g, "&quot;")}"><span>${(s.title || "").replace(/</g, "&lt;")}</span></a>`,
+        )
+        .join("");
+    } catch (e) {
+      console.error("fetchSocialLinksSubPage error", e);
+    }
   }
   window.fetchSocialLinksSubPage = fetchSocialLinksSubPage;
 
@@ -1371,8 +1796,9 @@
     const el = document.getElementById("appVersion");
     if (!el) return;
     // اگر مقدار پیش‌فرض placeholder است لود کن
-    const SUPABASE_URL = "https://gwsmvcgjdodmkoqupdal.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
+    const SUPABASE_URL = "https://etevwqbiynardwsezasn.supabase.co";
+    const SUPABASE_KEY =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0ZXZ3cWJpeW5hcmR3c2V6YXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NjI0MzMsImV4cCI6MjA5NzEzODQzM30.1yPLfjydENjHacsI3PXLvekF7kIIWZDtaTARyDt5tUw";
     try {
       if (!window.supabase?.createClient) return;
       const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -1392,7 +1818,7 @@
   // Run after hydrate
   const origHydrate = window.FilmChiinSharedSections?.hydrate;
   if (origHydrate) {
-    window.FilmChiinSharedSections.hydrate = async function() {
+    window.FilmChiinSharedSections.hydrate = async function () {
       await origHydrate();
       setupDock();
       updateSocialLinksLang();
@@ -1413,7 +1839,8 @@
 // ===== PATCH: Live search dropdown on movie/actor pages =====
 (function initSharedSearchDropdown() {
   const SUPABASE_URL = "https://gwsmvcgjdodmkoqupdal.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
+  const SUPABASE_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0ZXZ3cWJpeW5hcmR3c2V6YXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NjI0MzMsImV4cCI6MjA5NzEzODQzM30.1yPLfjydENjHacsI3PXLvekF7kIIWZDtaTARyDt5tUw";
 
   let moviesCache = null;
   let episodesCacheMap = new Map();
@@ -1424,41 +1851,56 @@
     if (!window.supabase?.createClient) return [];
     try {
       const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      const { data } = await db.from("movies").select("id,title,cover,type,synopsis,stars,director").order("updated_at", { ascending: false });
+      const { data } = await db
+        .from("movies")
+        .select("id,title,cover,type,synopsis,stars,director")
+        .order("updated_at", { ascending: false });
       moviesCache = data || [];
       return moviesCache;
-    } catch { return []; }
+    } catch {
+      return [];
+    }
   }
 
   async function getEpisodes(movieIds) {
     if (!window.supabase?.createClient || !movieIds.length) return new Map();
-    const missing = movieIds.filter(id => !episodesCacheMap.has(id));
+    const missing = movieIds.filter((id) => !episodesCacheMap.has(id));
     if (missing.length) {
       try {
         const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const { data } = await db.from("movie_items").select("movie_id,cover,order_index")
-          .in("movie_id", missing).order("order_index", { ascending: true });
+        const { data } = await db
+          .from("movie_items")
+          .select("movie_id,cover,order_index")
+          .in("movie_id", missing)
+          .order("order_index", { ascending: true });
         const grouped = new Map();
-        (data || []).forEach(ep => {
+        (data || []).forEach((ep) => {
           if (!grouped.has(ep.movie_id)) grouped.set(ep.movie_id, []);
           grouped.get(ep.movie_id).push(ep.cover);
         });
-        missing.forEach(id => episodesCacheMap.set(id, grouped.get(id) || []));
+        missing.forEach((id) =>
+          episodesCacheMap.set(id, grouped.get(id) || []),
+        );
       } catch {}
     }
     return episodesCacheMap;
   }
 
   function makeMovieSlug(title) {
-    return String(title || "").toLowerCase().trim()
+    return String(title || "")
+      .toLowerCase()
+      .trim()
       .replace(/[\(\)\[\]\{\}]/g, "")
       .replace(/[^a-z0-9\u0600-\u06FF]+/gi, "-")
-      .replace(/-+/g, "-").replace(/^-|-$/g, "");
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
   }
 
   function buildMoviePageHref(title) {
     const slug = makeMovieSlug(title || "");
-    return slug ? `/movie.html?slug=${encodeURIComponent(slug)}` : "/movie.html";
+    return slug
+      ? `/movie.html?slug=${encodeURIComponent(slug)}`
+      : "/movie.html";
   }
 
   function scoreMovie(movie, query) {
@@ -1496,7 +1938,9 @@
       const allImgs = wrap.querySelectorAll("img");
       const next = covers[idx];
       // fade current out, show next
-      allImgs.forEach(im => { im.style.opacity = "0"; });
+      allImgs.forEach((im) => {
+        im.style.opacity = "0";
+      });
       const newImg = wrap.querySelector("img") || document.createElement("img");
       newImg.src = next;
       newImg.style.opacity = "1";
@@ -1510,25 +1954,36 @@
       return;
     }
 
-    dropdown.innerHTML = results.map((m, i) => {
-      const href = buildMoviePageHref(m.title);
-      const borderClass = m.type === "collection" ? "collection-border" : m.type === "series" ? "serial-border" : "";
-      const coverHtml = m.type === "collection"
-        ? `<div class="search-dropdown-cover-wrap" data-movie-id="${m.id}"><img src="${m.cover || ''}" alt="${m.title || ''}" class="search-dropdown-cover" /></div>`
-        : `<img src="${m.cover || ''}" alt="${m.title || ''}" class="search-dropdown-cover" />`;
-      return `<div class="search-dropdown-item ${borderClass}" data-href="${href}" data-movie-id="${m.id}" data-type="${m.type || 'single'}">
+    dropdown.innerHTML = results
+      .map((m, i) => {
+        const href = buildMoviePageHref(m.title);
+        const borderClass =
+          m.type === "collection"
+            ? "collection-border"
+            : m.type === "series"
+              ? "serial-border"
+              : "";
+        const coverHtml =
+          m.type === "collection"
+            ? `<div class="search-dropdown-cover-wrap" data-movie-id="${m.id}"><img src="${m.cover || ""}" alt="${m.title || ""}" class="search-dropdown-cover" /></div>`
+            : `<img src="${m.cover || ""}" alt="${m.title || ""}" class="search-dropdown-cover" />`;
+        return `<div class="search-dropdown-item ${borderClass}" data-href="${href}" data-movie-id="${m.id}" data-type="${m.type || "single"}">
         ${coverHtml}
-        <span class="search-dropdown-title">${m.title || ''}</span>
+        <span class="search-dropdown-title">${m.title || ""}</span>
         <button class="search-dropdown-open-btn" data-href="${href}" tabindex="-1">Open</button>
       </div>`;
-    }).join("");
+      })
+      .join("");
 
     // Attach click handlers
-    dropdown.querySelectorAll(".search-dropdown-item").forEach(item => {
+    dropdown.querySelectorAll(".search-dropdown-item").forEach((item) => {
       item.addEventListener("click", (e) => {
         if (e.target.closest(".search-dropdown-open-btn")) {
           e.stopPropagation();
-          window.open(e.target.closest(".search-dropdown-open-btn").dataset.href, "_blank");
+          window.open(
+            e.target.closest(".search-dropdown-open-btn").dataset.href,
+            "_blank",
+          );
           return;
         }
         const href = item.dataset.href;
@@ -1549,7 +2004,9 @@
     // Start cover cycling for collections
     results.forEach((m) => {
       if (m.type !== "collection") return;
-      const wrap = dropdown.querySelector(`.search-dropdown-cover-wrap[data-movie-id="${m.id}"]`);
+      const wrap = dropdown.querySelector(
+        `.search-dropdown-cover-wrap[data-movie-id="${m.id}"]`,
+      );
       if (!wrap) return;
       const epMap = episodesCacheMap.get(m.id);
       if (epMap && epMap.length > 0) {
@@ -1572,14 +2029,16 @@
 
     const allMovies = await getMovies();
     const scored = allMovies
-      .map(m => ({ movie: m, score: scoreMovie(m, query) }))
-      .filter(r => r.score > 0)
+      .map((m) => ({ movie: m, score: scoreMovie(m, query) }))
+      .filter((r) => r.score > 0)
       .sort((a, b) => b.score - a.score || 0)
       .slice(0, 10)
-      .map(r => r.movie);
+      .map((r) => r.movie);
 
     // Pre-fetch episodes for collections in results
-    const collectionIds = scored.filter(m => m.type === "collection").map(m => m.id);
+    const collectionIds = scored
+      .filter((m) => m.type === "collection")
+      .map((m) => m.id);
     if (collectionIds.length) await getEpisodes(collectionIds);
 
     if (scored.length === 0 && !query) {
@@ -1604,7 +2063,8 @@
       dropdown.id = "searchLiveDropdown";
       dropdown.className = "search-live-dropdown";
       dropdown.style.display = "none";
-      const wrap = searchInput.closest(".search-input-wrap") || searchInput.parentElement;
+      const wrap =
+        searchInput.closest(".search-input-wrap") || searchInput.parentElement;
       if (wrap) {
         wrap.style.position = "relative";
         wrap.appendChild(dropdown);
@@ -1613,7 +2073,10 @@
 
     searchInput.addEventListener("input", () => {
       clearTimeout(searchDebounce);
-      searchDebounce = setTimeout(() => onSearchInput(searchInput, dropdown), 200);
+      searchDebounce = setTimeout(
+        () => onSearchInput(searchInput, dropdown),
+        200,
+      );
     });
 
     // Close dropdown when clicking outside

@@ -1,6 +1,6 @@
-const SUPABASE_URL = "https://gwsmvcgjdodmkoqupdal.supabase.co";
+const SUPABASE_URL = "https://etevwqbiynardwsezasn.supabase.co";
 const SUPABASE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0ZXZ3cWJpeW5hcmR3c2V6YXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NjI0MzMsImV4cCI6MjA5NzEzODQzM30.1yPLfjydENjHacsI3PXLvekF7kIIWZDtaTARyDt5tUw";
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 window._supabaseClient = db;
@@ -69,7 +69,9 @@ function buildMoviePageHref(title) {
 function parseActorSlug() {
   const pathname = window.location.pathname || "";
   if (pathname.startsWith("/actor/")) {
-    return decodeURIComponent(pathname.replace("/actor/", "").replace(/\/+$/, "")).trim();
+    return decodeURIComponent(
+      pathname.replace("/actor/", "").replace(/\/+$/, ""),
+    ).trim();
   }
   return (new URLSearchParams(window.location.search).get("slug") || "").trim();
 }
@@ -91,15 +93,65 @@ function applySavedTheme() {
   }
 
   const colorThemes = {
-    blue: { accentRgb: "0, 74, 124", accentDark: "#004a7c", accent: "#0091d5", accentLight: "#2185d5", accentContrast: "#0d47a1", bgDay: "#f1f4f9", bgSoft: "#e8f0fa" },
-    green: { accentRgb: "27, 94, 32", accentDark: "#1b5e20", accent: "#2e9d57", accentLight: "#4caf50", accentContrast: "#145a32", bgDay: "#edf7ef", bgSoft: "#e0f2e4" },
-    yellow: { accentRgb: "146, 121, 18", accentDark: "#927912", accent: "#c5a317", accentLight: "#d9b62f", accentContrast: "#725d0e", bgDay: "#fbf7e8", bgSoft: "#f4edd2" },
-    red: { accentRgb: "140, 35, 35", accentDark: "#8c2323", accent: "#c84646", accentLight: "#d86464", accentContrast: "#6f1b1b", bgDay: "#faeeee", bgSoft: "#f4dede" },
-    purple: { accentRgb: "73, 53, 126", accentDark: "#49357e", accent: "#6f4dbb", accentLight: "#8a6ad1", accentContrast: "#39295f", bgDay: "#f2eefb", bgSoft: "#e7e0f7" },
-    teal: { accentRgb: "17, 95, 104", accentDark: "#115f68", accent: "#188a94", accentLight: "#21a4b0", accentContrast: "#0d4b51", bgDay: "#eaf7f8", bgSoft: "#def0f2" },
+    blue: {
+      accentRgb: "0, 74, 124",
+      accentDark: "#004a7c",
+      accent: "#0091d5",
+      accentLight: "#2185d5",
+      accentContrast: "#0d47a1",
+      bgDay: "#f1f4f9",
+      bgSoft: "#e8f0fa",
+    },
+    green: {
+      accentRgb: "27, 94, 32",
+      accentDark: "#1b5e20",
+      accent: "#2e9d57",
+      accentLight: "#4caf50",
+      accentContrast: "#145a32",
+      bgDay: "#edf7ef",
+      bgSoft: "#e0f2e4",
+    },
+    yellow: {
+      accentRgb: "146, 121, 18",
+      accentDark: "#927912",
+      accent: "#c5a317",
+      accentLight: "#d9b62f",
+      accentContrast: "#725d0e",
+      bgDay: "#fbf7e8",
+      bgSoft: "#f4edd2",
+    },
+    red: {
+      accentRgb: "140, 35, 35",
+      accentDark: "#8c2323",
+      accent: "#c84646",
+      accentLight: "#d86464",
+      accentContrast: "#6f1b1b",
+      bgDay: "#faeeee",
+      bgSoft: "#f4dede",
+    },
+    purple: {
+      accentRgb: "73, 53, 126",
+      accentDark: "#49357e",
+      accent: "#6f4dbb",
+      accentLight: "#8a6ad1",
+      accentContrast: "#39295f",
+      bgDay: "#f2eefb",
+      bgSoft: "#e7e0f7",
+    },
+    teal: {
+      accentRgb: "17, 95, 104",
+      accentDark: "#115f68",
+      accent: "#188a94",
+      accentLight: "#21a4b0",
+      accentContrast: "#0d4b51",
+      bgDay: "#eaf7f8",
+      bgSoft: "#def0f2",
+    },
   };
 
-  const selected = colorThemes[localStorage.getItem("colorTheme") || "blue"] || colorThemes.blue;
+  const selected =
+    colorThemes[localStorage.getItem("colorTheme") || "blue"] ||
+    colorThemes.blue;
   const s = document.documentElement.style;
   s.setProperty("--theme-accent-rgb", selected.accentRgb);
   s.setProperty("--theme-accent-dark", selected.accentDark);
@@ -127,7 +179,9 @@ async function hydrateBannerFromHome() {
     targetHeader.innerHTML = header.innerHTML;
     document.body.classList.add("shared-header-ready");
   }
-  if (features) document.getElementById("movieFeaturesMount").innerHTML = features.outerHTML;
+  if (features)
+    document.getElementById("movieFeaturesMount").innerHTML =
+      features.outerHTML;
 }
 
 function buildActorEpisodesMap(items) {
@@ -145,26 +199,45 @@ function renderActorPosts(posts, episodesMap = new Map()) {
   const container = document.getElementById("actorMoviesList");
   container.innerHTML = posts
     .map((m) => {
-      const cover = escapeHtml(m.cover || "https://via.placeholder.com/120x80?text=No+Cover");
+      const cover = escapeHtml(
+        m.cover || "https://via.placeholder.com/120x80?text=No+Cover",
+      );
       const title = escapeHtml(m.title || "-");
       const synopsis = escapeHtml(m.synopsis || "-");
       const url = buildMoviePageHref(m.title || "");
       const storedEpisodes = episodesMap.get(String(m.id)) || [];
-      const movieEpisodes = m.type === "collection"
-        ? [{ title: m.title, cover: m.cover, link: m.link, synopsis: m.synopsis }, ...storedEpisodes]
-        : storedEpisodes;
+      const movieEpisodes =
+        m.type === "collection"
+          ? [
+              {
+                title: m.title,
+                cover: m.cover,
+                link: m.link,
+                synopsis: m.synopsis,
+              },
+              ...storedEpisodes,
+            ]
+          : storedEpisodes;
       const showEpisodes = m.type === "collection" && movieEpisodes.length > 0;
       const episodesHtml = showEpisodes
         ? `<div class="actor-episodes-block">
             <span class="field-label"><img src="/images/icons8-video.apng" style="width:20px;height:20px;"> ${t("episodes")}:</span>
             <div class="episodes-container actor-episodes-container">
               <div class="episodes-list actor-episodes-list">
-                ${movieEpisodes.map((ep, idx) => {
-                  const epTitle = escapeHtml(ep.title || `Episode ${idx + 1}`);
-                  const epCover = escapeHtml(ep.cover || m.cover || "https://via.placeholder.com/120x80?text=No+Cover");
-                  const scrollable = epTitle.length > 16 ? "scrollable" : "";
-                  return `<div class="episode-card actor-episode-card ${idx === 0 ? "active" : ""}"><img src="${epCover}" alt="${epTitle}" class="episode-cover"><span class="episode-title ${scrollable}"><span>${epTitle}</span></span></div>`;
-                }).join("")}
+                ${movieEpisodes
+                  .map((ep, idx) => {
+                    const epTitle = escapeHtml(
+                      ep.title || `Episode ${idx + 1}`,
+                    );
+                    const epCover = escapeHtml(
+                      ep.cover ||
+                        m.cover ||
+                        "https://via.placeholder.com/120x80?text=No+Cover",
+                    );
+                    const scrollable = epTitle.length > 16 ? "scrollable" : "";
+                    return `<div class="episode-card actor-episode-card ${idx === 0 ? "active" : ""}"><img src="${epCover}" alt="${epTitle}" class="episode-cover"><span class="episode-title ${scrollable}"><span>${epTitle}</span></span></div>`;
+                  })
+                  .join("")}
               </div>
             </div>
           </div>`
@@ -213,7 +286,11 @@ async function loadActorPage() {
   });
 
   applySavedTheme();
-  try { await hydrateBannerFromHome(); } catch (e) { console.error(e); }
+  try {
+    await hydrateBannerFromHome();
+  } catch (e) {
+    console.error(e);
+  }
 
   const slug = parseActorSlug();
   if (!slug) {
@@ -229,14 +306,21 @@ async function loadActorPage() {
       if (Array.isArray(parsed) && parsed.length) {
         window._fcMovies = parsed;
         setTimeout(() => {
-          if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
-          if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
+          if (window.FilmChiinSharedSections?.buildSideMenuGenres)
+            window.FilmChiinSharedSections.buildSideMenuGenres();
+          if (window.FilmChiinSharedSections?.buildSideMenuCountries)
+            window.FilmChiinSharedSections.buildSideMenuCountries();
         }, 100);
       }
     }
-  } catch(e) { /* ignore */ }
+  } catch (e) {
+    /* ignore */
+  }
 
-  const { data: movies, error } = await db.from("movies").select("id,title,cover,link,synopsis,stars,type,created_at,genre,product").order("created_at", { ascending: false });
+  const { data: movies, error } = await db
+    .from("movies")
+    .select("id,title,cover,link,synopsis,stars,type,created_at,genre,product")
+    .order("created_at", { ascending: false });
   if (error || !Array.isArray(movies)) {
     status.textContent = t("actorNotFound");
     return;
@@ -244,23 +328,40 @@ async function loadActorPage() {
   // ذخیره برای live search و genre/country grid در سایدمنو
   window._fcMovies = movies;
   // ذخیره در sessionStorage برای استفاده در صفحات بعدی (ژانر/کشور سایدمنو)
-  try { sessionStorage.setItem("filmchin_movies_cache", JSON.stringify(movies)); } catch(e) { /* quota */ }
+  try {
+    sessionStorage.setItem("filmchin_movies_cache", JSON.stringify(movies));
+  } catch (e) {
+    /* quota */
+  }
   setTimeout(() => {
-    if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
-    if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
+    if (window.FilmChiinSharedSections?.buildSideMenuGenres)
+      window.FilmChiinSharedSections.buildSideMenuGenres();
+    if (window.FilmChiinSharedSections?.buildSideMenuCountries)
+      window.FilmChiinSharedSections.buildSideMenuCountries();
   }, 200);
 
-  const posts = movies.filter((m) => extractCommaSeparatedNames(m.stars || "").some((name) => makeActorSlug(name) === slug));
+  const posts = movies.filter((m) =>
+    extractCommaSeparatedNames(m.stars || "").some(
+      (name) => makeActorSlug(name) === slug,
+    ),
+  );
   if (!posts.length) {
     status.textContent = t("actorNotFound");
     return;
   }
 
-  const actorName = extractCommaSeparatedNames(posts[0].stars || "").find((name) => makeActorSlug(name) === slug) || slug;
+  const actorName =
+    extractCommaSeparatedNames(posts[0].stars || "").find(
+      (name) => makeActorSlug(name) === slug,
+    ) || slug;
   actorNameEl.textContent = actorName;
   document.title = `FilmChiin | ${actorName}`;
 
-  const { data: actorRow } = await db.from("actors").select("profile_url").eq("slug", slug).maybeSingle();
+  const { data: actorRow } = await db
+    .from("actors")
+    .select("profile_url")
+    .eq("slug", slug)
+    .maybeSingle();
   if (actorRow?.profile_url) {
     actorAvatar.src = actorRow.profile_url;
     actorAvatar.hidden = false;
@@ -274,7 +375,9 @@ async function loadActorPage() {
     actorAvatarFallback.hidden = false;
   }
 
-  const collectionIds = posts.filter((m) => m.type === "collection").map((m) => m.id);
+  const collectionIds = posts
+    .filter((m) => m.type === "collection")
+    .map((m) => m.id);
   let episodesMap = new Map();
   if (collectionIds.length) {
     const { data: movieItems } = await db
@@ -308,27 +411,39 @@ document.addEventListener("DOMContentLoaded", () => {
       sideMenu.classList.toggle("active");
       if (menuOverlay) menuOverlay.classList.toggle("active");
     } else {
-      window.location.href = new URL("/?openMenu=1", window.location.origin).href;
+      window.location.href = new URL(
+        "/?openMenu=1",
+        window.location.origin,
+      ).href;
     }
   });
 
   // Dock: favorites → open overlay locally if available
-  document.querySelector("#bottomFavoritesBtn")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    const favBtn = document.getElementById("favoriteMoviesBtn");
-    if (favBtn) {
-      favBtn.click();
-    } else {
-      window.location.href = new URL("/?openFavorites=1", window.location.origin).href;
-    }
-  });
+  document
+    .querySelector("#bottomFavoritesBtn")
+    ?.addEventListener("click", (e) => {
+      e.preventDefault();
+      const favBtn = document.getElementById("favoriteMoviesBtn");
+      if (favBtn) {
+        favBtn.click();
+      } else {
+        window.location.href = new URL(
+          "/?openFavorites=1",
+          window.location.origin,
+        ).href;
+      }
+    });
 
   // Dock: search → focus
   document.querySelector("#bottomSearchBtn")?.addEventListener("click", (e) => {
     e.preventDefault();
     const si = document.getElementById("search");
     if (si) {
-      try { si.focus({ preventScroll: true }); } catch { si.focus(); }
+      try {
+        si.focus({ preventScroll: true });
+      } catch {
+        si.focus();
+      }
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   });
@@ -345,23 +460,35 @@ document.addEventListener("DOMContentLoaded", () => {
         clearTimeout(debounce);
         debounce = setTimeout(async () => {
           const query = searchInput.value.trim();
-          if (!query) { dropdown.style.display = "none"; return; }
+          if (!query) {
+            dropdown.style.display = "none";
+            return;
+          }
 
-          const allMovies = Array.isArray(window._fcMovies) ? window._fcMovies : [];
+          const allMovies = Array.isArray(window._fcMovies)
+            ? window._fcMovies
+            : [];
           if (!allMovies.length) {
             // Fetch if not cached
             try {
               const { createClient } = window.supabase || {};
               if (!createClient) return;
-              const db2 = createClient(window.SUPABASE_URL || "", window.SUPABASE_KEY || "");
-              const { data } = await db2.from("movies").select("id,title,cover,type,synopsis,stars,director");
+              const db2 = createClient(
+                window.SUPABASE_URL || "",
+                window.SUPABASE_KEY || "",
+              );
+              const { data } = await db2
+                .from("movies")
+                .select("id,title,cover,type,synopsis,stars,director");
               window._fcMovies = data || [];
-            } catch(e) { return; }
+            } catch (e) {
+              return;
+            }
           }
 
           const q = query.toLowerCase();
           const scored = (window._fcMovies || [])
-            .map(m => {
+            .map((m) => {
               const title = (m.title || "").toLowerCase();
               const synopsis = (m.synopsis || "").toLowerCase();
               const stars = (m.stars || "").toLowerCase();
@@ -372,30 +499,46 @@ document.addEventListener("DOMContentLoaded", () => {
               else if (synopsis.includes(q)) score = 1;
               return { m, score };
             })
-            .filter(r => r.score > 0)
+            .filter((r) => r.score > 0)
             .sort((a, b) => b.score - a.score)
             .slice(0, 10)
-            .map(r => r.m);
+            .map((r) => r.m);
 
-          if (!scored.length) { dropdown.style.display = "none"; return; }
+          if (!scored.length) {
+            dropdown.style.display = "none";
+            return;
+          }
 
           const lang = localStorage.getItem("siteLanguage") || "en";
           const openLabel = lang === "fa" ? "باز کن" : "Open";
 
-          dropdown.innerHTML = scored.map(m => {
-            const slug = String(m.title || "").toLowerCase().trim()
-              .replace(/[\(\)\[\]\{\}]/g, "").replace(/[^a-z0-9\u0600-\u06FF]+/gi, "-")
-              .replace(/-+/g, "-").replace(/^-|-$/g, "");
-            const href = slug ? `/movie.html?slug=${encodeURIComponent(slug)}` : "/movie.html";
-            const borderClass = m.type === "collection" ? "collection-border" : m.type === "serial" ? "serial-border" : "";
-            return `<div class="search-dropdown-item ${borderClass}" data-href="${href}">
+          dropdown.innerHTML = scored
+            .map((m) => {
+              const slug = String(m.title || "")
+                .toLowerCase()
+                .trim()
+                .replace(/[\(\)\[\]\{\}]/g, "")
+                .replace(/[^a-z0-9\u0600-\u06FF]+/gi, "-")
+                .replace(/-+/g, "-")
+                .replace(/^-|-$/g, "");
+              const href = slug
+                ? `/movie.html?slug=${encodeURIComponent(slug)}`
+                : "/movie.html";
+              const borderClass =
+                m.type === "collection"
+                  ? "collection-border"
+                  : m.type === "serial"
+                    ? "serial-border"
+                    : "";
+              return `<div class="search-dropdown-item ${borderClass}" data-href="${href}">
               <img src="${m.cover || ""}" alt="" class="search-dropdown-cover" />
               <span class="search-dropdown-title">${m.title || ""}</span>
               <button class="search-dropdown-open-btn" data-href="${href}">${openLabel}</button>
             </div>`;
-          }).join("");
+            })
+            .join("");
 
-          dropdown.querySelectorAll(".search-dropdown-item").forEach(item => {
+          dropdown.querySelectorAll(".search-dropdown-item").forEach((item) => {
             item.addEventListener("click", (e) => {
               if (e.target.closest(".search-dropdown-open-btn")) {
                 e.stopPropagation();
@@ -415,7 +558,7 @@ document.addEventListener("DOMContentLoaded", () => {
           dropdown.style.display = "none";
         }
       });
-      dropdown.addEventListener("click", e => e.stopPropagation());
+      dropdown.addEventListener("click", (e) => e.stopPropagation());
 
       searchInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {

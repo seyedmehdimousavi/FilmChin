@@ -1,6 +1,6 @@
-const SUPABASE_URL = "https://gwsmvcgjdodmkoqupdal.supabase.co";
+const SUPABASE_URL = "https://etevwqbiynardwsezasn.supabase.co";
 const SUPABASE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0ZXZ3cWJpeW5hcmR3c2V6YXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NjI0MzMsImV4cCI6MjA5NzEzODQzM30.1yPLfjydENjHacsI3PXLvekF7kIIWZDtaTARyDt5tUw";
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 window._supabaseClient = db;
@@ -14,19 +14,29 @@ function showToast(msg) {
     if (!container) {
       container = document.createElement("div");
       container.id = "topToastContainer";
-      container.style.cssText = "position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:999999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:max-content;max-width:90vw;";
+      container.style.cssText =
+        "position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:999999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:max-content;max-width:90vw;";
       document.body.appendChild(container);
     }
     const toast = document.createElement("div");
-    toast.style.cssText = "pointer-events:auto;max-width:min(920px,95%);padding:10px 14px;background:rgba(0,74,124,0.85);color:#fff;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.3);font-size:14px;line-height:1.2;text-align:center;opacity:0;transition:opacity 220ms ease,transform 220ms ease;transform:translateY(-6px);";
+    toast.style.cssText =
+      "pointer-events:auto;max-width:min(920px,95%);padding:10px 14px;background:rgba(0,74,124,0.85);color:#fff;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.3);font-size:14px;line-height:1.2;text-align:center;opacity:0;transition:opacity 220ms ease,transform 220ms ease;transform:translateY(-6px);";
     toast.textContent = msg || "";
     container.appendChild(toast);
-    requestAnimationFrame(() => { toast.style.opacity = "1"; toast.style.transform = "translateY(0)"; });
+    requestAnimationFrame(() => {
+      toast.style.opacity = "1";
+      toast.style.transform = "translateY(0)";
+    });
     setTimeout(() => {
-      toast.style.opacity = "0"; toast.style.transform = "translateY(-6px)";
-      setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 250);
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(-6px)";
+      setTimeout(() => {
+        if (container.contains(toast)) container.removeChild(toast);
+      }, 250);
     }, 3000);
-  } catch(err) { console.error("showToast error", err); }
+  } catch (err) {
+    console.error("showToast error", err);
+  }
 }
 let currentUser = null;
 let favoriteMovieIds = new Set();
@@ -66,8 +76,10 @@ const movieI18n = {
     noDirectorMovies: "No other movies found for this director.",
     similarByGenreTitle: "Similar movies by genre",
     noSimilarGenre: "No similar-genre movies found.",
-    noActorsArchive: "Other movies of these actors are not available in archive.",
-    noDirectorArchive: "Other movies of this director are not available in archive.",
+    noActorsArchive:
+      "Other movies of these actors are not available in archive.",
+    noDirectorArchive:
+      "Other movies of this director are not available in archive.",
     goToPage: "Go to page",
     postOptionAddFavorite: "Add to favorite",
     postOptionFavoriteStatusAdd: "Add to your favorites",
@@ -142,76 +154,110 @@ const movieFeatureI18n = {
   en: {
     siteFeaturesTitle: "FilmChiin site features",
     featureTitle1: "Create account",
-    featureDesc1: "By creating an account, you unlock extra capabilities: build a personal favorites list and chat with admin.",
+    featureDesc1:
+      "By creating an account, you unlock extra capabilities: build a personal favorites list and chat with admin.",
     featureTitle2: "Instant and advanced search",
-    featureDesc2: "Search is fully instant. As you type, results filter immediately and matched text is highlighted in title, synopsis, cast, and other fields.",
+    featureDesc2:
+      "Search is fully instant. As you type, results filter immediately and matched text is highlighted in title, synopsis, cast, and other fields.",
     featureTitle3: "Customize homepage layout",
-    featureDesc3: "Use SideMenu options to arrange homepage layout based on your preference.",
+    featureDesc3:
+      "Use SideMenu options to arrange homepage layout based on your preference.",
     featureTitle4: "Type and genre tabs",
-    featureDesc4: "Homepage is separated by content type (movie, collection, series). You can also filter each tab by genres with one click.",
+    featureDesc4:
+      "Homepage is separated by content type (movie, collection, series). You can also filter each tab by genres with one click.",
     featureTitle5: "Sort by IMDb rating",
-    featureDesc5: "Sort visible list by IMDb score and quickly focus on higher-rated titles.",
+    featureDesc5:
+      "Sort visible list by IMDb score and quickly focus on higher-rated titles.",
     featureTitle6: "Sort by release year",
-    featureDesc6: "Use release filter to prioritize newer/older titles based on your preference.",
+    featureDesc6:
+      "Use release filter to prioritize newer/older titles based on your preference.",
     featureTitle7: "Live movie count",
-    featureDesc7: "At the top of the homepage, the visible movie count updates immediately when search, genres, tabs, IMDb filters, or release filters change.",
+    featureDesc7:
+      "At the top of the homepage, the visible movie count updates immediately when search, genres, tabs, IMDb filters, or release filters change.",
     featureTitle8: "Episode list for collections/series",
-    featureDesc8: "For collections and series, all episodes are shown in small cards in the same post and selecting an episode updates card info instantly.",
+    featureDesc8:
+      "For collections and series, all episodes are shown in small cards in the same post and selecting an episode updates card info instantly.",
     featureTitle9: "One-click file access",
-    featureDesc9: "With <strong>Go to file</strong>, <code>@Filmchinbot</code> sends the movie or episode file directly without needing channel join.",
+    featureDesc9:
+      "With <strong>Go to file</strong>, <code>@Filmchinbot</code> sends the movie or episode file directly without needing channel join.",
     featureTitle10: "Comments in each post",
-    featureDesc10: "Each post supports comments with custom UI and avatars; comment count is shown near the comment icon.",
+    featureDesc10:
+      "Each post supports comments with custom UI and avatars; comment count is shown near the comment icon.",
     featureTitle11: "Popular movies and page list",
-    featureDesc11: "Popular section is built from click stats and the floating panel lists current-page posts for quick navigation.",
+    featureDesc11:
+      "Popular section is built from click stats and the floating panel lists current-page posts for quick navigation.",
     featureTitle12: "Copy or share movie links",
-    featureDesc12: "Each post includes copy and share buttons for its dedicated movie page link, so you can open the post details and continue to the file from there.",
+    featureDesc12:
+      "Each post includes copy and share buttons for its dedicated movie page link, so you can open the post details and continue to the file from there.",
     featureTitle13: "Responsive Liquid Glass design",
-    featureDesc13: "Parts of UI use a Liquid Glass-inspired design with smooth animations and balanced transparency on mobile/desktop.",
+    featureDesc13:
+      "Parts of UI use a Liquid Glass-inspired design with smooth animations and balanced transparency on mobile/desktop.",
     featureTitle14: "Site language switch",
-    featureDesc14: "From language settings, you can switch the UI between Persian and English. Core texts, headings, and feature descriptions update consistently based on your selected language.",
+    featureDesc14:
+      "From language settings, you can switch the UI between Persian and English. Core texts, headings, and feature descriptions update consistently based on your selected language.",
     featureTitle15: "Site color theme switch",
-    featureDesc15: "With the color theme option, you can personalize the site look to match your taste. Your selected theme is applied across UI sections for a more consistent and pleasant browsing experience.",
+    featureDesc15:
+      "With the color theme option, you can personalize the site look to match your taste. Your selected theme is applied across UI sections for a more consistent and pleasant browsing experience.",
     featureTitle16: "Admin announcements on homepage",
-    featureDesc16: "Messages published from the admin panel appear as announcements on the homepage, and users can mark them as read after viewing them.",
+    featureDesc16:
+      "Messages published from the admin panel appear as announcements on the homepage, and users can mark them as read after viewing them.",
     featureTitle17: "Dedicated genre page",
-    featureDesc17: "Clicking any genre from the 'Genres' section opens a dedicated page showing all movies of that genre. Movies are displayed in a 3-column card layout, with a 'Show more' button to load additional films.",
+    featureDesc17:
+      "Clicking any genre from the 'Genres' section opens a dedicated page showing all movies of that genre. Movies are displayed in a 3-column card layout, with a 'Show more' button to load additional films.",
   },
   fa: {
     siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
     featureTitle1: "ساخت حساب کاربری",
-    featureDesc1: "با ساخت حساب کاربری به قابلیت های بیشتری دسترسی دارید می‌توانید برای خودتان یک لیست اختصاصی از فیلم‌های مورد علاقه بسازید. میتوانید از چت با ادمین استفاده کنید.",
+    featureDesc1:
+      "با ساخت حساب کاربری به قابلیت های بیشتری دسترسی دارید می‌توانید برای خودتان یک لیست اختصاصی از فیلم‌های مورد علاقه بسازید. میتوانید از چت با ادمین استفاده کنید.",
     featureTitle2: "جست‌وجوی لحظه‌ای و پیشرفته",
-    featureDesc2: "جست‌وجوی سایت کاملاً لحظه‌ای است؛ با تایپ هر عبارت، نتایج بلافاصله فیلتر می‌شوند. عبارت جست‌وجوشده در عنوان، خلاصه، بازیگران و سایر فیلدها هایلایت می‌شود.",
+    featureDesc2:
+      "جست‌وجوی سایت کاملاً لحظه‌ای است؛ با تایپ هر عبارت، نتایج بلافاصله فیلتر می‌شوند. عبارت جست‌وجوشده در عنوان، خلاصه، بازیگران و سایر فیلدها هایلایت می‌شود.",
     featureTitle3: "شخصی سازی چیدمان صفحه",
-    featureDesc3: "از طریق گزینه های موجود در SideMenu میتوانید چیدمان صفحه اصلی را مطابق با سلیقه ی خود مرتب کنید.",
+    featureDesc3:
+      "از طریق گزینه های موجود در SideMenu میتوانید چیدمان صفحه اصلی را مطابق با سلیقه ی خود مرتب کنید.",
     featureTitle4: "فیلترفیلم هاوژانرها در تب‌های جداگانه",
-    featureDesc4: "صفحه اصلی بر اساس نوع محتوا (فیلم سینمایی، کالکشن، سریال) با تب‌ها تفکیک شده است. علاوه بر آن، در هر تب می‌توانید با یک کلیک ژانر را فیلتر کنید.",
+    featureDesc4:
+      "صفحه اصلی بر اساس نوع محتوا (فیلم سینمایی، کالکشن، سریال) با تب‌ها تفکیک شده است. علاوه بر آن، در هر تب می‌توانید با یک کلیک ژانر را فیلتر کنید.",
     featureTitle5: "مرتب‌سازی بر اساس امتیاز IMDb",
-    featureDesc5: "لیست قابل مشاهده را می‌توانید بر اساس امتیاز IMDb مرتب کنید تا سریع‌تر به عناوین با امتیاز بالاتر برسید.",
+    featureDesc5:
+      "لیست قابل مشاهده را می‌توانید بر اساس امتیاز IMDb مرتب کنید تا سریع‌تر به عناوین با امتیاز بالاتر برسید.",
     featureTitle6: "مرتب‌سازی بر اساس سال انتشار",
-    featureDesc6: "با فیلتر سال انتشار می‌توانید عناوین جدیدتر یا قدیمی‌تر را بر اساس نیاز خود ببینید.",
+    featureDesc6:
+      "با فیلتر سال انتشار می‌توانید عناوین جدیدتر یا قدیمی‌تر را بر اساس نیاز خود ببینید.",
     featureTitle7: "آمار دقیق تعداد فیلم‌ها در هر لحظه",
-    featureDesc7: "در بالای صفحه اصلی، تعداد فیلم‌های در حال نمایش با توجه به فیلترها و جست‌وجوی فعلی نمایش داده می‌شود و بعد از هر تغییر به‌صورت لحظه‌ای به‌روزرسانی می‌شود.",
+    featureDesc7:
+      "در بالای صفحه اصلی، تعداد فیلم‌های در حال نمایش با توجه به فیلترها و جست‌وجوی فعلی نمایش داده می‌شود و بعد از هر تغییر به‌صورت لحظه‌ای به‌روزرسانی می‌شود.",
     featureTitle8: "لیست قسمت‌های سریال وکالکشن",
-    featureDesc8: "برای سریال‌ها و کالکشن‌ها، تمام قسمت‌ها در قالب کارت‌های کوچک داخل همان پست نمایش داده می‌شوند و با انتخاب هر قسمت اطلاعات کارت فوراً آپدیت می‌شود.",
+    featureDesc8:
+      "برای سریال‌ها و کالکشن‌ها، تمام قسمت‌ها در قالب کارت‌های کوچک داخل همان پست نمایش داده می‌شوند و با انتخاب هر قسمت اطلاعات کارت فوراً آپدیت می‌شود.",
     featureTitle9: "دسترسی به فایل فقط با یک کلیک",
-    featureDesc9: "با فشردن دکمه <strong>Go to file</strong> بات <code>@Filmchinbot</code> فایل فیلم یا قسمت سریال را برای شما ارسال می‌کند؛ بدون نیاز به جوین شدن در کانال.",
+    featureDesc9:
+      "با فشردن دکمه <strong>Go to file</strong> بات <code>@Filmchinbot</code> فایل فیلم یا قسمت سریال را برای شما ارسال می‌کند؛ بدون نیاز به جوین شدن در کانال.",
     featureTitle10: "کامنت و نمایش گفت‌وگو در همان پست",
-    featureDesc10: "برای هر پست می‌توانید کامنت بگذارید و همه نظرات در همان کارت فیلم با طراحی اختصاصی و آواتارها نمایش داده می‌شوند.",
+    featureDesc10:
+      "برای هر پست می‌توانید کامنت بگذارید و همه نظرات در همان کارت فیلم با طراحی اختصاصی و آواتارها نمایش داده می‌شوند.",
     featureTitle11: "فیلم‌های پرطرفدارولیست فیلم‌های صفحه",
-    featureDesc11: "بخش فیلم‌های پرطرفدار بر اساس آمار کلیک‌ها ساخته می‌شود و دکمه شناور لیست فیلم‌های صفحه فعلی را نشان می‌دهد.",
+    featureDesc11:
+      "بخش فیلم‌های پرطرفدار بر اساس آمار کلیک‌ها ساخته می‌شود و دکمه شناور لیست فیلم‌های صفحه فعلی را نشان می‌دهد.",
     featureTitle12: "کپی یا اشتراک لینک هر فیلم",
-    featureDesc12: "برای هر پست، دکمه‌هایی برای کپی و اشتراک لینک صفحه اختصاصی فیلم وجود دارد تا بتوانید اطلاعات پست را باز کنید و از همان‌جا به فایل بروید.",
+    featureDesc12:
+      "برای هر پست، دکمه‌هایی برای کپی و اشتراک لینک صفحه اختصاصی فیلم وجود دارد تا بتوانید اطلاعات پست را باز کنید و از همان‌جا به فایل بروید.",
     featureTitle13: "طراحی Liquid Glass واکنش‌گرا",
-    featureDesc13: "بخش هایی از سایت با الهام از طراحی Liquid Glass ساخته شده است؛ کارت‌ها، دکمه‌ها و پنل‌ها تجربه کاربری روان و چشم‌نواز ایجاد می‌کنند.",
+    featureDesc13:
+      "بخش هایی از سایت با الهام از طراحی Liquid Glass ساخته شده است؛ کارت‌ها، دکمه‌ها و پنل‌ها تجربه کاربری روان و چشم‌نواز ایجاد می‌کنند.",
     featureTitle14: "امکان تغییر زبان سایت",
-    featureDesc14: "در بخش تنظیمات زبان می‌توانید رابط کاربری سایت را بین فارسی و انگلیسی جابه‌جا کنید. تمام متن‌های اصلی، عنوان‌ها و توضیحات امکانات بر اساس زبان انتخابی شما به‌صورت یکپارچه تغییر می‌کنند.",
+    featureDesc14:
+      "در بخش تنظیمات زبان می‌توانید رابط کاربری سایت را بین فارسی و انگلیسی جابه‌جا کنید. تمام متن‌های اصلی، عنوان‌ها و توضیحات امکانات بر اساس زبان انتخابی شما به‌صورت یکپارچه تغییر می‌کنند.",
     featureTitle15: "امکان تغییر تم رنگی سایت",
-    featureDesc15: "با گزینه تغییر تم رنگی، می‌توانید ظاهر سایت را متناسب با سلیقه خود شخصی‌سازی کنید. تم انتخابی روی بخش‌های مختلف رابط کاربری اعمال می‌شود تا تجربه مرور سایت هماهنگ‌تر و دلپذیرتر باشد.",
+    featureDesc15:
+      "با گزینه تغییر تم رنگی، می‌توانید ظاهر سایت را متناسب با سلیقه خود شخصی‌سازی کنید. تم انتخابی روی بخش‌های مختلف رابط کاربری اعمال می‌شود تا تجربه مرور سایت هماهنگ‌تر و دلپذیرتر باشد.",
     featureTitle16: "اعلان‌های مدیریت در صفحه اصلی",
-    featureDesc16: "پیام‌هایی که مدیریت از پنل ادمین منتشر می‌کند، به‌صورت اعلان در صفحه اصلی نمایش داده می‌شوند و کاربر می‌تواند بعد از خواندن، آن‌ها را علامت‌گذاری کند.",
+    featureDesc16:
+      "پیام‌هایی که مدیریت از پنل ادمین منتشر می‌کند، به‌صورت اعلان در صفحه اصلی نمایش داده می‌شوند و کاربر می‌تواند بعد از خواندن، آن‌ها را علامت‌گذاری کند.",
     featureTitle17: "صفحه اختصاصی ژانر",
-    featureDesc17: "با کلیک روی هر ژانر از بخش «ژانر ها» صفحه‌ای اختصاصی با تمامی فیلم‌های آن ژانر باز می‌شود. فیلم‌ها در قالب کارت‌های سه‌ستونه نمایش داده می‌شوند و دکمه «نمایش بیشتر» به کاربر امکان می‌دهد فیلم‌های بیشتری را ببیند.",
+    featureDesc17:
+      "با کلیک روی هر ژانر از بخش «ژانر ها» صفحه‌ای اختصاصی با تمامی فیلم‌های آن ژانر باز می‌شود. فیلم‌ها در قالب کارت‌های سه‌ستونه نمایش داده می‌شوند و دکمه «نمایش بیشتر» به کاربر امکان می‌دهد فیلم‌های بیشتری را ببیند.",
   },
 };
 
@@ -232,20 +278,33 @@ function applyMovieFeatureTranslations() {
 }
 
 function applyMoviePostOptionsTranslations() {
-  const setText = (id, key) => { const el = document.getElementById(id); if (el) el.textContent = mt(key); };
+  const setText = (id, key) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = mt(key);
+  };
   setText("postOptionsTitle", "postOptions");
   const closeBtn = document.getElementById("postOptionsCloseBtn");
   if (closeBtn) closeBtn.setAttribute("aria-label", mt("close"));
-  const favTitle = document.querySelector("#postOptionFavorite .post-option-title");
+  const favTitle = document.querySelector(
+    "#postOptionFavorite .post-option-title",
+  );
   if (favTitle) favTitle.textContent = mt("postOptionAddFavorite");
   setText("postOptionFavoriteStatus", "postOptionFavoriteStatusAdd");
-  const copyTitle = document.querySelector("#postOptionCopyLink .post-option-title");
+  const copyTitle = document.querySelector(
+    "#postOptionCopyLink .post-option-title",
+  );
   if (copyTitle) copyTitle.textContent = mt("postOptionCopyLink");
-  const copySub = document.querySelector("#postOptionCopyLink .post-option-subtitle");
+  const copySub = document.querySelector(
+    "#postOptionCopyLink .post-option-subtitle",
+  );
   if (copySub) copySub.textContent = mt("postOptionCopyLinkSub");
-  const shareTitle = document.querySelector("#postOptionShareLink .post-option-title");
+  const shareTitle = document.querySelector(
+    "#postOptionShareLink .post-option-title",
+  );
   if (shareTitle) shareTitle.textContent = mt("postOptionShareLink");
-  const shareSub = document.querySelector("#postOptionShareLink .post-option-subtitle");
+  const shareSub = document.querySelector(
+    "#postOptionShareLink .post-option-subtitle",
+  );
   if (shareSub) shareSub.textContent = mt("postOptionShareLinkSub");
 }
 
@@ -315,7 +374,9 @@ function buildActorPageHref(name) {
 function parseSlug() {
   const pathname = window.location.pathname || "";
   if (pathname.startsWith("/movie/")) {
-    return decodeURIComponent(pathname.replace("/movie/", "").replace(/\/+$/, ""));
+    return decodeURIComponent(
+      pathname.replace("/movie/", "").replace(/\/+$/, ""),
+    );
   }
   return (new URLSearchParams(window.location.search).get("slug") || "").trim();
 }
@@ -332,7 +393,9 @@ function applyMovieHeroBackground(coverUrl) {
 
 function extractHashtagTokens(str) {
   if (!str) return [];
-  return (str.match(/#[^\s,،]+/g) || []).map((tag) => tag.trim()).filter(Boolean);
+  return (str.match(/#[^\s,،]+/g) || [])
+    .map((tag) => tag.trim())
+    .filter(Boolean);
 }
 
 function isEnglishHashtag(tag) {
@@ -384,7 +447,9 @@ function buildActorChip(value) {
 
 async function fetchActorAvatars() {
   try {
-    const { data, error } = await db.from("actors").select("name,slug,profile_url");
+    const { data, error } = await db
+      .from("actors")
+      .select("name,slug,profile_url");
     if (error || !Array.isArray(data)) return;
     actorAvatarMap = new Map();
     data.forEach((row) => {
@@ -403,20 +468,27 @@ function renderChips(str, mode = "hashtags") {
   if (mode === "names") {
     const names = extractCommaSeparatedNames(str);
     if (!names.length) return `<span class="chip">${escapeHtml(str)}</span>`;
-    return names.map((name) => buildSearchChip(name, "person-chip")).join(' <span class="chip-separator">,</span> ');
+    return names
+      .map((name) => buildSearchChip(name, "person-chip"))
+      .join(' <span class="chip-separator">,</span> ');
   }
 
   if (mode === "actors") {
     const names = extractCommaSeparatedNames(str);
     if (!names.length) return `<span class="chip">${escapeHtml(str)}</span>`;
-    return names.map((name) => buildActorChip(name)).join(' <span class="chip-separator">,</span> ');
+    return names
+      .map((name) => buildActorChip(name))
+      .join(' <span class="chip-separator">,</span> ');
   }
 
   const tags = extractHashtagTokens(str);
   if (tags.length) {
-    const visibleTags = mode === "genre" ? filterHashtagsByLanguage(tags) : tags;
+    const visibleTags =
+      mode === "genre" ? filterHashtagsByLanguage(tags) : tags;
     if (!visibleTags.length) return '<span class="chip">-</span>';
-    return visibleTags.map((tag) => buildSearchChip(tag, "genre-chip-mini")).join("");
+    return visibleTags
+      .map((tag) => buildSearchChip(tag, "genre-chip-mini"))
+      .join("");
   }
 
   return String(str)
@@ -425,7 +497,6 @@ function renderChips(str, mode = "hashtags") {
     .map((g) => buildSearchChip(g, "country-chip"))
     .join("");
 }
-
 
 function classifySynopsisChar(ch) {
   if (/\s/.test(ch)) return "neutral";
@@ -463,7 +534,8 @@ function buildSynopsisSegments(rawText) {
   segments.forEach((seg) => {
     if (!seg.text) return;
     const prev = merged[merged.length - 1];
-    if (prev && prev.dir === seg.dir) prev.text = `${prev.text} ${seg.text}`.trim();
+    if (prev && prev.dir === seg.dir)
+      prev.text = `${prev.text} ${seg.text}`.trim();
     else merged.push(seg);
   });
 
@@ -482,7 +554,10 @@ function makeSynopsisHtml(rawText) {
   }
 
   return segments
-    .map((seg) => `<span class="synopsis-segment synopsis-${seg.dir}" dir="${seg.dir === "fa" ? "rtl" : "ltr"}">${escapeHtml(seg.text)}</span>`)
+    .map(
+      (seg) =>
+        `<span class="synopsis-segment synopsis-${seg.dir}" dir="${seg.dir === "fa" ? "rtl" : "ltr"}">${escapeHtml(seg.text)}</span>`,
+    )
     .join("");
 }
 
@@ -502,13 +577,26 @@ function buildTelegramBotUrlFromChannelLink(rawLink) {
   if (host !== "t.me" && host !== "telegram.me") return trimmed;
 
   const parts = url.pathname.split("/").filter(Boolean);
-  if (parts[0] === "c" && parts.length >= 3 && /^\d+$/.test(parts[1]) && /^\d+$/.test(parts[2])) {
+  if (
+    parts[0] === "c" &&
+    parts.length >= 3 &&
+    /^\d+$/.test(parts[1]) &&
+    /^\d+$/.test(parts[2])
+  ) {
     return `https://t.me/Filmchinbot?start=forward_${parts[1]}_${parts[2]}`;
   }
-  if (parts.length === 2 && /^[A-Za-z0-9_]+$/.test(parts[0]) && /^\d+$/.test(parts[1])) {
+  if (
+    parts.length === 2 &&
+    /^[A-Za-z0-9_]+$/.test(parts[0]) &&
+    /^\d+$/.test(parts[1])
+  ) {
     return `https://t.me/Filmchinbot?start=forward_${parts[0]}_${parts[1]}`;
   }
-  if (parts.length === 3 && /^[A-Za-z0-9_]+$/.test(parts[0]) && /^\d+$/.test(parts[2])) {
+  if (
+    parts.length === 3 &&
+    /^[A-Za-z0-9_]+$/.test(parts[0]) &&
+    /^\d+$/.test(parts[2])
+  ) {
     return `https://t.me/Filmchinbot?start=forward_${parts[0]}_${parts[2]}`;
   }
   return trimmed;
@@ -519,15 +607,65 @@ function applySavedTheme() {
   document.body.classList.toggle("dark", savedTheme === "dark");
 
   const colorThemes = {
-    blue: { accentRgb: "0, 74, 124", accentDark: "#004a7c", accent: "#0091d5", accentLight: "#2185d5", accentContrast: "#0d47a1", bgDay: "#f1f4f9", bgSoft: "#e8f0fa" },
-    green: { accentRgb: "25, 114, 64", accentDark: "#197240", accent: "#31aa63", accentLight: "#4bb97a", accentContrast: "#0f5c32", bgDay: "#f1f8f3", bgSoft: "#e6f4eb" },
-    yellow: { accentRgb: "156, 124, 19", accentDark: "#9c7c13", accent: "#d3a72a", accentLight: "#e0be4e", accentContrast: "#7a6008", bgDay: "#faf7ed", bgSoft: "#f7f0d8" },
-    red: { accentRgb: "152, 49, 49", accentDark: "#983131", accent: "#cb4a4a", accentLight: "#de6a6a", accentContrast: "#7a2323", bgDay: "#faf1f1", bgSoft: "#f5e3e3" },
-    purple: { accentRgb: "84, 63, 153", accentDark: "#543f99", accent: "#7f63d0", accentLight: "#9a83de", accentContrast: "#3e2c7a", bgDay: "#f5f2fb", bgSoft: "#ece6f7" },
-    teal: { accentRgb: "19, 106, 114", accentDark: "#136a72", accent: "#1d98a2", accentLight: "#40afb7", accentContrast: "#0f5258", bgDay: "#f0f7f8", bgSoft: "#deeff1" },
+    blue: {
+      accentRgb: "0, 74, 124",
+      accentDark: "#004a7c",
+      accent: "#0091d5",
+      accentLight: "#2185d5",
+      accentContrast: "#0d47a1",
+      bgDay: "#f1f4f9",
+      bgSoft: "#e8f0fa",
+    },
+    green: {
+      accentRgb: "25, 114, 64",
+      accentDark: "#197240",
+      accent: "#31aa63",
+      accentLight: "#4bb97a",
+      accentContrast: "#0f5c32",
+      bgDay: "#f1f8f3",
+      bgSoft: "#e6f4eb",
+    },
+    yellow: {
+      accentRgb: "156, 124, 19",
+      accentDark: "#9c7c13",
+      accent: "#d3a72a",
+      accentLight: "#e0be4e",
+      accentContrast: "#7a6008",
+      bgDay: "#faf7ed",
+      bgSoft: "#f7f0d8",
+    },
+    red: {
+      accentRgb: "152, 49, 49",
+      accentDark: "#983131",
+      accent: "#cb4a4a",
+      accentLight: "#de6a6a",
+      accentContrast: "#7a2323",
+      bgDay: "#faf1f1",
+      bgSoft: "#f5e3e3",
+    },
+    purple: {
+      accentRgb: "84, 63, 153",
+      accentDark: "#543f99",
+      accent: "#7f63d0",
+      accentLight: "#9a83de",
+      accentContrast: "#3e2c7a",
+      bgDay: "#f5f2fb",
+      bgSoft: "#ece6f7",
+    },
+    teal: {
+      accentRgb: "19, 106, 114",
+      accentDark: "#136a72",
+      accent: "#1d98a2",
+      accentLight: "#40afb7",
+      accentContrast: "#0f5258",
+      bgDay: "#f0f7f8",
+      bgSoft: "#deeff1",
+    },
   };
 
-  const selected = colorThemes[localStorage.getItem("colorTheme") || "blue"] || colorThemes.blue;
+  const selected =
+    colorThemes[localStorage.getItem("colorTheme") || "blue"] ||
+    colorThemes.blue;
   const s = document.documentElement.style;
   s.setProperty("--theme-accent-rgb", selected.accentRgb);
   s.setProperty("--theme-accent-dark", selected.accentDark);
@@ -537,7 +675,14 @@ function applySavedTheme() {
   s.setProperty("--theme-bg-day", selected.bgDay);
   s.setProperty("--theme-bg-soft", selected.bgSoft);
 
-  const goPageColors = { blue: "#1e88e5", green: "#2e9d57", yellow: "#c5a317", red: "#c84646", purple: "#6f4dbb", teal: "#188a94" };
+  const goPageColors = {
+    blue: "#1e88e5",
+    green: "#2e9d57",
+    yellow: "#c5a317",
+    red: "#c84646",
+    purple: "#6f4dbb",
+    teal: "#188a94",
+  };
   const themeName = localStorage.getItem("colorTheme") || "blue";
   s.setProperty("--go-page-bg", goPageColors[themeName] || "#7c4dff");
 }
@@ -547,16 +692,17 @@ function setSeo(movie, slug) {
   const year = movie?.year || "";
   const genre = Array.isArray(movie?.genre)
     ? movie.genre.join(", ")
-    : (movie?.genre || "");
+    : movie?.genre || "";
   const director = movie?.director || "";
   const imdb = movie?.imdb ? `امتیاز IMDb: ${movie.imdb}` : "";
 
   // عنوان بهینه برای گوگل
   const titleParts = [movieTitle];
   if (year) titleParts.push(year);
-  const seoTitle = titleParts.length > 1
-    ? `دانلود ${titleParts.join(" ")} | فیلمچین FilmChiin`
-    : `FilmChiin | دانلود فیلم و سریال`;
+  const seoTitle =
+    titleParts.length > 1
+      ? `دانلود ${titleParts.join(" ")} | فیلمچین FilmChiin`
+      : `FilmChiin | دانلود فیلم و سریال`;
 
   // توضیح غنی
   const rawDesc = (movie?.synopsis || "").trim();
@@ -567,7 +713,7 @@ function setSeo(movie, slug) {
   if (imdb) descParts.push(imdb);
   const seoDesc = rawDesc
     ? rawDesc.substring(0, 155)
-    : (descParts.join(" | ") || "دانلود فیلم و سریال با لینک مستقیم در فیلمچین");
+    : descParts.join(" | ") || "دانلود فیلم و سریال با لینک مستقیم در فیلمچین";
 
   const cover = movie?.cover || "https://filmchiin.ir/images/banner-icon.png";
 
@@ -581,7 +727,10 @@ function setSeo(movie, slug) {
     if (el) el.setAttribute("content", content);
   };
   setMeta('meta[name="description"]', seoDesc);
-  setMeta('meta[name="keywords"]', `دانلود ${movieTitle}, ${movieTitle} ${year}, فیلمچین, filmchiin, دانلود فیلم`);
+  setMeta(
+    'meta[name="keywords"]',
+    `دانلود ${movieTitle}, ${movieTitle} ${year}, فیلمچین, filmchiin, دانلود فیلم`,
+  );
   setMeta('meta[property="og:title"]', seoTitle);
   setMeta('meta[property="og:description"]', seoDesc);
   setMeta('meta[property="og:image"]', cover);
@@ -603,25 +752,29 @@ function setSeo(movie, slug) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Movie",
-    "name": movieTitle,
-    "url": canonical,
-    "image": cover,
-    "description": seoDesc,
-    ...(year ? { "datePublished": String(year) } : {}),
-    ...(director ? { "director": { "@type": "Person", "name": director } } : {}),
-    ...(movie?.imdb ? { "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": String(movie.imdb),
-      "bestRating": "10",
-      "ratingCount": "1000"
-    }} : {}),
-    ...(genre ? { "genre": genre.split(",").map(g => g.trim()) } : {}),
-    "publisher": {
+    name: movieTitle,
+    url: canonical,
+    image: cover,
+    description: seoDesc,
+    ...(year ? { datePublished: String(year) } : {}),
+    ...(director ? { director: { "@type": "Person", name: director } } : {}),
+    ...(movie?.imdb
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: String(movie.imdb),
+            bestRating: "10",
+            ratingCount: "1000",
+          },
+        }
+      : {}),
+    ...(genre ? { genre: genre.split(",").map((g) => g.trim()) } : {}),
+    publisher: {
       "@type": "Organization",
-      "name": "FilmChiin | فیلمچین",
-      "url": "https://filmchiin.ir",
-      "logo": "https://filmchiin.ir/images/banner-icon.png"
-    }
+      name: "FilmChiin | فیلمچین",
+      url: "https://filmchiin.ir",
+      logo: "https://filmchiin.ir/images/banner-icon.png",
+    },
   };
 
   let ldEl = document.getElementById("movieJsonLd");
@@ -635,7 +788,10 @@ function setSeo(movie, slug) {
 
   // آپدیت html lang و dir بر اساس زبان ذخیره‌شده کاربر
   document.documentElement.setAttribute("lang", pageLang);
-  document.documentElement.setAttribute("dir", pageLang === "fa" ? "rtl" : "ltr");
+  document.documentElement.setAttribute(
+    "dir",
+    pageLang === "fa" ? "rtl" : "ltr",
+  );
 }
 
 function openPostOptions() {
@@ -662,7 +818,10 @@ async function loadCurrentUserAndFavorites() {
       favoriteMovieIds = new Set();
       return;
     }
-    const { data: favs } = await db.from("favorites").select("movie_id").eq("user_id", currentUser.id);
+    const { data: favs } = await db
+      .from("favorites")
+      .select("movie_id")
+      .eq("user_id", currentUser.id);
     favoriteMovieIds = new Set((favs || []).map((f) => f.movie_id));
   } catch {
     currentUser = null;
@@ -681,7 +840,9 @@ function syncFavoriteOptionUi() {
   }
   const isFavorite = favoriteMovieIds.has(currentMovie.id);
   btn.classList.toggle("favorite-active", isFavorite);
-  statusEl.textContent = isFavorite ? mt("postOptionFavoriteStatusIn") : mt("postOptionFavoriteStatusAdd");
+  statusEl.textContent = isFavorite
+    ? mt("postOptionFavoriteStatusIn")
+    : mt("postOptionFavoriteStatusAdd");
 }
 
 async function toggleFavoriteCurrentMovie() {
@@ -693,46 +854,74 @@ async function toggleFavoriteCurrentMovie() {
   const movieId = currentMovie.id;
   const has = favoriteMovieIds.has(movieId);
   if (has) {
-    const { error } = await db.from("favorites").delete().eq("user_id", currentUser.id).eq("movie_id", movieId);
+    const { error } = await db
+      .from("favorites")
+      .delete()
+      .eq("user_id", currentUser.id)
+      .eq("movie_id", movieId);
     if (!error) favoriteMovieIds.delete(movieId);
   } else {
-    const { error } = await db.from("favorites").insert([{ user_id: currentUser.id, movie_id: movieId }]);
+    const { error } = await db
+      .from("favorites")
+      .insert([{ user_id: currentUser.id, movie_id: movieId }]);
     if (!error) favoriteMovieIds.add(movieId);
   }
   syncFavoriteOptionUi();
 }
 
 function bindPostOptions(slug) {
-  document.getElementById("postOptionsCloseBtn")?.addEventListener("click", closePostOptions);
-  document.getElementById("postOptionsOverlay")?.addEventListener("click", (e) => {
-    if (e.target.id === "postOptionsOverlay" || e.target.classList.contains("post-options-backdrop")) {
-      closePostOptions();
-    }
-  });
+  document
+    .getElementById("postOptionsCloseBtn")
+    ?.addEventListener("click", closePostOptions);
+  document
+    .getElementById("postOptionsOverlay")
+    ?.addEventListener("click", (e) => {
+      if (
+        e.target.id === "postOptionsOverlay" ||
+        e.target.classList.contains("post-options-backdrop")
+      ) {
+        closePostOptions();
+      }
+    });
 
-  document.getElementById("postOptionFavorite")?.addEventListener("click", async () => {
-    await toggleFavoriteCurrentMovie();
-  });
+  document
+    .getElementById("postOptionFavorite")
+    ?.addEventListener("click", async () => {
+      await toggleFavoriteCurrentMovie();
+    });
 
-  document.getElementById("postOptionCopyLink")?.addEventListener("click", async () => {
-    const url = `${window.location.origin}/movie.html?slug=${encodeURIComponent(slug)}`;
-    await navigator.clipboard.writeText(url);
-    closePostOptions();
-  });
-
-  document.getElementById("postOptionShareLink")?.addEventListener("click", async () => {
-    const url = `${window.location.origin}/movie.html?slug=${encodeURIComponent(slug)}`;
-    if (navigator.share) {
-      await navigator.share({ title: currentMovie?.title || "FilmChiin", url });
-    } else {
+  document
+    .getElementById("postOptionCopyLink")
+    ?.addEventListener("click", async () => {
+      const url = `${window.location.origin}/movie.html?slug=${encodeURIComponent(slug)}`;
       await navigator.clipboard.writeText(url);
-    }
-    closePostOptions();
-  });
+      closePostOptions();
+    });
+
+  document
+    .getElementById("postOptionShareLink")
+    ?.addEventListener("click", async () => {
+      const url = `${window.location.origin}/movie.html?slug=${encodeURIComponent(slug)}`;
+      if (navigator.share) {
+        await navigator.share({
+          title: currentMovie?.title || "FilmChiin",
+          url,
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+      }
+      closePostOptions();
+    });
 }
 
 async function loadComments(movieId) {
-  const { data } = await db.from("comments").select("*").eq("movie_id", movieId).eq("approved", true).order("created_at", { ascending: true }).limit(500);
+  const { data } = await db
+    .from("comments")
+    .select("*")
+    .eq("movie_id", movieId)
+    .eq("approved", true)
+    .order("created_at", { ascending: true })
+    .limit(500);
   return data || [];
 }
 
@@ -750,17 +939,24 @@ function attachCommentsHandlers(card, movieId) {
 
   function renderComments(arr) {
     const latest = (arr || []).slice(-3).map((c) => c.name || "Guest");
-    if (avatarsEl) avatarsEl.innerHTML = latest.map((n) => `<div class="avatar">${escapeHtml(initials(n))}</div>`).join("");
+    if (avatarsEl)
+      avatarsEl.innerHTML = latest
+        .map((n) => `<div class="avatar">${escapeHtml(initials(n))}</div>`)
+        .join("");
     if (countEl) countEl.textContent = `${(arr || []).length} comments`;
     if (commentsList) {
-      commentsList.innerHTML = (arr || []).map((c) => `
+      commentsList.innerHTML = (arr || [])
+        .map(
+          (c) => `
         <div class="comment-row">
           <div class="comment-avatar">${escapeHtml(initials(c.name))}</div>
           <div class="comment-body">
             <div class="comment-meta"><strong>${escapeHtml(c.name || "Guest")}</strong> · <span class="comment-time">${timeAgo(c.created_at)}</span></div>
             <div class="comment-text-content">${escapeHtml(c.text || "")}</div>
           </div>
-        </div>`).join("");
+        </div>`,
+        )
+        .join("");
     }
   }
 
@@ -784,10 +980,18 @@ function attachCommentsHandlers(card, movieId) {
     const text = (textInput?.value || "").trim();
     if (!text) return;
     sendBtn.disabled = true;
-    await db.from("comments").insert([{ movie_id: movieId, name, text, approved: false, published: false }]);
+    await db
+      .from("comments")
+      .insert([
+        { movie_id: movieId, name, text, approved: false, published: false },
+      ]);
     if (nameInput) nameInput.value = "";
     if (textInput) textInput.value = "";
-    showToast(pageLang === "fa" ? "کامنت بعد از تایید ادمین نمایش داده خواهد شد" : "Comment will be shown after admin approval");
+    showToast(
+      pageLang === "fa"
+        ? "کامنت بعد از تایید ادمین نمایش داده خواهد شد"
+        : "Comment will be shown after admin approval",
+    );
     await refresh();
     sendBtn.disabled = false;
   });
@@ -804,7 +1008,9 @@ function buildSimilarByGenre(current, allMovies) {
     .map((m) => {
       const g = new Set(extractHashtagTokens(m.genre || ""));
       let overlap = 0;
-      currentGenres.forEach((x) => { if (g.has(x)) overlap += 1; });
+      currentGenres.forEach((x) => {
+        if (g.has(x)) overlap += 1;
+      });
       return { movie: m, overlap, total: g.size || 999 };
     })
     .filter((x) => x.overlap > 0)
@@ -833,7 +1039,9 @@ function buildSimilarByActors(current, allMovies) {
       const actors = normalizeNameTokens(m.stars || "");
       const actorsSet = new Set(actors);
       let overlap = 0;
-      currentSet.forEach((a) => { if (actorsSet.has(a)) overlap += 1; });
+      currentSet.forEach((a) => {
+        if (actorsSet.has(a)) overlap += 1;
+      });
       return { movie: m, overlap, total: actorsSet.size || 999 };
     })
     .filter((x) => x.overlap > 0)
@@ -854,7 +1062,9 @@ function buildBySameDirector(current, allMovies) {
     .map((m) => {
       const directors = new Set(normalizeNameTokens(m.director || ""));
       let overlap = 0;
-      currentDirectors.forEach((d) => { if (directors.has(d)) overlap += 1; });
+      currentDirectors.forEach((d) => {
+        if (directors.has(d)) overlap += 1;
+      });
       return { movie: m, overlap, total: directors.size || 999 };
     })
     .filter((x) => x.overlap > 0)
@@ -870,7 +1080,9 @@ function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
   const html = (similarMovies || [])
     .map((m) => {
       const title = escapeHtml(m.title || "-");
-      const cover = escapeHtml(m.cover || "https://via.placeholder.com/300x200?text=No+Cover");
+      const cover = escapeHtml(
+        m.cover || "https://via.placeholder.com/300x200?text=No+Cover",
+      );
       const url = buildMoviePageHref(m.title || "");
       return `
         <div class="favorite-item coming-soon-grid-item similar-movie-card" data-url="${escapeHtml(url)}">
@@ -925,7 +1137,9 @@ function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
 }
 
 function renderMovieCard(container, movie, allMovies, episodes = []) {
-  const cover = escapeHtml(movie.cover || "https://via.placeholder.com/300x200?text=No+Image");
+  const cover = escapeHtml(
+    movie.cover || "https://via.placeholder.com/300x200?text=No+Image",
+  );
   const title = escapeHtml(movie.title || "-");
   const synopsis = makeSynopsisHtml(movie.synopsis || "-");
 
@@ -937,7 +1151,9 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
   const episodesHtml = (episodes || [])
     .map((ep, idx) => {
       const epTitle = escapeHtml(ep.title || `Episode ${idx + 1}`);
-      const epCover = escapeHtml(ep.cover || "https://via.placeholder.com/120x80?text=No+Cover");
+      const epCover = escapeHtml(
+        ep.cover || "https://via.placeholder.com/120x80?text=No+Cover",
+      );
       const scrollable = epTitle.length > 16 ? "scrollable" : "";
       return `<div class="episode-card ${idx === 0 ? "active" : ""}" data-link="${escapeHtml(ep.link || "#")}" data-title="${epTitle}"><img src="${epCover}" alt="${epTitle}" class="episode-cover"><span class="episode-title ${scrollable}"><span>${epTitle}</span></span></div>`;
     })
@@ -969,7 +1185,18 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
   card?.addEventListener("click", (e) => {
     const target = e.target;
     if (!(target instanceof Element)) return;
-    if (target.closest(".go-btn") || target.closest(".episode-card") || target.closest(".quote-toggle-btn") || target.closest(".quote-text") || target.closest(".synopsis-quote") || target.closest(".synopsis-segment") || target.closest("a") || target.closest(".comment-summary") || target.closest(".comments-panel")) return;
+    if (
+      target.closest(".go-btn") ||
+      target.closest(".episode-card") ||
+      target.closest(".quote-toggle-btn") ||
+      target.closest(".quote-text") ||
+      target.closest(".synopsis-quote") ||
+      target.closest(".synopsis-segment") ||
+      target.closest("a") ||
+      target.closest(".comment-summary") ||
+      target.closest(".comments-panel")
+    )
+      return;
     openPostOptions();
   });
 
@@ -994,15 +1221,36 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
 
       if (movie.type === "collection") {
         if (movieNameEl) movieNameEl.textContent = ep.title || movie.title;
-        if (quoteTextEl) quoteTextEl.innerHTML = makeSynopsisHtml(ep.synopsis || movie.synopsis || "-");
-        if (directorFieldEl) directorFieldEl.innerHTML = renderChips(ep.director || movie.director || "-", "names");
-        if (productFieldEl) productFieldEl.innerHTML = renderChips(ep.product || movie.product || "-");
-        if (starsFieldEl) starsFieldEl.innerHTML = renderChips(ep.stars || movie.stars || "-", "actors");
+        if (quoteTextEl)
+          quoteTextEl.innerHTML = makeSynopsisHtml(
+            ep.synopsis || movie.synopsis || "-",
+          );
+        if (directorFieldEl)
+          directorFieldEl.innerHTML = renderChips(
+            ep.director || movie.director || "-",
+            "names",
+          );
+        if (productFieldEl)
+          productFieldEl.innerHTML = renderChips(
+            ep.product || movie.product || "-",
+          );
+        if (starsFieldEl)
+          starsFieldEl.innerHTML = renderChips(
+            ep.stars || movie.stars || "-",
+            "actors",
+          );
         if (imdbChipEl) imdbChipEl.textContent = ep.imdb || movie.imdb || "-";
-        if (releaseFieldEl) releaseFieldEl.textContent = ep.release_info || movie.release_info || "-";
-        if (genreFieldEl) genreFieldEl.innerHTML = renderChips(ep.genre || movie.genre || "-", "genre");
+        if (releaseFieldEl)
+          releaseFieldEl.textContent =
+            ep.release_info || movie.release_info || "-";
+        if (genreFieldEl)
+          genreFieldEl.innerHTML = renderChips(
+            ep.genre || movie.genre || "-",
+            "genre",
+          );
         if (coverImgEl) coverImgEl.src = ep.cover || movie.cover || "";
-        if (coverBlurEl) coverBlurEl.style.backgroundImage = `url('${ep.cover || movie.cover || ""}')`;
+        if (coverBlurEl)
+          coverBlurEl.style.backgroundImage = `url('${ep.cover || movie.cover || ""}')`;
       } else if (movie.type === "serial") {
         if (movieNameEl) movieNameEl.textContent = ep.title || movie.title;
       }
@@ -1012,14 +1260,32 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
   goBtn?.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const finalLink = buildTelegramBotUrlFromChannelLink(goBtn.dataset.link || "#");
-    if (finalLink && finalLink !== "#") window.open(finalLink, "_blank", "noopener");
+    const finalLink = buildTelegramBotUrlFromChannelLink(
+      goBtn.dataset.link || "#",
+    );
+    if (finalLink && finalLink !== "#")
+      window.open(finalLink, "_blank", "noopener");
   });
 
   attachCommentsHandlers(card, movie.id);
-  renderSimilarMovies(container, buildSimilarByGenre(movie, allMovies), "similarByGenreTitle", "noSimilarGenre");
-  renderSimilarMovies(container, buildSimilarByActors(movie, allMovies), "similarByActorsTitle", "noActorsArchive");
-  renderSimilarMovies(container, buildBySameDirector(movie, allMovies), "bySameDirectorTitle", "noDirectorArchive");
+  renderSimilarMovies(
+    container,
+    buildSimilarByGenre(movie, allMovies),
+    "similarByGenreTitle",
+    "noSimilarGenre",
+  );
+  renderSimilarMovies(
+    container,
+    buildSimilarByActors(movie, allMovies),
+    "similarByActorsTitle",
+    "noActorsArchive",
+  );
+  renderSimilarMovies(
+    container,
+    buildBySameDirector(movie, allMovies),
+    "bySameDirectorTitle",
+    "noDirectorArchive",
+  );
 }
 
 function initFeatureAccordions() {
@@ -1063,7 +1329,8 @@ async function hydrateSharedSectionsFromHome() {
     document.body.classList.add("shared-header-ready");
   }
   if (features) {
-    document.getElementById("movieFeaturesMount").innerHTML = features.outerHTML;
+    document.getElementById("movieFeaturesMount").innerHTML =
+      features.outerHTML;
     applyMovieFeatureTranslations();
     initFeatureAccordions();
   }
@@ -1097,7 +1364,9 @@ async function loadMoviePage() {
         }
         sessionStorage.removeItem("filmchin_quick_movie");
       }
-    } catch(e) { /* ignore */ }
+    } catch (e) {
+      /* ignore */
+    }
 
     if (quickMovie) {
       currentMovie = quickMovie;
@@ -1111,12 +1380,29 @@ async function loadMoviePage() {
       let quickEpisodes = [];
       if (quickMovie.type === "collection" || quickMovie.type === "serial") {
         try {
-          const { data: qItems } = await db.from("movie_items").select("*").eq("movie_id", quickMovie.id).order("order_index", { ascending: true });
+          const { data: qItems } = await db
+            .from("movie_items")
+            .select("*")
+            .eq("movie_id", quickMovie.id)
+            .order("order_index", { ascending: true });
           quickEpisodes = [
-            { title: quickMovie.title, cover: quickMovie.cover, link: quickMovie.link, synopsis: quickMovie.synopsis, director: quickMovie.director, product: quickMovie.product, stars: quickMovie.stars, imdb: quickMovie.imdb, release_info: quickMovie.release_info, genre: quickMovie.genre },
+            {
+              title: quickMovie.title,
+              cover: quickMovie.cover,
+              link: quickMovie.link,
+              synopsis: quickMovie.synopsis,
+              director: quickMovie.director,
+              product: quickMovie.product,
+              stars: quickMovie.stars,
+              imdb: quickMovie.imdb,
+              release_info: quickMovie.release_info,
+              genre: quickMovie.genre,
+            },
             ...(qItems || []),
           ];
-        } catch(e) { /* ignore */ }
+        } catch (e) {
+          /* ignore */
+        }
       }
 
       // رندر کارت اصلی فوری (با اپیزودها اگر موجود باشد)
@@ -1128,49 +1414,67 @@ async function loadMoviePage() {
       fetchActorAvatars().catch(() => {});
 
       // ابتدا movies را بگیر، سپس movie_items را برای رندر کامل کارت
-      db.from("movies").select("*").then(async ({ data: allMovies, error }) => {
-        if (error || !Array.isArray(allMovies)) return;
+      db.from("movies")
+        .select("*")
+        .then(async ({ data: allMovies, error }) => {
+          if (error || !Array.isArray(allMovies)) return;
 
-        // ذخیره در حافظه موقت مرورگر برای صفحات بعدی (ژانر/کشور سایدمنو)
-        window._fcMovies = allMovies;
-        try { sessionStorage.setItem("filmchin_movies_cache", JSON.stringify(allMovies)); } catch(e) { /* quota */ }
+          // ذخیره در حافظه موقت مرورگر برای صفحات بعدی (ژانر/کشور سایدمنو)
+          window._fcMovies = allMovies;
+          try {
+            sessionStorage.setItem(
+              "filmchin_movies_cache",
+              JSON.stringify(allMovies),
+            );
+          } catch (e) {
+            /* quota */
+          }
 
-        setTimeout(() => {
-          if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
-          if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
-          if (window.FilmChiinSharedSections?.buildGenreHubGrid) window.FilmChiinSharedSections.buildGenreHubGrid();
-        }, 200);
+          setTimeout(() => {
+            if (window.FilmChiinSharedSections?.buildSideMenuGenres)
+              window.FilmChiinSharedSections.buildSideMenuGenres();
+            if (window.FilmChiinSharedSections?.buildSideMenuCountries)
+              window.FilmChiinSharedSections.buildSideMenuCountries();
+            if (window.FilmChiinSharedSections?.buildGenreHubGrid)
+              window.FilmChiinSharedSections.buildGenreHubGrid();
+          }, 200);
 
-        const fullMovie = allMovies.find((item) => makeMovieSlug(item.title) === slug) || quickMovie;
-        currentMovie = fullMovie;
+          const fullMovie =
+            allMovies.find((item) => makeMovieSlug(item.title) === slug) ||
+            quickMovie;
+          currentMovie = fullMovie;
 
-        // لود movie_items برای رندر کامل کارت (اپیزودها برای collection/serial)
-        let episodes = [];
-        if (fullMovie.type === "collection" || fullMovie.type === "serial") {
-          const { data: items } = await db.from("movie_items").select("*").eq("movie_id", fullMovie.id).order("order_index", { ascending: true });
-          episodes = [
-            {
-              title: fullMovie.title,
-              cover: fullMovie.cover,
-              link: fullMovie.link,
-              synopsis: fullMovie.synopsis,
-              director: fullMovie.director,
-              product: fullMovie.product,
-              stars: fullMovie.stars,
-              imdb: fullMovie.imdb,
-              release_info: fullMovie.release_info,
-              genre: fullMovie.genre,
-            },
-            ...(items || []),
-          ];
-        }
+          // لود movie_items برای رندر کامل کارت (اپیزودها برای collection/serial)
+          let episodes = [];
+          if (fullMovie.type === "collection" || fullMovie.type === "serial") {
+            const { data: items } = await db
+              .from("movie_items")
+              .select("*")
+              .eq("movie_id", fullMovie.id)
+              .order("order_index", { ascending: true });
+            episodes = [
+              {
+                title: fullMovie.title,
+                cover: fullMovie.cover,
+                link: fullMovie.link,
+                synopsis: fullMovie.synopsis,
+                director: fullMovie.director,
+                product: fullMovie.product,
+                stars: fullMovie.stars,
+                imdb: fullMovie.imdb,
+                release_info: fullMovie.release_info,
+                genre: fullMovie.genre,
+              },
+              ...(items || []),
+            ];
+          }
 
-        // رندر کامل کارت با داده‌های کامل (جایگزین رندر سریع اولیه)
-        applyMovieHeroBackground(fullMovie.cover || "");
-        setSeo(fullMovie, slug);
-        renderMovieCard(cardContainer, fullMovie, allMovies, episodes);
-        syncFavoriteOptionUi();
-      });
+          // رندر کامل کارت با داده‌های کامل (جایگزین رندر سریع اولیه)
+          applyMovieHeroBackground(fullMovie.cover || "");
+          setSeo(fullMovie, slug);
+          renderMovieCard(cardContainer, fullMovie, allMovies, episodes);
+          syncFavoriteOptionUi();
+        });
       return;
     }
 
@@ -1183,17 +1487,23 @@ async function loadMoviePage() {
         if (Array.isArray(parsed) && parsed.length) {
           window._fcMovies = parsed;
           setTimeout(() => {
-            if (window.FilmChiinSharedSections?.buildSideMenuGenres) window.FilmChiinSharedSections.buildSideMenuGenres();
-            if (window.FilmChiinSharedSections?.buildSideMenuCountries) window.FilmChiinSharedSections.buildSideMenuCountries();
-            if (window.FilmChiinSharedSections?.buildGenreHubGrid) window.FilmChiinSharedSections.buildGenreHubGrid();
+            if (window.FilmChiinSharedSections?.buildSideMenuGenres)
+              window.FilmChiinSharedSections.buildSideMenuGenres();
+            if (window.FilmChiinSharedSections?.buildSideMenuCountries)
+              window.FilmChiinSharedSections.buildSideMenuCountries();
+            if (window.FilmChiinSharedSections?.buildGenreHubGrid)
+              window.FilmChiinSharedSections.buildGenreHubGrid();
           }, 100);
         }
       }
-    } catch(e) { /* ignore */ }
+    } catch (e) {
+      /* ignore */
+    }
 
     await fetchActorAvatars();
     const { data: movies, error } = await db.from("movies").select("*");
-    if (error || !Array.isArray(movies)) return (status.textContent = mt("fetchError"));
+    if (error || !Array.isArray(movies))
+      return (status.textContent = mt("fetchError"));
 
     const movie = movies.find((item) => makeMovieSlug(item.title) === slug);
     if (!movie) return (status.textContent = mt("notFound"));
@@ -1201,7 +1511,11 @@ async function loadMoviePage() {
     // ذخیره برای live search dropdown و genre/country grid در سایدمنو
     window._fcMovies = movies;
     // ذخیره در sessionStorage برای استفاده در صفحات بعدی (ژانر/کشور سایدمنو)
-    try { sessionStorage.setItem("filmchin_movies_cache", JSON.stringify(movies)); } catch(e) { /* quota */ }
+    try {
+      sessionStorage.setItem("filmchin_movies_cache", JSON.stringify(movies));
+    } catch (e) {
+      /* quota */
+    }
     // ساخت genre و country grid در sidemenu بعد از لود فیلم‌ها
     setTimeout(() => {
       if (window.FilmChiinSharedSections?.buildSideMenuGenres) {
@@ -1218,24 +1532,29 @@ async function loadMoviePage() {
     currentMovie = movie;
     applyMovieHeroBackground(movie.cover || "");
 
-    const { data: items } = await db.from("movie_items").select("*").eq("movie_id", movie.id).order("order_index", { ascending: true });
-    const episodes = (movie.type === "collection" || movie.type === "serial")
-      ? [
-          {
-            title: movie.title,
-            cover: movie.cover,
-            link: movie.link,
-            synopsis: movie.synopsis,
-            director: movie.director,
-            product: movie.product,
-            stars: movie.stars,
-            imdb: movie.imdb,
-            release_info: movie.release_info,
-            genre: movie.genre,
-          },
-          ...(items || []),
-        ]
-      : [];
+    const { data: items } = await db
+      .from("movie_items")
+      .select("*")
+      .eq("movie_id", movie.id)
+      .order("order_index", { ascending: true });
+    const episodes =
+      movie.type === "collection" || movie.type === "serial"
+        ? [
+            {
+              title: movie.title,
+              cover: movie.cover,
+              link: movie.link,
+              synopsis: movie.synopsis,
+              director: movie.director,
+              product: movie.product,
+              stars: movie.stars,
+              imdb: movie.imdb,
+              release_info: movie.release_info,
+              genre: movie.genre,
+            },
+            ...(items || []),
+          ]
+        : [];
 
     await loadCurrentUserAndFavorites();
     bindPostOptions(slug);
@@ -1270,27 +1589,39 @@ document.addEventListener("DOMContentLoaded", () => {
       sideMenu.classList.toggle("active");
       if (menuOverlay) menuOverlay.classList.toggle("active");
     } else {
-      window.location.href = new URL("/?openMenu=1", window.location.origin).href;
+      window.location.href = new URL(
+        "/?openMenu=1",
+        window.location.origin,
+      ).href;
     }
   });
 
   // Dock: favorites → open favorites overlay locally if available
-  document.querySelector("#bottomFavoritesBtn")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    const favBtn = document.getElementById("favoriteMoviesBtn");
-    if (favBtn) {
-      favBtn.click();
-    } else {
-      window.location.href = new URL("/?openFavorites=1", window.location.origin).href;
-    }
-  });
+  document
+    .querySelector("#bottomFavoritesBtn")
+    ?.addEventListener("click", (e) => {
+      e.preventDefault();
+      const favBtn = document.getElementById("favoriteMoviesBtn");
+      if (favBtn) {
+        favBtn.click();
+      } else {
+        window.location.href = new URL(
+          "/?openFavorites=1",
+          window.location.origin,
+        ).href;
+      }
+    });
 
   // Dock: search → focus search input + init live dropdown
   document.querySelector("#bottomSearchBtn")?.addEventListener("click", (e) => {
     e.preventDefault();
     const si = document.getElementById("search");
     if (si) {
-      try { si.focus({ preventScroll: true }); } catch { si.focus(); }
+      try {
+        si.focus({ preventScroll: true });
+      } catch {
+        si.focus();
+      }
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   });
@@ -1308,13 +1639,18 @@ document.addEventListener("DOMContentLoaded", () => {
         clearTimeout(debounce);
         debounce = setTimeout(async () => {
           const query = searchInput.value.trim();
-          if (!query) { dropdown.style.display = "none"; return; }
+          if (!query) {
+            dropdown.style.display = "none";
+            return;
+          }
 
           // Use movies fetched in loadMoviePage (stored as window._fcMovies)
-          const allMovies = Array.isArray(window._fcMovies) ? window._fcMovies : [];
+          const allMovies = Array.isArray(window._fcMovies)
+            ? window._fcMovies
+            : [];
           const q = query.toLowerCase();
           const scored = allMovies
-            .map(m => {
+            .map((m) => {
               const title = (m.title || "").toLowerCase();
               const synopsis = (m.synopsis || "").toLowerCase();
               const stars = (m.stars || "").toLowerCase();
@@ -1325,30 +1661,46 @@ document.addEventListener("DOMContentLoaded", () => {
               else if (synopsis.includes(q)) score = 1;
               return { m, score };
             })
-            .filter(r => r.score > 0)
+            .filter((r) => r.score > 0)
             .sort((a, b) => b.score - a.score)
             .slice(0, 10)
-            .map(r => r.m);
+            .map((r) => r.m);
 
-          if (!scored.length) { dropdown.style.display = "none"; return; }
+          if (!scored.length) {
+            dropdown.style.display = "none";
+            return;
+          }
 
           const lang = localStorage.getItem("siteLanguage") || "en";
           const openLabel = lang === "fa" ? "باز کن" : "Open";
 
-          dropdown.innerHTML = scored.map(m => {
-            const slug = String(m.title || "").toLowerCase().trim()
-              .replace(/[\(\)\[\]\{\}]/g, "").replace(/[^a-z0-9\u0600-\u06FF]+/gi, "-")
-              .replace(/-+/g, "-").replace(/^-|-$/g, "");
-            const href = slug ? `/movie.html?slug=${encodeURIComponent(slug)}` : "/movie.html";
-            const borderClass = m.type === "collection" ? "collection-border" : m.type === "serial" ? "serial-border" : "";
-            return `<div class="search-dropdown-item ${borderClass}" data-href="${href}">
+          dropdown.innerHTML = scored
+            .map((m) => {
+              const slug = String(m.title || "")
+                .toLowerCase()
+                .trim()
+                .replace(/[\(\)\[\]\{\}]/g, "")
+                .replace(/[^a-z0-9\u0600-\u06FF]+/gi, "-")
+                .replace(/-+/g, "-")
+                .replace(/^-|-$/g, "");
+              const href = slug
+                ? `/movie.html?slug=${encodeURIComponent(slug)}`
+                : "/movie.html";
+              const borderClass =
+                m.type === "collection"
+                  ? "collection-border"
+                  : m.type === "serial"
+                    ? "serial-border"
+                    : "";
+              return `<div class="search-dropdown-item ${borderClass}" data-href="${href}">
               <img src="${m.cover || ""}" alt="" class="search-dropdown-cover" />
               <span class="search-dropdown-title">${m.title || ""}</span>
               <button class="search-dropdown-open-btn" data-href="${href}">${openLabel}</button>
             </div>`;
-          }).join("");
+            })
+            .join("");
 
-          dropdown.querySelectorAll(".search-dropdown-item").forEach(item => {
+          dropdown.querySelectorAll(".search-dropdown-item").forEach((item) => {
             item.addEventListener("click", (e) => {
               if (e.target.closest(".search-dropdown-open-btn")) {
                 e.stopPropagation();
@@ -1368,7 +1720,7 @@ document.addEventListener("DOMContentLoaded", () => {
           dropdown.style.display = "none";
         }
       });
-      dropdown.addEventListener("click", e => e.stopPropagation());
+      dropdown.addEventListener("click", (e) => e.stopPropagation());
 
       // Enter → go home with search query
       searchInput.addEventListener("keydown", (e) => {
