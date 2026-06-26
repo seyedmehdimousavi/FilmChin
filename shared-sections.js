@@ -2166,6 +2166,7 @@
       if (btn.dataset.goFileEnhanced === "1") return;
       btn.dataset.goFileEnhanced = "1";
       btn.classList.add("go-file-button");
+      btn.closest(".button-wrap")?.classList.add("go-file-wrap");
       btn.innerHTML = markup(text("idle"));
     });
   }

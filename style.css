@@ -9294,3 +9294,71 @@ body.dark .go-btn.go-file-button {
 @keyframes goFileSvgScale { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 body.reduce-animations .go-file-loader, body.reduce-animations .go-file-check-svg { animation:none; }
 @media (max-width: 420px) { .go-btn.go-file-button { min-width: 100%; min-height: 62px; padding: 0 16px; } }
+
+/* Keep the custom Go to file control independent from the site's glass button wrapper system. */
+.button-wrap.go-file-wrap,
+.button-wrap:has(.go-file-button) {
+  transform: none !important;
+  background: transparent !important;
+  transition: none !important;
+}
+.button-wrap.go-file-wrap .button-shadow,
+.button-wrap:has(.go-file-button) .button-shadow {
+  display: none !important;
+}
+.go-btn.go-file-button {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  pointer-events: auto;
+  position: relative;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 68px;
+  min-width: min(340px, 100%);
+  gap: 10px;
+  padding: 0 22px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--theme-accent), var(--theme-accent-dark));
+  box-shadow: 0 14px 30px rgba(var(--theme-accent-rgb), 0.28);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+.go-btn.go-file-button::after,
+.go-btn.go-file-button span::after {
+  content: none !important;
+  display: none !important;
+}
+.go-btn.go-file-button span {
+  all: unset;
+  box-sizing: border-box;
+}
+body.dark .go-btn.go-file-button {
+  background: linear-gradient(135deg, var(--theme-accent-light), var(--theme-accent));
+  box-shadow: 0 14px 30px rgba(var(--theme-accent-rgb), 0.36);
+}
+.go-file-button .go-file-button-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  position: relative;
+}
+.go-file-button .go-file-svg-container {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 22px;
+}
+.go-file-button .go-file-button-copy {
+  color: #fff;
+  line-height: 1;
+  font-weight: 800;
+  white-space: nowrap;
+}
