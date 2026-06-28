@@ -1456,9 +1456,16 @@
     if (!dock) return;
 
     // ---- Menu button → open local sideMenu if injected, else navigate home ----
-    const menuBtn = dock.querySelector("#bottomMenuBtn");
-    if (menuBtn) {
-      menuBtn.addEventListener("click", () => {
+    // نکته: setupDock() از دو مسیر مستقل صدا زده می‌شود (هم مستقیم روی DOMContentLoaded
+    // و هم بعد از hydrate)، پس بدون clone کردن، روی این دکمه دو listener کلیک بسته می‌شد
+    // و یک تپ، ساید منو را باز و بلافاصله دوباره بسته می‌کرد (toggle دوبار = هیچ تغییری).
+    const menuBtnRaw = dock.querySelector("#bottomMenuBtn");
+    if (menuBtnRaw) {
+      const menuBtn = menuBtnRaw.cloneNode(true);
+      menuBtnRaw.parentNode.replaceChild(menuBtn, menuBtnRaw);
+      menuBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         const sideMenu = document.getElementById("sideMenu");
         const menuOverlay = document.getElementById("menuOverlay");
         if (sideMenu) {
@@ -1487,7 +1494,7 @@
           window.openFavoritesOverlayUI();
           return;
         }
-        // Sub-pages (movie/actor): use standalone loader
+        // Sub-pages (movie/actor/genre): use standalone loader
         if (typeof window.openFavoritesSubPage === "function") {
           window.openFavoritesSubPage();
         }
@@ -1495,8 +1502,11 @@
     }
 
     // ---- Search button → focus the header search input ----
-    const searchBtn = dock.querySelector("#bottomSearchBtn");
-    if (searchBtn) {
+    const searchBtnRaw = dock.querySelector("#bottomSearchBtn");
+    if (searchBtnRaw) {
+      // همان دلیل بالا: clone می‌کنیم تا listenerهای تکراری از فراخوانی‌های مکرر setupDock جمع نشوند
+      const searchBtn = searchBtnRaw.cloneNode(true);
+      searchBtnRaw.parentNode.replaceChild(searchBtn, searchBtnRaw);
       searchBtn.addEventListener("click", (e) => {
         e.preventDefault();
         const searchInput = document.getElementById("search");
