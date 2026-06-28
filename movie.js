@@ -64,6 +64,9 @@ const movieI18n = {
     release: "Release",
     genre: "Genre",
     goToFile: "Go to file",
+    getAllEpisodes: "Get all episodes",
+    receivingAllEpisodes: "Receiving",
+    allEpisodesReceived: "Received",
     comments: "comments",
     commentsTitle: "Comments",
     yourName: "Your name",
@@ -110,6 +113,9 @@ const movieI18n = {
     release: "انتشار",
     genre: "ژانر",
     goToFile: "دریافت فایل",
+    getAllEpisodes: "دریافت همه اپیزودها",
+    receivingAllEpisodes: "در حال دریافت",
+    allEpisodesReceived: "دریافت شد",
     comments: "نظر",
     commentsTitle: "نظرات",
     yourName: "نام شما",
@@ -600,6 +606,12 @@ function buildTelegramBotUrlFromChannelLink(rawLink) {
     return `https://t.me/Filmchinbot?start=forward_${parts[0]}_${parts[2]}`;
   }
   return trimmed;
+}
+
+// ===================== لینک بات برای دریافت همه اپیزودهای یک کالکشن/سریال =====================
+function buildAllEpisodesBotUrl(movieId) {
+  if (!movieId) return "#";
+  return `https://t.me/Filmchinbot?start=all_${encodeURIComponent(movieId)}`;
 }
 
 function applySavedTheme() {
@@ -1173,6 +1185,11 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
       <span class="field-label anim-vertical"><img src="/images/icons8-comedy-96.png" class="genre-bell" style="width:20px;height:20px;"> ${mt("genre")}: </span><div class="field-quote genre-grid anim-horizontal genre-field">${renderChips(movie.genre || "-", "genre")}</div>
       <div class="episodes-container anim-vertical" data-movie-id="${escapeHtml(movie.id)}"><div class="episodes-list anim-left-right">${episodesHtml}</div></div>
       <div class="post-action-row movie-page-actions"><div class="button-wrap"><button class="go-btn anim-vertical" data-link="${escapeHtml((episodes[0] && episodes[0].link) || movie.link || "#")}"><span>${mt("goToFile")}</span></button><div class="button-shadow"></div></div></div>
+      ${
+        movie.type === "collection" || movie.type === "serial"
+          ? `<div class="post-action-row get-all-episodes-row"><div class="button-wrap get-all-episodes-wrap"><button class="get-all-btn anim-vertical" data-movie-id="${escapeHtml(movie.id)}"><span>${mt("getAllEpisodes")}</span></button><div class="button-shadow"></div></div></div>`
+          : ""
+      }
       <div class="comment-summary anim-horizontal"><div class="avatars"></div><div class="comments-count">0 ${mt("comments")}</div><div class="enter-comments"><img src="/images/icons8-comment.apng" style="width:22px;height:22px;"></div></div>
       <div class="comments-panel" aria-hidden="true"><div class="comments-panel-inner"><div class="comments-panel-header"><div class="comments-title">${mt("commentsTitle")}</div></div><div class="comments-list"></div><div class="comment-input-row"><div class="name-comments-close"><input class="comment-name" placeholder="${mt("yourName")}" maxlength="60" /><div class="button-wrap"><button class="comments-close"><span>${mt("close")}</span></button><div class="button-shadow"></div></div></div><textarea class="comment-text" placeholder="${mt("writeComment")}" rows="2"></textarea><div class="button-wrap"><button class="comment-send"><span>${mt("send")}</span></button><div class="button-shaddow"></div></div></div></div></div>
     </div>
@@ -1180,6 +1197,7 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
 
   const card = container.querySelector(".movie-card");
   const goBtn = container.querySelector(".go-btn");
+  const getAllBtn = container.querySelector(".get-all-btn");
   const episodeCards = container.querySelectorAll(".episode-card");
 
   card?.addEventListener("click", (e) => {
@@ -1187,6 +1205,7 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
     if (!(target instanceof Element)) return;
     if (
       target.closest(".go-btn") ||
+      target.closest(".get-all-btn") ||
       target.closest(".episode-card") ||
       target.closest(".quote-toggle-btn") ||
       target.closest(".quote-text") ||
@@ -1265,6 +1284,16 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
     );
     if (finalLink && finalLink !== "#")
       window.open(finalLink, "_blank", "noopener");
+  });
+
+  getAllBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const allLink = buildAllEpisodesBotUrl(
+      getAllBtn.dataset.movieId || movie.id,
+    );
+    if (allLink && allLink !== "#")
+      window.open(allLink, "_blank", "noopener");
   });
 
   attachCommentsHandlers(card, movie.id);

@@ -6895,98 +6895,8 @@ body.dark .language-option {
   pointer-events: auto;
 }
 
-.go-page-btn {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  cursor: pointer;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 10px;
-  border-radius: 15px;
-  border: 1px solid rgba(var(--theme-accent-rgb), 0.35);
-  background:
-    radial-gradient(
-      circle at 18% 18%,
-      rgba(255, 255, 255, 0.26),
-      transparent 48%
-    ),
-    linear-gradient(
-      135deg,
-      var(--theme-accent-dark),
-      var(--theme-accent),
-      var(--theme-accent-light)
-    );
-  box-shadow:
-    0 10px 24px rgba(var(--theme-accent-rgb), 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.34);
-  color: #fff;
-  font-size: 15px;
-  font-weight: bolder;
-  margin-top: 8px;
-  transform: translateY(0);
-  transition:
-    transform 0.22s ease,
-    box-shadow 0.22s ease,
-    filter 0.22s ease;
-}
-
-.go-page-btn::before {
-  content: "➜";
-  font-size: 15px;
-  opacity: 0.92;
-}
-
-.go-page-btn::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -120%;
-  width: 72%;
-  height: 100%;
-  background: linear-gradient(
-    110deg,
-    transparent,
-    rgba(255, 255, 255, 0.24),
-    transparent
-  );
-  transform: skewX(-18deg);
-  transition: left 0.4s ease;
-}
-
-.go-page-btn:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 14px 30px rgba(var(--theme-accent-rgb), 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  filter: saturate(1.1);
-}
-
-.go-page-btn:hover::after {
-  left: 118%;
-}
-
-.go-page-btn:active {
-  transform: translateY(0);
-}
-
-body.dark .go-page-btn {
-  border-color: rgba(255, 255, 255, 0.22);
-  box-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
-}
-
-.go-page-btn span {
-  width: 100%;
-  text-align: center;
-  color: #fff;
-  font-size: inherit;
-  font-weight: inherit;
-}
+/* .go-page-btn flat skin is defined together with .go-btn / .get-all-btn
+   in the consolidated "Action buttons" section below (no glass effect). */
 
 .movie-page-header-only {
   position: sticky;
@@ -9260,138 +9170,184 @@ body.dark .comments-panel-inner {
   margin: 28px 0 10px;
 }
 
-/* ===== Themed Go to file animated button (matches requested download-button design) ===== */
-.button-wrap.go-file-wrap,
-.button-wrap:has(.go-file-button) {
-  transform: none !important;
-  background: transparent !important;
-  transition: none !important;
+/* ===== Get all episodes row (collection/series only) — sits below the file/page row ===== */
+.get-all-episodes-row {
+  margin-top: 10px;
 }
-.button-wrap.go-file-wrap .button-shadow,
-.button-wrap:has(.go-file-button) .button-shadow {
-  display: none !important;
-}
-.go-btn.go-file-button.download-button {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-  pointer-events: auto;
-  position: relative;
-  z-index: 3;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.get-all-episodes-wrap {
   width: 100%;
-  min-width: 340px;
-  min-height: 68px;
-  padding: 24px 64px;
-  border-radius: 8px;
-  background: var(--go-file-bg, var(--theme-accent));
-  color: #fff;
-  font-family: "Roboto", "Product Sans", "IRANSansWeb", sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  box-shadow: 0 12px 28px rgba(var(--go-file-shadow-rgb, var(--theme-accent-rgb)), 0.24);
-  transition: transform 0.18s linear, background-color 0.18s linear, box-shadow 0.18s linear;
+  margin-top: 10px;
 }
-.go-btn.go-file-button.download-button:hover {
-  transform: scale(1.01);
-  background: var(--go-file-bg-hover, var(--theme-accent-light));
+.post-action-row.get-all-episodes-row .get-all-episodes-wrap {
+  margin-top: 0;
 }
-.go-btn.go-file-button.download-button:focus {
-  outline: none !important;
-}
-.go-btn.go-file-button.download-button:active {
-  transform: scale(0.99);
-}
-.go-btn.go-file-button.download-button::after,
-.go-btn.go-file-button.download-button span::after {
-  content: none !important;
-  display: none !important;
-}
-.go-btn.go-file-button.download-button span {
-  all: unset;
-  box-sizing: border-box;
-}
-.download-button-inner {
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  width: 100%;
-}
-.svg-container {
-  width: 22px;
-  height: 22px;
-  display: grid !important;
-  place-items: center;
-  flex: 0 0 22px;
-}
-.download-icon,
-.check-svg {
-  display: block;
-}
-.download-arrow {
-  transition: transform 0.2s linear;
-}
-.go-btn.go-file-button.download-button:hover .download-arrow {
-  transform: translate(0, 3px);
-}
-.check-svg {
-  animation: svgScale 0.5s ease-in-out;
-}
-.download-loader {
-  width: 16px;
-  height: 16px;
-  border: 2px solid transparent;
-  border-top-color: #ffffff;
-  border-radius: 50%;
-  opacity: 0;
-  animation: button-loading-spinner 1s ease 3;
-}
-.button-copy {
-  color: #fff !important;
-  line-height: 1;
-  padding-inline-start: 8px;
-  padding-top: 2px;
-  font-weight: 700;
-  white-space: nowrap;
-}
+
+/* =====================================================================
+   Action buttons: Go to file / Go to page / Get all episodes
+   از صفر بازنویسی شد — بدون وراثت از استایل شیشه‌ای پیش‌فرض دکمه‌ها،
+   با گوشه‌های گردتر، رنگ و طراحی یکسان برای هر سه دکمه.
+   ===================================================================== */
+
 .hidden {
   display: none !important;
 }
-@keyframes svgScale {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(1.2);
-  }
+
+
+/* خنثی‌سازی کامل افکت‌های شیشه‌ای ارثی (تیلت سه‌بعدی، سایه بلور، پس‌زمینه) روی wrap این دکمه‌ها */
+.button-wrap.fc-action-wrap {
+  border-radius: 18px;
+  background: transparent !important;
+  transform: none !important;
+  transition: none !important;
 }
-@keyframes button-loading-spinner {
-  from {
-    transform: rotate(0turn);
-    opacity: 1;
-  }
-  to {
-    transform: rotate(1turn);
+.button-wrap.fc-action-wrap .button-shadow {
+  display: none !important;
+}
+.button-wrap.fc-action-wrap:has(button:hover),
+.button-wrap.fc-action-wrap:has(button:active) {
+  transform: none !important;
+}
+
+/* پوسته‌ی پایه‌ی مشترک هر سه دکمه — رنگ یکدست، بدون گرادیان/درخشش شیشه‌ای */
+.fc-action-btn {
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 16px;
+  border-radius: 18px !important;
+  background: var(--go-file-bg, var(--theme-accent)) !important;
+  color: #fff;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-decoration: none;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: background-color 0.18s ease, transform 0.12s ease !important;
+}
+/* این دو قانون مخصوصاً برای خنثی‌کردن قانون‌های سراسری button:hover / button:active
+   (که transform و box-shadow شیشه‌ای را روی هر <button> سایت اعمال می‌کنند) لازم‌اند؛
+   همان جایی که در پیاده‌سازی قبلی باگ انیمیشن از همین‌جا نشأت می‌گرفت. */
+.fc-action-btn:hover {
+  background: var(--go-file-bg-hover, var(--theme-accent-light)) !important;
+  transform: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+.fc-action-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+.fc-action-btn:focus {
+  outline: none;
+}
+.fc-action-btn:active {
+  transform: scale(0.97) !important;
+  box-shadow: none !important;
+}
+/* خاموش‌کردن قطعی شبه‌المان‌های دکمه‌ی شیشه‌ای پیش‌فرض سایت روی این دکمه‌ها */
+.fc-action-btn::after,
+.fc-action-btn span::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+.fc-action-btn span {
+  all: unset;
+  box-sizing: border-box;
+  display: block;
+  color: inherit;
+  font: inherit;
+  text-shadow: none !important;
+}
+.button-wrap.fc-action-wrap:has(button:active) span {
+  text-shadow: none !important;
+}
+
+/* آیکن + اسپینر + تیک (فقط برای دریافت فایل / دریافت همه اپیزودها) */
+.fc-action-btn .fc-btn-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+.fc-action-btn .svg-container {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 20px;
+}
+.fc-action-btn .download-icon,
+.fc-action-btn .check-svg,
+.fc-action-btn .fc-static-icon {
+  display: block;
+}
+.fc-action-btn .download-arrow {
+  transition: transform 0.2s linear;
+}
+.fc-action-btn:hover .download-arrow {
+  transform: translate(0, 2px);
+}
+.fc-action-btn .check-svg {
+  animation: fcCheckPop 0.35s ease-out;
+}
+.fc-action-btn .download-loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: fcSpin 0.8s linear infinite;
+}
+.fc-action-btn .button-copy {
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+@keyframes fcCheckPop {
+  0% {
+    transform: scale(0.4);
     opacity: 0;
   }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
-body.reduce-animations .download-loader,
-body.reduce-animations .check-svg {
+@keyframes fcSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+body.reduce-animations .fc-action-btn .download-loader,
+body.reduce-animations .fc-action-btn .check-svg {
   animation-duration: 0.01ms;
-  animation-iteration-count: 1;
 }
-@media (max-width: 375px) {
-  .go-btn.go-file-button.download-button {
-    min-width: 300px;
-    padding-inline: 32px;
-  }
-}
+
 @media (max-width: 340px) {
-  .go-btn.go-file-button.download-button {
-    min-width: 100%;
+  .fc-action-btn {
+    padding: 10px 10px;
+    font-size: 13px;
   }
 }
+

@@ -1090,6 +1090,14 @@ function buildTelegramBotUrlFromChannelLink(rawLink) {
   // اگر هیچ ساختاری تطابق نداشت → بدون تغییر
   return trimmed;
 }
+
+// ===================== لینک بات برای دریافت همه اپیزودهای یک کالکشن/سریال =====================
+// این لینک با /start:all_<movieId> در بات شناسایی می‌شود و تمام اپیزودهای movie_items مربوط به
+// همان movies.id را پشت سر هم برای کاربر ارسال می‌کند (دقیقا معادل دکمه «دریافت همه اپیزودها» در بات)
+function buildAllEpisodesBotUrl(movieId) {
+  if (!movieId) return "#";
+  return `https://t.me/Filmchinbot?start=all_${encodeURIComponent(movieId)}`;
+}
 // ===================== GLOBAL: normalize all Go to file links via Telegram bot =====================
 // این لیسنر روی همه دکمه‌های .go-btn در صفحه کار می‌کند (کارت‌ها، مودال‌ها، ...)
 
@@ -1939,6 +1947,9 @@ document.addEventListener("DOMContentLoaded", () => {
       genre: "Genre",
       goToFile: "Go to file",
       goToPage: "Go to page",
+      getAllEpisodes: "Get all episodes",
+      receivingAllEpisodes: "Receiving",
+      allEpisodesReceived: "Received",
       comments: "comments",
       commentsTitle: "Comments",
       yourName: "Your name",
@@ -2050,6 +2061,9 @@ document.addEventListener("DOMContentLoaded", () => {
       featureTitle17: "Dedicated genre page",
       featureDesc17:
         "Clicking any genre from the 'Genres' section opens a dedicated page showing all movies of that genre. Movies are displayed in a 3-column card layout, with a 'Show more' button to load additional films.",
+      featureTitle18: "Get all episodes",
+      featureDesc18:
+        "For collections and series, tapping the 'Get all episodes' button sends every episode of that title one after another via the @Filmchinbot Telegram bot, so you don't have to fetch each episode one by one.",
       similarByActorsTitle: "Other movies with similar cast",
       bySameDirectorTitle: "Other movies by this director",
       noSimilarActors: "No similar-cast movies found.",
@@ -2124,6 +2138,9 @@ document.addEventListener("DOMContentLoaded", () => {
       genre: "ژانر",
       goToFile: "دریافت فایل",
       goToPage: "صفحه فیلم",
+      getAllEpisodes: "دریافت همه اپیزودها",
+      receivingAllEpisodes: "در حال دریافت",
+      allEpisodesReceived: "دریافت شد",
       comments: "نظر",
       commentsTitle: "نظرات",
       yourName: "نام شما",
@@ -2236,6 +2253,9 @@ document.addEventListener("DOMContentLoaded", () => {
       featureTitle17: "صفحه اختصاصی ژانر",
       featureDesc17:
         "با کلیک روی هر ژانر از بخش «ژانر ها» صفحه‌ای اختصاصی با تمامی فیلم‌های آن ژانر باز می‌شود. فیلم‌ها در قالب کارت‌های سه‌ستونه نمایش داده می‌شوند و دکمه «نمایش بیشتر» به کاربر امکان می‌دهد فیلم‌های بیشتری را ببیند.",
+      featureTitle18: "دریافت همه اپیزودها",
+      featureDesc18:
+        "برای کالکشن‌ها و سریال‌ها، با زدن دکمه «دریافت همه اپیزودها» تمام قسمت‌های آن مجموعه پشت‌سرهم از طریق ربات @Filmchinbot برای شما ارسال می‌شود؛ بدون نیاز به دریافت تک‌تک قسمت‌ها.",
       similarByActorsTitle: "فیلم‌های دیگر با بازیگران مشابه",
       bySameDirectorTitle: "فیلم‌های دیگر این کارگردان",
       noSimilarActors: "فیلم مشابه بر اساس بازیگران پیدا نشد.",
@@ -3894,15 +3914,8 @@ document.addEventListener("DOMContentLoaded", () => {
       div.setAttribute("dir", "auto");
 
       div.onclick = () => {
-        if (searchInput) {
-          searchInput.value = g;
-          searchInput.setAttribute("dir", "auto"); // 👈 برای سرچ هم درست نمایش داده بشه
-        }
-        currentPage = 1;
-        renderPagedMovies();
-        document.getElementById("sideMenu")?.classList.remove("active");
-        document.getElementById("menuOverlay")?.classList.remove("active");
-        document.body.classList.remove("no-scroll", "menu-open");
+        // مطابق رفتار صفحات فیلم/بازیگر: کلیک روی ژانر در ساید منو باید صفحه ژانر را باز کند، نه جست‌وجو
+        window.location.href = `/genre.html?genre=${encodeURIComponent(g)}`;
       };
       genreGrid.appendChild(div);
     });
@@ -5230,6 +5243,17 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     </div>
 
+    ${
+      m.type === "collection" || m.type === "serial"
+        ? `<div class="post-action-row get-all-episodes-row">
+      <div class="button-wrap get-all-episodes-wrap">
+        <button class="get-all-btn anim-vertical" data-movie-id="${escapeHtml(m.id)}"><span>${uiText("getAllEpisodes")}</span></button>
+        <div class="button-shadow"></div>
+      </div>
+    </div>`
+        : ""
+    }
+
   <div class="comment-summary anim-horizontal">
     <div class="avatars"></div>
     <div class="comments-count">0 ${uiText("comments")}</div>
@@ -5333,7 +5357,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // دکمه Go to file
-        if (target.closest(".go-btn")) {
+        if (target.closest(".go-btn") || target.closest(".get-all-btn")) {
           return;
         }
 
@@ -5555,6 +5579,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (finalLink && finalLink !== "#") {
           window.open(finalLink, "_blank");
+        }
+      });
+
+      // ===================== رفتار دکمه دریافت همه اپیزودها =====================
+      const getAllBtn = card.querySelector(".get-all-btn");
+      getAllBtn?.addEventListener("click", async () => {
+        const movieId = getAllBtn.dataset.movieId || m.id;
+        const allLink = buildAllEpisodesBotUrl(movieId);
+        try {
+          await db.from("click_logs").insert([
+            {
+              movie_id: movieId,
+              episode_index: null,
+              link: allLink,
+              title: m.title,
+            },
+          ]);
+        } catch (err) {
+          console.error("click log error (all episodes):", err);
+        }
+        if (allLink && allLink !== "#") {
+          window.open(allLink, "_blank");
         }
       });
 
@@ -6894,6 +6940,11 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="field-label">${uiText("genre")}: </span><div class="field-quote genre-grid">${renderChips(data.genre || "-", "genre")}</div>
           <div class="episodes-container" data-movie-id="${data.id}"><div class="episodes-list"></div></div>
           <div class="button-wrap"><button class="go-btn" data-link="${escapeHtml(data.link || "#")}"><span>${uiText("goToFile")}</span></button><div class="button-shadow"></div></div>
+          ${
+            data.type === "collection" || data.type === "serial"
+              ? `<div class="button-wrap get-all-episodes-wrap"><button class="get-all-btn" data-movie-id="${escapeHtml(data.id)}"><span>${uiText("getAllEpisodes")}</span></button><div class="button-shadow"></div></div>`
+              : ""
+          }
           <div class="button-wrap"><button class="close-btn"><span>${uiText("close")}</span></button><div class="button-shadow"></div></div>
         </div>
       </div>`;
@@ -6945,6 +6996,16 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
     bindGoBtn();
+
+    function bindGetAllBtn() {
+      const btn = content.querySelector(".get-all-btn");
+      if (btn)
+        btn.onclick = () => {
+          const allLink = buildAllEpisodesBotUrl(btn.dataset.movieId || m.id);
+          if (allLink && allLink !== "#") window.open(allLink, "_blank");
+        };
+    }
+    bindGetAllBtn();
     initModalSynopsisToggle(content);
 
     if (m.type === "collection" || m.type === "serial") {
@@ -11031,18 +11092,33 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 })();
 
-(function initAnimatedGoFileButtons() {
-  const labels = {
-    en: { idle: "Go to file", loading: "Receiving", done: "Received" },
-    fa: { idle: "Go to file", loading: "در حال دریافت", done: "دریافت شد" },
+(function initActionButtons() {
+  const labelSets = {
+    file: {
+      en: { idle: "Go to file", loading: "Receiving", done: "Received" },
+      fa: { idle: "Go to file", loading: "در حال دریافت", done: "دریافت شد" },
+    },
+    allEpisodes: {
+      en: { idle: "Get all episodes", loading: "Receiving", done: "Received" },
+      fa: {
+        idle: "دریافت همه اپیزودها",
+        loading: "در حال دریافت",
+        done: "دریافت شد",
+      },
+    },
   };
 
   function lang() {
     return localStorage.getItem("siteLanguage") === "fa" ? "fa" : "en";
   }
 
-  function text(key) {
-    return (labels[lang()] || labels.en)[key] || labels.en[key];
+  function variantOf(btn) {
+    return btn?.classList.contains("get-all-btn") ? "allEpisodes" : "file";
+  }
+
+  function text(btn, key) {
+    const set = labelSets[variantOf(btn)] || labelSets.file;
+    return (set[lang()] || set.en)[key] || set.en[key];
   }
 
   function syncGoFileThemeVars() {
@@ -11051,25 +11127,23 @@ document.addEventListener("DOMContentLoaded", () => {
     if (selectedTheme === "blue") {
       rootStyle.setProperty("--go-file-bg", "#3b82f6");
       rootStyle.setProperty("--go-file-bg-hover", "#60a5fa");
-      rootStyle.setProperty("--go-file-shadow-rgb", "59, 130, 246");
       return;
     }
     rootStyle.setProperty("--go-file-bg", "var(--theme-accent)");
     rootStyle.setProperty("--go-file-bg-hover", "var(--theme-accent-light)");
-    rootStyle.setProperty("--go-file-shadow-rgb", "var(--theme-accent-rgb)");
   }
 
   function markup(label) {
     return `
-      <span class="download-button-inner">
+      <span class="fc-btn-inner">
         <span class="svg-container" aria-hidden="true">
-          <svg class="download-icon" width="18" height="22" viewBox="0 0 18 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path class="download-arrow" d="M13 9L9 13M9 13L5 9M9 13V1" stroke="#F2F2F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M1 17V18C1 18.7956 1.31607 19.5587 1.87868 20.1213C2.44129 20.6839 3.20435 21 4 21H14C14.7956 21 15.5587 20.6839 16.1213 20.1213C16.6839 19.5587 17 18.7956 17 18V17" stroke="#F2F2F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg class="download-icon" width="18" height="18" viewBox="0 0 18 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="download-arrow" d="M13 9L9 13M9 13L5 9M9 13V1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1 17V18C1 18.7956 1.31607 19.5587 1.87868 20.1213C2.44129 20.6839 3.20435 21 4 21H14C14.7956 21 15.5587 20.6839 16.1213 20.1213C16.6839 19.5587 17 18.7956 17 18V17" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <span class="download-loader hidden"></span>
-          <svg class="check-svg hidden" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20ZM15.1071 7.9071C15.4976 7.51658 15.4976 6.88341 15.1071 6.49289C14.7165 6.10237 14.0834 6.10237 13.6929 6.49289L8.68568 11.5001L7.10707 9.92146C6.71655 9.53094 6.08338 9.53094 5.69286 9.92146C5.30233 10.312 5.30233 10.9452 5.69286 11.3357L7.97857 13.6214C8.3691 14.0119 9.00226 14.0119 9.39279 13.6214L15.1071 7.9071Z" fill="white"/>
+          <svg class="check-svg hidden" width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20ZM15.1071 7.9071C15.4976 7.51658 15.4976 6.88341 15.1071 6.49289C14.7165 6.10237 14.0834 6.10237 13.6929 6.49289L8.68568 11.5001L7.10707 9.92146C6.71655 9.53094 6.08338 9.53094 5.69286 9.92146C5.30233 10.312 5.30233 10.9452 5.69286 11.3357L7.97857 13.6214C8.3691 14.0119 9.00226 14.0119 9.39279 13.6214L15.1071 7.9071Z" fill="#fff"/>
           </svg>
         </span>
         <span class="button-copy">${label}</span>
@@ -11084,29 +11158,54 @@ document.addEventListener("DOMContentLoaded", () => {
     icon?.classList.toggle("hidden", state !== "idle");
     loader?.classList.toggle("hidden", state !== "loading");
     check?.classList.toggle("hidden", state !== "done");
-    if (copy) copy.textContent = text(state === "done" ? "done" : state === "loading" ? "loading" : "idle");
+    if (copy) copy.textContent = text(btn, state);
+  }
+
+  // پیدا کردن المان‌های مطابق selector، حتی اگر خودِ root با selector تطابق داشته باشد
+  // (در پیاده‌سازی قبلی این حالت در نظر گرفته نشده بود و باعث می‌شد بعضی دکمه‌ها enhance نشوند)
+  function collect(root, selector) {
+    if (!root || root.nodeType !== 1) return [];
+    const list = root.matches?.(selector) ? [root] : [];
+    if (root.querySelectorAll) list.push(...root.querySelectorAll(selector));
+    return list;
   }
 
   function enhance(root = document) {
     syncGoFileThemeVars();
-    root.querySelectorAll(".go-btn").forEach((btn) => {
-      if (btn.dataset.goFileEnhanced === "1") return;
-      btn.dataset.goFileEnhanced = "1";
-      btn.classList.add("go-file-button", "download-button");
-      btn.closest(".button-wrap")?.classList.add("go-file-wrap");
-      btn.innerHTML = markup(text("idle"));
-      btn.querySelector(".download-loader")?.addEventListener("animationend", () => {
-        setState(btn, "done");
-      });
+
+    // دکمه‌های پویا: دریافت فایل / دریافت همه اپیزودها (آیکن + اسپینر + تیک)
+    collect(root, ".go-btn, .get-all-btn").forEach((btn) => {
+      if (btn.dataset.fcEnhanced === "1") return;
+      btn.dataset.fcEnhanced = "1";
+      btn.classList.add("fc-action-btn");
+      btn.closest(".button-wrap")?.classList.add("fc-action-wrap");
+      btn.innerHTML = markup(text(btn, "idle"));
+    });
+
+    // دکمه‌ی ایستا: صفحه فیلم — فقط همان پوسته‌ی رنگی، بدون انیمیشن/تعویض متن
+    collect(root, ".go-page-btn").forEach((btn) => {
+      if (btn.dataset.fcEnhanced === "1") return;
+      btn.dataset.fcEnhanced = "1";
+      btn.classList.add("fc-action-btn");
+      btn.closest(".button-wrap")?.classList.add("fc-action-wrap");
     });
   }
 
-  document.addEventListener("click", (event) => {
-    const btn = event.target.closest(".go-btn.go-file-button");
-    if (!btn || btn.dataset.goFileClicked === "1") return;
-    btn.dataset.goFileClicked = "1";
-    setState(btn, "loading");
-  }, true);
+  // کلیک روی دکمه‌های پویا → حالت "در حال دریافت" سپس بعد از یک تاخیر کوتاه "دریافت شد"
+  // (به‌جای تکیه بر animationend که در پیاده‌سازی قبلی منبع باگ بود)
+  document.addEventListener(
+    "click",
+    (event) => {
+      const btn = event.target.closest(
+        ".go-btn.fc-action-btn, .get-all-btn.fc-action-btn",
+      );
+      if (!btn || btn.dataset.fcClicked === "1") return;
+      btn.dataset.fcClicked = "1";
+      setState(btn, "loading");
+      setTimeout(() => setState(btn, "done"), 1400);
+    },
+    true,
+  );
 
   document.addEventListener("DOMContentLoaded", () => enhance());
   window.addEventListener("storage", syncGoFileThemeVars);
@@ -11117,7 +11216,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   });
-  if (document.documentElement) observer.observe(document.documentElement, { childList: true, subtree: true });
-  window.FilmChiinEnhanceGoFileButtons = enhance;
+  if (document.documentElement)
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+    });
+  window.FilmChiinEnhanceActionButtons = enhance;
   window.FilmChiinSyncGoFileThemeVars = syncGoFileThemeVars;
 })();
