@@ -1,9 +1,9 @@
 // ==================== genre.js ====================
 // صفحه اختصاصی نمایش فیلم‌ها بر اساس ژانر
 
-const SUPABASE_URL = "https://etevwqbiynardwsezasn.supabase.co";
+const SUPABASE_URL = "https://gwsmvcgjdodmkoqupdal.supabase.co";
 const SUPABASE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0ZXZ3cWJpeW5hcmR3c2V6YXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NjI0MzMsImV4cCI6MjA5NzEzODQzM30.1yPLfjydENjHacsI3PXLvekF7kIIWZDtaTARyDt5tUw";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
 
 if (!window._supabaseClient) {
   window._supabaseClient = window.supabase.createClient(

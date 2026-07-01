@@ -1846,9 +1846,9 @@
     const el = document.getElementById("appVersion");
     if (!el) return;
     // اگر مقدار پیش‌فرض placeholder است لود کن
-    const SUPABASE_URL = "https://etevwqbiynardwsezasn.supabase.co";
-    const SUPABASE_KEY =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0ZXZ3cWJpeW5hcmR3c2V6YXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NjI0MzMsImV4cCI6MjA5NzEzODQzM30.1yPLfjydENjHacsI3PXLvekF7kIIWZDtaTARyDt5tUw";
+    const SUPABASE_URL = "https://gwsmvcgjdodmkoqupdal.supabase.co";
+const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
     try {
       if (!window.supabase?.createClient) return;
       const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -1889,8 +1889,8 @@
 // ===== PATCH: Live search dropdown on movie/actor pages =====
 (function initSharedSearchDropdown() {
   const SUPABASE_URL = "https://gwsmvcgjdodmkoqupdal.supabase.co";
-  const SUPABASE_KEY =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0ZXZ3cWJpeW5hcmR3c2V6YXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NjI0MzMsImV4cCI6MjA5NzEzODQzM30.1yPLfjydENjHacsI3PXLvekF7kIIWZDtaTARyDt5tUw";
+const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
 
   let moviesCache = null;
   let episodesCacheMap = new Map();
