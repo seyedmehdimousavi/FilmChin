@@ -1967,6 +1967,7 @@ document.addEventListener("DOMContentLoaded", () => {
       supportUs: "Support us",
       copyAddress: "Copy",
       copiedAddress: "Copied ✓",
+      openInTonkeeper: "Open in Tonkeeper",
       siteFeaturesButton: "Site features",
       siteFeaturesTitle: "FilmChiin site features",
       genreHubTitle: "Genres",
@@ -2064,6 +2065,9 @@ document.addEventListener("DOMContentLoaded", () => {
       featureTitle18: "Get all episodes",
       featureDesc18:
         "For collections and series, tapping the 'Get all episodes' button sends every episode of that title one after another via the @Filmchinbot Telegram bot, so you don't have to fetch each episode one by one.",
+      featureTitle19: "Direct Tonkeeper wallet connection",
+      featureDesc19:
+        "In the 'Support us' section, TON wallet addresses show an 'Open in Tonkeeper' button. Tapping it opens the Tonkeeper app directly on the transfer screen with the destination address already filled in, so you can send TON in a couple of taps.",
       similarByActorsTitle: "Other movies with similar cast",
       bySameDirectorTitle: "Other movies by this director",
       noSimilarActors: "No similar-cast movies found.",
@@ -2158,6 +2162,7 @@ document.addEventListener("DOMContentLoaded", () => {
       supportUs: "حمایت از ما",
       copyAddress: "کپی",
       copiedAddress: "کپی شد ✓",
+      openInTonkeeper: "باز کردن در تون‌کیپر",
       siteFeaturesButton: "لیست امکانات سایت",
       siteFeaturesTitle: "لیست امکانات سایت FilmChiin",
       genreHubTitle: "ژانر ها",
@@ -2256,6 +2261,9 @@ document.addEventListener("DOMContentLoaded", () => {
       featureTitle18: "دریافت همه اپیزودها",
       featureDesc18:
         "برای کالکشن‌ها و سریال‌ها، با زدن دکمه «دریافت همه اپیزودها» تمام قسمت‌های آن مجموعه پشت‌سرهم از طریق ربات @Filmchinbot برای شما ارسال می‌شود؛ بدون نیاز به دریافت تک‌تک قسمت‌ها.",
+      featureTitle19: "اتصال مستقیم به کیف‌پول تون‌کیپر",
+      featureDesc19:
+        "در بخش «حمایت از ما»، روبه‌روی آدرس کیف‌پول‌های TON یک دکمه «باز کردن در تون‌کیپر» نمایش داده می‌شود. با لمس آن، اپلیکیشن Tonkeeper مستقیماً روی صفحه‌ی انتقال باز می‌شود و آدرس مقصد از پیش در آن پر شده است تا با چند ضربه بتوانید توکن TON ارسال کنید.",
       similarByActorsTitle: "فیلم‌های دیگر با بازیگران مشابه",
       bySameDirectorTitle: "فیلم‌های دیگر این کارگردان",
       noSimilarActors: "فیلم مشابه بر اساس بازیگران پیدا نشد.",
@@ -6573,6 +6581,13 @@ document.addEventListener("DOMContentLoaded", () => {
     resetAutoSlide();
   }
 
+  // تشخیص اینکه آیا کیف‌پول از نوع TON است (برای نمایش دکمه «باز کردن در تون‌کیپر»)
+  function isTonWalletAddress(name, address) {
+    const n = (name || "").toLowerCase();
+    if (n.includes("ton")) return true;
+    return /^(EQ|UQ|kQ|0Q)[A-Za-z0-9_-]{46}$/.test((address || "").trim());
+  }
+
   async function initSupportSheet() {
     const chip = document.getElementById("supportChip");
     const sheet = document.getElementById("supportSheet");
@@ -6621,6 +6636,14 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="support-wallet-addr">${escapeHtml(w.address || "")}</span>
           <button class="support-copy-btn" type="button" aria-label="copy">${uiText("copyAddress")}</button>
         </div>
+        ${
+          isTonWalletAddress(w.name, w.address)
+            ? `<a class="support-wallet-open-btn" href="https://app.tonkeeper.com/transfer/${encodeURIComponent(w.address || "")}" target="_blank" rel="noopener noreferrer">
+                <i class="bi bi-wallet2" aria-hidden="true"></i>
+                <span>${uiText("openInTonkeeper")}</span>
+              </a>`
+            : ""
+        }
       `;
 
         bubble
@@ -6628,6 +6651,12 @@ document.addEventListener("DOMContentLoaded", () => {
           ?.addEventListener("click", (e) => {
             e.stopPropagation();
             copyFn();
+          });
+
+        bubble
+          .querySelector(".support-wallet-open-btn")
+          ?.addEventListener("click", (e) => {
+            e.stopPropagation();
           });
 
         listEl.appendChild(bubble);

@@ -7684,6 +7684,38 @@ body.dark .support-copy-btn {
   background: rgba(var(--theme-accent-rgb), 0.22);
   color: var(--theme-accent-light, #a0c4ff);
 }
+/* دکمه «باز کردن در تون‌کیپر» */
+.support-wallet-open-btn {
+  all: unset;
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--btn-day);
+  color: #fff;
+  border-radius: 12px;
+  padding: 9px 14px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 100ms ease,
+    opacity 140ms ease;
+}
+body.dark .support-wallet-open-btn {
+  background: var(--btn-night);
+}
+.support-wallet-open-btn:active {
+  transform: scale(0.97);
+  opacity: 0.88;
+}
+.support-wallet-open-btn i {
+  font-size: 0.9rem;
+}
 .toggle-row span i,
 .theme-palette-title i {
   margin-inline-end: 6px;
@@ -8121,6 +8153,9 @@ body.dark #profileMenu.profile-menu {
 }
 .support-copy-btn {
   box-shadow: 0 8px 18px rgba(var(--theme-accent-rgb), 0.18);
+}
+.support-wallet-open-btn {
+  box-shadow: 0 8px 18px rgba(var(--theme-accent-rgb), 0.22);
 }
 .support-copy-btn::after,
 .support-copy-btn span::after {
