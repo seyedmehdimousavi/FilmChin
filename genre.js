@@ -107,10 +107,28 @@ const PAGE_SIZE = 12;
 let allGenreMovies = [];
 let shownCount = 0;
 
+// کاهش حجم تصاویر کاور با wsrv.nl (resize + webp)
+function optimizeCoverUrl(url, width = 300, quality = 75) {
+  if (!url || typeof url !== "string") return url;
+  if (
+    url.startsWith("data:") ||
+    url.startsWith("/") ||
+    url.includes("via.placeholder.com") ||
+    url.includes("wsrv.nl")
+  ) {
+    return url;
+  }
+  try {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=${width}&output=webp&q=${quality}`;
+  } catch {
+    return url;
+  }
+}
+
 // ===== Render movie cards =====
 function renderMovieCard(movie) {
   const cover = escapeHtml(
-    movie.cover || "https://via.placeholder.com/200x300?text=No+Image",
+    optimizeCoverUrl(movie.cover, 300) || "https://via.placeholder.com/200x300?text=No+Image",
   );
   const title = escapeHtml(movie.title || "-");
   const href = buildMoviePageHref(movie.title || "");

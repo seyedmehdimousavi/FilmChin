@@ -3,6 +3,24 @@ const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// کاهش حجم تصاویر کاور با wsrv.nl (resize + webp) - فایل اصلی روی Supabase دست نمی‌خوره
+function optimizeCoverUrl(url, width = 400, quality = 75) {
+  if (!url || typeof url !== "string") return url;
+  if (
+    url.startsWith("data:") ||
+    url.startsWith("/") ||
+    url.includes("via.placeholder.com") ||
+    url.includes("wsrv.nl")
+  ) {
+    return url;
+  }
+  try {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=${width}&output=webp&q=${quality}`;
+  } catch {
+    return url;
+  }
+}
 window._supabaseClient = db;
 window.SUPABASE_URL = SUPABASE_URL;
 window.SUPABASE_KEY = SUPABASE_KEY;
@@ -394,7 +412,7 @@ function applyMovieHeroBackground(coverUrl) {
     body.style.removeProperty("--movie-hero-url");
     return;
   }
-  body.style.setProperty("--movie-hero-url", `url("${coverUrl}")`);
+  body.style.setProperty("--movie-hero-url", `url("${optimizeCoverUrl(coverUrl, 800, 70)}")`);
 }
 
 function extractHashtagTokens(str) {
@@ -1093,7 +1111,7 @@ function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
     .map((m) => {
       const title = escapeHtml(m.title || "-");
       const cover = escapeHtml(
-        m.cover || "https://via.placeholder.com/300x200?text=No+Cover",
+        optimizeCoverUrl(m.cover, 300) || "https://via.placeholder.com/300x200?text=No+Cover",
       );
       const url = buildMoviePageHref(m.title || "");
       return `
@@ -1150,7 +1168,7 @@ function renderSimilarMovies(container, similarMovies, titleKey, emptyKey) {
 
 function renderMovieCard(container, movie, allMovies, episodes = []) {
   const cover = escapeHtml(
-    movie.cover || "https://via.placeholder.com/300x200?text=No+Image",
+    optimizeCoverUrl(movie.cover, 500) || "https://via.placeholder.com/300x200?text=No+Image",
   );
   const title = escapeHtml(movie.title || "-");
   const synopsis = makeSynopsisHtml(movie.synopsis || "-");
@@ -1164,7 +1182,7 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
     .map((ep, idx) => {
       const epTitle = escapeHtml(ep.title || `Episode ${idx + 1}`);
       const epCover = escapeHtml(
-        ep.cover || "https://via.placeholder.com/120x80?text=No+Cover",
+        optimizeCoverUrl(ep.cover, 150) || "https://via.placeholder.com/120x80?text=No+Cover",
       );
       const scrollable = epTitle.length > 16 ? "scrollable" : "";
       return `<div class="episode-card ${idx === 0 ? "active" : ""}" data-link="${escapeHtml(ep.link || "#")}" data-title="${epTitle}"><img src="${epCover}" alt="${epTitle}" class="episode-cover"><span class="episode-title ${scrollable}"><span>${epTitle}</span></span></div>`;
@@ -1267,9 +1285,9 @@ function renderMovieCard(container, movie, allMovies, episodes = []) {
             ep.genre || movie.genre || "-",
             "genre",
           );
-        if (coverImgEl) coverImgEl.src = ep.cover || movie.cover || "";
+        if (coverImgEl) coverImgEl.src = optimizeCoverUrl(ep.cover || movie.cover || "", 500);
         if (coverBlurEl)
-          coverBlurEl.style.backgroundImage = `url('${ep.cover || movie.cover || ""}')`;
+          coverBlurEl.style.backgroundImage = `url('${optimizeCoverUrl(ep.cover || movie.cover || "", 500)}')`;
       } else if (movie.type === "serial") {
         if (movieNameEl) movieNameEl.textContent = ep.title || movie.title;
       }
@@ -1722,7 +1740,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     ? "serial-border"
                     : "";
               return `<div class="search-dropdown-item ${borderClass}" data-href="${href}">
-              <img src="${m.cover || ""}" alt="" class="search-dropdown-cover" />
+              <img src="${optimizeCoverUrl(m.cover, 100) || ""}" alt="" class="search-dropdown-cover" />
               <span class="search-dropdown-title">${m.title || ""}</span>
               <button class="search-dropdown-open-btn" data-href="${href}">${openLabel}</button>
             </div>`;

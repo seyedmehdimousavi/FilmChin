@@ -1,6 +1,27 @@
 // -------------------- Scroll position restoration --------------------
 // از bfcache مرورگر استفاده می‌کنیم تا صفحه عیناً همان‌طور که بود برگردد
 // بدون لود مجدد - دقیقاً مانند تمام سایت‌های استاندارد
+
+// کاهش حجم تصاویر کاور با استفاده از سرویس رایگان wsrv.nl (resize + تبدیل به webp)
+// این کار حجم دانلود اینترنت کاربر رو به شدت کم می‌کنه، بدون اینکه چیزی روی
+// خود Supabase Storage تغییر کنه (فایل اصلی دست نمی‌خوره).
+function optimizeCoverUrl(url, width = 400, quality = 75) {
+  if (!url || typeof url !== "string") return url;
+  if (
+    url.startsWith("data:") ||
+    url.startsWith("/") ||
+    url.includes("via.placeholder.com") ||
+    url.includes("wsrv.nl")
+  ) {
+    return url;
+  }
+  try {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=${width}&output=webp&q=${quality}`;
+  } catch {
+    return url;
+  }
+}
+
 (function setupScrollRestoration() {
   // "auto" به مرورگر اجازه می‌دهد از bfcache برای برگشت سریع استفاده کند
   if ("scrollRestoration" in history) {
@@ -3049,7 +3070,7 @@ document.addEventListener("DOMContentLoaded", () => {
     comingSoonGrid.innerHTML = slice
       .map((movie) => {
         const cover = escapeHtml(
-          movie.cover || "https://via.placeholder.com/300x200?text=Coming+Soon",
+          optimizeCoverUrl(movie.cover, 300) || "https://via.placeholder.com/300x200?text=Coming+Soon",
         );
         const title = escapeHtml(movie.title || getComingSoonMessage(false));
         return `
@@ -3210,11 +3231,8 @@ document.addEventListener("DOMContentLoaded", () => {
     favoritesGrid.innerHTML = slice
       .map(({ movie }) => {
         const cover = escapeHtml(
-          movie.cover || "https://via.placeholder.com/300x200?text=No+Image",
+          optimizeCoverUrl(movie.cover, 300) || "https://via.placeholder.com/300x200?text=No+Image",
         );
-        const title = escapeHtml(movie.title || movie.name || "-");
-        const imdb = escapeHtml(movie.imdb || "");
-        const release = escapeHtml(movie.release_info || "");
 
         return `
           <div class="favorite-item">
@@ -5162,7 +5180,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     for (const m of pageItems) {
       const cover = escapeHtml(
-        m.cover || "https://via.placeholder.com/300x200?text=No+Image",
+        optimizeCoverUrl(m.cover) || "https://via.placeholder.com/300x200?text=No+Image",
       );
       const title = escapeHtml(m.title || "-");
       const synopsis = makeSynopsisHtml(m.synopsis || "-");
@@ -10982,8 +11000,8 @@ document.addEventListener("DOMContentLoaded", () => {
               : "";
         const coverHtml =
           m.type === "collection"
-            ? `<div class="search-dropdown-cover-wrap" data-mid="${m.id}"><img src="${escapeHtml(m.cover || "")}" alt="" style="opacity:1;" /></div>`
-            : `<img src="${escapeHtml(m.cover || "")}" alt="" class="search-dropdown-cover" />`;
+            ? `<div class="search-dropdown-cover-wrap" data-mid="${m.id}"><img src="${escapeHtml(optimizeCoverUrl(m.cover, 100) || "")}" alt="" style="opacity:1;" /></div>`
+            : `<img src="${escapeHtml(optimizeCoverUrl(m.cover, 100) || "")}" alt="" class="search-dropdown-cover" />`;
         return `<div class="search-dropdown-item ${borderClass}" data-href="${escapeHtml(href)}" data-mid="${m.id}">
         ${coverHtml}
         <span class="search-dropdown-title">${escapeHtml(m.title || "")}</span>

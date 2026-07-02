@@ -1,4 +1,22 @@
 (function () {
+  // کاهش حجم تصاویر کاور با wsrv.nl (resize + webp)
+  function optimizeCoverUrl(url, width = 100, quality = 75) {
+    if (!url || typeof url !== "string") return url;
+    if (
+      url.startsWith("data:") ||
+      url.startsWith("/") ||
+      url.includes("via.placeholder.com") ||
+      url.includes("wsrv.nl")
+    ) {
+      return url;
+    }
+    try {
+      return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=${width}&output=webp&q=${quality}`;
+    } catch {
+      return url;
+    }
+  }
+
   const featureI18n = {
     en: {
       siteFeaturesTitle: "FilmChiin site features",
@@ -2015,8 +2033,8 @@ const SUPABASE_KEY =
               : "";
         const coverHtml =
           m.type === "collection"
-            ? `<div class="search-dropdown-cover-wrap" data-movie-id="${m.id}"><img src="${m.cover || ""}" alt="${m.title || ""}" class="search-dropdown-cover" /></div>`
-            : `<img src="${m.cover || ""}" alt="${m.title || ""}" class="search-dropdown-cover" />`;
+            ? `<div class="search-dropdown-cover-wrap" data-movie-id="${m.id}"><img src="${optimizeCoverUrl(m.cover) || ""}" alt="${m.title || ""}" class="search-dropdown-cover" /></div>`
+            : `<img src="${optimizeCoverUrl(m.cover) || ""}" alt="${m.title || ""}" class="search-dropdown-cover" />`;
         return `<div class="search-dropdown-item ${borderClass}" data-href="${href}" data-movie-id="${m.id}" data-type="${m.type || "single"}">
         ${coverHtml}
         <span class="search-dropdown-title">${m.title || ""}</span>

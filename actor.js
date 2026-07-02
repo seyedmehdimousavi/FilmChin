@@ -2,6 +2,24 @@ const SUPABASE_URL = "https://gwsmvcgjdodmkoqupdal.supabase.co";
 const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3c212Y2dqZG9kbWtvcXVwZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NDczNjEsImV4cCI6MjA3MjEyMzM2MX0.OVXO9CdHtrCiLhpfbuaZ8GVDIrUlA8RdyQwz2Bk2cDY";
 
+// کاهش حجم تصاویر کاور با wsrv.nl (resize + webp)
+function optimizeCoverUrl(url, width = 400, quality = 75) {
+  if (!url || typeof url !== "string") return url;
+  if (
+    url.startsWith("data:") ||
+    url.startsWith("/") ||
+    url.includes("via.placeholder.com") ||
+    url.includes("wsrv.nl")
+  ) {
+    return url;
+  }
+  try {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=${width}&output=webp&q=${quality}`;
+  } catch {
+    return url;
+  }
+}
+
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 window._supabaseClient = db;
 window.SUPABASE_URL = SUPABASE_URL;
@@ -200,7 +218,7 @@ function renderActorPosts(posts, episodesMap = new Map()) {
   container.innerHTML = posts
     .map((m) => {
       const cover = escapeHtml(
-        m.cover || "https://via.placeholder.com/120x80?text=No+Cover",
+        optimizeCoverUrl(m.cover, 400) || "https://via.placeholder.com/120x80?text=No+Cover",
       );
       const title = escapeHtml(m.title || "-");
       const synopsis = escapeHtml(m.synopsis || "-");
@@ -230,8 +248,7 @@ function renderActorPosts(posts, episodesMap = new Map()) {
                       ep.title || `Episode ${idx + 1}`,
                     );
                     const epCover = escapeHtml(
-                      ep.cover ||
-                        m.cover ||
+                      optimizeCoverUrl(ep.cover || m.cover, 150) ||
                         "https://via.placeholder.com/120x80?text=No+Cover",
                     );
                     const scrollable = epTitle.length > 16 ? "scrollable" : "";
@@ -531,7 +548,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     ? "serial-border"
                     : "";
               return `<div class="search-dropdown-item ${borderClass}" data-href="${href}">
-              <img src="${m.cover || ""}" alt="" class="search-dropdown-cover" />
+              <img src="${optimizeCoverUrl(m.cover, 100) || ""}" alt="" class="search-dropdown-cover" />
               <span class="search-dropdown-title">${m.title || ""}</span>
               <button class="search-dropdown-open-btn" data-href="${href}">${openLabel}</button>
             </div>`;
